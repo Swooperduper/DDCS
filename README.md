@@ -1,6 +1,12 @@
-# firstdata-ts-testapp
-a fully filled out backend for typescript on nodeJS express and uses overnightJS to handle routing to the controllers<br>
-(it adds TypeScript decorators to express), it also handles logging when needed
+# DDCS 3.0
+## Dynamic DCS System for Controlling DCS Servers
+The Dynamic DCS engine is built on externally written software from the ground up to offload all the process's from the DCS server to allow for unique game play using nodeJS and mongoDB for asynchronous processing and decision making.
+The server then, syncs to it through lua sockets and it compiles commands to send back, essentially freeing up massive amounts of overhead for the server to do what it needs to do.<br>
+
+The full system is compiled of:<br>
+DCS (Game Server) <-> dynamicdcs.com (nodeJS) <-> Discord (API) or SRS (JSON file)
+
+The main goal of this server is to create a place to fly where it feels like a real war, things happen that you cant predict like a real war.
 
 ## Commands:
 (Some of these commands require `npm install` to have been run beforehand)
