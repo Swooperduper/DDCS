@@ -1,31 +1,31 @@
-import FirstDataServer from './server';
-import { Logger } from '@overnightjs/logger';
+import DDCSServer from "./server";
+import { Logger } from "@overnightjs/logger";
 
 // Start the server or run tests
-if (process.env.NODE_ENV !== 'testing') {
+if (process.env.NODE_ENV !== "testing") {
 
-    let server = new FirstDataServer();
-    server.start(process.env.NODE_ENV === 'development' ? 3000 : 8000);
+    let server = new DDCSServer();
+    server.start(process.env.NODE_ENV === "development" ? 3000 : 8000);
 
 } else {
 
-    const Jasmine = require('jasmine');
+    const Jasmine = require("jasmine");
     const jasmine = new Jasmine();
 
     jasmine.loadConfig({
-        "spec_dir": "src",
-        "spec_files": [
+        spec_dir: "src",
+        spec_files: [
             "./controllers/**/*.test.ts"
         ],
-        "stopSpecOnExpectationFailure": false,
-        "random": true
+        stopSpecOnExpectationFailure: false,
+        random: true
     });
 
     jasmine.onComplete((passed: boolean) => {
         if (passed) {
-            Logger.Info('All tests have passed :)');
+            Logger.Info("All tests have passed :)");
         } else {
-            Logger.Err('At least one test has failed :(');
+            Logger.Err("At least one test has failed :(");
         }
     });
 

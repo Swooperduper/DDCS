@@ -1,11 +1,11 @@
-import * as bodyParser from 'body-parser';
-import * as controllers from './controllers';
-import { Server } from '@overnightjs/core';
-import { Logger } from '@overnightjs/logger';
+import * as bodyParser from "body-parser";
+import * as controllers from "./controllers";
+import { Server } from "@overnightjs/core";
+import { Logger } from "@overnightjs/logger";
 
-class FirstDataServer extends Server {
+class DDCSServer extends Server {
 
-    private readonly SERVER_START_MSG = 'FirstData server started on port: ';
+    private readonly SERVER_START_MSG = "DDCS server started on port: ";
 
     constructor() {
         super(true);
@@ -19,8 +19,8 @@ class FirstDataServer extends Server {
         const ctlrInstances = [];
         for (const name in controllers) {
             if (controllers.hasOwnProperty(name)) {
-                let Controller = (controllers as any)[name];
-                ctlrInstances.push(new Controller());
+                const controller = (controllers as any)[name];
+                ctlrInstances.push(new controller());
             }
         }
         super.addControllers(ctlrInstances);
@@ -33,4 +33,4 @@ class FirstDataServer extends Server {
     }
 }
 
-export default FirstDataServer;
+export default DDCSServer;
