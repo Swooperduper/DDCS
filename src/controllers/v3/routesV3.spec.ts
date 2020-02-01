@@ -5,7 +5,7 @@ import {OK, BAD_REQUEST, NOT_FOUND} from "http-status-codes";
 import {SuperTest, Test} from "supertest";
 import {Logger} from "@overnightjs/logger";
 
-import TestServer from "../common/TestServer.test";
+import TestServer from "../common/TestServer.spec";
 import {V3Controller} from "./routesV3";
 
 

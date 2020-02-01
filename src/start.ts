@@ -4,7 +4,7 @@ import { Logger } from "@overnightjs/logger";
 // Start the server or run tests
 if (process.env.NODE_ENV !== "testing") {
 
-    let server = new DDCSServer();
+    const server = new DDCSServer();
     server.start(process.env.NODE_ENV === "development" ? 3000 : 8000);
 
 } else {
@@ -15,7 +15,7 @@ if (process.env.NODE_ENV !== "testing") {
     jasmine.loadConfig({
         spec_dir: "src",
         spec_files: [
-            "./controllers/**/*.test.ts"
+            "./controllers/**/*.spec.ts"
         ],
         stopSpecOnExpectationFailure: false,
         random: true

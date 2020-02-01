@@ -4,10 +4,10 @@
   "description": "backend nodeJS TypeScript development engine with full unit testing",
   "main": "src/start.ts",
   "scripts": {
-    "start": "cross-env NODE_ENV=production npm install --only=prod &&  node ./dist/start.js",
+    "start": "cross-env NODE_ENV=production npm install --only=prod && npm run build &&  node ./dist/start.js",
     "start-dev": "nodemon --config \"./util/nodemon.json\"/",
     "test": "cross-env NODE_ENV=testing ts-node ./src/start.ts",
-    "build": "rmdir /Q /S dist 2>nul && tsc --sourceMap false"
+    "build": "rimraf dist && tsc --sourceMap false"
   },
   "bugs": {
     "url": "https://github.com/afinegan/DDCS/issues"
@@ -29,7 +29,9 @@
     "@types/supertest": "^2.0.8",
     "cross-env": "^7.0.0",
     "jasmine": "^3.5.0",
+    "jest": "^25.1.0",
     "nodemon": "^2.0.2",
+    "rimraf": "^3.0.1",
     "supertest": "^4.0.2",
     "ts-node": "^8.5.4",
     "tsc": "^1.20150623.0",
