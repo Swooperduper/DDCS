@@ -1,1 +1,1 @@
-export * from "./v3/routesV3";
+export * from "./api/v3/routesV3";

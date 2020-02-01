@@ -1,11 +1,11 @@
 import * as supertest from "supertest";
 
-import {} from "jasmine";
+import {} from "jest";
 import {OK} from "http-status-codes";
 import {SuperTest, Test} from "supertest";
 import {Logger} from "@overnightjs/logger";
 
-import TestServer from "../common/TestServer";
+import TestServer from "../../common/TestServer";
 import {V3Controller} from "./routesV3";
 
 
