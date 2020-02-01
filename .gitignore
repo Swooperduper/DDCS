@@ -1,9 +1,8 @@
 *.iml
 .idea/
-**/build
+**/dist
+**/coverage
 **/src/**/*.js
 **/src/**/*.js.map
 **/node_modules/
 **/package-lock.json
-
-dist

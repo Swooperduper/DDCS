@@ -5,8 +5,8 @@
   "main": "src/start.ts",
   "scripts": {
     "start": "cross-env NODE_ENV=production npm install --only=prod && npm run build &&  node ./dist/start.js",
-    "start-dev": "nodemon --config \"./util/nodemon.json\"/",
-    "test": "cross-env NODE_ENV=testing ts-node ./src/start.ts",
+    "start:dev": "nodemon --config \"./util/nodemon.json\"/",
+    "test": "jest",
     "build": "rimraf dist && tsc --sourceMap false"
   },
   "bugs": {
@@ -24,15 +24,15 @@
   "devDependencies": {
     "@types/body-parser": "^1.17.1",
     "@types/express": "^4.17.2",
-    "@types/jasmine": "^3.5.2",
+    "@types/jest": "^25.1.1",
     "@types/node": "^12.12.17",
     "@types/supertest": "^2.0.8",
     "cross-env": "^7.0.0",
-    "jasmine": "^3.5.0",
     "jest": "^25.1.0",
     "nodemon": "^2.0.2",
     "rimraf": "^3.0.1",
     "supertest": "^4.0.2",
+    "ts-jest": "^25.1.0",
     "ts-node": "^8.5.4",
     "tsc": "^1.20150623.0",
     "tslib": "^1.10.0",
