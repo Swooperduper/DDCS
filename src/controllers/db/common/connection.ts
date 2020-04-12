@@ -3,7 +3,7 @@ import * as Mongoose from "mongoose";
 export let localConnection: Mongoose.Connection;
 export let remoteConnection: Mongoose.Connection;
 
-export const getDBconnections = (): void => {
+export async function getDBconnections() {
     if (!localConnection) {
         let connString = "mongodb://" + process.env.DB_LOCAL_HOST + ":27017/" + process.env.DB_LOCAL_DATABASE;
         if (!!process.env.DB_USER && !!process.env.DB_PASSWORD) {

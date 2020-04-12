@@ -8,7 +8,7 @@ import {IWebPush} from "../../../typings";
 
 const webPushTable = localConnection.model(process.env.SERVERNAME + "_webpush", webPushSchema);
 
-export async function unitActionGrabNextQue(obj: any): Promise<IWebPush[]> {
+export async function webPushActionGrabNextQue(obj: any): Promise<IWebPush[]> {
     return new Promise((resolve, reject) => {
         webPushTable.findOneAndRemove({serverName: process.env.SERVERNAME}, (err, wpush: any) => {
             if(err) {
@@ -19,7 +19,7 @@ export async function unitActionGrabNextQue(obj: any): Promise<IWebPush[]> {
     });
 }
 
-export async function unitActionSave(obj: any): Promise<IWebPush[]> {
+export async function webPushActionSave(obj: any): Promise<IWebPush[]> {
     return new Promise((resolve, reject) => {
         const webpush = new webPushTable(obj);
         webpush.save((err, wpush: any) => {
@@ -29,7 +29,7 @@ export async function unitActionSave(obj: any): Promise<IWebPush[]> {
     });
 }
 
-export async function unitActionDelete(obj: any): Promise<IWebPush[]> {
+export async function webPushActionDelete(obj: any): Promise<IWebPush[]> {
     return new Promise((resolve, reject) => {
         webPushTable.findByIdAndRemove(obj._id, (err, wpush: any) => {
             if (err) { reject(err); }
@@ -38,10 +38,10 @@ export async function unitActionDelete(obj: any): Promise<IWebPush[]> {
     });
 }
 
-export async function unitActionRemoveall(obj: any): Promise<any> {
+export async function webPushActionRemoveall(obj: any): Promise<any> {
     return webPushTable.deleteOne({});
 }
 
-export async function unitActionDropall(obj: any): Promise<any> {
+export async function webPushActionDropall(obj: any): Promise<any> {
     return webPushTable.collection.drop();
 }
