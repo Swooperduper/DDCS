@@ -4,27 +4,27 @@ import {ICampaigns} from "../../../typings";
 
 const campaignsTable = localConnection.model(process.env.SERVERNAME + "_campaigns", campaignsSchema);
 
-export const campaignsActionsRead = () => {
+export async function campaignsActionsRead() {
     return new Promise((resolve, reject) => {
         campaignsTable.find((err, campaigns) => {
             if (err) { reject(err); }
             resolve(campaigns);
         });
     });
-};
+}
 
-export const campaignsActionsReadLatest = () => {
+export async function campaignsActionsReadLatest() {
     return new Promise((resolve, reject) => {
         campaignsTable.findOne().sort({ field: "asc", createdAt: -1 }).limit(1).exec((err, campaigns) => {
             if (err) { reject(err); }
             resolve(campaigns);
         });
     });
-};
+}
 
-export const campaignsActionsUpdate = (obj: {
+export async function campaignsActionsUpdate(obj: {
     name: string
-}) => {
+}) {
     return new Promise((resolve, reject) => {
         campaignsTable.updateOne(
             {name: obj.name},
@@ -35,11 +35,11 @@ export const campaignsActionsUpdate = (obj: {
             }
         );
     });
-};
+}
 
-export const campaignsActionsSave = (obj: {
+export async function campaignsActionsSave(obj: {
     _id: string
-}) => {
+}) {
     return new Promise((resolve, reject) => {
         campaignsTable.find({_id: obj._id}, (err, campaignsObj) => {
             if (err) {reject(err); }
@@ -54,4 +54,4 @@ export const campaignsActionsSave = (obj: {
             }
         });
     });
-};
+}

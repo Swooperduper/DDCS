@@ -1,3 +1,7 @@
+/*
+ * DDCS Licensed under AGPL-3.0 by Andrew "Drex" Finegan https://github.com/afinegan/DynamicDCS
+ */
+
 import * as constants from "../../constants";
 import {localConnection} from "../common/connection";
 import {airfieldSchema} from "./schemas";
@@ -6,18 +10,16 @@ import {IBase} from "../../../typings";
 const airfieldTable = localConnection.model(process.env.SERVERNAME + "_airfield", airfieldSchema);
 const curTheater = constants.config.theater;
 
-export const baseActionRead = (obj: any): Promise<IBase[]> => {
+export async function baseActionRead(obj: any): Promise<IBase[]> {
     return new Promise( async (resolve, reject) => {
         await airfieldTable.find(obj, (err: any, dbairfields: Promise<IBase[]>) => {
             if (err) { reject(err); }
             resolve(dbairfields);
         });
     });
-};
+}
 
-export const baseActionUpdate = (obj: {
-    _id: string
-}): Promise<IBase[]> => {
+export async function baseActionUpdate(obj: {  _id: string }): Promise<IBase[]> {
     return new Promise((resolve, reject) => {
         airfieldTable.updateOne(
             {_id: obj._id},
@@ -28,11 +30,9 @@ export const baseActionUpdate = (obj: {
             }
         );
     });
-};
+}
 
-export const baseActionGetClosestBase = (obj: {
-    unitLonLatLoc: number[]
-}): Promise<IBase> => {
+export async function baseActionGetClosestBase(obj: { unitLonLatLoc: number[] }): Promise<any> {
     return new Promise((resolve, reject) => {
         airfieldTable.find(
             {
@@ -50,16 +50,16 @@ export const baseActionGetClosestBase = (obj: {
             },
             (err, dbairfields) => {
                 if (err) { reject(err); }
-                resolve(_.first(dbairfields));
+                resolve(dbairfields[0]);
             }
         );
     });
-};
+}
 
-export const baseActionGetClosestFriendlyBase = (obj: {
+export async function baseActionGetClosestFriendlyBase(obj: {
     playerSide: number,
     unitLonLatLoc: number[]
-}): Promise<IBase> => {
+}): Promise<any> {
     return new Promise((resolve, reject) => {
         airfieldTable.find(
             {
@@ -78,16 +78,16 @@ export const baseActionGetClosestFriendlyBase = (obj: {
             },
             (err, dbairfields) => {
                 if (err) { reject(err); }
-                resolve(_.first(dbairfields));
+                resolve(dbairfields[0]);
             }
         );
     });
-};
+}
 
-export const baseActionGetClosestEnemyBase = (obj: {
+export async function baseActionGetClosestEnemyBase(obj: {
     playerSide: number,
     unitLonLatLoc: number[]
-}): Promise<IBase> => {
+}): Promise<any> {
     return new Promise((resolve, reject) => {
         airfieldTable.find(
             {
@@ -106,13 +106,13 @@ export const baseActionGetClosestEnemyBase = (obj: {
             },
             (err, dbairfields) => {
                 if (err) { reject(err); }
-                resolve(_.first(dbairfields));
+                resolve(dbairfields[0]);
             }
         );
     });
-};
+}
 
-export const baseActionGetBaseSides = (serverName: string): Promise<IBase[]> => {
+export async function baseActionGetBaseSides(serverName: string): Promise<IBase[]> {
     return new Promise((resolve, reject) => {
         if (!curTheater) {
             constants.getServer(serverName)
@@ -143,12 +143,12 @@ export const baseActionGetBaseSides = (serverName: string): Promise<IBase[]> => 
             );
         }
     });
-};
+}
 
-export const baseActionUpdateSide = (obj: {
+export async function baseActionUpdateSide(obj: {
     name: string,
     side: number
-}): Promise<IBase[]> => {
+}): Promise<IBase[]> {
     return new Promise((resolve, reject) => {
         airfieldTable.updateMany(
             {_id: new RegExp(obj.name)},
@@ -159,12 +159,12 @@ export const baseActionUpdateSide = (obj: {
             }
         );
     });
-};
+}
 
-export const baseActionUpdateSpawnZones = (obj: {
+export async function baseActionUpdateSpawnZones(obj: {
     name: string,
     spawnZones: object
-}): Promise<IBase> => {
+}): Promise<IBase> {
     return new Promise((resolve, reject) => {
         airfieldTable.updateOne(
             {_id: obj.name},
@@ -175,12 +175,12 @@ export const baseActionUpdateSpawnZones = (obj: {
             }
         );
     });
-};
+}
 
-export const baseActionUpdateReplenTimer = (obj: {
+export async function baseActionUpdateReplenTimer(obj: {
     name: string,
     replenTime: number
-}): Promise<IBase> => {
+}): Promise<IBase> {
     return new Promise((resolve, reject) => {
         airfieldTable.updateOne(
             {_id: obj.name},
@@ -191,12 +191,12 @@ export const baseActionUpdateReplenTimer = (obj: {
             }
         );
     });
-};
+}
 
-export const baseActionSave = (obj: {
+export async function baseActionSave(obj: {
     _id: string,
     side: number
-}) => {
+}) {
     return new Promise((resolve, reject) => {
         airfieldTable.find({_id: obj._id}, (findErr, airfieldObj) => {
             if (findErr) { reject(findErr); }
@@ -218,4 +218,4 @@ export const baseActionSave = (obj: {
             }
         });
     });
-};
+}

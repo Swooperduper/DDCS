@@ -4,16 +4,16 @@ import {srvPlayerSchema} from "./schemas";
 
 const srvPlayerTable = localConnection.model(process.env.SERVERNAME + "_srvPlayer", srvPlayerSchema);
 
-export const srvPlayerActionsRead = (obj: ISrvPlayers) => {
+export async function srvPlayerActionsRead(obj: ISrvPlayers) {
     return new Promise((resolve, reject) => {
         srvPlayerTable.find(obj, (err, srvPlayer) => {
             if (err) { reject(err); }
             resolve(srvPlayer);
         });
     });
-};
+}
 
-export const srvPlayerActionsUpdate = (obj: ISrvPlayers) => {
+export async function srvPlayerActionsUpdate(obj: ISrvPlayers) {
     return new Promise((resolve, reject) => {
         srvPlayerTable.updateOne(
             {_id: obj._id},
@@ -24,9 +24,9 @@ export const srvPlayerActionsUpdate = (obj: ISrvPlayers) => {
             }
         );
     });
-};
+}
 
-export const srvPlayerActionsUnsetGicTimeLeft = (obj: ISrvPlayers) => {
+export async function srvPlayerActionsUnsetGicTimeLeft(obj: ISrvPlayers) {
     return new Promise((resolve, reject) => {
         srvPlayerTable.updateOne(
             {_id: obj._id},
@@ -37,19 +37,19 @@ export const srvPlayerActionsUnsetGicTimeLeft = (obj: ISrvPlayers) => {
             }
         );
     });
-};
+}
 
-export const srvPlayerActionsUpdateFromServer = (obj: {
+export async function srvPlayerActionsUpdateFromServer(obj: {
     _id: string,
     sessionName: string,
     side: number,
+    sideLockTime: number,
     curLifePoints?: number,
     currentSessionMinutesPlayed_blue?: number,
     currentSessionMinutesPlayed_red?: number,
     ipaddr?: string,
-    sideLockTime: number,
     sideLock?: number
-}) => {
+}) {
     return new Promise((resolve, reject) => {
         srvPlayerTable.find({_id: obj._id}, (err, serverObj: ISrvPlayers[]) => {
             if (err) { reject(err); }
@@ -68,7 +68,7 @@ export const srvPlayerActionsUpdateFromServer = (obj: {
                     resolve(serObj);
                 });
             } else {
-                const curPly = _.first(serverObj);
+                const curPly = serverObj[0];
                 if ((curPly.sessionName !== obj.sessionName) && curPly.sessionName && obj.sessionName) {
                     const curTime =  new Date().getTime();
                     obj.curLifePoints = constants.config.startLifePoints;
@@ -97,20 +97,20 @@ export const srvPlayerActionsUpdateFromServer = (obj: {
             }
         });
     });
-};
+}
 
-export const srvPlayerActionsAddLifePoints = (obj: {
+export async function srvPlayerActionsAddLifePoints(obj: {
     _id: string,
     groupId: number,
     addLifePoints?: number,
     execAction?: string
-}) => {
+}) {
     return new Promise((resolve, reject) => {
         srvPlayerTable.find({_id: obj._id}, (err: any, serverObj: ISrvPlayers[]) => {
             if (err) { reject(err); }
-            const addPoints: number = (obj.addLifePoints) ? obj.addLifePoints : _.first(serverObj).cachedRemovedLPPoints;
+            const addPoints: number = (obj.addLifePoints) ? obj.addLifePoints : serverObj[0].cachedRemovedLPPoints;
             const curAction: string = "addLifePoint";
-            const curPlayerLifePoints: number = _.first(serverObj).curLifePoints || 0;
+            const curPlayerLifePoints: number = serverObj[0].curLifePoints || 0;
             const curTotalPoints: number = (curPlayerLifePoints >= 0) ? curPlayerLifePoints + addPoints : addPoints;
             const maxLimitedPoints: number = (curTotalPoints > constants.maxLifePoints) ? constants.maxLifePoints : curTotalPoints;
             let msg;
@@ -144,21 +144,21 @@ export const srvPlayerActionsAddLifePoints = (obj: {
             }
         });
     });
-};
+}
 
 
-export const srvPlayerActionsRemoveLifePoints = (obj: {
+export async function srvPlayerActionsRemoveLifePoints(obj: {
     _id: string,
     groupId: number,
     removeLifePoints: number,
     execAction?: string,
     storePoints?: number
-}) => {
+}) {
     return new Promise((resolve, reject) => {
         srvPlayerTable.find({_id: obj._id}, (err: any, serverObj: ISrvPlayers[]) => {
             const removePoints = obj.removeLifePoints;
             const curAction = "removeLifePoints";
-            const curPlayerObj = _.first(serverObj);
+            const curPlayerObj = serverObj[0];
             const curPlayerLifePoints = curPlayerObj.curLifePoints || 0;
             const curTotalPoints = curPlayerLifePoints - removePoints;
             const maxLimitedPoints = (curTotalPoints > constants.maxLifePoints) ? constants.maxLifePoints : curTotalPoints;
@@ -195,12 +195,12 @@ export const srvPlayerActionsRemoveLifePoints = (obj: {
             }
         });
     });
-};
+}
 
-export const srvPlayerActionsClearTempScore = (obj: {
+export async function srvPlayerActionsClearTempScore(obj: {
     _id: string,
     groupId: number
-}) => {
+}) {
     return new Promise((resolve, reject) => {
         srvPlayerTable.find({_id: obj._id}, (err, serverObj) => {
             if (err) { reject(err); }
@@ -223,18 +223,18 @@ export const srvPlayerActionsClearTempScore = (obj: {
             }
         });
     });
-};
+}
 
-export const srvPlayerActionsAddTempScore = (obj: {
+export async function srvPlayerActionsAddTempScore(obj: {
     _id: string,
     groupId: number
     score?: number
-}) => {
+}) {
     return new Promise((resolve, reject) => {
-        srvPlayerTable.find({_id: obj._id}, (err, serverObj) => {
+        srvPlayerTable.find({_id: obj._id}, (err, serverObj: any[]) => {
             if (err) { reject(err); }
             if (serverObj.length !== 0) {
-                const newTmpScore = (_.first(serverObj).tmpRSPoints || 0) + (obj.score || 0);
+                const newTmpScore = (serverObj[0].tmpRSPoints || 0) + (obj.score || 0);
                 srvPlayerTable.updateOne(
                     {_id: obj._id},
                     {$set: {tmpRSPoints: newTmpScore}},
@@ -255,18 +255,18 @@ export const srvPlayerActionsAddTempScore = (obj: {
             }
         });
     });
-};
+}
 
-export const srvPlayerActionsApplyTempToRealScore = (obj: {
+export async function srvPlayerActionsApplyTempToRealScore(obj: {
     _id: string,
     groupId: number
-}) => {
+}) {
     return new Promise((resolve, reject) => {
-        srvPlayerTable.find({_id: obj._id}, (err, serverObj) => {
+        srvPlayerTable.find({_id: obj._id}, (err, serverObj: any[]) => {
             if (err) { reject(err); }
             if (serverObj.length !== 0) {
                 let mesg: string;
-                const curPly = _.first(serverObj);
+                const curPly = serverObj[0];
                 const rsTotals = {
                     redRSPoints: curPly.redRSPoints || 0,
                     blueRSPoints: curPly.blueRSPoints || 0,
@@ -297,21 +297,21 @@ export const srvPlayerActionsApplyTempToRealScore = (obj: {
             }
         });
     });
-};
+}
 
-export const srvPlayerActionsUnitAddToRealScore = (obj: {
+export async function srvPlayerActionsUnitAddToRealScore(obj: {
     _id: string,
     groupId: number,
     unitCoalition: number,
     score?: number,
     unitType?: string
-}) => {
+}) {
     return new Promise((resolve, reject) => {
-        srvPlayerTable.find({_id: obj._id}, (err, serverObj) => {
+        srvPlayerTable.find({_id: obj._id}, (err, serverObj: any[]) => {
             if (err) { reject(err); }
             if (serverObj.length !== 0) {
                 let mesg: string;
-                const curPly = _.first(serverObj);
+                const curPly = serverObj[0];
                 const addScore = obj.score || 0;
                 const curType = obj.unitType || "";
                 const tObj: any = {};
@@ -347,19 +347,19 @@ export const srvPlayerActionsUnitAddToRealScore = (obj: {
             }
         });
     });
-};
+}
 
-export const srvPlayerActionsAddMinutesPlayed = (obj: {
+export async function srvPlayerActionsAddMinutesPlayed(obj: {
     _id: string,
     side: number,
     minutesPlayed?: number
-}) => {
+}) {
     return new Promise((resolve, reject) => {
         const sessionMinutesVar = "currentSessionMinutesPlayed_" + constants.side[obj.side];
-        srvPlayerTable.find({ _id: obj._id }, (err, serverObj) => {
+        srvPlayerTable.find({ _id: obj._id }, (err, serverObj: any) => {
                 if (err) { reject(err); }
                 if (serverObj.length > 0) {
-                    const curPlayer = _.first(serverObj);
+                    const curPlayer = serverObj;
                     console.log("Name: ", curPlayer.name, (curPlayer.sessionMinutesVar || 0) + (obj.minutesPlayed || 0));
                     srvPlayerTable.updateOne(
                         { _id: obj._id },
@@ -374,12 +374,12 @@ export const srvPlayerActionsAddMinutesPlayed = (obj: {
                 }
             });
     });
-};
+}
 
-export const srvPlayerActionsResetMinutesPlayed = (obj: {
+export async function srvPlayerActionsResetMinutesPlayed(obj: {
     _id: string,
     side: number
-}) => {
+}) {
     return new Promise((resolve, reject) => {
         const sessionMinutesVar = "currentSessionMinutesPlayed_" + constants.side[obj.side];
         srvPlayerTable.updateOne(
@@ -391,4 +391,4 @@ export const srvPlayerActionsResetMinutesPlayed = (obj: {
             }
         );
     });
-};
+}

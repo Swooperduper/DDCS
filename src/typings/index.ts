@@ -197,10 +197,11 @@ export interface ICmdQue {
 
 export interface ISrvPlayers {
     ucid: string;
+    sideLockTime: number;
+    cachedRemovedLPPoints: number;
     _id?: string;
     side?: number;
     sideLock?: number;
-    sideLockTime?: number;
     curLifePoints?: number;
     gicTimeLeft?: number;
     redRSPoints?: number;
@@ -210,7 +211,6 @@ export interface ISrvPlayers {
     banned?: boolean;
     gciAllowed?: boolean;
     isGameMaster?: boolean;
-    cachedRemovedLPPoints?: number;
     currentSessionMinutesPlayed_blue?: number;
     currentSessionMinutesPlayed_red?: number;
     ipaddr?: string;
@@ -256,4 +256,73 @@ export interface ISimpleStatEvents {
     msg: string;
     createdAt: Date;
     updatedAt: Date;
+}
+
+export interface ICrate {
+    _id: string;
+    shapeName: string;
+    category: string;
+    type: string;
+    canCargo: boolean;
+    mass: number;
+    isCombo: boolean;
+    playerCanDrive: boolean;
+    name: string;
+    heading: number;
+    playerOwnerId: string;
+    templateName: string;
+    special: string;
+    crateAmt: number;
+    country: string;
+    side: number;
+    coalition: number;
+    lonLatLoc: number[];
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+export interface IAmmo {
+    count: number;
+    typeName: string;
+}
+
+export interface IUnit {
+    _id: string;
+    playerCanDrive: boolean;
+    hidden: boolean;
+    enabled: boolean;
+    dead: boolean;
+    isTroop: boolean;
+    isCrate: boolean;
+    isCombo: boolean;
+    isResync: boolean;
+    isAI: boolean;
+    ammo: IAmmo[];
+    agl: number;
+    alt: number;
+    category: string;
+    coalition: number;
+    country: string;
+    groupId: number;
+    groupName: string;
+    hdg: number;
+    inAir: boolean;
+    lonLatLoc: number[];
+    name: string;
+    playername: string;
+    speed: number;
+    surfType: number;
+    type: string;
+    unitId: number;
+    createdAt: Date;
+    updatedAt: Date;
+    intCargoType: string;
+    troopType: string;
+    virtCrateType: string;
+}
+
+export interface IWebPush {
+    payload: any;
+    serverName: string;
+    side: number;
 }

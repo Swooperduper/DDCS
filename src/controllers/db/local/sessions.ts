@@ -4,25 +4,25 @@ import {ISessions} from "../../../typings";
 
 const sessionsTable = localConnection.model(process.env.SERVERNAME + "_sessions", sessionsSchema);
 
-export const sessionsActionsRead = (obj: ISessions) => {
+export async function sessionsActionsRead(obj: ISessions) {
     return new Promise((resolve, reject) => {
         sessionsTable.find(obj).exec((err, sessions) => {
             if (err) { reject(err); }
             resolve(sessions);
         });
     });
-};
+}
 
-export const sessionsActionsReadLatest = () => {
+export async function sessionsActionsReadLatest() {
     return new Promise((resolve, reject) => {
         sessionsTable.findOne().sort({ field: "asc", createdAt: -1 }).limit(1).exec((err: any, sessions) => {
             if (err) { reject(err); }
             resolve(sessions);
         });
     });
-};
+}
 
-export const sessionsActionsUpdate = (obj: ISessions) => {
+export async function sessionsActionsUpdate(obj: ISessions) {
     return new Promise((resolve, reject) => {
         sessionsTable.updateOne(
             {name: obj.name},
@@ -34,9 +34,9 @@ export const sessionsActionsUpdate = (obj: ISessions) => {
             }
         );
     });
-};
+}
 
-export const sessionsActionsSave = (obj: ISessions) => {
+export async function sessionsActionsSave(obj: ISessions) {
     return new Promise((resolve, reject) => {
         sessionsTable.find({_id: obj._id}, (err, sessionsObj) => {
             if (err) {reject(err); }
@@ -49,4 +49,4 @@ export const sessionsActionsSave = (obj: ISessions) => {
             }
         });
     });
-};
+}

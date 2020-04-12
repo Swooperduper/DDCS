@@ -4,27 +4,27 @@ import {ISimpleStatEvents} from "../../../typings";
 
 const simpleStatEventTable = localConnection.model(process.env.SERVERNAME + "_simpleStatEvent", simpleStatEventSchema);
 
-export const simpleStatEventActionsRead = (obj: {
+export async function simpleStatEventActionsRead(obj: {
     sessionName: string
-}) => {
+}) {
     return new Promise((resolve, reject) => {
         simpleStatEventTable.find({sessionName: obj.sessionName, showInChart: true}, (err, simpleStatEvent) => {
             if (err) { reject(err); }
             resolve(simpleStatEvent);
         });
     });
-};
+}
 
-export const simpleStatEventActionsReadAll = () => {
+export async function simpleStatEventActionsReadAll() {
     return new Promise((resolve, reject) => {
         simpleStatEventTable.find((err, simpleStatEvent) => {
             if (err) { reject(err); }
             resolve(simpleStatEvent);
         });
     });
-};
+}
 
-export const simpleStatEventActionsSave = (obj: ISimpleStatEvents) => {
+export async function simpleStatEventActionsSave(obj: ISimpleStatEvents) {
     return new Promise((resolve, reject) => {
         const simplestatevent = new simpleStatEventTable(obj);
         simplestatevent.save((err, simpleStatEvent) => {
@@ -32,4 +32,4 @@ export const simpleStatEventActionsSave = (obj: ISimpleStatEvents) => {
             resolve(simpleStatEvent);
         });
     });
-};
+}

@@ -4,18 +4,18 @@ import {ICmdQue} from "../../../typings";
 
 const cmdQueTable = localConnection.model(process.env.SERVERNAME + "_cmdque", cmdQueSchema);
 
-export const cmdQueActionsGrabNextQue = (obj: {
+export async function cmdQueActionsGrabNextQue(obj: {
     queName: string
-}) => {
+}) {
     return new Promise((resolve, reject) => {
         cmdQueTable.findOneAndRemove({queName: obj.queName, timeToExecute: {$lt: new Date().getTime()}}, (err, clientQue) => {
             if (err) { reject(err); }
             resolve(clientQue);
         });
     });
-};
+}
 
-export const cmdQueActionsSave = (obj: ICmdQue) => {
+export async function cmdQueActionsSave(obj: ICmdQue) {
     return new Promise((resolve, reject) => {
         const cmdque = new cmdQueTable(obj);
         cmdque.save((err: any, saveCmdQue) => {
@@ -23,23 +23,23 @@ export const cmdQueActionsSave = (obj: ICmdQue) => {
             resolve(saveCmdQue);
         });
     });
-};
+}
 
-export const cmdQueActionsDelete = (obj: {
+export async function cmdQueActionsDelete(obj: {
     _id: string
-}) => {
+}) {
     return new Promise((resolve, reject) => {
         cmdQueTable.findByIdAndRemove(obj._id, (err, cmdque) => {
             if (err) { reject(err); }
             resolve(cmdque);
         });
     });
-};
+}
 
-export const cmdQueActionsRemoveAll = () => {
+export async function cmdQueActionsRemoveAll() {
     return cmdQueTable.deleteMany({});
-};
+}
 
-export const cmdQueActionsDropAll = () => {
+export async function cmdQueActionsDropAll() {
     return cmdQueTable.collection.drop();
-};
+}
