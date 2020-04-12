@@ -1,8 +1,9 @@
 {
   "extends": "tslint:recommended",
   "rules": {
+    "indent": [true, "spaces", 4],
     "max-line-length": {
-      "options": [100]
+      "options": [140]
     },
     "member-ordering": false,
     "no-consecutive-blank-lines": false,
@@ -18,6 +19,7 @@
         "functions": "never",
         "typeLiterals": "ignore"
       }
-    }]
+    }],
+    "no-console": [false, "log", "error"]
   }
 }
