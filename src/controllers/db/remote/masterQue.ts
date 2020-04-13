@@ -1,11 +1,14 @@
+/*
+ * DDCS Licensed under AGPL-3.0 by Andrew "Drex" Finegan https://github.com/afinegan/DynamicDCS
+ */
 
 import {remoteConnection} from "../common/connection";
-import {ICmdQue} from "../../../typings";
-import {masterQueSchema} from "../local/schemas";
+import {masterQueSchema} from "./schemas";
+import {IMasterCue} from "../../../typings";
 
 const masterQue = remoteConnection.model("masterque", masterQueSchema);
 
-export const masterQueGrabNextQue = (serverName: string, obj: ICmdQue): Promise<ICmdQue> => {
+export async function masterQueGrabNextQue(serverName: string, obj: IMasterCue): Promise<IMasterCue> {
     return new Promise((resolve, reject) => {
         masterQue.findOneAndRemove({serverName}, (err) => {
             if (err) { reject(err); }
@@ -14,10 +17,10 @@ export const masterQueGrabNextQue = (serverName: string, obj: ICmdQue): Promise<
     });
 };
 
-export const masterQueSave = (obj: ICmdQue) => {
+export async function masterQueSave(obj: IMasterCue) {
     return new Promise((resolve, reject) => {
         const server = new masterQue(obj);
-        server.save((err, servers) => {
+        server.save((err, servers: any) => {
             if (err) { reject(err); }
             resolve(servers);
         });

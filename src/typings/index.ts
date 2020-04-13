@@ -195,6 +195,19 @@ export interface ICmdQue {
     UpdatedAt: Date;
 }
 
+export interface IMasterCue {
+    _id: string;
+    timeToExecute: string;
+    actionObj: {
+        action: string;
+        cmd: string[];
+        reqID: string;
+    };
+    queName: string;
+    createdAt: Date;
+    UpdatedAt: Date;
+}
+
 export interface ISrvPlayers {
     ucid: string;
     sideLockTime: number;
@@ -325,4 +338,48 @@ export interface IWebPush {
     payload: any;
     serverName: string;
     side: number;
+}
+
+export interface IRemoteComms {
+    _id: string;
+    isInSRS: boolean;
+    isInDiscord: boolean;
+    SRSData: any;
+}
+
+export interface ITheater {
+    _id: string;
+    name: string;
+    lat: string;
+    lon: string;
+    zoom: string;
+    removeSideZone: string;
+}
+
+export interface IUserAccount {
+    authId: string;
+    permLvl: number;
+    gameName: string;
+    realName: string;
+    lastIp: string;
+    lastServer: string;
+    curSocket: string;
+    ucid: string;
+    firstName: string;
+    lastName: string;
+    nickName: string;
+    picture: string;
+    gender: string;
+    locale: string;
+}
+
+export interface IWeaponScore {
+    _id: string;
+    name: string;
+    displayName: string;
+    category: string;
+    unitType: string;
+    score: number;
+    tier: number;
+    fox2ModUnder2: number;
 }
