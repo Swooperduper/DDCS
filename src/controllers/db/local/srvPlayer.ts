@@ -4,7 +4,7 @@ import {srvPlayerSchema} from "./schemas";
 
 const srvPlayerTable = localConnection.model(process.env.SERVERNAME + "_srvPlayer", srvPlayerSchema);
 
-export async function srvPlayerActionsRead(obj: ISrvPlayers) {
+export async function srvPlayerActionsRead(obj: any) {
     return new Promise((resolve, reject) => {
         srvPlayerTable.find(obj, (err, srvPlayer) => {
             if (err) { reject(err); }

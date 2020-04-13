@@ -4,7 +4,7 @@ import {ISessions} from "../../../typings";
 
 const sessionsTable = localConnection.model(process.env.SERVERNAME + "_sessions", sessionsSchema);
 
-export async function sessionsActionsRead(obj: ISessions) {
+export async function sessionsActionsRead(obj: any) {
     return new Promise((resolve, reject) => {
         sessionsTable.find(obj).exec((err, sessions) => {
             if (err) { reject(err); }
@@ -22,7 +22,7 @@ export async function sessionsActionsReadLatest() {
     });
 }
 
-export async function sessionsActionsUpdate(obj: ISessions) {
+export async function sessionsActionsUpdate(obj: any) {
     return new Promise((resolve, reject) => {
         sessionsTable.updateOne(
             {name: obj.name},

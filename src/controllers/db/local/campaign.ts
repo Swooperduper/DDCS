@@ -22,9 +22,7 @@ export async function campaignsActionsReadLatest() {
     });
 }
 
-export async function campaignsActionsUpdate(obj: {
-    name: string
-}) {
+export async function campaignsActionsUpdate(obj: any) {
     return new Promise((resolve, reject) => {
         campaignsTable.updateOne(
             {name: obj.name},

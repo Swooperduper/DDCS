@@ -3,12 +3,12 @@
  */
 
 import * as _ from "lodash";
-import * as masterDBController from "../db/masterDB";
+import * as masterDBController from "../db";
 import * as constants from "../constants";
 
-export async function checkCurrentPlayerBalance(serverName: string): Promise<any>  {
+export async function checkCurrentPlayerBalance(): Promise<any>  {
     // set to 2:1 or worse
-    return masterDBController.campaignsActions("readLatest", serverName, {})
+    return masterDBController.campaignsActionsReadLatest()
         .then((latestCampaign: any) => {
             let sideState = {};
             const totalCampaignTime =
@@ -18,10 +18,10 @@ export async function checkCurrentPlayerBalance(serverName: string): Promise<any
                 // if (totalCampaignTime > 0) {
                 console.log("STACK: Blue:", latestCampaign.totalMinutesPlayed_blue, " Red:", latestCampaign.totalMinutesPlayed_red);
                 if (_.get(latestCampaign, "name")) {
-                    if (latestCampaign.totalMinutesPlayed_blue === 0){latestCampaign.totalMinutesPlayed_blue = 1}
-                    if (latestCampaign.totalMinutesPlayed_red === 0){latestCampaign.totalMinutesPlayed_red = 1}
-                    const redUnderdog = latestCampaign.totalMinutesPlayed_blue/ latestCampaign.totalMinutesPlayed_red;
-                    const blueUnderdog = latestCampaign.totalMinutesPlayed_red/ latestCampaign.totalMinutesPlayed_blue;
+                    if (latestCampaign.totalMinutesPlayed_blue === 0) {latestCampaign.totalMinutesPlayed_blue = 1; }
+                    if (latestCampaign.totalMinutesPlayed_red === 0) {latestCampaign.totalMinutesPlayed_red = 1; }
+                    const redUnderdog = latestCampaign.totalMinutesPlayed_blue / latestCampaign.totalMinutesPlayed_red;
+                    const blueUnderdog = latestCampaign.totalMinutesPlayed_red / latestCampaign.totalMinutesPlayed_blue;
 
                     if (redUnderdog > 1 && isFinite(redUnderdog)) {
                         sideState = {
@@ -48,11 +48,11 @@ export async function checkCurrentPlayerBalance(serverName: string): Promise<any
         });
 }
 
-export async function updateLatestCampaign(serverName: string) {
-    masterDBController.campaignsActions("readLatest", serverName, {})
+export async function updateLatestCampaign() {
+    masterDBController.campaignsActionsReadLatest()
         .then((campaign: any) => {
             if (campaign) {
-                masterDBController.sessionsActions("read", serverName, {campaignName: campaign.name})
+                masterDBController.sessionsActionsRead({campaignName: campaign.name})
                     .then((campSessions: any) => {
                         let totalMinutesPlayedBlue = 0;
                         let totalMinutesPlayedRed = 0;
@@ -60,7 +60,7 @@ export async function updateLatestCampaign(serverName: string) {
                             totalMinutesPlayedBlue += _.get(pa, "totalMinutesPlayed_blue", 0);
                             totalMinutesPlayedRed += _.get(pa, "totalMinutesPlayed_red", 0);
                         });
-                        masterDBController.campaignsActions("update", serverName, {
+                        masterDBController.campaignsActionsUpdate({
                             name: campaign.name,
                             totalMinutesPlayed_blue: totalMinutesPlayedBlue,
                             totalMinutesPlayed_red: totalMinutesPlayedRed
@@ -78,22 +78,22 @@ export async function updateLatestCampaign(serverName: string) {
         });
 }
 
-export async function updateSession(serverName: string, sessionName: string) {
-    masterDBController.srvPlayerActions("read", serverName, {sessionName})
-        .then((playerArray: any[]) => {
+export async function updateSession(sessionName: string) {
+    masterDBController.srvPlayerActionsRead({sessionName})
+        .then((playerArray: any) => {
             let currentSessionMinutesPlayedBlue = 0;
             let currentSessionMinutesPlayedRed = 0;
             _.forEach(playerArray, (pa) => {
                 currentSessionMinutesPlayedBlue += _.get(pa, "currentSessionMinutesPlayed_blue", 0);
                 currentSessionMinutesPlayedRed += _.get(pa, "currentSessionMinutesPlayed_red", 0);
             });
-            masterDBController.sessionsActions("update", serverName, {
+            masterDBController.sessionsActionsUpdate({
                 name: sessionName,
                 totalMinutesPlayed_blue: currentSessionMinutesPlayedBlue,
                 totalMinutesPlayed_red: currentSessionMinutesPlayedRed
             })
                 .then(() => {
-                    exports.updateLatestCampaign(serverName);
+                    exports.updateLatestCampaign();
                     console.log("sessionUpdate: Blue: ", currentSessionMinutesPlayedBlue, " Red: ", currentSessionMinutesPlayedRed);
                 })
                 .catch((err: any) => {
@@ -109,25 +109,25 @@ export async function updateSession(serverName: string, sessionName: string) {
 
 export async function recordFiveMinutesPlayed(serverName: string) {
     const totalMinsPerSide: any = {
-        0,
-        0
+        1: 0,
+        2: 0
     };
-    masterDBController.sessionsActions("readLatest", serverName, {})
+    masterDBController.sessionsActionsReadLatest()
         .then((latestSession: any) => {
             const unitsNewThan = new Date().getTime() - _.get(constants, ["time", "fourMins"], 0);
             // update only people who have played in the last 5 minutes
-            masterDBController.srvPlayerActions("read", serverName, {
+            masterDBController.srvPlayerActionsRead({
                 sessionName: latestSession.name,
                 updatedAt: {$gt: unitsNewThan}
             })
-                .then((playerArray: any[]) => {
+                .then((playerArray: any) => {
                     // console.log('playersInFiveMinutes: ', playerArray.length);
                     const processPromise: any[] = [];
                     _.forEach(playerArray, (player: any) => {
                         // console.log('isPlayerTimeGreater: ', player.name, new Date(player.updatedAt).getTime() >
                         // 		unitsNewThan, new Date(player.updatedAt).getTime() - unitsNewThan);
                         totalMinsPerSide[player.side] = totalMinsPerSide[player.side] + 5;
-                        processPromise.push(masterDBController.srvPlayerActions("addMinutesPlayed", serverName, {
+                        processPromise.push(masterDBController.srvPlayerActionsAddMinutesPlayed({
                             _id: player._id,
                             minutesPlayed: 5,
                             side: player.side
@@ -154,14 +154,14 @@ export async function recordFiveMinutesPlayed(serverName: string) {
     ;
 }
 
-export async function resetMinutesPlayed(serverName: string) {
-    masterDBController.sessionsActions("readLatest", serverName, {})
+export async function resetMinutesPlayed() {
+    masterDBController.sessionsActionsReadLatest()
         .then((latestSession: any) => {
             if (latestSession) {
-                masterDBController.srvPlayerActions("read", serverName, {sessionName: latestSession.name})
-                    .then((playerArray: any[]) => {
+                masterDBController.srvPlayerActionsRead({sessionName: latestSession.name})
+                    .then((playerArray: any) => {
                         _.forEach(playerArray, (player) => {
-                            masterDBController.srvPlayerActions("resetMinutesPlayed", serverName, {
+                            masterDBController.srvPlayerActionsResetMinutesPlayed({
                                 _id: player._id,
                                 side: player.side
                             });
