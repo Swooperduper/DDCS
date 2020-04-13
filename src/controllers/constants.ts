@@ -3,8 +3,8 @@
  */
 
 import * as _ from "lodash";
-import {airfieldTable, cmdQueTable, staticDictionaryTable, unitDictionaryTable, weaponScoreTable} from "./db/remote";
-import {IBase, IServer, IStaticDictionary, IUnitDictionary, IWeaponDictionary} from "../typings/index";
+import * as masterDBController from "./db";
+import {IBase, IServer, IStaticDictionary, IUnitDictionary, IWeaponDictionary} from "../typings";
 
 export const blueCountrys = [
     "AUSTRALIA",
@@ -222,22 +222,18 @@ export const crateTypes = [
     "uh1h_cargo"
 ];
 
-export const getBases = (serverName: string) => {
-    return airfieldTable.baseActionsRead(serverName)
+export async function getBases() {
+    return masterDBController.baseActionRead({})
         .then((curBases: IBase[]) => {
             return new Promise((resolve) => {
                 if (curBases.length) {
                     resolve(curBases);
                 } else {
                     console.log("Rebuilding Base DB");
-                    cmdQueTable.cmdQueActions(
-                        "save",
-                        serverName,
-                        {
+                    masterDBController.cmdQueActionsSave({
                             actionObj: { action: "GETPOLYDEF" },
                             queName: "clientArray"
-                        }
-                    )
+                    })
                     .catch((err: any) => {
                         console.log("erroring line790: ", err);
                     })
@@ -251,8 +247,8 @@ export const getBases = (serverName: string) => {
         });
 };
 
-export const getServer = (serverName: string) => {
-    return airfieldTable.serverActionsRead({ _id: serverName })
+export async function getServer() {
+    return masterDBController.serverActionsRead({})
         .then((server: IServer[]) => {
             return new Promise((resolve) => {
                 resolve(_.first(server));
@@ -265,7 +261,7 @@ export const getServer = (serverName: string) => {
 };
 
 export const getStaticDictionary = () => {
-    return staticDictionaryTable.staticDictionaryActionsRead()
+    return masterDBController.staticDictionaryActionsRead()
         .then((staticDic: IStaticDictionary[]) => {
             return new Promise((resolve) => {
                 resolve(staticDic);
@@ -278,7 +274,7 @@ export const getStaticDictionary = () => {
 };
 
 export const getUnitDictionary = (curTimePeriod: string) => {
-    return unitDictionaryTable.unitDictionaryActions("read", { timePeriod: curTimePeriod })
+    return masterDBController.unitDictionaryActionsRead({ timePeriod: curTimePeriod })
         .then((unitsDic: IUnitDictionary[]) => {
             return new Promise((resolve) => {
                 resolve(unitsDic);
@@ -291,7 +287,7 @@ export const getUnitDictionary = (curTimePeriod: string) => {
 };
 
 export const getWeaponDictionary = async () => {
-    return await weaponScoreTable.weaponScoreActionsRead()
+    return await masterDBController.weaponScoreActionsRead()
         .then((weaponsDic: IWeaponDictionary[]) => {
             return weaponsDic;
         })

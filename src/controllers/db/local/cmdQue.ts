@@ -15,7 +15,7 @@ export async function cmdQueActionsGrabNextQue(obj: {
     });
 }
 
-export async function cmdQueActionsSave(obj: ICmdQue) {
+export async function cmdQueActionsSave(obj: any) {
     return new Promise((resolve, reject) => {
         const cmdque = new cmdQueTable(obj);
         cmdque.save((err: any, saveCmdQue) => {

@@ -300,6 +300,8 @@ export interface IAmmo {
 }
 
 export interface IUnit {
+    jtacReplenTime: number;
+    jtacTarget: any;
     _id: string;
     playerCanDrive: boolean;
     hidden: boolean;

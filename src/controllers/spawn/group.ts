@@ -1530,7 +1530,7 @@ export function spawnSupportVehiclesOnFarp( serverName: string, baseName: string
     return curFarpArray;
 }
 
-export function spawnSupportBaseGrp( serverName: string, baseName: string, side: number ) {
+export function spawnSupportBaseGrp( baseName: string, side: number ) {
     let spawnArray: any[] = [];
     const curBases = _.get(constants, "bases");
     const farpBases = _.filter(curBases, (baseObj) => {
@@ -1538,9 +1538,9 @@ export function spawnSupportBaseGrp( serverName: string, baseName: string, side:
             _.includes(_.get(baseObj, "_id"), "_FOB")) && _.first(_.split(_.get(baseObj, "name"), " #")) === baseName;
     });
     _.forEach(farpBases, (farp) => {
-        spawnArray = _.concat(spawnArray, exports.spawnSupportVehiclesOnFarp( serverName, _.get(farp, "name"), side ));
+        spawnArray = _.concat(spawnArray, exports.spawnSupportVehiclesOnFarp( _.get(farp, "name"), side ));
     });
-    exports.spawnGroup(serverName, _.compact(spawnArray), baseName, side);
+    exports.spawnGroup(_.compact(spawnArray), baseName, side);
     return true;
 }
 
@@ -2628,13 +2628,13 @@ export async function spawnNewMapGrps( serverName: string ) {
     ;
 }
 
-export async function spawnLogisticCmdCenter(serverName: string, staticObj: any, init: boolean, baseObj: any, side: number) {
+export async function spawnLogisticCmdCenter(staticObj: any, init: boolean, baseObj: any, side: number) {
     // console.log('spawnLogi: ', serverName, staticObj, init, baseObj, side);
     let curGrpObj = _.cloneDeep(staticObj);
     _.set(curGrpObj, "name", _.get(curGrpObj, "name", _.get(baseObj, "name", "") + " Logistics"));
     _.set(curGrpObj, "coalition", _.get(curGrpObj, "coalition", side));
     if (_.isUndefined(_.get(curGrpObj, "lonLatLoc"))) {
-        _.set(curGrpObj, "lonLatLoc", zoneController.getRandomLatLonFromBase(serverName, _.get(baseObj, "name"), "buildingPoly"));
+        _.set(curGrpObj, "lonLatLoc", zoneController.getRandomLatLonFromBase(_.get(baseObj, "name"), "buildingPoly"));
     }
 
     curGrpObj = {
@@ -2645,17 +2645,16 @@ export async function spawnLogisticCmdCenter(serverName: string, staticObj: any,
         shape_name: "ComCenter"
     };
 
-    const curCMD = exports.spawnStatic(serverName, exports.staticTemplate(curGrpObj), curGrpObj.country, curGrpObj.name, init);
+    const curCMD = exports.spawnStatic(exports.staticTemplate(curGrpObj), curGrpObj.country, curGrpObj.name, init);
     const sendClient = {action: "CMD", cmd: curCMD, reqID: 0};
     const actionObj = {actionObj: sendClient, queName: "clientArray"};
-    masterDBController.cmdQueActions("save", serverName, actionObj)
+    masterDBController.cmdQueActions("save", actionObj)
         .catch((err: any) => {
             console.log("erroring line2176: ", err);
         })
     ;
     return masterDBController.unitActions(
         "updateByName",
-        serverName,
         {name: curGrpObj.name, coalition: curGrpObj.coalition, country: curGrpObj.country, dead: false}
     )
         .catch((err: any) => {
@@ -2664,14 +2663,14 @@ export async function spawnLogisticCmdCenter(serverName: string, staticObj: any,
     ;
 }
 
-export async function spawnRadioTower(serverName: string, staticObj: any, init: boolean, baseObj: any, side: number) {
+export async function spawnRadioTower(staticObj: any, init: boolean, baseObj: any, side: number) {
     // console.log('spawnLogi: ', serverName, staticObj, init, baseObj, side);
     let curGrpObj = _.cloneDeep(staticObj);
     _.set(curGrpObj, "name", _.get(curGrpObj, "name", _.get(baseObj, "name", "") + " Communications"));
     _.set(curGrpObj, "coalition", _.get(curGrpObj, "coalition", side));
     _.set(curGrpObj, "country", _.get(constants, ["defCountrys", curGrpObj.coalition]));
     if (_.isUndefined(_.get(curGrpObj, "lonLatLoc"))) {
-        _.set(curGrpObj, "lonLatLoc", zoneController.getRandomLatLonFromBase(serverName, _.get(baseObj, "name"), "buildingPoly"));
+        _.set(curGrpObj, "lonLatLoc", zoneController.getRandomLatLonFromBase(_.get(baseObj, "name"), "buildingPoly"));
     }
 
     curGrpObj = {

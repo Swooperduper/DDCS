@@ -4,7 +4,7 @@
 
 import * as _ from "lodash";
 import * as constants from "../constants";
-import * as masterDBController from "../db/masterDB";
+import * as masterDBController from "../db";
 import * as minutesPlayedController from "../action/minutesPlayed";
 import * as groupController from "../spawn/group";
 
@@ -64,7 +64,7 @@ export async function campaignStackTypes(serverName: string): Promise<any> {
 export async function processAI(serverName: string, sideStackedAgainst: any, aIConfig: any): Promise<any> {
     console.log("sideStackedAgainst: ", sideStackedAgainst);
     if (sideStackedAgainst.underdog > 0) {
-        return masterDBController.baseActions("read", serverName, {baseType: "MOB", side: sideStackedAgainst.underdog, enabled: true})
+        return masterDBController.baseActionRead({baseType: "MOB", side: sideStackedAgainst.underdog, enabled: true})
             .then((friendlyBases: any) => {
                 exports.checkBasesToSpawnConvoysFrom(serverName, friendlyBases, aIConfig);
             })
@@ -82,19 +82,19 @@ export async function checkBasesToSpawnConvoysFrom(serverName: string, friendlyB
             // spawn ground convoys
             // 1 point route is a non-transversable route for ground units
             if (aIConfig.AIType === "groundConvoy" && _.get(baseTemplate, "route", []).length > 1) {
-                masterDBController.baseActions("read", serverName, {
+                masterDBController.baseActionRead({
                     _id: _.get(baseTemplate, "destBase"),
                     side: _.get(constants, ["enemyCountry", _.get(base, "side", 0)]),
                     enabled: true
                 })
                     .then((destBaseInfo: any) => {
                         if (destBaseInfo.length > 0) {
-                            const curBase = _.first(destBaseInfo);
+                            const curBase = destBaseInfo[0];
                             // check if convoy exists first
                             const baseConvoyGroupName = "AI|" + aIConfig.name +
                                 "|" + _.get(baseTemplate, "sourceBase") +
                                 "_" + _.get(baseTemplate, "destBase") + "|";
-                            masterDBController.unitActions("read", serverName, {
+                            masterDBController.unitActionRead({
                                 groupName: baseConvoyGroupName,
                                 isCrate: false,
                                 dead: false
@@ -126,17 +126,17 @@ export async function checkBasesToSpawnConvoysFrom(serverName: string, friendlyB
                 ;
             }
             if (aIConfig.AIType === "CAPDefense") {
-                masterDBController.baseActions("read", serverName, {
+                masterDBController.baseActionRead({
                     _id: _.get(baseTemplate, "destBase"),
                     side: _.get(constants, ["enemyCountry", _.get(base, "side", 0)]),
                     enabled: true
                 })
                     .then((destBaseInfo: any) => {
                         if (destBaseInfo.length > 0) {
-                            const curBase = _.first(destBaseInfo);
+                            const curBase = destBaseInfo[0];
                             // check if convoy exists first
                             const baseCapGroupName = "AI|" + aIConfig.name + "|" + _.get(base, "name") + "|";
-                            masterDBController.unitActions("read", serverName, {
+                            masterDBController.unitActionRead({
                                 groupName: baseCapGroupName,
                                 isCrate: false,
                                 dead: false

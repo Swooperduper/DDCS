@@ -112,10 +112,10 @@ export async function baseActionGetClosestEnemyBase(obj: {
     });
 }
 
-export async function baseActionGetBaseSides(serverName: string): Promise<IBase[]> {
+export async function baseActionGetBaseSides(): Promise<IBase[]> {
     return new Promise((resolve, reject) => {
         if (!curTheater) {
-            constants.getServer(serverName)
+            constants.getServer(process.env.SERVERNAME)
                 .then((serverConf: any) => {
                     airfieldTable.find(
                         {mapType: serverConf.theater, enabled: true},

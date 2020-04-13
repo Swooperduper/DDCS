@@ -4,11 +4,10 @@
 
 import {remoteConnection} from "../common/connection";
 import {serverSchema} from "./schemas";
-import {IServer} from "../../../typings";
 
 const serverTable = remoteConnection.model("servers", serverSchema);
 
-export async function serverActionsCreate(obj: IServer) {
+export async function serverActionsCreate(obj: any) {
     return new Promise((resolve, reject) => {
         const server = new serverTable(obj);
         server.save((err, servers) => {
@@ -18,7 +17,7 @@ export async function serverActionsCreate(obj: IServer) {
     });
 }
 
-export async function serverActionsRead(obj: IServer) {
+export async function serverActionsRead(obj: any) {
     return new Promise((resolve, reject) => {
         serverTable.find(obj, (err, servers) => {
             if (err) { reject(err); }
@@ -27,7 +26,7 @@ export async function serverActionsRead(obj: IServer) {
     });
 }
 
-export async function serverActionsUpdate(obj: IServer) {
+export async function serverActionsUpdate(obj: any) {
     return new Promise((resolve, reject) => {
         serverTable.findOneAndUpdate(
             {name: obj.name},
@@ -41,7 +40,7 @@ export async function serverActionsUpdate(obj: IServer) {
     });
 }
 
-export async function serverActionsDelete(obj: IServer) {
+export async function serverActionsDelete(obj: any) {
     return new Promise((resolve, reject) => {
         serverTable.findOneAndRemove({name: obj.name}, (err, servers) => {
             if (err) { reject(err); }
