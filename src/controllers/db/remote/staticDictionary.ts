@@ -8,7 +8,7 @@ import {IStaticDictionary} from "../../../typings";
 
 const staticDictionaryTable = remoteConnection.model("staticDictionaries", staticDictionarySchema);
 
-export async function staticDictionaryActionsRead(obj: IStaticDictionary) {
+export async function staticDictionaryActionsRead(obj: any) {
     return new Promise((resolve, reject) => {
         staticDictionaryTable.find(obj, (err, staticDictionary: IStaticDictionary[]) => {
             if (err) { reject(err); }

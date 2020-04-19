@@ -4,12 +4,13 @@
 
 import * as _ from "lodash";
 import * as constants from "../constants";
-import * as masterDBController from "../db/masterDB";
+import * as masterDBController from "../db";
 import * as neutralCCController from "../action/neutralCC";
 import * as DCSLuaCommands from "../player/DCSLuaCommands";
 import * as zoneController from "../proxZone/zone";
 import * as groupController from "../spawn/group";
 import * as taskController from "../action/task";
+import {IUnit, IUnitDictionary} from "../../typings";
 
 let openSAM: string;
 
@@ -1422,14 +1423,13 @@ export function staticTemplate(staticObj: any) {
 }
 
 export function getRndFromSpawnCat(
-    serverName: string,
     spawnCat: string,
     side: number,
     spawnShow: boolean,
     spawnAlways: boolean,
-    launchers: number,
-    useUnitType: string
-) {
+    launchers?: number,
+    useUnitType?: string
+): IUnitDictionary[] {
     // console.log("getRndCat: ", serverName, spawnCat, side, spawnShow, spawnAlways, launchers, useUnitType);
     const curTimePeriod = _.get(constants, ["config", "timePeriod"]);
     const curEnabledCountrys = _.get(constants, [_.get(constants, ["side", side]) + "Countrys"]);
@@ -1461,7 +1461,7 @@ export function getRndFromSpawnCat(
         }
     });
     if (cPUnits.length < 0) {
-        return false;
+        return [];
     }
     if (spawnAlways) {
         randomIndex = _.random(0, cPUnits.length - 1);
@@ -1500,7 +1500,7 @@ export function getRndFromSpawnCat(
         // console.log('unitsChosen: ', unitsChosen, spawnShow);
         return unitsChosen;
     } else {
-        return false;
+        return [];
     }
 }
 
@@ -1629,7 +1629,7 @@ export async function spawnSAMNet(serverName: string, side: number, baseName: st
     // {$and: [{name: /Tuapse_FARP/}, {name: /EWR/}], dead: false}
     // first get working SAMS for base
     // console.log('sam for: ', baseName);
-    return masterDBController.unitActions("read", serverName, {$and: [{name: new RegExp(baseName)}, {name: /SAM/}], dead: false})
+    return masterDBController.unitActionRead({$and: [{name: new RegExp(baseName)}, {name: /SAM/}], dead: false})
         .then((samUnits: any[]) => {
             // console.log('misSAM: ', samUnits);
             if (samUnits.length > 0) {
@@ -1867,14 +1867,13 @@ export async function spawnConvoy(
     // console.log('CCD: ', curCMD);
     const sendClient = {action: "CMD", cmd: [curCMD], reqID: 0};
     const actionObj = {actionObj: sendClient, queName: "clientArray"};
-    return masterDBController.cmdQueActions("save", serverName, actionObj)
+    return masterDBController.cmdQueActionsSave(actionObj)
         .then(() => {
             // save in que to move convoy in 1 min
             taskController.setMissionTask(serverName, groupName, JSON.stringify(exports.convoyRouteTemplate(curGrpObj)))
                 .then(() => {
                     DCSLuaCommands.sendMesgToCoalition(
                         convoySide,
-                        serverName,
                         mesg,
                         20
                     );
@@ -1957,11 +1956,10 @@ export async function spawnCAPDefense(
     const curCMD = exports.spawnGrp(curGroupSpawn, _.get(constants, ["defCountrys", convoySide]), curUnit.category);
     const sendClient = {action: "CMD", cmd: [curCMD], reqID: 0};
     const actionObj = {actionObj: sendClient, queName: "clientArray"};
-    return masterDBController.cmdQueActions("save", serverName, actionObj)
+    return masterDBController.cmdQueActionsSave(actionObj)
         .then(() => {
             DCSLuaCommands.sendMesgToCoalition(
                 convoySide,
-                serverName,
                 mesg,
                 20
             );
@@ -1972,7 +1970,7 @@ export async function spawnCAPDefense(
     ;
 }
 
-export async function spawnDefenseChopper(serverName: string, playerUnitObj: any, unitObj: any) {
+export async function spawnDefenseChopper(playerUnitObj: any, unitObj: any) {
     let curTkrName: any;
     let curUnitSpawn = "";
     let curGroupSpawn;
@@ -1986,11 +1984,10 @@ export async function spawnDefenseChopper(serverName: string, playerUnitObj: any
     curTkrName = "AI|" + unitObj.name + "|";
     curSpwnUnit = _.cloneDeep(unitObj);
 
-    masterDBController.baseActions(
-        "getClosestFriendlyBase",
-        serverName,
-        { unitLonLatLoc: playerUnitObj.lonLatLoc, playerSide: playerUnitObj.coalition}
-    )
+    masterDBController.baseActionGetClosestFriendlyBase({
+        unitLonLatLoc: playerUnitObj.lonLatLoc,
+        playerSide: playerUnitObj.coalition
+    })
         .then((friendlyBase: any) => {
             const patrolDistance = 2;
             friendlyLoc = zoneController.getLonLatFromDistanceDirection(friendlyBase.centerLoc, 0, patrolDistance);
@@ -2032,12 +2029,11 @@ export async function spawnDefenseChopper(serverName: string, playerUnitObj: any
             const curCMD = exports.spawnGrp(curGroupSpawn, curCountry, curCategory);
             const sendClient = {action: "CMD", cmd: [curCMD], reqID: 0};
             const actionObj = {actionObj: sendClient, queName: "clientArray"};
-            masterDBController.cmdQueActions("save", serverName, actionObj)
+            masterDBController.cmdQueActionsSave(actionObj)
                 .then(() => {
                     const mesg = "C: A pair of " + unitObj.type + " is defending " + friendlyBase.name;
                     DCSLuaCommands.sendMesgToCoalition(
                         playerUnitObj.coalition,
-                        serverName,
                         mesg,
                         20
                     );
@@ -2053,7 +2049,7 @@ export async function spawnDefenseChopper(serverName: string, playerUnitObj: any
     ;
 }
 
-export async function spawnAtkChopper(serverName: string, playerUnitObj: any, unitObj: any) {
+export async function spawnAtkChopper(playerUnitObj: any, unitObj: any) {
     let curTkrName: string;
     let curUnitSpawn = "";
     let curGroupSpawn;
@@ -2068,17 +2064,15 @@ export async function spawnAtkChopper(serverName: string, playerUnitObj: any, un
     curTkrName = "AI|" + unitObj.name + "|";
     curSpwnUnit = _.cloneDeep(unitObj);
 
-    masterDBController.baseActions(
-        "getClosestEnemyBase",
-        serverName,
-        { unitLonLatLoc: playerUnitObj.lonLatLoc, playerSide: playerUnitObj.coalition}
-    )
+    masterDBController.baseActionGetClosestEnemyBase({
+        unitLonLatLoc: playerUnitObj.lonLatLoc,
+        playerSide: playerUnitObj.coalition
+    })
         .then((enemyBase: any) => {
-            masterDBController.baseActions(
-                "getClosestFriendlyBase",
-                serverName,
-                { unitLonLatLoc: playerUnitObj.lonLatLoc, playerSide: playerUnitObj.coalition}
-            )
+            masterDBController.baseActionGetClosestFriendlyBase({
+                unitLonLatLoc: playerUnitObj.lonLatLoc,
+                playerSide: playerUnitObj.coalition
+            })
                 .then((friendlyBase: any) => {
                     friendlyLoc = zoneController.getLonLatFromDistanceDirection(
                         friendlyBase.centerLoc,
@@ -2128,12 +2122,11 @@ export async function spawnAtkChopper(serverName: string, playerUnitObj: any, un
                     const curCMD = exports.spawnGrp(curGroupSpawn, curCountry, curCategory);
                     const sendClient = {action: "CMD", cmd: [curCMD], reqID: 0};
                     const actionObj = {actionObj: sendClient, queName: "clientArray"};
-                    return masterDBController.cmdQueActions("save", serverName, actionObj)
+                    return masterDBController.cmdQueActionsSave(actionObj)
                         .then(() => {
                             const mesg = "C: " + unitObj.type + " Atk Heli is departed " + friendlyBase.name + " and it is patrolling toward " + enemyBase.name;
                             DCSLuaCommands.sendMesgToCoalition(
                                 playerUnitObj.coalition,
-                                serverName,
                                 mesg,
                                 20
                             );
@@ -2154,7 +2147,7 @@ export async function spawnAtkChopper(serverName: string, playerUnitObj: any, un
     ;
 }
 
-export async function spawnBomberPlane(serverName: string, playerUnitObj: any, bomberObj: any) {
+export async function spawnBomberPlane(playerUnitObj: any, bomberObj: any) {
     let curTkrName: string;
     let curUnitSpawn = "";
     let curGroupSpawn;
@@ -2170,11 +2163,10 @@ export async function spawnBomberPlane(serverName: string, playerUnitObj: any, b
     curTkrName = "AI|" + bomberObj.name + "|";
     curSpwnUnit = _.cloneDeep(bomberObj);
 
-    masterDBController.baseActions(
-        "getClosestEnemyBase",
-        serverName,
-        { unitLonLatLoc: playerUnitObj.lonLatLoc, playerSide: playerUnitObj.coalition}
-    )
+    masterDBController.baseActionGetClosestEnemyBase({
+        unitLonLatLoc: playerUnitObj.lonLatLoc,
+        playerSide: playerUnitObj.coalition
+    })
         .then((closeBase: any) => {
             // console.log('CB: ', closeBase);
             remoteLoc = zoneController.getLonLatFromDistanceDirection(closeBase.centerLoc, randomDir, curSpwnUnit.spawnDistance);
@@ -2215,13 +2207,12 @@ export async function spawnBomberPlane(serverName: string, playerUnitObj: any, b
             const curCMD = exports.spawnGrp(curGroupSpawn, curCountry, curCategory);
             const sendClient = {action: "CMD", cmd: [curCMD], reqID: 0};
             const actionObj = {actionObj: sendClient, queName: "clientArray"};
-            return masterDBController.cmdQueActions("save", serverName, actionObj)
+            return masterDBController.cmdQueActionsSave(actionObj)
                 .then(() => {
                     const mesg = "C: " + bomberObj.type + " Bomber is commencing its run BRA " +
                         randomDir + " from " + closeBase.name + " " + bomberObj.details;
                     DCSLuaCommands.sendMesgToCoalition(
                         playerUnitObj.coalition,
-                        serverName,
                         mesg,
                         20
                     );
@@ -2237,7 +2228,7 @@ export async function spawnBomberPlane(serverName: string, playerUnitObj: any, b
     ;
 }
 
-export async function spawnAWACSPlane(serverName: string, playerUnitObj: any, awacsObj: any) {
+export async function spawnAWACSPlane(playerUnitObj: any, awacsObj: any) {
     let curTkrName: string;
     let curUnitSpawn;
     let curGroupSpawn;
@@ -2251,7 +2242,7 @@ export async function spawnAWACSPlane(serverName: string, playerUnitObj: any, aw
     curTkrName = "AI|" + awacsObj.name + "|";
     curSpwnUnit = _.cloneDeep(awacsObj);
 
-    masterDBController.baseActions("getClosestBase", serverName, { unitLonLatLoc: playerUnitObj.lonLatLoc})
+    masterDBController.baseActionGetClosestBase({ unitLonLatLoc: playerUnitObj.lonLatLoc})
         .then((closeBase: any) => {
             // console.log('CB: ', closeBase);
             remoteLoc = zoneController.getLonLatFromDistanceDirection(
@@ -2287,13 +2278,12 @@ export async function spawnAWACSPlane(serverName: string, playerUnitObj: any, aw
             const curCMD = exports.spawnGrp(curGroupSpawn, curCountry, curCategory);
             const sendClient = {action: "CMD", cmd: [curCMD], reqID: 0};
             const actionObj = {actionObj: sendClient, queName: "clientArray"};
-            return masterDBController.cmdQueActions("save", serverName, actionObj)
+            return masterDBController.cmdQueActionsSave(actionObj)
                 .then(() => {
                     const mesg = "C: A " + awacsObj.type + " AWACS Has Been Spawned " +
                         playerUnitObj.hdg + " from " + closeBase.name + " " + awacsObj.details;
                     DCSLuaCommands.sendMesgToCoalition(
                         playerUnitObj.coalition,
-                        serverName,
                         mesg,
                         20
                     );
@@ -2309,7 +2299,7 @@ export async function spawnAWACSPlane(serverName: string, playerUnitObj: any, aw
     ;
 }
 
-export async function spawnTankerPlane(serverName: string, playerUnitObj: any, tankerObj: any, playerLoc: any, remoteLoc: any) {
+export async function spawnTankerPlane(playerUnitObj: any, tankerObj: any, playerLoc: any, remoteLoc: any) {
     let curTkrName: string;
     let curUnitSpawn;
     let curGroupSpawn;
@@ -2322,7 +2312,7 @@ export async function spawnTankerPlane(serverName: string, playerUnitObj: any, t
     curTkrName = "AI|" + tankerObj.name + "|";
     curSpwnUnit = _.cloneDeep(tankerObj);
 
-    masterDBController.baseActions("getClosestBase", serverName, { unitLonLatLoc: playerLoc})
+    masterDBController.baseActionGetClosestBase({ unitLonLatLoc: playerLoc})
         .then((closeBase: any) => {
             curGrpObj = {
                 ..._.cloneDeep(curSpwnUnit),
@@ -2351,13 +2341,12 @@ export async function spawnTankerPlane(serverName: string, playerUnitObj: any, t
             const curCMD = exports.spawnGrp(curGroupSpawn, curCountry, curCategory);
             const sendClient = {action: "CMD", cmd: [curCMD], reqID: 0};
             const actionObj = {actionObj: sendClient, queName: "clientArray"};
-            return masterDBController.cmdQueActions("save", serverName, actionObj)
+            return masterDBController.cmdQueActionsSave(actionObj)
                 .then(() => {
                     const mesg = "C: A " + tankerObj.type + " Tanker Has Been Spawned " +
                         playerUnitObj.hdg + " from " + closeBase.name + " " + tankerObj.details;
                     DCSLuaCommands.sendMesgToCoalition(
                         playerUnitObj.coalition,
-                        serverName,
                         mesg,
                         20
                     );
@@ -2381,7 +2370,9 @@ export async function spawnSupportPlane(serverName: string, baseObj: any, side: 
     let curGroupSpawn;
     let curSide;
     let curSpwnUnit;
-    let curGrpObj = {};
+    let curGrpObj = {
+        category: undefined
+    };
     let curRoutes;
     let baseLoc;
     let remoteLoc;
@@ -2403,7 +2394,7 @@ export async function spawnSupportPlane(serverName: string, baseObj: any, side: 
         // remoteLoc = zoneController.getLonLatFromDistanceDirection(baseLoc, _.random(0, 359), 70);
     }
     curGrpObj = {
-        ..._.cloneDeep(curSpwnUnit),
+        ...curSpwnUnit,
         groupId: grpNum,
         groupName: curBaseName,
         country: curSide
@@ -2439,12 +2430,11 @@ export async function spawnSupportPlane(serverName: string, baseObj: any, side: 
     const curCMD = exports.spawnGrp(curGroupSpawn, curSide, curGrpObj.category);
     const sendClient = {action: "CMD", cmd: [curCMD], reqID: 0};
     const actionObj = {actionObj: sendClient, queName: "clientArray"};
-    return masterDBController.cmdQueActions("save", serverName, actionObj)
+    return masterDBController.cmdQueActionsSave(actionObj)
         .then(() => {
             const mesg = "C: Cargo Support Plane 10 mins out, BRA " + randomDir + " from " + _.get(baseObj, "name");
             DCSLuaCommands.sendMesgToCoalition(
                 side,
-                serverName,
                 mesg,
                 20
             );
@@ -2455,7 +2445,7 @@ export async function spawnSupportPlane(serverName: string, baseObj: any, side: 
     ;
 }
 
-export async function spawnLogiGroup(serverName: string, spawnArray: any[], side: number) {
+export async function spawnLogiGroup(spawnArray: any[], side: number) {
     let curAng: number;
     let grpNum = 0;
     let unitNum = 0;
@@ -2511,7 +2501,7 @@ export async function spawnLogiGroup(serverName: string, spawnArray: any[], side
         const curCMD = exports.spawnGrp(curGroupSpawn, curSide, curGrpObj.category);
         const sendClient = {action: "CMD", cmd: [curCMD], reqID: 0};
         const actionObj = {actionObj: sendClient, queName: "clientArray"};
-        return masterDBController.cmdQueActions("save", serverName, actionObj)
+        return masterDBController.cmdQueActionsSave(actionObj)
             .catch((err: any) => {
                 console.log("erroring line1816: ", err);
             })
@@ -2573,7 +2563,7 @@ export async function spawnGroup(serverName: string, spawnArray: any[], baseName
         // console.log('cmd: ', curCMD);
         const sendClient = {action: "CMD", cmd: [curCMD], reqID: 0};
         const actionObj = {actionObj: sendClient, queName: "clientArray"};
-        return masterDBController.cmdQueActions("save", serverName, actionObj)
+        return masterDBController.cmdQueActionsSave(actionObj)
             .catch((err: any) => {
                 console.log("erroring line525: ", err);
             })
@@ -2585,7 +2575,7 @@ export async function spawnNewMapGrps( serverName: string ) {
     let totalUnitsSpawned = 0;
     const curServer = _.get(constants, ["config"]);
     let totalUnitNum;
-    return masterDBController.baseActions("read", serverName, {name: {$not: /#/}, enabled: true})
+    return masterDBController.baseActionRead({name: {$not: /#/}, enabled: true})
         .then((bases: any[]) => {
             _.forEach(bases, (base) => {
                 if (!_.includes(_.get(base, "name"), "Carrier")) {
@@ -2593,11 +2583,11 @@ export async function spawnNewMapGrps( serverName: string ) {
                     const baseName = _.get(base, "name");
                     const baseStartSide = _.get(base, "defaultStartSide", 0);
                     totalUnitNum = 0;
-                    groupController.spawnLogisticCmdCenter(serverName, {}, false, base, baseStartSide);
+                    groupController.spawnLogisticCmdCenter({}, false, base, baseStartSide);
                     exports.spawnSupportBaseGrp(serverName, baseName, baseStartSide, true);
                     if (_.get(base, "baseType") === "MOB") {
                         while (spawnArray.length + totalUnitNum < curServer.replenThresholdBase) { // UNCOMMENT THESE
-                            totalUnitNum += exports.spawnBaseReinforcementGroup(serverName, baseStartSide, baseName, true, true);
+                            totalUnitNum += exports.spawnBaseReinforcementGroup(baseStartSide, baseName, true, true);
                         }
                         exports.spawnSAMNet(serverName, baseStartSide, baseName, true);
                         totalUnitNum += 3;
@@ -2605,7 +2595,7 @@ export async function spawnNewMapGrps( serverName: string ) {
                             serverName,
                             {},
                             true,
-                            _.find(_.get(constants, "bases"),{name: baseName}),
+                            _.find(_.get(constants, "bases"), { name: baseName } ),
                             baseStartSide
                         );
                     }
@@ -2648,15 +2638,17 @@ export async function spawnLogisticCmdCenter(staticObj: any, init: boolean, base
     const curCMD = exports.spawnStatic(exports.staticTemplate(curGrpObj), curGrpObj.country, curGrpObj.name, init);
     const sendClient = {action: "CMD", cmd: curCMD, reqID: 0};
     const actionObj = {actionObj: sendClient, queName: "clientArray"};
-    masterDBController.cmdQueActions("save", actionObj)
+    masterDBController.cmdQueActionsSave(actionObj)
         .catch((err: any) => {
             console.log("erroring line2176: ", err);
         })
     ;
-    return masterDBController.unitActions(
-        "updateByName",
-        {name: curGrpObj.name, coalition: curGrpObj.coalition, country: curGrpObj.country, dead: false}
-    )
+    return masterDBController.unitActionUpdateByName({
+        name: curGrpObj.name,
+        coalition: curGrpObj.coalition,
+        country: curGrpObj.country,
+        dead: false
+    })
         .catch((err: any) => {
             console.log("erroring line2181: ", err);
         })
@@ -2680,19 +2672,20 @@ export async function spawnRadioTower(staticObj: any, init: boolean, baseObj: an
         shape_name: "tele_bash_m"
     };
 
-    const curCMD = exports.spawnStatic(serverName, exports.staticTemplate(curGrpObj), curGrpObj.country, curGrpObj.name, init);
+    const curCMD = exports.spawnStatic(exports.staticTemplate(curGrpObj), curGrpObj.country, curGrpObj.name, init);
     const sendClient = {action: "CMD", cmd: curCMD, reqID: 0};
     const actionObj = {actionObj: sendClient, queName: "clientArray"};
-    masterDBController.cmdQueActions("save", serverName, actionObj)
+    masterDBController.cmdQueActionsSave(actionObj)
         .catch((err: any) => {
             console.log("erroring line2204: ", err);
         })
     ;
-    return masterDBController.unitActions(
-        "updateByName",
-        serverName,
-        {name: curGrpObj.name, coalition: curGrpObj.coalition, country: curGrpObj.country, dead: false}
-    )
+    return masterDBController.unitActionUpdateByName({
+        name: curGrpObj.name,
+        coalition: curGrpObj.coalition,
+        country: curGrpObj.country,
+        dead: false
+    })
         .catch((err: any) => {
             console.log("erroring line2209: ", err);
         })
@@ -2729,11 +2722,11 @@ export async function replenishUnits( serverName: string, baseName: string, side
     // exports.spawnGroup(serverName, exports.spawnBaseReinforcementGroup(serverName, side, baseName), baseName, side);
 }
 
-export async function destroyUnit( serverName: string, unitName: string ) {
+export async function destroyUnit( unitName: string ) {
     // DONT USE ON CLIENT AIRCRAFT
     const sendClient = {action: "REMOVEOBJECT", removeObject: unitName, reqID: 0};
     const actionObj = {actionObj: sendClient, queName: "clientArray"};
-    return masterDBController.cmdQueActions("save", serverName, actionObj)
+    return masterDBController.cmdQueActionsSave(actionObj)
         .catch((err: any) => {
             console.log("erroring line613: ", err);
         })
@@ -2743,12 +2736,12 @@ export async function destroyUnit( serverName: string, unitName: string ) {
 export async function healBase( serverName: string, baseName: string, curPlayerUnit: any) {
     // respawn farp tower to 'heal' it
     return new Promise((resolve, reject) => {
-        masterDBController.baseActions("read", serverName, {name: baseName})
+        masterDBController.baseActionRead({name: baseName})
             .then((baseUnit: any) => {
                 if (baseUnit) {
                     const curBase = baseUnit[0];
                     if (_.get(curBase, "baseType") !== "MOB") {
-                        neutralCCController.spawnCCAtNeutralBase(serverName, curPlayerUnit)
+                        neutralCCController.spawnCCAtNeutralBase(curPlayerUnit)
                             .then((resp: any) => {
                                 exports.spawnSupportBaseGrp( serverName, curBase.name, _.get(curPlayerUnit, "coalition") );
                                 resolve(resp);
@@ -2760,7 +2753,7 @@ export async function healBase( serverName: string, baseName: string, curPlayerU
                         ;
 
                     } else {
-                        masterDBController.unitActions("read", serverName, {name: _.get(curBase, "name") + " Logistics", dead: false})
+                        masterDBController.unitActionRead({name: _.get(curBase, "name") + " Logistics", dead: false})
                             .then((logiUnit: any[]) => {
                                 const curUnit = logiUnit[0];
                                 if (curUnit) {
@@ -2777,7 +2770,7 @@ export async function healBase( serverName: string, baseName: string, curPlayerU
                                 reject(err);
                             })
                         ;
-                        masterDBController.unitActions("read", serverName, {name: _.get(curBase, "name") + " Communications", dead: false})
+                        masterDBController.unitActionRead({name: _.get(curBase, "name") + " Communications", dead: false})
                             .then((commUnit: any[]) => {
                                 const curCommUnit = commUnit[0];
                                 if (curCommUnit) {

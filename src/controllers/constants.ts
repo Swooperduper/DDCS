@@ -113,10 +113,11 @@ export const countryId = [
     "UNITED_ARAB_EMIRATES"
 ];
 
-export const defCountrys = {
-    1: "RUSSIA",
-    2: "USA"
-};
+export const defCountrys = [
+    "default",
+    "RUSSIA",
+    "USA"
+];
 
 export const enemyCountry = [
     0,
@@ -245,24 +246,23 @@ export async function getBases() {
         .catch((err: any) => {
             console.log("err line110: ", err);
         });
-};
+}
 
 export async function getServer() {
     return masterDBController.serverActionsRead({})
-        .then((server: IServer[]) => {
+        .then((server: any) => {
             return new Promise((resolve) => {
                 resolve(_.first(server));
             });
         })
         .catch((err: any) => {
             console.log("err line101: ", err);
-        })
-        ;
-};
+        });
+}
 
 export const getStaticDictionary = () => {
-    return masterDBController.staticDictionaryActionsRead()
-        .then((staticDic: IStaticDictionary[]) => {
+    return masterDBController.staticDictionaryActionsRead({})
+        .then((staticDic: any) => {
             return new Promise((resolve) => {
                 resolve(staticDic);
             });
@@ -275,7 +275,7 @@ export const getStaticDictionary = () => {
 
 export const getUnitDictionary = (curTimePeriod: string) => {
     return masterDBController.unitDictionaryActionsRead({ timePeriod: curTimePeriod })
-        .then((unitsDic: IUnitDictionary[]) => {
+        .then((unitsDic: any) => {
             return new Promise((resolve) => {
                 resolve(unitsDic);
             });
@@ -287,8 +287,8 @@ export const getUnitDictionary = (curTimePeriod: string) => {
 };
 
 export const getWeaponDictionary = async () => {
-    return await masterDBController.weaponScoreActionsRead()
-        .then((weaponsDic: IWeaponDictionary[]) => {
+    return await masterDBController.weaponScoreActionsRead({})
+        .then((weaponsDic: any) => {
             return weaponsDic;
         })
         .catch ((err: any) => {

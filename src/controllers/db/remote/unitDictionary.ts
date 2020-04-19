@@ -8,7 +8,7 @@ import {IUnitDictionary} from "../../../typings";
 
 const unitDictionaryTable = remoteConnection.model("unitDictionaries", unitDictionarySchema);
 
-export async function unitDictionaryActionsRead(obj: IUnitDictionary) {
+export async function unitDictionaryActionsRead(obj: any) {
     return new Promise((resolve, reject) => {
         unitDictionaryTable.find(obj, (err, unitDictionary: IUnitDictionary[]) => {
             if (err) { reject(err); }

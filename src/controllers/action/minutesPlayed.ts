@@ -107,7 +107,7 @@ export async function updateSession(sessionName: string) {
     ;
 }
 
-export async function recordFiveMinutesPlayed(serverName: string) {
+export async function recordFiveMinutesPlayed() {
     const totalMinsPerSide: any = {
         1: 0,
         2: 0
@@ -135,7 +135,7 @@ export async function recordFiveMinutesPlayed(serverName: string) {
                     });
                     Promise.all(processPromise)
                         .then(() => {
-                            exports.updateSession(serverName, latestSession);
+                            exports.updateSession(latestSession);
                         })
                         .catch((err: any) => {
                             console.log("err line133: ", err);

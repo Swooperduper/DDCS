@@ -2,60 +2,53 @@
  * DDCS Licensed under AGPL-3.0 by Andrew "Drex" Finegan https://github.com/afinegan/DynamicDCS
  */
 
-const	_ = require('lodash');
-const masterDBController = require('../db/masterDB');
+import * as _ from "lodash";
+import * as masterDBController from "../db";
 
-_.set(exports, 'setSideLockFlags', function (serverName) {
-	// console.log('SETSIDELOCKGFLAGS ');
-	var playerSideLockTable = [];
-	masterDBController.sessionsActions('readLatest', serverName, {})
-		.then(function (latestSession) {
-			if (latestSession.name) {
-				masterDBController.srvPlayerActions('read', serverName, {sessionName: latestSession.name})
-					.then(function (playerArray) {
-						_.forEach(playerArray, function (player) {
-							var lockObj;
-							var lockedSide =  player.sideLock;
-							if(player.isGameMaster) {
-								lockObj = {
-									ucid: player._id + '_GM',
-									val: 1
-								};
-							} else {
-								if(lockedSide > 0) {
-									lockObj = {
-										ucid: player._id + '_' + lockedSide,
-										val: 1
-									};
-								} else {
-									lockObj = {
-										ucid: player._id + '_' + lockedSide,
-										val: 0
-									};
-								}
-							}
-							playerSideLockTable.push(lockObj);
-						});
-						sendClient = {
-							"action" : "SETSIDELOCK",
-							"data": playerSideLockTable
-						};
-						actionObj = {actionObj: sendClient, queName: 'clientArray'};
-						console.log('setSideLock: ', sendClient);
-						masterDBController.cmdQueActions('save', serverName, actionObj)
-							.catch(function (err) {
-								console.log('erroring line41: ', err);
-							})
-						;
-					})
-					.catch(function (err) {
-						console.log('line80', err);
-					})
-				;
-			}
-		})
-		.catch(function (err) {
-			console.log('line86', err);
-		})
-	;
-});
+export async function setSideLockFlags() {
+    // console.log('SETSIDELOCKGFLAGS ');
+    const playerSideLockTable: any[] = [];
+    return masterDBController.sessionsActionsReadLatest()
+        .then((latestSession: any) => {
+            if (latestSession.name) {
+                return masterDBController.srvPlayerActionsRead({sessionName: latestSession.name})
+                    .then((playerArray: any) => {
+                        _.forEach(playerArray, (player) => {
+                            let lockObj;
+                            const lockedSide =  player.sideLock;
+                            if (player.isGameMaster) {
+                                lockObj = {
+                                    ucid: player._id + "_GM",
+                                    val: 1
+                                };
+                            } else {
+                                if (lockedSide > 0) {
+                                    lockObj = {
+                                        ucid: player._id + "_" + player.sideLock,
+                                        val: 1
+                                    };
+                                } else {
+                                    lockObj = {
+                                        ucid: player._id + "_" + player.sideLock,
+                                        val: 0
+                                    };
+                                }
+                            }
+                            playerSideLockTable.push(lockObj);
+                        });
+
+                        console.log("setSideLock: ", playerSideLockTable);
+                        return masterDBController.cmdQueActionsSave({
+                            actionObj: {
+                                action : "SETSIDELOCK",
+                                data: playerSideLockTable
+                            },
+                            queName: "clientArray"
+                        })
+                            .catch((err) => console.log("error" + " line41: ", err) );
+                    })
+                    .catch((err) => console.log("line80", err) );
+            }
+        })
+        .catch((err) => console.log("line86", err) );
+}

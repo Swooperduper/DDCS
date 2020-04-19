@@ -2,99 +2,145 @@
  * DDCS Licensed under AGPL-3.0 by Andrew "Drex" Finegan https://github.com/afinegan/DynamicDCS
  */
 
-const	_ = require('lodash');
-const masterDBController = require('../db/masterDB');
+import * as masterDBController from "../db";
 
-// game mission commands
-_.assign(exports, {
-	forcePlayerSpectator: function (serverName, playerId, mesg) {
-		var curCMD;
-		var sendClient;
-		var actionObj;
-		curCMD = 'net.force_player_slot('+playerId+', 0, "")';
-		sendClient = {action: "CMD", cmd: curCMD, reqID: 0};
-		actionObj = {actionObj: sendClient, queName: 'gameGuiArray'};
-		masterDBController.cmdQueActions('save', serverName, actionObj)
-			.catch(function (err) {
-				console.log('erroring line65: ', err);
-			})
-		;
-		curCMD = 'net.send_chat([['+mesg+']], all)';
-		sendClient = {action: "CMD", cmd: curCMD, reqID: 0};
-		actionObj = {actionObj: sendClient, queName: 'gameGuiArray'};
-		masterDBController.cmdQueActions('save', serverName, actionObj)
-			.catch(function (err) {
-				console.log('erroring line73: ', err);
-			})
-		;
-	},
-	kickPlayer: function (serverName, playerId, mesg) {
-		var curCMD = 'net.kick('+playerId+', [['+mesg+']])';
-		var sendClient = {action: "CMD", cmd: curCMD, reqID: 0};
-		var actionObj = {actionObj: sendClient, queName: 'gameGuiArray'};
-		masterDBController.cmdQueActions('save', serverName, actionObj)
-			.catch(function (err) {
-				console.log('erroring line56: ', err);
-			})
-		;
-	},
-	loadMission: function (serverName, missionName) {
-		var curCMD = 'net.load_mission([[' + missionName + ']])';
-		var sendClient = {action: "CMD", cmd: curCMD, reqID: 0};
-		var actionObj = {actionObj: sendClient, queName: 'gameGuiArray'};
-		masterDBController.cmdQueActions('save', serverName, actionObj)
-			.catch(function (err) {
-				console.log('erroring line65: ', err);
-			})
-		;
-	},
-	sendMesgChatWindow: function (serverName, mesg) {
-		var curCMD = 'net.send_chat([['+mesg+']], true)';
-		var sendClient = {action: "CMD", cmd: curCMD, reqID: 0};
-		var actionObj = {actionObj: sendClient, queName: 'gameGuiArray'};
-		masterDBController.cmdQueActions('save', serverName, actionObj)
-			.catch(function (err) {
-				console.log('erroring line45: ', err);
-			})
-		;
-	},
-	sendMesgToAll: function (serverName, mesg, time, delayTime) {
-		var curCMD = 'trigger.action.outText([['+mesg+']], '+time+')';
-		var sendClient = {action: "CMD", cmd: [curCMD], reqID: 0};
-		var actionObj = {actionObj: sendClient, queName: 'clientArray', timeToExecute: delayTime};
-		masterDBController.cmdQueActions('save', serverName, actionObj)
-			.catch(function (err) {
-				console.log('erroring line16: ', err);
-			})
-		;
-	},
-	sendMesgToCoalition: function (coalition, serverName, mesg, time, delayTime) {
-		var curCMD = 'trigger.action.outTextForCoalition('+coalition+', [['+mesg+']], '+time+')';
-		var sendClient = {action: "CMD", cmd: [curCMD], reqID: 0};
-		var actionObj = {actionObj: sendClient, queName: 'clientArray', timeToExecute: delayTime};
-		masterDBController.cmdQueActions('save', serverName, actionObj)
-			.catch(function (err) {
-				console.log('erroring line27: ', err);
-			})
-		;
-	},
-	sendMesgToGroup: function (groupId, serverName, mesg, time, delayTime) {
-		var curCMD = 'trigger.action.outTextForGroup('+groupId+', [['+mesg+']], '+time+')';
-		var sendClient = {action: "CMD", cmd: [curCMD], reqID: 0};
-		var actionObj = {actionObj: sendClient, queName: 'clientArray', timeToExecute: delayTime};
-		masterDBController.cmdQueActions('save', serverName, actionObj)
-			.catch(function (err) {
-				console.log('erroring line38: ', err);
-			})
-		;
-	},
-	setIsOpenSlotFlag: function (serverName, lockFlag) {
-		var sendClient = {action: "SETISOPENSLOT", val: lockFlag};
-		var actionObj = {actionObj: sendClient, queName: 'clientArray'};
-		masterDBController.cmdQueActions('save', serverName, actionObj)
-			.catch(function (err) {
-				console.log('erroring line38: ', err);
-			})
-		;
-	}
-});
+export async function forcePlayerSpectator(playerId: number, mesg: string) {
+
+    const forcePromise: any[] = [];
+
+    forcePromise.push(masterDBController.cmdQueActionsSave({
+        actionObj: {
+            action: "CMD",
+            cmd: "net.force_player_slot(" + playerId + ", 0, \"\")",
+            reqID: 0
+        },
+        queName: "gameGuiArray"
+    })
+        .catch((err) => {
+            console.log("erroring line65: ", err);
+        }));
+
+    forcePromise.push(masterDBController.cmdQueActionsSave({
+        actionObj: {
+            action: "CMD",
+            cmd: "net.send_chat([[" + mesg + "]], all)",
+            reqID: 0
+        },
+        queName: "gameGuiArray"
+    })
+        .catch((err) => {
+            console.log("erroring line73: ", err);
+        }));
+
+    return Promise.all(forcePromise)
+        .catch((err) => {
+            console.log("error line38: ", err);
+        });
+}
+
+export async function kickPlayer(playerId: number, mesg: string) {
+    return masterDBController.cmdQueActionsSave({
+        actionObj: {
+            action: "CMD",
+            cmd: "net.kick(" + playerId + ", [[" + mesg + "]])",
+            reqID: 0
+        },
+        queName: "gameGuiArray"
+    })
+        .catch((err) => {
+            console.log("erroring line56: ", err);
+        })
+    ;
+}
+
+export async function loadMission(missionName: string) {
+    return masterDBController.cmdQueActionsSave({
+        actionObj: {
+            action: "CMD",
+            cmd: "net.load_mission([[" + missionName + "]])",
+            reqID: 0
+        },
+        queName: "gameGuiArray"
+    })
+        .catch((err) => {
+            console.log("erroring line65: ", err);
+        })
+    ;
+}
+
+export async function sendMesgChatWindow(mesg: string) {
+    return masterDBController.cmdQueActionsSave({
+        actionObj: {
+            action: "CMD",
+            cmd: "net.send_chat([[" + mesg + "]], true)",
+            reqID: 0
+        },
+        queName: "gameGuiArray"
+    })
+        .catch((err) => {
+            console.log("erroring line45: ", err);
+        })
+    ;
+}
+
+export async function sendMesgToAll(mesg: string, time: number, delayTime?: number) {
+    return masterDBController.cmdQueActionsSave({
+        actionObj: {
+            action: "CMD",
+            cmd: ["trigger.action.outText([[" + mesg + "]], " + time + ")"],
+            reqID: 0
+        },
+        queName: "clientArray",
+        timeToExecute: delayTime
+    })
+        .catch((err) => {
+            console.log("erroring line16: ", err);
+        })
+    ;
+}
+
+export async function sendMesgToCoalition(coalition: number, mesg: string, time: number, delayTime?: number) {
+    return masterDBController.cmdQueActionsSave({
+        actionObj: {
+            action: "CMD",
+            cmd: ["trigger.action.outTextForCoalition(" + coalition + ", [[" + mesg + "]], " + time + ")"],
+            reqID: 0
+        },
+        queName: "clientArray",
+        timeToExecute: delayTime
+    })
+        .catch((err: any) => {
+            console.log("erroring line27: ", err);
+        })
+    ;
+}
+
+export async function sendMesgToGroup(groupId: number, mesg: string, time: number, delayTime?: number) {
+    return masterDBController.cmdQueActionsSave({
+        actionObj: {
+            action: "CMD",
+            cmd: ["trigger.action.outTextForGroup(" + groupId + ", [[" + mesg + "]], " + time + ")"],
+            reqID: 0
+        },
+        queName: "clientArray",
+        timeToExecute: delayTime
+    })
+        .catch((err) => {
+            console.log("erroring line38: ", err);
+        })
+    ;
+}
+
+export async function setIsOpenSlotFlag(lockFlag: number) {
+    return masterDBController.cmdQueActionsSave({
+        actionObj: {
+            action: "SETISOPENSLOT",
+            val: lockFlag
+        },
+        queName: "clientArray"
+    })
+        .catch((err: any) => {
+            console.log("erroring line38: ", err);
+        })
+    ;
+}

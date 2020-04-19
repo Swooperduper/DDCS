@@ -110,7 +110,7 @@ export async function staticCrateActionDelete(obj: any): Promise<ICrate[]> {
     });
 }
 
-export async function staticCrateActionRemoveall(obj: any): Promise<any> {
+export async function staticCrateActionRemoveall(): Promise<any> {
     return staticCratesTable.deleteOne({});
 }
 

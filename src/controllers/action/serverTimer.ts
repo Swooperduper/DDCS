@@ -2,189 +2,189 @@
  * DDCS Licensed under AGPL-3.0 by Andrew "Drex" Finegan https://github.com/afinegan/DynamicDCS
  */
 
-const	_ = require('lodash');
-const constants = require('../constants');
-const DCSLuaCommands = require('../player/DCSLuaCommands');
-const masterDBController = require('../db/masterDB');
+import * as _ from "lodash";
+import * as constants from "../constants";
+import * as DCSLuaCommands from "../player/DCSLuaCommands";
+import * as masterDBController from "../db";
 
-var cntr = 10;
-var curSecs = 0;
-var curTime = new Date().getTime();
-var lastSentLoader = _.cloneDeep(curTime);
-var maxTime = 0;
-var mesg;
-var oneHour = _.get(constants, 'time.oneHour');
+let curSecs = 0;
+let curTime = new Date().getTime();
+let lastSentLoader = _.cloneDeep(curTime);
+let maxTime = 0;
+let mesg;
+const oneHour = _.get(constants, "time.oneHour");
 
-_.set(exports, 'timerObj', {});
+exports.timerObj = {};
 
-//only 5 hour rotation allowed atm
-_.set(exports, 'processTimer', function (serverName, serverSecs) {
-	maxTime = _.get(constants, 'config.restartTime');
-	mesg = null;
-	curSecs = serverSecs;
-	//5 hours
-	// if (serverSecs > 3600 && !_.get(exports, 'timerObj.fiveHours')) {
-	//	mesg = 'Server is restarting in 5 hours!';
-	//	_.set(exports, 'timerObj.fiveHours', true)
-	// }
-	//4 hours
-	if (maxTime > 0) {
-		if (serverSecs > (maxTime - (oneHour * 4)) && !_.get(exports, 'timerObj.fourHours')) {
-			mesg = 'Server is restarting in 4 hours!';
-			_.set(exports, 'timerObj.fourHours', true);
-		}
-		//3 hours
-		if (serverSecs > (maxTime - (oneHour * 3)) && !_.get(exports, 'timerObj.threeHours')) {
-			mesg = 'Server is restarting in 3 hours!';
-			_.set(exports, 'timerObj.threeHours', true);
-		}
-		//2 hours
-		if (serverSecs > (maxTime - (oneHour * 2)) && !_.get(exports, 'timerObj.twoHours')) {
-			mesg = 'Server is restarting in 2 hours!';
-			_.set(exports, 'timerObj.twoHours', true);
-		}
-		//1 hour
-		if (serverSecs > (maxTime - oneHour) && !_.get(exports, 'timerObj.oneHour')) {
-			mesg = 'Server is restarting in 1 hour!';
-			_.set(exports, 'timerObj.oneHour', true);
-		}
-		//30 mins
-		if (serverSecs > (maxTime - 1800) && !_.get(exports, 'timerObj.thirtyMinutes')) {
-			mesg = 'Server is restarting in 30 minutes!';
-			_.set(exports, 'timerObj.thirtyMinutes', true);
-		}
-		//20 mins
-		if (serverSecs > (maxTime - 1440) && !_.get(exports, 'timerObj.twentyMinutes')) {
-			mesg = 'Server is restarting in 20 mins!';
-			_.set(exports, 'timerObj.twentyMinutes', true);
-		}
-		//10 mins
-		if (serverSecs > (maxTime - 720) && !_.get(exports, 'timerObj.tenMinutes')) {
-			mesg = 'Server is restarting in 10 mins!';
-			_.set(exports, 'timerObj.tenMinutes', true);
-		}
-		//5 mins
-		if (serverSecs > (maxTime - 360) && !_.get(exports, 'timerObj.fiveMinutes')) {
-			mesg = 'Server is restarting in 5 minutes!';
-			_.set(exports, 'timerObj.fiveMinutes', true);
-		}
-		//4 mins
-		if (serverSecs > (maxTime - 240) && !_.get(exports, 'timerObj.fourMinutes')) {
-			mesg = 'Server is restarting in 4 minutes!';
-			_.set(exports, 'timerObj.fourMinutes', true);
-		}
-		//3 mins
-		if (serverSecs > (maxTime - 180) && !_.get(exports, 'timerObj.threeMinutes')) {
-			mesg = 'Server is restarting in 3 minutes!';
-			_.set(exports, 'timerObj.threeMinutes', true);
-		}
-		//2 mins
-		if (serverSecs > (maxTime - 120) && !_.get(exports, 'timerObj.twoMinutes')) {
-			mesg = 'Server is restarting in 2 minutes, Locking Server Down!';
-			_.set(exports, 'timerObj.twoMinutes', true);
-			DCSLuaCommands.setIsOpenSlotFlag(serverName, 0);
-		}
-		//1 min
-		if (serverSecs > (maxTime - 60) && !_.get(exports, 'timerObj.oneMinute')) {
-			mesg = 'Server is restarting in 1 minute, Server Is Locked!';
-			_.set(exports, 'timerObj.oneMinute', true);
-			DCSLuaCommands.setIsOpenSlotFlag(serverName, 0);
-			masterDBController.sessionsActions('readLatest', serverName, {})
-				.then(function (latestSession) {
-					if (latestSession.name) {
-						masterDBController.srvPlayerActions('read', serverName, { sessionName: latestSession.name })
-							.then(function (playerArray) {
-								_.forEach(playerArray, function (player) {
-									DCSLuaCommands.kickPlayer(serverName, player.id, 'Server is now restarting!');
-								});
-							})
-							.catch(function (err) {
-								console.log('line101: ', err);
-							})
-						;
-					}
-				})
-				.catch(function (err) {
-					console.log('line107: ', err);
-				})
-			;
-		}
-		//restart server
-		if (serverSecs > maxTime) {
-			//restart server on next or same map depending on rotation
-			curTime = new Date().getTime();
-			if (curTime > lastSentLoader + _.get(constants, 'time.oneMin')) {
-				masterDBController.sessionsActions('readLatest', serverName, {})
-					.then(function (latestSession) {
-						if (latestSession.name) {
-							masterDBController.srvPlayerActions('read', serverName, { sessionName: latestSession.name })
-								.then(function (playerArray) {
-									_.forEach(playerArray, function (player) {
-										DCSLuaCommands.kickPlayer(serverName, player.id, 'Server is now restarting!');
-									});
-									exports.restartServer(serverName);
-								})
-								.catch(function (err) {
-									console.log('line101: ', err);
-								})
-							;
-						}
-					})
-					.catch(function (err) {
-						console.log('line107: ', err);
-					})
-				;
-				lastSentLoader = curTime;
-			}
-		} else {
-			if (mesg) {
-				console.log('serverMesg: ', serverName, mesg);
-				DCSLuaCommands.sendMesgToAll(serverName, mesg, 20);
-			}
-		}
-	}
-});
+export function processTimer(serverSecs: number) {
+    maxTime = constants.config.restartTime;
+    mesg = null;
+    curSecs = serverSecs;
 
-_.set(exports, 'resetTimerObj', function () {
-	_.set(exports, 'timerObj', {});
-});
+    if (maxTime > 0) {
+        if (serverSecs > (maxTime - (oneHour * 4)) && !exports.timerObj.fourHours) {
+            mesg = "Server is restarting in 4 hours!";
+            exports.timerObj.fourHours = true;
+        }
+        // 3 hours
+        if (serverSecs > (maxTime - (oneHour * 3)) && !exports.timerObj.threeHours) {
+            mesg = "Server is restarting in 3 hours!";
+            exports.timerObj.threeHours = true;
+        }
+        // 2 hours
+        if (serverSecs > (maxTime - (oneHour * 2)) && !exports.timerObj.twoHours) {
+            mesg = "Server is restarting in 2 hours!";
+            exports.timerObj.twoHours = true;
+        }
+        // 1 hour
+        if (serverSecs > (maxTime - oneHour) && !exports.timerObj.oneHour) {
+            mesg = "Server is restarting in 1 hour!";
+            exports.timerObj.oneHour = true;
+        }
+        // 30 mins
+        if (serverSecs > (maxTime - 1800) && !exports.timerObj.thirtyMinutes) {
+            mesg = "Server is restarting in 30 minutes!";
+            exports.timerObj.thirtyMinutes = true;
+        }
+        // 20 mins
+        if (serverSecs > (maxTime - 1440) && !exports.timerObj.twentyMinutes) {
+            mesg = "Server is restarting in 20 mins!";
+            exports.timerObj.twentyMinutes = true;
+        }
+        // 10 mins
+        if (serverSecs > (maxTime - 720) && !exports.timerObj.tenMinutes) {
+            mesg = "Server is restarting in 10 mins!";
+            exports.timerObj.tenMinutes = true;
+        }
+        // 5 mins
+        if (serverSecs > (maxTime - 360) && !exports.timerObj.fiveMinutes) {
+            mesg = "Server is restarting in 5 minutes!";
+            exports.timerObj.fiveMinutes = true;
+        }
+        // 4 mins
+        if (serverSecs > (maxTime - 240) && !exports.timerObj.fourMinutes) {
+            mesg = "Server is restarting in 4 minutes!";
+            exports.timerObj.fourMinutes = true;
+        }
+        // 3 mins
+        if (serverSecs > (maxTime - 180) && !exports.timerObj.threeMinutes) {
+            mesg = "Server is restarting in 3 minutes!";
+            exports.timerObj.threeMinutes = true;
+        }
+        // 2 mins
+        if (serverSecs > (maxTime - 120) && !exports.timerObj.twoMinutes) {
+            mesg = "Server is restarting in 2 minutes, Locking Server Down!";
+            exports.timerObj.twoMinutes = true;
+            DCSLuaCommands.setIsOpenSlotFlag(0)
+                .catch((err) => {
+                    console.log("line80: ", err);
+                });
+        }
+        // 1 min
+        if (serverSecs > (maxTime - 60) && !exports.timerObj.oneMinute) {
+            mesg = "Server is restarting in 1 minute, Server Is Locked!";
+            exports.timerObj.oneMinute = true;
+            DCSLuaCommands.setIsOpenSlotFlag(0)
+                .catch((err) => {
+                    console.log("line89: ", err);
+                });
+            masterDBController.sessionsActionsReadLatest()
+                .then((latestSession: any) => {
+                    if (latestSession.name) {
+                        masterDBController.srvPlayerActionsRead({ sessionName: latestSession.name })
+                            .then((playerArray: any) => {
+                                _.forEach(playerArray, (player) => {
+                                    DCSLuaCommands.kickPlayer(player.id, "Server is now restarting!")
+                                        .catch((err) => {
+                                            console.log("line99: ", err);
+                                        });
+                                });
+                            })
+                            .catch((err) => {
+                                console.log("line101: ", err);
+                            })
+                        ;
+                    }
+                })
+                .catch((err) => {
+                    console.log("line107: ", err);
+                })
+            ;
+        }
+        // restart server
+        if (serverSecs > maxTime) {
+            // restart server on next or same map depending on rotation
+            curTime = new Date().getTime();
+            if (curTime > lastSentLoader + constants.time.oneMin) {
+                masterDBController.sessionsActionsReadLatest()
+                    .then((latestSession: any) => {
+                        if (latestSession.name) {
+                            masterDBController.srvPlayerActionsRead({ sessionName: latestSession.name })
+                                .then((playerArray: any) => {
+                                    _.forEach(playerArray, (player) => {
+                                        DCSLuaCommands.kickPlayer(player.id, "Server is now restarting!")
+                                            .catch((err) => {
+                                                console.log("line127: ", err);
+                                            });
+                                    });
+                                    exports.restartServer();
+                                })
+                                .catch((err) => {
+                                    console.log("line101: ", err);
+                                });
+                        }
+                    })
+                    .catch((err) => {
+                        console.log("line107: ", err);
+                    });
+                lastSentLoader = curTime;
+            }
+        } else {
+            if (mesg) {
+                console.log("serverMesg: ", mesg);
+                DCSLuaCommands.sendMesgToAll(mesg, 20)
+                    .catch((err) => {
+                        console.log("line135: ", err);
+                    });
+            }
+        }
+    }
+}
 
-_.set(exports, 'restartServer', function (serverName) {
-	masterDBController.serverActions('read', {_id: serverName})
-		.then(function (server) {
-			var newMap = _.get(server, [0, 'curFilePath']) + '_' +
-				_.get(server, [0, 'curSeason']) + '_' +
-				_.random(1, _.get(server, [0, 'mapCount'])) + '.miz';
+export function resetTimerObj() {
+    exports.timerObj = {};
+}
 
-			console.log('Loading Map: ', newMap);
-			DCSLuaCommands.loadMission(serverName, newMap);
-		})
-		.catch(function (err) {
-			console.log('line73: ', err);
-		})
-	;
+export async function restartServer() {
+    masterDBController.serverActionsRead({})
+        .then((server: any) => {
+            const newMap = server[0].curFilePath + "_" + server[0].curSeason + "_" +
+                _.random(1, (server[0].mapCount || 1)) + ".miz";
 
+            console.log("Loading Map: ", newMap);
+            DCSLuaCommands.loadMission(newMap);
+        })
+        .catch((err) => {
+            console.log("line73: ", err);
+        });
+}
 
-});
+export function secondsToHms(d: number) {
+    const h = Math.floor(d / 3600);
+    const m = Math.floor(d % 3600 / 60);
+    // const s = Math.floor(d % 3600 % 60);
 
-_.set(exports, 'secondsToHms', function (d) {
-	d = Number(d);
-	var h = Math.floor(d / 3600);
-	var m = Math.floor(d % 3600 / 60);
-	var s = Math.floor(d % 3600 % 60);
+    const hDisplay = h > 0 ? h + (h === 1 ? " hour, " : " hours, ") : "";
+    const mDisplay = m > 0 ? m + (m === 1 ? " minute, " : " minutes") : "";
+    // const sDisplay = s > 0 ? s + (s === 1 ? " second" : " seconds") : "";
+    return hDisplay + mDisplay;
+}
 
-	var hDisplay = h > 0 ? h + (h === 1 ? " hour, " : " hours, ") : "";
-	var mDisplay = m > 0 ? m + (m === 1 ? " minute, " : " minutes") : "";
-	// var sDisplay = s > 0 ? s + (s === 1 ? " second" : " seconds") : "";
-	return hDisplay + mDisplay;
-});
-
-_.set(exports, 'timeLeft', function (serverName, curUnit) {
-	var formatTime = exports.secondsToHms(maxTime - curSecs);
-	DCSLuaCommands.sendMesgToGroup(
-		curUnit.groupId,
-		serverName,
-		"G: Server has " + formatTime + " left till restart!",
-		5
-	);
-});
+export async function timeLeft(curUnit: any) {
+    const formatTime = exports.secondsToHms(maxTime - curSecs);
+    return DCSLuaCommands.sendMesgToGroup(
+        curUnit.groupId,
+        "G: Server has " + formatTime + " left till restart!",
+        5
+    );
+}

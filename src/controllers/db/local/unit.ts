@@ -10,25 +10,25 @@ import {IUnit} from "../../../typings";
 
 const unitTable = localConnection.model(process.env.SERVERNAME + "_unit", unitSchema);
 
-export async function unitActionRead(obj: any): Promise<IUnit[]> {
+export async function unitActionRead(obj: any): Promise<any[]> {
     return new Promise((resolve, reject) => {
-        unitTable.find(obj).sort( { createdAt: -1 } ).exec((err, dbUnits: IUnit[]) => {
+        unitTable.find(obj).sort( { createdAt: -1 } ).exec((err, dbUnits: any[]) => {
             if (err) { reject(err); }
             resolve(dbUnits);
         });
     });
 }
 
-export async function unitActionReadStd(obj: any): Promise<IUnit[]> {
+export async function unitActionReadStd(obj: any): Promise<any[]> {
     return new Promise((resolve, reject) => {
-        unitTable.find(obj).exec((err, dbUnits: IUnit[]) => {
+        unitTable.find(obj).exec((err, dbUnits: any[]) => {
             if (err) { reject(err); }
             resolve(dbUnits);
         });
     });
 }
 
-export async function unitActionReadMin(obj: any): Promise<IUnit[]> {
+export async function unitActionReadMin(obj: any): Promise<any[]> {
     return new Promise((resolve, reject) => {
         unitTable.find(obj).exec((err, dbUnits) => {
             const curDbUnits: any[] = [];
@@ -52,7 +52,7 @@ export async function unitActionReadMin(obj: any): Promise<IUnit[]> {
     });
 }
 
-export async function unitActionSave(obj: any): Promise<IUnit[]> {
+export async function unitActionSave(obj: any): Promise<any[]> {
     return new Promise((resolve, reject) => {
         const unit = new unitTable(obj);
         unit.save((err, units: any) => {
@@ -62,7 +62,7 @@ export async function unitActionSave(obj: any): Promise<IUnit[]> {
     });
 }
 
-export async function unitActionUpdate(obj: any): Promise<IUnit[]> {
+export async function unitActionUpdate(obj: any): Promise<any[]> {
     return new Promise((resolve, reject) => {
         unitTable.findOneAndUpdate(
             {_id: obj._id},
@@ -75,7 +75,7 @@ export async function unitActionUpdate(obj: any): Promise<IUnit[]> {
     });
 }
 
-export async function unitActionUpdateByName(obj: any): Promise<IUnit[]> {
+export async function unitActionUpdateByName(obj: any): Promise<any[]> {
     return new Promise((resolve, reject) => {
         unitTable.findOneAndUpdate(
             {name: obj.name},
@@ -88,7 +88,7 @@ export async function unitActionUpdateByName(obj: any): Promise<IUnit[]> {
     });
 }
 
-export async function unitActionUpdateByUnitId(obj: any): Promise<IUnit[]> {
+export async function unitActionUpdateByUnitId(obj: any): Promise<any[]> {
     return new Promise((resolve, reject) => {
         unitTable.findOneAndUpdate(
             {unitId: obj.unitId},
@@ -101,7 +101,7 @@ export async function unitActionUpdateByUnitId(obj: any): Promise<IUnit[]> {
     });
 }
 
-export async function unitActionChkResync(obj: any): Promise<IUnit[]> {
+export async function unitActionChkResync(obj: any): Promise<any[]> {
     return new Promise((resolve, reject) => {
         unitTable.updateMany(
             {},
@@ -114,7 +114,7 @@ export async function unitActionChkResync(obj: any): Promise<IUnit[]> {
     });
 }
 
-export async function unitActionMarkUndead(obj: any): Promise<IUnit[]> {
+export async function unitActionMarkUndead(obj: any): Promise<any[]> {
     return new Promise((resolve, reject) => {
         unitTable.updateMany(
             {isResync: false},
@@ -127,7 +127,7 @@ export async function unitActionMarkUndead(obj: any): Promise<IUnit[]> {
     });
 }
 
-export async function unitActionRemoveAllDead(obj: any): Promise<IUnit[]> {
+export async function unitActionRemoveAllDead(obj: any): Promise<any[]> {
     return new Promise((resolve, reject) => {
         const fiveMinsAgo = new Date(new Date()).getTime() - _.get(constants, "time.fiveMins");
         // console.log('five mins: ', fiveMinsAgo);
@@ -149,7 +149,7 @@ export async function unitActionRemoveAllDead(obj: any): Promise<IUnit[]> {
     });
 }
 
-export async function unitActionDelete(obj: any): Promise<IUnit[]> {
+export async function unitActionDelete(obj: any): Promise<any[]> {
     return new Promise((resolve, reject) => {
         unitTable.findByIdAndRemove(obj._id, (err, units: any) => {
             if (err) { reject(err); }
@@ -158,7 +158,7 @@ export async function unitActionDelete(obj: any): Promise<IUnit[]> {
     });
 }
 
-export async function unitActionRemoveall(obj: any): Promise<any> {
+export async function unitActionRemoveall(): Promise<any> {
     return unitTable.deleteOne({});
 }
 
