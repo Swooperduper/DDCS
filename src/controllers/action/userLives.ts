@@ -252,7 +252,7 @@ export async function addLifePoints(curPlayer: any, curUnit: any, execAction?: s
     });
 }
 
-export async function removeLifePoints(curPlayer: any, curUnit: any, execAction: string, isDirect: boolean, removeLP: number) {
+export async function removeLifePoints(curPlayer: any, curUnit: any, execAction: string, isDirect?: boolean, removeLP?: number) {
     let curRemoveLP = removeLP;
     if (!isDirect) {
         const curUnitDictionary = _.find(constants.unitDictionary, {_id: curUnit.type});
@@ -275,7 +275,7 @@ export async function removeLifePoints(curPlayer: any, curUnit: any, execAction:
     return masterDBController.srvPlayerActionsRemoveLifePoints({
         _id: curPlayer._id,
         groupId: curUnit.groupId,
-        removeLifePoints: curRemoveLP,
+        removeLifePoints: curRemoveLP || 0,
         execAction,
         storePoints: !isDirect
     });

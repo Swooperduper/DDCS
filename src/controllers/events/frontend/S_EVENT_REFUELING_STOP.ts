@@ -2,57 +2,53 @@
  * DDCS Licensed under AGPL-3.0 by Andrew "Drex" Finegan https://github.com/afinegan/DynamicDCS
  */
 
-const _ = require('lodash');
-const constants = require('../../constants');
-const masterDBController = require('../../db/masterDB');
-const DCSLuaCommands = require('../../player/DCSLuaCommands');
-const playersEvent = require('../../events/backend/players');
-const webPushCommands = require('../../socketIO/webPush');
+import * as _ from "lodash";
+import * as constants from "../../constants";
+import * as masterDBController from "../../db";
+// import * as DCSLuaCommands from "../../player/DCSLuaCommands";
+// import * as playersEvent from "../../events/backend/players";
+import * as webPushCommands from "../../socketIO/webPush";
 
-_.set(exports, 'processEventRefuelingStop', function (serverName, sessionName, eventObj) {
-	// Occurs when an aircraft is finished taking fuel.
-	masterDBController.unitActions('read', serverName, {unitId: _.get(eventObj, ['data', 'arg3'])})
-		.then(function (iunit) {
-			masterDBController.srvPlayerActions('read', serverName, {sessionName: sessionName})
-				.then(function (playerArray) {
-					var curIUnit = _.get(iunit, 0);
-					if (curIUnit) {
-						var iPlayer;
-						var iCurObj;
-						iPlayer = _.find(playerArray, {name: _.get(curIUnit, 'playername')});
-						if(iPlayer) {
-							iCurObj = {
-								sessionName: sessionName,
-								eventCode: constants.shortNames[eventObj.action],
-								iucid: _.get(iPlayer, 'ucid'),
-								iName: _.get(curIUnit, 'playername'),
-								displaySide: _.get(curIUnit, 'coalition'),
-								roleCode: 'I',
-								msg: 'C: '+ _.get(curIUnit, 'type') + '('+ _.get(curIUnit, 'playername') + ') ended refueling',
-								showInChart: true
-							};
-							if (_.get(iCurObj, 'iucid')) {
-								webPushCommands.sendToCoalition(serverName, {payload: {action: eventObj.action, data: _.cloneDeep(iCurObj)}});
-								masterDBController.simpleStatEventActions('save', serverName, iCurObj);
-							}
-							/*
-							DCSLuaCommands.sendMesgToGroup(
-								_.get(curIUnit, 'groupId'),
-								serverName,
-								_.get(iCurObj, 'msg'),
-								5
-							);
-							*/
-						}
-					}
-				})
-				.catch(function (err) {
-					console.log('err line45: ', err);
-				})
-			;
-		})
-		.catch(function (err) {
-			console.log('err line39: ', err);
-		})
-	;
-});
+export async function processEventRefuelingStop(sessionName: string, eventObj: any) {
+    // Occurs when an aircraft is finished taking fuel.
+    masterDBController.unitActionRead({unitId: eventObj.data.arg3})
+        .then((iunit: any) => {
+            masterDBController.srvPlayerActionsRead({sessionName})
+                .then((playerArray: any) => {
+                    const curIUnit = iunit[0];
+                    if (curIUnit) {
+                        const iPlayer = _.find(playerArray, {name: curIUnit.playername});
+                        if (iPlayer) {
+                            const iCurObj = {
+                                sessionName,
+                                eventCode: constants.shortNames[eventObj.action],
+                                iucid: iPlayer.ucid,
+                                iName: curIUnit.playername,
+                                displaySide: curIUnit.coalition,
+                                roleCode: "I",
+                                msg: "C: " + curIUnit.type + "(" + curIUnit.playername + ") ended refueling",
+                                showInChart: true
+                            };
+                            if (iCurObj.iucid) {
+                                webPushCommands.sendToCoalition({payload: {action: eventObj.action, data: _.cloneDeep(iCurObj)}});
+                                masterDBController.simpleStatEventActionsSave(iCurObj);
+                            }
+                            /*
+                            DCSLuaCommands.sendMesgToGroup(
+                                _.get(curIUnit, 'groupId'),
+                                serverName,
+                                _.get(iCurObj, 'msg'),
+                                5
+                            );
+                            */
+                        }
+                    }
+                })
+                .catch((err) => {
+                    console.log("err line45: ", err);
+                });
+        })
+        .catch((err) => {
+            console.log("err line39: ", err);
+        });
+}

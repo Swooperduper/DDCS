@@ -19,12 +19,12 @@ export async function baseActionRead(obj: any): Promise<IBase[]> {
     });
 }
 
-export async function baseActionUpdate(obj: {  _id: string }): Promise<IBase[]> {
+export async function baseActionUpdate(obj: any): Promise<IBase[]> {
     return new Promise((resolve, reject) => {
         airfieldTable.updateOne(
             {_id: obj._id},
             {$set: obj},
-            (err: any, serObj: Promise<IBase[]>) => {
+            (err: any, serObj: any) => {
                 if (err) { reject(err); }
                 resolve(serObj);
             }
@@ -115,7 +115,7 @@ export async function baseActionGetClosestEnemyBase(obj: {
 export async function baseActionGetBaseSides(): Promise<IBase[]> {
     return new Promise((resolve, reject) => {
         if (!curTheater) {
-            constants.getServer(process.env.SERVERNAME)
+            constants.getServer()
                 .then((serverConf: any) => {
                     airfieldTable.find(
                         {mapType: serverConf.theater, enabled: true},

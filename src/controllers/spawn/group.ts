@@ -2717,7 +2717,7 @@ export async function spawnBaseEWR(serverName: string, type: string, baseName: s
     return exports.spawnLogiGroup(serverName, [unitStart], side);
 }
 
-export async function replenishUnits( serverName: string, baseName: string, side: number ) {
+export async function replenishUnits( baseName: string, side: number ) {
     return exports.spawnBaseReinforcementGroup(serverName, side, baseName);
     // exports.spawnGroup(serverName, exports.spawnBaseReinforcementGroup(serverName, side, baseName), baseName, side);
 }
@@ -2733,7 +2733,7 @@ export async function destroyUnit( unitName: string ) {
     ;
 }
 
-export async function healBase( serverName: string, baseName: string, curPlayerUnit: any) {
+export async function healBase( baseName: string, curPlayerUnit: any) {
     // respawn farp tower to 'heal' it
     return new Promise((resolve, reject) => {
         masterDBController.baseActionRead({name: baseName})

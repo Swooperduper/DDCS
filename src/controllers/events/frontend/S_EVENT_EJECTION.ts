@@ -45,7 +45,7 @@ export async function processEventEjection(sessionName: string, eventObj: any) {
                             ;
 
                             if (constants.config.inGameHitMessages) {
-                                DCSLuaCommands.sendMesgToAll(,
+                                DCSLuaCommands.sendMesgToAll(
                                     iCurObj.msg,
                                     5,
                                     nowTime + constants.time.oneMin

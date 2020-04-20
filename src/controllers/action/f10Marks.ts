@@ -86,7 +86,6 @@ export async function setFarpMarks() {
 }
 
 export async function setUnitMark(
-    serverName: string,
     unit: any
 ) {
     if (!_.includes(_.get(constants, "crateTypes"), _.get(unit, "type"))) {
