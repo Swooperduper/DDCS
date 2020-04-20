@@ -2509,7 +2509,7 @@ export async function spawnLogiGroup(spawnArray: any[], side: number) {
     }
 }
 
-export async function spawnGroup(serverName: string, spawnArray: any[], baseName: string, side: number) {
+export async function spawnGroup(spawnArray: any[], baseName?: string, side?: number) {
     let grpNum = 0;
     let unitNum = 0;
     let curBaseName = "";

@@ -84,7 +84,7 @@ export async function unpackCrate(crateObj: any) {
                         if ( localCrateNum >=  numCrate) {
                             if (curCrateSpecial === "reloadGroup") {
                                 // console.log('reloadGroup: ', serverName, curPlayerUnit, curCrate);
-                                reloadController.reloadSAM(curPlayerUnit, curCrate)
+                                reloadController.reloadSAM(curPlayerUnit)
                                     .then((response: any) => {
                                         // console.log('reload resp: ', response);
                                         if (response) {

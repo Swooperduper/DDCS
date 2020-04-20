@@ -152,7 +152,7 @@ export async function srvPlayerActionsRemoveLifePoints(obj: {
     groupId: number,
     removeLifePoints: number,
     execAction?: string,
-    storePoints?: number
+    storePoints?: boolean
 }) {
     return new Promise((resolve, reject) => {
         srvPlayerTable.find({_id: obj._id}, (err: any, serverObj: ISrvPlayers[]) => {
