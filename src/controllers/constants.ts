@@ -6,7 +6,7 @@ import * as _ from "lodash";
 import * as masterDBController from "./db";
 import {IBase, IServer, IStaticDictionary, IUnitDictionary, IWeaponDictionary} from "../typings";
 
-export const blueCountrys = [
+export const blueCountrys: string[] = [
     "AUSTRALIA",
     "AUSTRIA",
     "BELGIUM",
@@ -36,7 +36,7 @@ export const blueCountrys = [
     "INSURGENTS"
 ];
 
-export const countryId = [
+export const countryId: string[] = [
     "RUSSIA",
     "UKRAINE",
     "USA",
@@ -113,21 +113,21 @@ export const countryId = [
     "UNITED_ARAB_EMIRATES"
 ];
 
-export const defCountrys = [
+export const defCountrys: string[] = [
     "default",
     "RUSSIA",
     "USA"
 ];
 
-export const enemyCountry = [
+export const enemyCountry: number[] = [
     0,
     2,
     1
 ];
 
-export const maxLifePoints = 18;
+export const maxLifePoints: number = 18;
 
-export const redCountrys = [
+export const redCountrys: string[] = [
     "ABKHAZIA",
     "BELARUS",
     "CHINA",
@@ -156,20 +156,20 @@ export const redCountrys = [
     "AGGRESSORS"
 ];
 
-export const seasons = [
+export const seasons: string[] = [
     "Autumn",
     "Spring",
     "Summer",
     "Winter"
 ];
 
-export const side = [
+export const side: string[] = [
     "neutral",
     "red",
     "blue"
 ];
 
-export const shortNames = {
+export const shortNames: any = {
     players: "TR",
     friendly_fire: "FF",
     self_kill: "SK",
@@ -190,7 +190,7 @@ export const shortNames = {
     S_EVENT_PLAYER_LEAVE_UNIT: "LU"
 };
 
-export const time = {
+export const time: any = {
     sec: 1000,
     twoSec: 2 * 1000,
     fifteenSecs: 15 * 1000,
@@ -205,7 +205,7 @@ export const time = {
     twoMinutes: 2 * 60 * 1000
 };
 
-export const crateTypes = [
+export const crateTypes: string[] = [
     "iso_container_small",
     "iso_container",
     "ammo_cargo",

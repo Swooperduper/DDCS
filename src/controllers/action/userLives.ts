@@ -243,7 +243,7 @@ export async function checkAircraftCosts() {
     ;
 }
 
-export async function addLifePoints(curPlayer: any, curUnit: any, execAction: string, addLP: number) {
+export async function addLifePoints(curPlayer: any, curUnit: any, execAction?: string, addLP?: number) {
     return masterDBController.srvPlayerActionsAddLifePoints({
         _id: curPlayer._id,
         groupId: curUnit.groupId,

@@ -24,7 +24,7 @@ export async function simpleStatEventActionsReadAll() {
     });
 }
 
-export async function simpleStatEventActionsSave(obj: ISimpleStatEvents) {
+export async function simpleStatEventActionsSave(obj: any) {
     return new Promise((resolve, reject) => {
         const simplestatevent = new simpleStatEventTable(obj);
         simplestatevent.save((err, simpleStatEvent) => {

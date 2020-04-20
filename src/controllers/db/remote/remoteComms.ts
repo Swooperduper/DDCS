@@ -18,7 +18,7 @@ export async function remoteCommsActionsCreate(obj: IRemoteComms) {
     });
 }
 
-export async function remoteCommsActionsRead(obj: IRemoteComms) {
+export async function remoteCommsActionsRead(obj: any) {
     return new Promise((resolve, reject) => {
         remoteCommsTable.find(obj, (err, servers: any) => {
             if (err) { reject(err); }

@@ -13,7 +13,7 @@ export async function srvPlayerActionsRead(obj: any) {
     });
 }
 
-export async function srvPlayerActionsUpdate(obj: ISrvPlayers) {
+export async function srvPlayerActionsUpdate(obj: any) {
     return new Promise((resolve, reject) => {
         srvPlayerTable.updateOne(
             {_id: obj._id},
@@ -26,7 +26,7 @@ export async function srvPlayerActionsUpdate(obj: ISrvPlayers) {
     });
 }
 
-export async function srvPlayerActionsUnsetGicTimeLeft(obj: ISrvPlayers) {
+export async function srvPlayerActionsUnsetGicTimeLeft(obj: any) {
     return new Promise((resolve, reject) => {
         srvPlayerTable.updateOne(
             {_id: obj._id},

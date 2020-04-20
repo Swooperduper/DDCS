@@ -2,44 +2,44 @@
  * DDCS Licensed under AGPL-3.0 by Andrew "Drex" Finegan https://github.com/afinegan/DynamicDCS
  */
 
-const _ = require('lodash');
-const constants = require('../../constants');
-const masterDBController = require('../../db/masterDB');
-const DCSLuaCommands = require('../../player/DCSLuaCommands');
-const playersEvent = require('../../events/backend/players');
-const webPushCommands = require('../../socketIO/webPush');
+import * as _ from "lodash";
+import * as constants from "../../constants";
+import * as masterDBController from "../../db";
+// import * as DCSLuaCommands from "../../player/DCSLuaCommands";
+import * as playersEvent from "./players";
+import * as webPushCommands from "../../socketIO/webPush";
 
-_.set(exports, 'processSelfKill', function (serverName, sessionName, eventObj) {
-	var iCurObj;
-	var iPlayer;
-	// "self_kill", playerID
-	iCurObj = {sessionName: sessionName};
-	_.set(iCurObj, 'iPlayerId', _.get(eventObj, 'data.arg1'));
-	iPlayer = _.find(playersEvent.rtPlayerArray[serverName], {id: eventObj.data.arg1});
-	if (iPlayer) {
-		iCurObj = {
-			sessionName: sessionName,
-			eventCode: constants.shortNames[eventObj.action],
-			iucid: iPlayer.ucid,
-			iName: iPlayer.name,
-			displaySide: 'A',
-			roleCode: 'I',
-			msg: 'A: ' + constants.side[iPlayer.side] + ' ' + iPlayer.name + ' has killed himself'
-		};
-		if(_.get(iCurObj, 'iucid')) {
-			webPushCommands.sendToAll(serverName, {payload: {action: eventObj.action, data: _.cloneDeep(iCurObj)}});
-			masterDBController.simpleStatEventActions('save', serverName, iCurObj)
-				.catch(function (err) {
-					console.log('err line45: ', err);
-				})
-			;
-		}
-		/*
-		DCSLuaCommands.sendMesgToAll(
-			serverName,
-			_.get(iCurObj, 'msg'),
-			15
-		);
-		*/
-	}
-});
+export async function processSelfKill(sessionName: string, eventObj: any) {
+    // "self_kill", playerID
+    const iPlayer = _.find(playersEvent.rtPlayerArray, {id: eventObj.data.arg1});
+
+    if (iPlayer) {
+        const iCurObj = {
+            iPlayerId: eventObj.data.arg1,
+            sessionName,
+            eventCode: constants.shortNames[eventObj.action],
+            iucid: iPlayer.ucid,
+            iName: iPlayer.name,
+            displaySide: "A",
+            roleCode: "I",
+            msg: "A: " + constants.side[iPlayer.side] + " " + iPlayer.name + " has killed himself"
+        };
+        if (iCurObj.iucid) {
+            webPushCommands.sendToAll({payload: {action: eventObj.action, data: _.cloneDeep(iCurObj)}})
+                .catch((err) => {
+                    console.log("err line30: ", err);
+                });
+            masterDBController.simpleStatEventActionsSave(iCurObj)
+                .catch((err) => {
+                    console.log("err line45: ", err);
+                });
+        }
+        /*
+        DCSLuaCommands.sendMesgToAll(
+            serverName,
+            _.get(iCurObj, 'msg'),
+            15
+        );
+        */
+    }
+}
