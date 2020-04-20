@@ -16,7 +16,7 @@ import * as DCSLuaCommands from "../../player/DCSLuaCommands";
 import * as webPushCommands from "../../socketIO/webPush";
 import * as radioTowerController from "../../action/radioTower";
 
-export const shootingUsers = {};
+export let shootingUsers = {};
 
 export async function checkShootingUsers() {
     const nowTime = new Date().getTime();
