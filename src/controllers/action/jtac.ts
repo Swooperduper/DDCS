@@ -3,9 +3,7 @@
  */
 
 import * as _ from "lodash";
-import * as constants from "../constants";
-import * as masterDBController from "../db";
-import * as proximityController from "../proxZone/proximity";
+import * as ddcsController from "../";
 
 const jtacDistance = 5;
 let curLaserCode = 1688;
@@ -14,14 +12,14 @@ const blueLaserCode = 1687;
 const fiveMins = 5 * 60 * 1000;
 
 export async function aliveJtac30SecCheck() {
-    masterDBController.unitActionRead({
+    ddcsController.unitActionRead({
         proxChkGrp: "jtac",
         dead: false
     })
         .then((jtacUnits) => {
             _.forEach(jtacUnits, (jtUnit) => {
                 if (jtUnit.jtacTarget) {
-                    masterDBController.unitActionRead({
+                    ddcsController.unitActionRead({
                         name: jtUnit.jtacTarget
                     })
                         .then((jtacTarget) => {
@@ -32,7 +30,7 @@ export async function aliveJtac30SecCheck() {
                                         exports.setLaserSmoke(jtUnit, curJtacTarget);
                                     }
                                 } else {
-                                    masterDBController.unitActionUpdateByName({name: jtUnit.name, jtacTarget: null})
+                                    ddcsController.unitActionUpdateByName({name: jtUnit.name, jtacTarget: null})
                                         .then(() => {
                                             exports.removeLaserIR(jtUnit);
                                             exports.jtacNewTarget(jtUnit);
@@ -43,7 +41,7 @@ export async function aliveJtac30SecCheck() {
                                     ;
                                 }
                             } else {
-                                masterDBController.unitActionUpdateByName({name: jtUnit.name, jtacTarget: null})
+                                ddcsController.unitActionUpdateByName({name: jtUnit.name, jtacTarget: null})
                                     .then(() => {
                                         exports.removeLaserIR(jtUnit);
                                         exports.jtacNewTarget(jtUnit);
@@ -71,11 +69,11 @@ export async function aliveJtac30SecCheck() {
 
 export async function jtacNewTarget(jtUnit: any) {
     const enemySide = (jtUnit.coalition === 1) ? 2 : 1;
-    proximityController.getCoalitionGroundUnitsInProximity(jtUnit.lonLatLoc, jtacDistance, enemySide)
+    ddcsController.getCoalitionGroundUnitsInProximity(jtUnit.lonLatLoc, jtacDistance, enemySide)
         .then((enemyUnits: any) => {
             const enemyUnitNameArray = _.map(enemyUnits, "name");
             if (enemyUnitNameArray.length > 0) {
-                masterDBController.cmdQueActionsSave({
+                ddcsController.cmdQueActionsSave({
                     actionObj: {
                         action: "ISLOSVISIBLE",
                         jtacUnitName: jtUnit.name,
@@ -99,13 +97,13 @@ export async function processLOSEnemy(losReply: any) {
     if (losReply.data.length) {
         let enemyUnit;
         const unitPThrArray: any[] = [];
-        masterDBController.unitActionRead({name: losReply.jtacUnitName})
+        ddcsController.unitActionRead({name: losReply.jtacUnitName})
             .then((fJtacUnit) => {
                 const curJtacUnit = _.get(fJtacUnit, [0]);
-                masterDBController.unitActionRead({name: {$in: losReply.data}})
+                ddcsController.unitActionRead({name: {$in: losReply.data}})
                     .then((eJtacUnit) => {
                         _.forEach(eJtacUnit, (jtUnit) => {
-                            const curUnitDict = _.find(_.get(constants, "unitDictionary"), {_id: jtUnit.type});
+                            const curUnitDict = _.find(_.get(ddcsController, "unitDictionary"), {_id: jtUnit.type});
                             if (curUnitDict) {
                                 _.set(jtUnit, "threatLvl", curUnitDict.threatLvl);
                                 unitPThrArray.push(jtUnit);
@@ -130,7 +128,7 @@ export async function processLOSEnemy(losReply: any) {
 
 export async function removeLaserIR(jtUnit: any) {
     console.log("Removing Laser: ", jtUnit.name);
-    masterDBController.cmdQueActionsSave({
+    ddcsController.cmdQueActionsSave({
         actionObj: {
             action : "REMOVELASERIR",
             jtacUnitName: jtUnit.name
@@ -151,7 +149,7 @@ export async function setLaserSmoke(jtUnit: any, enemyUnit: any) {
         curLaserCode = blueLaserCode;
     }
 
-    masterDBController.cmdQueActionsSave({
+    ddcsController.cmdQueActionsSave({
         actionObj: {
             action: "SETLASERSMOKE",
             jtacUnitName: jtUnit.name,
@@ -165,7 +163,7 @@ export async function setLaserSmoke(jtUnit: any, enemyUnit: any) {
             console.log("erroring line23: ", err);
         })
     ;
-    masterDBController.unitActionUpdate({_id: jtUnit.name, jtacTarget: enemyUnit.name, jtacReplenTime: new Date().getTime() + fiveMins})
+    ddcsController.unitActionUpdate({_id: jtUnit.name, jtacTarget: enemyUnit.name, jtacReplenTime: new Date().getTime() + fiveMins})
         .catch((err: any) => {
             console.log("erroring line28: ", err);
         })

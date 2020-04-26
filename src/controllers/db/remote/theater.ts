@@ -2,15 +2,13 @@
  * DDCS Licensed under AGPL-3.0 by Andrew "Drex" Finegan https://github.com/afinegan/DynamicDCS
  */
 
-import {remoteConnection} from "../common/connection";
-import {theaterSchema} from "./schemas";
-import {ITheater} from "../../../typings";
+import * as ddcsController from "../../";
 
-const theaterTable = remoteConnection.model("theaters", theaterSchema);
+const theaterTable = ddcsController.remoteConnection.model("theaters", ddcsController.theaterSchema);
 
-export async function theaterActionsRead() {
+export async function theaterActionsRead(): Promise<{theaters: ddcsController.ITheater[]}> {
     return new Promise((resolve, reject) => {
-        theaterTable.find((err, servers: ITheater[]) => {
+        theaterTable.find((err, servers: ddcsController.ITheater[]) => {
             if (err) { reject(err); }
             resolve({theaters: servers});
         });

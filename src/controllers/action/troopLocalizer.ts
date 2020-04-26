@@ -3,17 +3,15 @@
  */
 
 import * as _ from "lodash";
-import * as masterDBController from "../db";
-import * as proximityController from "../proxZone/proximity";
-import * as groupController from "../spawn/group";
+import * as ddcsController from "../";
 
 export async function checkTroopProx() {
-    masterDBController.unitActionRead({isTroop: true, dead: false})
+    ddcsController.unitActionRead({isTroop: true, dead: false})
         .then((troopUnits) => {
             _.forEach(troopUnits, (troop) => {
                 const stParse = _.split(troop.name, "|");
                 const playerName = stParse[3];
-                proximityController.isPlayerInProximity(troop.lonLatLoc, 1, playerName)
+                ddcsController.isPlayerInProximity(troop.lonLatLoc, 1, playerName)
                     .then((isPlayerProximity) => {
                         console.log(
                             "Destroying " + playerName + "s " + troop.type + " has been destroyed due to proximity",
@@ -21,7 +19,7 @@ export async function checkTroopProx() {
                             !isPlayerProximity
                         );
                         if (!isPlayerProximity) {
-                            groupController.destroyUnit(troop.name);
+                            ddcsController.destroyUnit(troop.name);
                         }
                     })
                     .catch((err) => {

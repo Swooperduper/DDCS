@@ -2,128 +2,135 @@
  * DDCS Licensed under AGPL-3.0 by Andrew "Drex" Finegan https://github.com/afinegan/DynamicDCS
  */
 
-import {remoteConnection} from "../common/connection";
-import {userAccountSchema} from "./schemas";
-import {IUserAccount} from "../../../typings";
 import * as _ from "lodash";
+import * as ddcsController from "../../";
 
-const userAccountTable = remoteConnection.model("useraccounts", userAccountSchema);
+const userAccountTable = ddcsController.remoteConnection.model("useraccounts", ddcsController.userAccountSchema);
 
-export async function userAccountActionsCreate(obj: IUserAccount) {
+export async function userAccountActionsCreate(obj: any): Promise<void> {
     return new Promise((resolve, reject) => {
         const useraccount = new userAccountTable(obj);
-        useraccount.save((err, savedUserAccount) => {
+        useraccount.save((err) => {
             if (err) { reject(err); }
-            resolve(savedUserAccount);
+            resolve();
         });
     });
 }
 
-export async function userAccountActionsRead(obj: IUserAccount) {
+export async function userAccountActionsRead(obj: any): Promise<ddcsController.IUserAccount[]> {
     return new Promise((resolve, reject) => {
-        userAccountTable.find(obj, (err, useraccount) => {
+        userAccountTable.find(obj, (err, useraccount: ddcsController.IUserAccount[]) => {
             if (err) { reject(err); }
             resolve(useraccount);
         });
     });
 }
 
-export async function userAccountActionsGetPerm(obj: IUserAccount) {
+export async function userAccountActionsGetPerm(obj: any): Promise<ddcsController.IUserAccount[]> {
     return new Promise((resolve, reject) => {
-        userAccountTable.find({authId: obj}, (err, useraccount) => {
+        userAccountTable.find({authId: obj}, (err, useraccount: ddcsController.IUserAccount[]) => {
             if (err) { reject(err); }
             resolve(useraccount);
         });
     });
 }
 
-export async function userAccountActionsUpdateSingleUCID(obj: IUserAccount) {
+export async function userAccountActionsUpdateSingleUCID(obj: any): Promise<void> {
     return new Promise((resolve, reject) => {
         userAccountTable.findOneAndUpdate(
             {ucid: obj.ucid},
             {$set: obj},
             {new: true},
-            (err, uaccount) => {
+            (err) => {
                 if (err) { reject(err); }
-                resolve(uaccount);
+                resolve();
             }
         );
     });
 }
 
-export async function userAccountActionsUpdateSingleIP(obj: any) {
+export async function userAccountActionsUpdateSingleIP(obj: any): Promise<void> {
     return new Promise((resolve, reject) => {
         userAccountTable.findOneAndUpdate(
             {lastIp: obj.ipaddr},
             {$set: obj},
             {new: true},
-            (err, uaccount) => {
+            (err) => {
                 if (err) { reject(err); }
-                resolve(uaccount);
+                resolve();
             }
         );
     });
 }
 
-export async function userAccountActionsUpdate(obj: IUserAccount) {
+export async function userAccountActionsUpdate(obj: any): Promise<void> {
     return new Promise((resolve, reject) => {
-        userAccountTable.find({ucid: obj.ucid}, (err, ucidUser) => {
+        userAccountTable.find({ucid: obj.ucid}, (err, ucidUser: ddcsController.IUserAccount[]) => {
             if (err) {
                 reject(err);
             }
-            const firstUcidUser = _.first(ucidUser);
-            if (!firstUcidUser) {
-                userAccountTable.find({lastIp: obj.lastIp}, (findErr, ipUser) => {
-                    if (findErr) {
-                        reject(findErr);
-                    }
-                    const firstIpUser = _.first(ipUser);
-                    if (firstIpUser) {
-                        _.set(firstIpUser, "gameName", _.get(obj, "gameName"));
-                        if (typeof obj.curSocket !== "undefined") {
-                            _.set(firstIpUser, "curSocket", _.get(obj, "curSocket"));
-                        }
-                        firstIpUser.save((saveErr) => {
-                            if (saveErr) {
-                                reject(saveErr);
-                            }
-                            resolve(ipUser);
-                        });
-                    }
-                });
-            } else {
-                _.set(firstUcidUser, "gameName", _.get(obj, "gameName"));
-                _.set(firstUcidUser, "lastIp", _.get(obj, "lastIp"));
+
+            if (ucidUser.length > 0) {
+                const firstUcidUser = {
+                    ...ucidUser[0],
+                    gameName: obj.gameName,
+                    lastIp: obj.lastIp
+                };
+
                 if (typeof obj.curSocket !== "undefined") {
-                    _.set(ucidUser, "curSocket", _.get(obj, "curSocket"));
+                    firstUcidUser.curSocket = obj.curSocket;
                 }
-                firstUcidUser.save((saveErr: any) => {
+                const fIObj = new userAccountTable(firstUcidUser);
+                fIObj.save((saveErr) => {
                     if (saveErr) {
                         reject(saveErr);
                     }
-                    resolve(ucidUser);
+                    resolve();
+                });
+            } else {
+                userAccountTable.find({lastIp: obj.lastIp}, (findErr, ipUser: ddcsController.IUserAccount[]) => {
+                    if (findErr) {
+                        reject(findErr);
+                    }
+                    const firstIpUser = ipUser[0];
+                    if (firstIpUser) {
+                        firstIpUser.gameName = obj.gameName;
+                        if (typeof obj.curSocket !== "undefined") {
+                            firstIpUser.curSocket = obj.curSocket;
+                        }
+                        const fIObj = new userAccountTable(firstIpUser);
+                        fIObj.save((saveErr) => {
+                            if (saveErr) { reject(saveErr); }
+                            resolve();
+                        });
+                    }
                 });
             }
         });
     });
 }
 
-export async function userAccountActionsUpdateSocket(obj: IUserAccount) {
+export async function userAccountActionsUpdateSocket(obj: any): Promise<void> {
     // console.log('UA update socket line42: ', obj);
     return new Promise((resolve, reject) => {
-        userAccountTable.find({authId: obj.authId}, (err, authIdUser) => {
+        userAccountTable.find({authId: obj.authId}, (err, authIdUser: ddcsController.IUserAccount[]) => {
             if (err) {
                 reject(err);
             }
-            const firstAuthIdUser = _.first(authIdUser);
+            let firstAuthIdUser = authIdUser[0];
             if (firstAuthIdUser) {
-                _.set(firstAuthIdUser, "lastIp", _.get(obj, "lastIp"));
-                _.set(firstAuthIdUser, "curSocket", _.get(obj, "curSocket"));
-                firstAuthIdUser.save((saveErr) => {
+                firstAuthIdUser = {
+                    ...firstAuthIdUser,
+                    lastIp: obj.lastIp,
+                    curSocket: obj.curSocket
+                };
+
+                const fAObj = new userAccountTable(firstAuthIdUser);
+                fAObj.save((saveErr) => {
                     if (saveErr) {
                         reject(saveErr);
                     }
-                    resolve(firstAuthIdUser);
+                    resolve();
                 });
             } else {
                 console.log("User " + obj.authId + " does not exist in user database line111");
@@ -133,7 +140,7 @@ export async function userAccountActionsUpdateSocket(obj: IUserAccount) {
     });
 }
 
-export async function userAccountActionsCheckAccount(obj: IUserAccount) {
+export async function userAccountActionsCheckAccount(obj: any): Promise<void> {
     const curAuthId = _.get(obj, "body.sub");
     return new Promise((resolve, reject) => {
         userAccountTable.find({authId: curAuthId}, (err, userAccount) => {
@@ -143,20 +150,20 @@ export async function userAccountActionsCheckAccount(obj: IUserAccount) {
 
                 const useraccount = new userAccountTable({
                     authId: curAuthId,
-                    realName: _.get(obj, "body.name"),
-                    firstName: _.get(obj, "body.given_name"),
-                    lastName: _.get(obj, "body.family_name"),
-                    nickName: _.get(obj, "body.nickname"),
-                    picture: _.get(obj, "body.picture"),
-                    gender: _.get(obj, "body.gender"),
-                    locale: _.get(obj, "body.locale")
+                    realName: obj.body.name,
+                    firstName: obj.body.given_name,
+                    lastName: obj.body.family_name,
+                    nickName: obj.body.nickname,
+                    picture: obj.body.picture,
+                    gender: obj.body.gender,
+                    locale: obj.body.locale
                 });
-                useraccount.save((saveErr, saveUserAccount) => {
+                useraccount.save((saveErr) => {
                     if (saveErr) { reject(saveErr); }
-                    resolve(saveUserAccount);
+                    resolve();
                 });
             } else {
-                resolve(firstUserAccount);
+                resolve();
             }
         });
     });

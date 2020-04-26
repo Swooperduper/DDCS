@@ -2,15 +2,13 @@
  * DDCS Licensed under AGPL-3.0 by Andrew "Drex" Finegan https://github.com/afinegan/DynamicDCS
  */
 
-import {remoteConnection} from "../common/connection";
-import {staticDictionarySchema} from "./schemas";
-import {IStaticDictionary} from "../../../typings";
+import * as ddcsController from "../../";
 
-const staticDictionaryTable = remoteConnection.model("staticDictionaries", staticDictionarySchema);
+const staticDictionaryTable = ddcsController.remoteConnection.model("staticDictionaries", ddcsController.staticDictionarySchema);
 
-export async function staticDictionaryActionsRead(obj: any) {
+export async function staticDictionaryActionsRead(obj: any): Promise<ddcsController.IStaticDictionary[]> {
     return new Promise((resolve, reject) => {
-        staticDictionaryTable.find(obj, (err, staticDictionary: IStaticDictionary[]) => {
+        staticDictionaryTable.find(obj, (err, staticDictionary: ddcsController.IStaticDictionary[]) => {
             if (err) { reject(err); }
             resolve(staticDictionary);
         });

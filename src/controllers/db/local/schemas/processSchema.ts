@@ -11,7 +11,7 @@ export const processSchema = new mongoose.Schema({
             required: true
         },
         queObj: {
-            type: Schema.Types.Mixed,
+            type: Object,
             required: true
         }
     },

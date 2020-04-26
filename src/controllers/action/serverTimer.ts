@@ -3,21 +3,19 @@
  */
 
 import * as _ from "lodash";
-import * as constants from "../constants";
-import * as DCSLuaCommands from "../player/DCSLuaCommands";
-import * as masterDBController from "../db";
+import * as ddcsController from "../";
 
 let curSecs = 0;
 let curTime = new Date().getTime();
 let lastSentLoader = _.cloneDeep(curTime);
 let maxTime = 0;
 let mesg;
-const oneHour = _.get(constants, "time.oneHour");
+const oneHour = _.get(ddcsController, "time.oneHour");
 
 exports.timerObj = {};
 
 export function processTimer(serverSecs: number) {
-    maxTime = constants.config.restartTime;
+    maxTime = ddcsController.config.restartTime;
     mesg = null;
     curSecs = serverSecs;
 
@@ -75,7 +73,7 @@ export function processTimer(serverSecs: number) {
         if (serverSecs > (maxTime - 120) && !exports.timerObj.twoMinutes) {
             mesg = "Server is restarting in 2 minutes, Locking Server Down!";
             exports.timerObj.twoMinutes = true;
-            DCSLuaCommands.setIsOpenSlotFlag(0)
+            ddcsController.setIsOpenSlotFlag(0)
                 .catch((err) => {
                     console.log("line80: ", err);
                 });
@@ -84,17 +82,17 @@ export function processTimer(serverSecs: number) {
         if (serverSecs > (maxTime - 60) && !exports.timerObj.oneMinute) {
             mesg = "Server is restarting in 1 minute, Server Is Locked!";
             exports.timerObj.oneMinute = true;
-            DCSLuaCommands.setIsOpenSlotFlag(0)
+            ddcsController.setIsOpenSlotFlag(0)
                 .catch((err) => {
                     console.log("line89: ", err);
                 });
-            masterDBController.sessionsActionsReadLatest()
+            ddcsController.sessionsActionsReadLatest()
                 .then((latestSession: any) => {
                     if (latestSession.name) {
-                        masterDBController.srvPlayerActionsRead({ sessionName: latestSession.name })
+                        ddcsController.srvPlayerActionsRead({ sessionName: latestSession.name })
                             .then((playerArray: any) => {
                                 _.forEach(playerArray, (player) => {
-                                    DCSLuaCommands.kickPlayer(player.id, "Server is now restarting!")
+                                    ddcsController.kickPlayer(player.id, "Server is now restarting!")
                                         .catch((err) => {
                                             console.log("line99: ", err);
                                         });
@@ -115,14 +113,14 @@ export function processTimer(serverSecs: number) {
         if (serverSecs > maxTime) {
             // restart server on next or same map depending on rotation
             curTime = new Date().getTime();
-            if (curTime > lastSentLoader + constants.time.oneMin) {
-                masterDBController.sessionsActionsReadLatest()
+            if (curTime > lastSentLoader + ddcsController.time.oneMin) {
+                ddcsController.sessionsActionsReadLatest()
                     .then((latestSession: any) => {
                         if (latestSession.name) {
-                            masterDBController.srvPlayerActionsRead({ sessionName: latestSession.name })
+                            ddcsController.srvPlayerActionsRead({ sessionName: latestSession.name })
                                 .then((playerArray: any) => {
                                     _.forEach(playerArray, (player) => {
-                                        DCSLuaCommands.kickPlayer(player.id, "Server is now restarting!")
+                                        ddcsController.kickPlayer(player.id, "Server is now restarting!")
                                             .catch((err) => {
                                                 console.log("line127: ", err);
                                             });
@@ -142,7 +140,7 @@ export function processTimer(serverSecs: number) {
         } else {
             if (mesg) {
                 console.log("serverMesg: ", mesg);
-                DCSLuaCommands.sendMesgToAll(mesg, 20)
+                ddcsController.sendMesgToAll(mesg, 20)
                     .catch((err) => {
                         console.log("line135: ", err);
                     });
@@ -156,13 +154,13 @@ export function resetTimerObj() {
 }
 
 export async function restartServer() {
-    masterDBController.serverActionsRead({})
+    ddcsController.serverActionsRead({})
         .then((server: any) => {
             const newMap = server[0].curFilePath + "_" + server[0].curSeason + "_" +
                 _.random(1, (server[0].mapCount || 1)) + ".miz";
 
             console.log("Loading Map: ", newMap);
-            DCSLuaCommands.loadMission(newMap);
+            ddcsController.loadMission(newMap);
         })
         .catch((err) => {
             console.log("line73: ", err);
@@ -182,7 +180,7 @@ export function secondsToHms(d: number) {
 
 export async function timeLeft(curUnit: any) {
     const formatTime = exports.secondsToHms(maxTime - curSecs);
-    return DCSLuaCommands.sendMesgToGroup(
+    return ddcsController.sendMesgToGroup(
         curUnit.groupId,
         "G: Server has " + formatTime + " left till restart!",
         5

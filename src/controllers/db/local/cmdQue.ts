@@ -1,45 +1,47 @@
-import {localConnection} from "../common/connection";
-import {cmdQueSchema} from "./schemas";
-import {ICmdQue} from "../../../typings";
+/*
+ * DDCS Licensed under AGPL-3.0 by Andrew "Drex" Finegan https://github.com/afinegan/DynamicDCS
+ */
 
-const cmdQueTable = localConnection.model(process.env.SERVERNAME + "_cmdque", cmdQueSchema);
+import * as ddcsController from "../../";
+
+const cmdQueTable = ddcsController.localConnection.model(process.env.SERVERNAME + "_cmdque", ddcsController.cmdQueSchema);
 
 export async function cmdQueActionsGrabNextQue(obj: {
     queName: string
-}) {
+}): Promise<ddcsController.ICmdQue> {
     return new Promise((resolve, reject) => {
-        cmdQueTable.findOneAndRemove({queName: obj.queName, timeToExecute: {$lt: new Date().getTime()}}, (err, clientQue) => {
+        cmdQueTable.findOneAndRemove({queName: obj.queName, timeToExecute: {$lt: new Date().getTime()}}, (err, clientQue: any) => {
             if (err) { reject(err); }
             resolve(clientQue);
         });
     });
 }
 
-export async function cmdQueActionsSave(obj: any) {
+export async function cmdQueActionsSave(obj: any): Promise<void> {
     return new Promise((resolve, reject) => {
         const cmdque = new cmdQueTable(obj);
-        cmdque.save((err: any, saveCmdQue) => {
+        cmdque.save((err) => {
             if (err) { reject(err); }
-            resolve(saveCmdQue);
+            resolve();
         });
     });
 }
 
 export async function cmdQueActionsDelete(obj: {
     _id: string
-}) {
+}): Promise<void> {
     return new Promise((resolve, reject) => {
-        cmdQueTable.findByIdAndRemove(obj._id, (err, cmdque) => {
+        cmdQueTable.findByIdAndRemove(obj._id, (err) => {
             if (err) { reject(err); }
-            resolve(cmdque);
+            resolve();
         });
     });
 }
 
-export async function cmdQueActionsRemoveAll() {
+export async function cmdQueActionsRemoveAll(): Promise<any> {
     return cmdQueTable.deleteMany({});
 }
 
-export async function cmdQueActionsDropAll() {
+export async function cmdQueActionsDropAll(): Promise<any> {
     return cmdQueTable.collection.drop();
 }

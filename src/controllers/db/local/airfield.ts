@@ -2,37 +2,36 @@
  * DDCS Licensed under AGPL-3.0 by Andrew "Drex" Finegan https://github.com/afinegan/DynamicDCS
  */
 
-import * as constants from "../../constants";
-import {localConnection} from "../common/connection";
-import {airfieldSchema} from "./schemas";
-import {IBase} from "../../../typings";
+import * as _ from "lodash";
+import * as ddcsController from "../../";
+import {IServer} from "../../";
 
-const airfieldTable = localConnection.model(process.env.SERVERNAME + "_airfield", airfieldSchema);
-const curTheater = constants.config.theater;
+const airfieldTable = ddcsController.localConnection.model(process.env.SERVERNAME + "_airfield", ddcsController.airfieldSchema);
+const curTheater = ddcsController.config.theater;
 
-export async function baseActionRead(obj: any): Promise<IBase[]> {
+export async function baseActionRead(obj: any): Promise<ddcsController.IBase[]> {
     return new Promise( async (resolve, reject) => {
-        await airfieldTable.find(obj, (err: any, dbairfields: Promise<IBase[]>) => {
+        await airfieldTable.find(obj, (err, dbairfields: Promise<ddcsController.IBase[]>) => {
             if (err) { reject(err); }
             resolve(dbairfields);
         });
     });
 }
 
-export async function baseActionUpdate(obj: any): Promise<IBase[]> {
+export async function baseActionUpdate(obj: any): Promise<void> {
     return new Promise((resolve, reject) => {
         airfieldTable.updateOne(
             {_id: obj._id},
             {$set: obj},
-            (err: any, serObj: any) => {
+            (err) => {
                 if (err) { reject(err); }
-                resolve(serObj);
+                resolve();
             }
         );
     });
 }
 
-export async function baseActionGetClosestBase(obj: { unitLonLatLoc: number[] }): Promise<any> {
+export async function baseActionGetClosestBase(obj: { unitLonLatLoc: number[] }): Promise<ddcsController.IBase> {
     return new Promise((resolve, reject) => {
         airfieldTable.find(
             {
@@ -48,9 +47,9 @@ export async function baseActionGetClosestBase(obj: { unitLonLatLoc: number[] })
                 },
                 mapType: curTheater
             },
-            (err, dbairfields) => {
+            (err, dbAirfields: ddcsController.IBase[]) => {
                 if (err) { reject(err); }
-                resolve(dbairfields[0]);
+                resolve(dbAirfields[0]);
             }
         );
     });
@@ -59,7 +58,7 @@ export async function baseActionGetClosestBase(obj: { unitLonLatLoc: number[] })
 export async function baseActionGetClosestFriendlyBase(obj: {
     playerSide: number,
     unitLonLatLoc: number[]
-}): Promise<any> {
+}): Promise<ddcsController.IBase> {
     return new Promise((resolve, reject) => {
         airfieldTable.find(
             {
@@ -76,7 +75,7 @@ export async function baseActionGetClosestFriendlyBase(obj: {
                 },
                 mapType: curTheater
             },
-            (err, dbairfields) => {
+            (err, dbairfields: ddcsController.IBase[]) => {
                 if (err) { reject(err); }
                 resolve(dbairfields[0]);
             }
@@ -87,13 +86,13 @@ export async function baseActionGetClosestFriendlyBase(obj: {
 export async function baseActionGetClosestEnemyBase(obj: {
     playerSide: number,
     unitLonLatLoc: number[]
-}): Promise<any> {
+}): Promise<ddcsController.IBase> {
     return new Promise((resolve, reject) => {
         airfieldTable.find(
             {
                 baseType: "MOB",
                 enabled: true,
-                side: constants.enemyCountry[obj.playerSide],
+                side: ddcsController.enemyCountry[obj.playerSide],
                 centerLoc: {
                     $near: {
                         $geometry: {
@@ -104,7 +103,7 @@ export async function baseActionGetClosestEnemyBase(obj: {
                 },
                 mapType: curTheater
             },
-            (err, dbairfields) => {
+            (err, dbairfields: ddcsController.IBase[]) => {
                 if (err) { reject(err); }
                 resolve(dbairfields[0]);
             }
@@ -112,31 +111,31 @@ export async function baseActionGetClosestEnemyBase(obj: {
     });
 }
 
-export async function baseActionGetBaseSides(): Promise<IBase[]> {
+export async function baseActionGetBaseSides(): Promise<ddcsController.IBase[]> {
     return new Promise((resolve, reject) => {
         if (!curTheater) {
-            constants.getServer()
-                .then((serverConf: any) => {
+            ddcsController.getServer()
+                .then((serverConf) => {
                     airfieldTable.find(
                         {mapType: serverConf.theater, enabled: true},
-                        (err, dbairfields) => {
+                        (err, dbAirfields: ddcsController.IBase[]) => {
                             if (err) { reject(err); }
-                            resolve(_.transform(dbairfields, (result: any, value: any) => {
+                            resolve(_.transform(dbAirfields, (result: any, value: any) => {
                                 result.push({name: value.name, baseType: value.baseType, side: value.side});
                             }, []));
                         }
                     );
                 })
-                .catch((err: any) => {
-                    reject("line:542, failed to connect to db: ");
+                .catch((err) => {
+                    reject("line:542, failed to connect to db: " + JSON.stringify(err));
                 })
             ;
         } else {
             airfieldTable.find(
                 {mapType: curTheater, enabled: true},
-                (err, dbairfields) => {
+                (err, dbAirfields: ddcsController.IBase[]) => {
                     if (err) { reject(err); }
-                    resolve(_.transform(dbairfields, (result: any, value: any) => {
+                    resolve(_.transform(dbAirfields, (result: any, value: any) => {
                         result.push({name: value.name, baseType: value.baseType, side: value.side});
                     }));
                 }
@@ -148,12 +147,12 @@ export async function baseActionGetBaseSides(): Promise<IBase[]> {
 export async function baseActionUpdateSide(obj: {
     name: string,
     side: number
-}): Promise<IBase[]> {
+}): Promise<ddcsController.IBase[]> {
     return new Promise((resolve, reject) => {
         airfieldTable.updateMany(
             {_id: new RegExp(obj.name)},
             {$set: {side: obj.side, replenTime: new Date()}},
-            (err, airfields) => {
+            (err, airfields: ddcsController.IBase[]) => {
                 if (err) { reject(err); }
                 resolve(airfields);
             }
@@ -164,12 +163,12 @@ export async function baseActionUpdateSide(obj: {
 export async function baseActionUpdateSpawnZones(obj: {
     name: string,
     spawnZones: object
-}): Promise<IBase> {
+}): Promise<ddcsController.IBase[]> {
     return new Promise((resolve, reject) => {
         airfieldTable.updateOne(
             {_id: obj.name},
             {$set: {spawnZones: obj.spawnZones}},
-            (err, airfield) => {
+            (err, airfield: ddcsController.IBase[]) => {
                 if (err) { reject(err); }
                 resolve(airfield);
             }
@@ -180,12 +179,12 @@ export async function baseActionUpdateSpawnZones(obj: {
 export async function baseActionUpdateReplenTimer(obj: {
     name: string,
     replenTime: number
-}): Promise<IBase> {
+}): Promise<ddcsController.IBase[]> {
     return new Promise((resolve, reject) => {
         airfieldTable.updateOne(
             {_id: obj.name},
             {$set: {replenTime: obj.replenTime}},
-            (err, airfield) => {
+            (err, airfield: ddcsController.IBase[]) => {
                 if (err) { reject(err); }
                 resolve(airfield);
             }
@@ -196,23 +195,23 @@ export async function baseActionUpdateReplenTimer(obj: {
 export async function baseActionSave(obj: {
     _id: string,
     side: number
-}) {
+}): Promise<void> {
     return new Promise((resolve, reject) => {
-        airfieldTable.find({_id: obj._id}, (findErr, airfieldObj) => {
+        airfieldTable.find({_id: obj._id}, (findErr, airfieldObj: ddcsController.IBase[]) => {
             if (findErr) { reject(findErr); }
             if (airfieldObj.length === 0) {
                 const aObj = new airfieldTable(obj);
-                aObj.save((err, afObj) => {
+                aObj.save((err) => {
                     if (err) { reject(err); }
-                    resolve(afObj);
+                    resolve();
                 });
             } else {
                 airfieldTable.updateOne(
                     {_id: obj._id},
                     {$set: {side: obj.side}},
-                    (err, airfield) => {
+                    (err) => {
                         if (err) { reject(err); }
-                        resolve(airfield);
+                        resolve();
                     }
                 );
             }

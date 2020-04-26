@@ -4,7 +4,7 @@
 
 import * as masterDBController from "../db";
 
-export async function forcePlayerSpectator(playerId: number, mesg: string) {
+export async function forcePlayerSpectator(playerId: string, mesg: string) {
 
     const forcePromise: any[] = [];
 

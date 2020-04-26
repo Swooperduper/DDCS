@@ -2,13 +2,11 @@
  * DDCS Licensed under AGPL-3.0 by Andrew "Drex" Finegan https://github.com/afinegan/DynamicDCS
  */
 
-import {remoteConnection} from "../common/connection";
-import {masterQueSchema} from "./schemas";
-import {IMasterCue} from "../../../typings";
+import * as ddcsController from "../../";
 
-const masterQue = remoteConnection.model("masterque", masterQueSchema);
+const masterQue = ddcsController.remoteConnection.model("masterque", ddcsController.masterQueSchema);
 
-export async function masterQueGrabNextQue(serverName: string, obj: IMasterCue): Promise<IMasterCue> {
+export async function masterQueGrabNextQue(serverName: string, obj: ddcsController.IMasterCue): Promise<void> {
     return new Promise((resolve, reject) => {
         masterQue.findOneAndRemove({serverName}, (err) => {
             if (err) { reject(err); }
@@ -17,12 +15,12 @@ export async function masterQueGrabNextQue(serverName: string, obj: IMasterCue):
     });
 };
 
-export async function masterQueSave(obj: IMasterCue) {
+export async function masterQueSave(obj: ddcsController.IMasterCue): Promise<void> {
     return new Promise((resolve, reject) => {
         const server = new masterQue(obj);
-        server.save((err, servers: any) => {
+        server.save((err) => {
             if (err) { reject(err); }
-            resolve(servers);
+            resolve();
         });
     });
 };

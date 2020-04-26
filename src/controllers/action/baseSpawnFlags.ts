@@ -2,12 +2,12 @@
  * DDCS Licensed under AGPL-3.0 by Andrew "Drex" Finegan https://github.com/afinegan/DynamicDCS
  */
 
-import * as masterDBController from "../db";
+import * as ddcsController from "../";
 
 export async function setbaseSides() {
-    return masterDBController.baseActionGetBaseSides()
+    return ddcsController.baseActionGetBaseSides()
         .then((baseSides: any) => {
-            return masterDBController.cmdQueActionsSave({
+            return ddcsController.cmdQueActionsSave({
                 queName: "clientArray",
                 actionObj: {
                     action: "SETBASEFLAGS",

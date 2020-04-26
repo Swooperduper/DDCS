@@ -3,17 +3,14 @@
  */
 
 import * as _ from "lodash";
-import * as constants from "../constants";
-import * as masterDBController from "../db";
-import * as minutesPlayedController from "../action/minutesPlayed";
-import * as groupController from "../spawn/group";
+import * as ddcsController from "../";
 
 export async function maintainPvEConfig(): Promise<any> {
     const promiseStack: any = [];
     return await exports.campaignStackTypes()
         .then((stackObj: any) => {
             let lockedStack: boolean;
-            _.forEach(_.get(constants, "config.pveAIConfig", []), (pveConfig) => {
+            _.forEach(_.get(ddcsController, "config.pveAIConfig", []), (pveConfig) => {
                 lockedStack = false;
                 _.forEach(_.get(pveConfig, "config", []), (aIConfig) => {
                     if (aIConfig.functionCall === "fullAIEnabled") {
@@ -44,7 +41,7 @@ export async function maintainPvEConfig(): Promise<any> {
 export async function campaignStackTypes(serverName: string): Promise<any> {
     const promiseArray = [];
     const stackObj = {};
-    promiseArray.push(minutesPlayedController.checkCurrentPlayerBalance()
+    promiseArray.push(ddcsController.checkCurrentPlayerBalance()
         .then((sideStackedAgainst: any) => {
             _.set(stackObj, "fullCampaignStackStats", sideStackedAgainst);
         })
@@ -64,7 +61,7 @@ export async function campaignStackTypes(serverName: string): Promise<any> {
 export async function processAI(serverName: string, sideStackedAgainst: any, aIConfig: any): Promise<any> {
     console.log("sideStackedAgainst: ", sideStackedAgainst);
     if (sideStackedAgainst.underdog > 0) {
-        return masterDBController.baseActionRead({baseType: "MOB", side: sideStackedAgainst.underdog, enabled: true})
+        return ddcsController.baseActionRead({baseType: "MOB", side: sideStackedAgainst.underdog, enabled: true})
             .then((friendlyBases: any) => {
                 exports.checkBasesToSpawnConvoysFrom(serverName, friendlyBases, aIConfig);
             })
@@ -82,9 +79,9 @@ export async function checkBasesToSpawnConvoysFrom(serverName: string, friendlyB
             // spawn ground convoys
             // 1 point route is a non-transversable route for ground units
             if (aIConfig.AIType === "groundConvoy" && _.get(baseTemplate, "route", []).length > 1) {
-                masterDBController.baseActionRead({
+                ddcsController.baseActionRead({
                     _id: _.get(baseTemplate, "destBase"),
-                    side: _.get(constants, ["enemyCountry", _.get(base, "side", 0)]),
+                    side: _.get(ddcsController, ["enemyCountry", _.get(base, "side", 0)]),
                     enabled: true
                 })
                     .then((destBaseInfo: any) => {
@@ -94,7 +91,7 @@ export async function checkBasesToSpawnConvoysFrom(serverName: string, friendlyB
                             const baseConvoyGroupName = "AI|" + aIConfig.name +
                                 "|" + _.get(baseTemplate, "sourceBase") +
                                 "_" + _.get(baseTemplate, "destBase") + "|";
-                            masterDBController.unitActionRead({
+                            ddcsController.unitActionRead({
                                 groupName: baseConvoyGroupName,
                                 isCrate: false,
                                 dead: false
@@ -104,7 +101,7 @@ export async function checkBasesToSpawnConvoysFrom(serverName: string, friendlyB
                                         // respawn convoy because it doesnt exist
                                         console.log("convoy ", _.get(base, "name"), " attacking ", _.get(curBase, "name"));
                                         const message = "C: A convoy just left " + _.get(base, "name") + " is attacking " + _.get(curBase, "name");
-                                        groupController.spawnConvoy(
+                                        ddcsController.spawnConvoy(
                                             serverName,
                                             baseConvoyGroupName,
                                             _.get(base, "side", 0),
@@ -126,9 +123,9 @@ export async function checkBasesToSpawnConvoysFrom(serverName: string, friendlyB
                 ;
             }
             if (aIConfig.AIType === "CAPDefense") {
-                masterDBController.baseActionRead({
+                ddcsController.baseActionRead({
                     _id: _.get(baseTemplate, "destBase"),
-                    side: _.get(constants, ["enemyCountry", _.get(base, "side", 0)]),
+                    side: _.get(ddcsController, ["enemyCountry", _.get(base, "side", 0)]),
                     enabled: true
                 })
                     .then((destBaseInfo: any) => {
@@ -136,7 +133,7 @@ export async function checkBasesToSpawnConvoysFrom(serverName: string, friendlyB
                             const curBase = destBaseInfo[0];
                             // check if convoy exists first
                             const baseCapGroupName = "AI|" + aIConfig.name + "|" + _.get(base, "name") + "|";
-                            masterDBController.unitActionRead({
+                            ddcsController.unitActionRead({
                                 groupName: baseCapGroupName,
                                 isCrate: false,
                                 dead: false
@@ -146,7 +143,7 @@ export async function checkBasesToSpawnConvoysFrom(serverName: string, friendlyB
                                         console.log("RESPAWNCAP: ", baseCapGroupName, capGroup.length);
                                         // respawn convoy because it doesnt exist
                                         const mesg = "C: A CAP Defense spawned at " + _.get(base, "name");
-                                        groupController.spawnCAPDefense(
+                                        ddcsController.spawnCAPDefense(
                                             serverName,
                                             baseCapGroupName,
                                             _.get(base, "side", 0),

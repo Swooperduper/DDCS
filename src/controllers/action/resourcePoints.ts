@@ -3,29 +3,27 @@
  */
 
 import * as _ from "lodash";
-import * as masterDBController from "../db";
-import * as DCSLuaCommands from "../player/DCSLuaCommands";
-import { IUnit } from "src/typings";
+import * as ddcsController from "../";
 
 export async function spendResourcePoints(player: any, rsCost: number, rsItem: string, itemObj: any) {
 
-    let curUnit: IUnit;
+    let curUnit: ddcsController.IUnit;
 
     if (isNaN(player.slot)) {
         console.log("player doesnt have slotID: " + player);
         return Promise.resolve(false);
     } else {
-        return masterDBController.unitActionRead({unitId: _.toNumber(player.slot)})
+        return ddcsController.unitActionRead({unitId: _.toNumber(player.slot)})
             .then((cUnit) => {
                 let mesg;
                 let currentObjUpdate: any;
                 curUnit = _.get(cUnit, [0]);
                 if (curUnit.inAir) {
-                    return masterDBController.unitActionRead({_id: "AI|" + itemObj.name + "|"})
+                    return ddcsController.unitActionRead({_id: "AI|" + itemObj.name + "|"})
                         .then((unitExist) => {
                             if (unitExist.length > 0 && rsItem === "Tanker") {
                                 mesg = "G: Tanker your trying to spawn already exists";
-                                DCSLuaCommands.sendMesgToGroup(
+                                ddcsController.sendMesgToGroup(
                                     curUnit.groupId,
                                     mesg,
                                     5
@@ -49,11 +47,11 @@ export async function spendResourcePoints(player: any, rsCost: number, rsItem: s
                                             _id: player._id,
                                             redRSPoints: player.redRSPoints - rsCost
                                         };
-                                        return masterDBController.srvPlayerActionsUpdate(currentObjUpdate)
+                                        return ddcsController.srvPlayerActionsUpdate(currentObjUpdate)
                                             .then(() => {
                                                 mesg = "G: You have spent red " + rsCost + " points on a " + rsItem +
                                                     "(" + currentObjUpdate.redRSPoints + "pts left)";
-                                                DCSLuaCommands.sendMesgToGroup(
+                                                ddcsController.sendMesgToGroup(
                                                     curUnit.groupId,
                                                     mesg,
                                                     5
@@ -66,7 +64,7 @@ export async function spendResourcePoints(player: any, rsCost: number, rsItem: s
                                     } else {
                                         mesg = "G: You do not have red " + rsCost + " points to buy a " +
                                             rsItem + " (" + player.redRSPoints + "pts)";
-                                        DCSLuaCommands.sendMesgToGroup(
+                                        ddcsController.sendMesgToGroup(
                                             curUnit.groupId,
                                             mesg,
                                             5
@@ -79,11 +77,11 @@ export async function spendResourcePoints(player: any, rsCost: number, rsItem: s
                                             _id: player._id,
                                             blueRSPoints: player.blueRSPoints - rsCost
                                         };
-                                        return masterDBController.srvPlayerActionsUpdate(currentObjUpdate)
+                                        return ddcsController.srvPlayerActionsUpdate(currentObjUpdate)
                                             .then(() => {
                                                 mesg = "G: You have spent " + rsCost + " blue points on a " + rsItem +
                                                     "(" + currentObjUpdate.blueRSPoints + "pts left)";
-                                                DCSLuaCommands.sendMesgToGroup(
+                                                ddcsController.sendMesgToGroup(
                                                     curUnit.groupId,
                                                     mesg,
                                                     5
@@ -96,7 +94,7 @@ export async function spendResourcePoints(player: any, rsCost: number, rsItem: s
                                     } else {
                                         mesg = "G: You do not have " + rsCost + " blue points to buy a " +
                                             rsItem + " (" + player.blueRSPoints + "pts)";
-                                        DCSLuaCommands.sendMesgToGroup(
+                                        ddcsController.sendMesgToGroup(
                                             curUnit.groupId,
                                             mesg,
                                             5
@@ -112,7 +110,7 @@ export async function spendResourcePoints(player: any, rsCost: number, rsItem: s
                         ;
                 } else {
                     mesg = "G: You cannot spend RS points on the ground, Please TakeOff First, Then Call RS Point Option!";
-                    DCSLuaCommands.sendMesgToGroup(
+                    ddcsController.sendMesgToGroup(
                         curUnit.groupId,
                         mesg,
                         5
@@ -128,7 +126,7 @@ export async function spendResourcePoints(player: any, rsCost: number, rsItem: s
 
 export async function checkResourcePoints(player: any) {
     if (player.name) {
-        return masterDBController.unitActionRead({dead: false, playername: player.name})
+        return ddcsController.unitActionRead({dead: false, playername: player.name})
             .then((cUnit) => {
                 let mesg;
                 if (cUnit.length > 0) {
@@ -138,7 +136,7 @@ export async function checkResourcePoints(player: any) {
                         mesg = "G: You have " + player.blueRSPoints + " Blue Resource Points!";
                     }
 
-                    DCSLuaCommands.sendMesgToGroup(
+                    ddcsController.sendMesgToGroup(
                         cUnit[0].groupId,
                         mesg,
                         5

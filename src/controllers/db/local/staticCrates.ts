@@ -2,31 +2,29 @@
  * DDCS Licensed under AGPL-3.0 by Andrew "Drex" Finegan https://github.com/afinegan/DynamicDCS
  */
 
-import {localConnection} from "../common/connection";
-import {staticCrateSchema} from "./schemas";
-import {ICrate} from "../../../typings";
+import * as ddcsController from "../../";
 
-const staticCratesTable = localConnection.model(process.env.SERVERNAME + "_crates", staticCrateSchema);
+const staticCratesTable = ddcsController.localConnection.model(process.env.SERVERNAME + "_crates", ddcsController.staticCrateSchema);
 
-export async function staticCrateActionRead(obj: any): Promise<ICrate[]> {
+export async function staticCrateActionRead(obj: any): Promise<ddcsController.ICrate[]> {
     return new Promise((resolve, reject) => {
-        staticCratesTable.find(obj).sort( { createdAt: -1 } ).exec((err, dbUnits: ICrate[]) => {
+        staticCratesTable.find(obj).sort( { createdAt: -1 } ).exec((err, dbUnits: ddcsController.ICrate[]) => {
             if (err) { reject(err); }
             resolve(dbUnits);
         });
     });
 }
 
-export async function staticCrateActionReadStd(obj: any): Promise<ICrate[]> {
+export async function staticCrateActionReadStd(obj: any): Promise<ddcsController.ICrate[]> {
     return new Promise((resolve, reject) => {
-        staticCratesTable.find(obj).exec((err, dbUnits: ICrate[]) => {
+        staticCratesTable.find(obj).exec((err, dbUnits: ddcsController.ICrate[]) => {
             if (err) { reject(err); }
             resolve(dbUnits);
         });
     });
 }
 
-export async function staticCrateActionSave(obj: any): Promise<ICrate[]> {
+export async function staticCrateActionSave(obj: any): Promise<ddcsController.ICrate[]> {
     return new Promise((resolve, reject) => {
         const crate = new staticCratesTable(obj);
         crate.save((err, units: any) => {
@@ -36,7 +34,7 @@ export async function staticCrateActionSave(obj: any): Promise<ICrate[]> {
     });
 }
 
-export async function staticCrateActionUpdate(obj: any): Promise<ICrate[]> {
+export async function staticCrateActionUpdate(obj: any): Promise<ddcsController.ICrate[]> {
     return new Promise((resolve, reject) => {
         staticCratesTable.findOneAndUpdate(
             {_id: obj._id},
@@ -49,7 +47,7 @@ export async function staticCrateActionUpdate(obj: any): Promise<ICrate[]> {
     });
 }
 
-export async function staticCrateActionUpdateByName(obj: any): Promise<ICrate[]> {
+export async function staticCrateActionUpdateByName(obj: any): Promise<ddcsController.ICrate[]> {
     return new Promise((resolve, reject) => {
         staticCratesTable.findOneAndUpdate(
             {name: obj.name},
@@ -62,7 +60,7 @@ export async function staticCrateActionUpdateByName(obj: any): Promise<ICrate[]>
     });
 }
 
-export async function staticCrateActionUpdateByUnitId(obj: any): Promise<ICrate[]> {
+export async function staticCrateActionUpdateByUnitId(obj: any): Promise<ddcsController.ICrate[]> {
     return new Promise((resolve, reject) => {
         staticCratesTable.findOneAndUpdate(
             {unitId: obj.unitId},
@@ -75,7 +73,7 @@ export async function staticCrateActionUpdateByUnitId(obj: any): Promise<ICrate[
     });
 }
 
-export async function staticCrateActionChkResync(obj: any): Promise<ICrate[]> {
+export async function staticCrateActionChkResync(obj: any): Promise<ddcsController.ICrate[]> {
     return new Promise((resolve, reject) => {
         staticCratesTable.updateMany(
             {},
@@ -88,7 +86,7 @@ export async function staticCrateActionChkResync(obj: any): Promise<ICrate[]> {
     });
 }
 
-export async function staticCrateActionMarkUndead(obj: any): Promise<ICrate[]> {
+export async function staticCrateActionMarkUndead(obj: any): Promise<ddcsController.ICrate[]> {
     return new Promise((resolve, reject) => {
         staticCratesTable.updateMany(
             {isResync: false},
@@ -101,7 +99,7 @@ export async function staticCrateActionMarkUndead(obj: any): Promise<ICrate[]> {
     });
 }
 
-export async function staticCrateActionDelete(obj: any): Promise<ICrate[]> {
+export async function staticCrateActionDelete(obj: any): Promise<ddcsController.ICrate[]> {
     return new Promise((resolve, reject) => {
         staticCratesTable.findByIdAndRemove(obj._id, (err, units: any) => {
             if (err) { reject(err); }

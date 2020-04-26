@@ -3,15 +3,15 @@
  */
 
 import * as _ from "lodash";
-import * as masterDBController from "../db";
+import * as ddcsController from "../";
 
 export async function setSideLockFlags() {
     // console.log('SETSIDELOCKGFLAGS ');
     const playerSideLockTable: any[] = [];
-    return masterDBController.sessionsActionsReadLatest()
+    return ddcsController.sessionsActionsReadLatest()
         .then((latestSession: any) => {
             if (latestSession.name) {
-                return masterDBController.srvPlayerActionsRead({sessionName: latestSession.name})
+                return ddcsController.srvPlayerActionsRead({sessionName: latestSession.name})
                     .then((playerArray: any) => {
                         _.forEach(playerArray, (player) => {
                             let lockObj;
@@ -38,7 +38,7 @@ export async function setSideLockFlags() {
                         });
 
                         console.log("setSideLock: ", playerSideLockTable);
-                        return masterDBController.cmdQueActionsSave({
+                        return ddcsController.cmdQueActionsSave({
                             actionObj: {
                                 action : "SETSIDELOCK",
                                 data: playerSideLockTable

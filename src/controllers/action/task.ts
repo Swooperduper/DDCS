@@ -3,7 +3,7 @@
  */
 
 import * as constants from "../constants";
-import * as masterDBController from "../db";
+import * as ddcsController from "../";
 
 const delayTask = constants.time.oneMin;
 let nowTime;
@@ -26,7 +26,7 @@ export async function setEWRTask(unitName: string) {
         queName: "clientArray",
         timeToExecute: nowTime + delayTask
     };
-    return masterDBController.cmdQueActionsSave(actionObj)
+    return ddcsController.cmdQueActionsSave(actionObj)
         .catch((err) => {
             console.log("erroring line13: ", err);
         })
@@ -48,7 +48,7 @@ export async function setMissionTask(groupName: string, route: string) {
         queName: "clientArray",
         timeToExecute: nowTime + delayTask
     };
-    return masterDBController.cmdQueActionsSave(actionObj)
+    return ddcsController.cmdQueActionsSave(actionObj)
         .catch((err) => {
             console.log("erroring line13: ", err);
         })

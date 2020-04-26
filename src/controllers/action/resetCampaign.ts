@@ -6,14 +6,12 @@
 const exec = require("child_process").exec;
 
 import * as _ from "lodash";
-import * as constants from "../constants";
-import * as masterDBController from "../db";
-import * as serverTimerController from "../action/serverTimer";
+import * as ddcsController from "../";
 
 export let timeToRestart = 0;
 
 export function setTimeToRestart(timestamp: number) {
-    exports.timeToRestart = timestamp;
+    timeToRestart = timestamp;
 }
 
 // Create shutdown function
@@ -22,9 +20,9 @@ function shutdown(callback: { (output: any): void; (arg0: any): any; }) {
 }
 
 export function checkTimeToRestart() {
-    if (exports.timeToRestart !== 0) {
-        if (new Date().getTime() > exports.timeToRestart) {
-            exports.restartServer();
+    if (timeToRestart !== 0) {
+        if (new Date().getTime() > timeToRestart) {
+            restartCampaign();
         }
     }
 }
@@ -32,17 +30,17 @@ export function checkTimeToRestart() {
 export async function clearCampaignTables() {
     console.log("clearTables");
     const groupPromise: any[] = [];
-    groupPromise.push(masterDBController.cmdQueActionsRemoveAll()
+    groupPromise.push(ddcsController.cmdQueActionsRemoveAll()
         .catch((err: any) => {
             console.log("line 32: ", err);
         }))
     ;
-    groupPromise.push(masterDBController.staticCrateActionRemoveall()
+    groupPromise.push(ddcsController.staticCrateActionRemoveall()
         .catch((err: any) => {
             console.log("line 37: ", err);
         }))
     ;
-    groupPromise.push(masterDBController.unitActionRemoveall()
+    groupPromise.push(ddcsController.unitActionRemoveall()
         .catch((err: any) => {
             console.log("line 42: ", err);
         }))
@@ -53,14 +51,14 @@ export async function clearCampaignTables() {
         });
 }
 
-export function restartServer() {
+export function restartCampaign() {
     console.log("ALL TABLES CLEARED OFF, restart");
-    if (_.get(constants, "config.fullServerRestartOnCampaignWin", false)) {
+    if (_.get(ddcsController, "config.fullServerRestartOnCampaignWin", false)) {
         shutdown((output: any) => {
             console.log(output);
         });
     } else {
-        serverTimerController.restartServer()
+        ddcsController.restartServer()
             .catch((err) => {
                 console.log("line61: ", err);
             });

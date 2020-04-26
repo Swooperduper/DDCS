@@ -1,39 +1,42 @@
-import {localConnection} from "../common/connection";
-import {ISrvPlayers} from "../../../typings";
-import {srvPlayerSchema} from "./schemas";
+/*
+ * DDCS Licensed under AGPL-3.0 by Andrew "Drex" Finegan https://github.com/afinegan/DynamicDCS
+ */
 
-const srvPlayerTable = localConnection.model(process.env.SERVERNAME + "_srvPlayer", srvPlayerSchema);
+import * as _ from "lodash";
+import * as ddcsController from "../../";
 
-export async function srvPlayerActionsRead(obj: any) {
+const srvPlayerTable = ddcsController.localConnection.model(process.env.SERVERNAME + "_srvPlayer", ddcsController.srvPlayerSchema);
+
+export async function srvPlayerActionsRead(obj: any): Promise<ddcsController.ISrvPlayers[]> {
     return new Promise((resolve, reject) => {
-        srvPlayerTable.find(obj, (err, srvPlayer) => {
+        srvPlayerTable.find(obj, (err, srvPlayer: ddcsController.ISrvPlayers[]) => {
             if (err) { reject(err); }
             resolve(srvPlayer);
         });
     });
 }
 
-export async function srvPlayerActionsUpdate(obj: any) {
+export async function srvPlayerActionsUpdate(obj: any): Promise<void> {
     return new Promise((resolve, reject) => {
         srvPlayerTable.updateOne(
             {_id: obj._id},
             {$set: obj},
-            (err, serObj) => {
+            (err) => {
                 if (err) { reject(err); }
-                resolve(serObj);
+                resolve();
             }
         );
     });
 }
 
-export async function srvPlayerActionsUnsetGicTimeLeft(obj: any) {
+export async function srvPlayerActionsUnsetGicTimeLeft(obj: any): Promise<void> {
     return new Promise((resolve, reject) => {
         srvPlayerTable.updateOne(
             {_id: obj._id},
             {$unset: { gicTimeLeft: "" }},
-            (err, serObj) => {
+            (err) => {
                 if (err) { reject(err); }
-                resolve(serObj);
+                resolve();
             }
         );
     });
@@ -49,33 +52,35 @@ export async function srvPlayerActionsUpdateFromServer(obj: {
     currentSessionMinutesPlayed_red?: number,
     ipaddr?: string,
     sideLock?: number
-}) {
+}): Promise<void> {
     return new Promise((resolve, reject) => {
-        srvPlayerTable.find({_id: obj._id}, (err, serverObj: ISrvPlayers[]) => {
+        srvPlayerTable.find({_id: obj._id}, (err, serverObj: ddcsController.ISrvPlayers[]) => {
             if (err) { reject(err); }
             if (serverObj.length === 0) {
-                const sObj: any = new srvPlayerTable(obj);
-                if (sObj.ipaddr === ":10308") {
-                    sObj.ipaddr = "127.0.0.1";
+
+                if (obj.ipaddr === ":10308") {
+                    obj.ipaddr = "127.0.0.1";
                 }
 
-                if (sObj.side === 0) { // keep the user on the last side
-                    delete sObj.side;
+                if (obj.side === 0) { // keep the user on the last side
+                    delete obj.side;
                 }
-                sObj.curLifePoints = constants.config.startLifePoints;
-                sObj.save((saveErr: any, serObj: ISrvPlayers) => {
+                obj.curLifePoints = ddcsController.config.startLifePoints;
+
+                const sObj = new srvPlayerTable(obj);
+                sObj.save((saveErr) => {
                     if (saveErr) { reject(saveErr); }
-                    resolve(serObj);
+                    resolve();
                 });
             } else {
                 const curPly = serverObj[0];
                 if ((curPly.sessionName !== obj.sessionName) && curPly.sessionName && obj.sessionName) {
                     const curTime =  new Date().getTime();
-                    obj.curLifePoints = constants.config.startLifePoints;
+                    obj.curLifePoints = ddcsController.config.startLifePoints;
                     obj.currentSessionMinutesPlayed_blue = 0;
                     obj.currentSessionMinutesPlayed_red = 0;
                     if (curPly.sideLockTime < curTime) {
-                        obj.sideLockTime = curTime + constants.time.oneHour;
+                        obj.sideLockTime = curTime + ddcsController.time.oneHour;
                         obj.sideLock = 0;
                     }
                 }
@@ -104,27 +109,28 @@ export async function srvPlayerActionsAddLifePoints(obj: {
     groupId: number,
     addLifePoints?: number,
     execAction?: string
-}) {
+}): Promise<void> {
     return new Promise((resolve, reject) => {
-        srvPlayerTable.find({_id: obj._id}, (err: any, serverObj: ISrvPlayers[]) => {
+        srvPlayerTable.find({_id: obj._id}, (err: any, serverObj: ddcsController.ISrvPlayers[]) => {
             if (err) { reject(err); }
             const addPoints: number = (obj.addLifePoints) ? obj.addLifePoints : serverObj[0].cachedRemovedLPPoints;
             const curAction: string = "addLifePoint";
             const curPlayerLifePoints: number = serverObj[0].curLifePoints || 0;
             const curTotalPoints: number = (curPlayerLifePoints >= 0) ? curPlayerLifePoints + addPoints : addPoints;
-            const maxLimitedPoints: number = (curTotalPoints > constants.maxLifePoints) ? constants.maxLifePoints : curTotalPoints;
+            const maxLimitedPoints: number = (curTotalPoints > ddcsController.maxLifePoints) ?
+                ddcsController.maxLifePoints : curTotalPoints;
             let msg;
             if (serverObj.length > 0) {
                 const setObj = {
                     cachedRemovedLPPoints: (!obj.addLifePoints) ?  0 : undefined,
                     curLifePoints: maxLimitedPoints,
                     lastLifeAction: curAction,
-                    safeLifeActionTime: new Date().getTime() + constants.time.fifteenSecs
+                    safeLifeActionTime: new Date().getTime() + ddcsController.time.fifteenSecs
                 };
                 srvPlayerTable.findOneAndUpdate(
                     {_id: obj._id},
                     { $set: setObj },
-                    (updateErr: any, srvPlayer) => {
+                    (updateErr, srvPlayer) => {
                         if (updateErr) { reject(updateErr); }
                         if (obj.execAction === "PeriodicAdd") {
                             msg = "+" + _.round(addPoints, 2).toFixed(2) + "LP(T:" + maxLimitedPoints.toFixed(2) + ")";
@@ -134,13 +140,13 @@ export async function srvPlayerActionsAddLifePoints(obj: {
                                 obj.execAction + "(Total:" + maxLimitedPoints.toFixed(2) + ")";
                         }
                         if (obj.groupId) {
-                            DCSLuaCommands.sendMesgToGroup( obj.groupId, msg, 5);
+                            ddcsController.sendMesgToGroup( obj.groupId, msg, 5);
                         }
-                        resolve(srvPlayer);
+                        resolve();
                     }
                 );
             } else {
-                resolve("line128: Error: No Record in player db" + obj._id);
+                resolve();
             }
         });
     });
@@ -153,45 +159,44 @@ export async function srvPlayerActionsRemoveLifePoints(obj: {
     removeLifePoints: number,
     execAction?: string,
     storePoints?: boolean
-}) {
+}): Promise<void> {
     return new Promise((resolve, reject) => {
-        srvPlayerTable.find({_id: obj._id}, (err: any, serverObj: ISrvPlayers[]) => {
+        srvPlayerTable.find({_id: obj._id}, (err: any, serverObj: ddcsController.ISrvPlayers[]) => {
             const removePoints = obj.removeLifePoints;
             const curAction = "removeLifePoints";
-            const curPlayerObj = serverObj[0];
-            const curPlayerLifePoints = curPlayerObj.curLifePoints || 0;
+            const curPlayerLifePoints = serverObj[0].curLifePoints || 0;
             const curTotalPoints = curPlayerLifePoints - removePoints;
-            const maxLimitedPoints = (curTotalPoints > constants.maxLifePoints) ? constants.maxLifePoints : curTotalPoints;
+            const maxLimitedPoints = (curTotalPoints > ddcsController.maxLifePoints) ? ddcsController.maxLifePoints : curTotalPoints;
             if (err) { reject(err); }
-            if (serverObj.length > 0) {
+            if (serverObj.length > 0 && serverObj[0].playerId) {
                 if (curTotalPoints < 0) {
-                    DCSLuaCommands.forcePlayerSpectator(
-                        curPlayerObj.playerId,
+                    ddcsController.forcePlayerSpectator(
+                        serverObj[0].playerId,
                         "You Do Not Have Enough Points To Fly This Vehicle" +
                         "{" + removePoints.toFixed(2) + "/" + curPlayerLifePoints.toFixed(2) + ")"
                     );
-                    resolve(serverObj);
+                    resolve();
                 } else {
                     const setObj = {
                         cachedRemovedLPPoints: (obj.storePoints) ? removePoints : undefined,
                         curLifePoints: maxLimitedPoints,
                         lastLifeAction: curAction,
-                        safeLifeActionTime: new Date().getTime() + constants.time.fifteenSecs
+                        safeLifeActionTime: new Date().getTime() + ddcsController.time.fifteenSecs
                     };
                     srvPlayerTable.findOneAndUpdate(
                         {_id: obj._id},
                         { $set: setObj },
                         (updateErr, srvPlayer) => {
                             if (updateErr) { reject(updateErr); }
-                            DCSLuaCommands.sendMesgToGroup( obj.groupId, "You Have Just Used " +
+                            ddcsController.sendMesgToGroup( obj.groupId, "You Have Just Used " +
                                 removePoints.toFixed(2) + " Life Points! " + obj.execAction +
                                 "(Total:" + curTotalPoints.toFixed(2) + ")", 5);
-                            resolve(srvPlayer);
+                            resolve();
                         }
                     );
                 }
             } else {
-                resolve("line 173: no players for id: " + obj._id);
+                resolve();
             }
         });
     });
@@ -200,7 +205,7 @@ export async function srvPlayerActionsRemoveLifePoints(obj: {
 export async function srvPlayerActionsClearTempScore(obj: {
     _id: string,
     groupId: number
-}) {
+}): Promise<void> {
     return new Promise((resolve, reject) => {
         srvPlayerTable.find({_id: obj._id}, (err, serverObj) => {
             if (err) { reject(err); }
@@ -210,16 +215,16 @@ export async function srvPlayerActionsClearTempScore(obj: {
                     {$set: {tmpRSPoints: 0}},
                     (updateErr) => {
                         if (updateErr) { reject(updateErr); }
-                        DCSLuaCommands.sendMesgToGroup(
+                        ddcsController.sendMesgToGroup(
                             obj.groupId,
                             "Your Tmp Score Has Been Cleared",
-                            "15"
+                            15
                         );
                         resolve();
                     }
                 );
             } else {
-                resolve("line 198: no players for id: " + obj._id);
+                resolve();
             }
         });
     });
@@ -229,7 +234,7 @@ export async function srvPlayerActionsAddTempScore(obj: {
     _id: string,
     groupId: number
     score?: number
-}) {
+}): Promise<void> {
     return new Promise((resolve, reject) => {
         srvPlayerTable.find({_id: obj._id}, (err, serverObj: any[]) => {
             if (err) { reject(err); }
@@ -240,18 +245,18 @@ export async function srvPlayerActionsAddTempScore(obj: {
                     {$set: {tmpRSPoints: newTmpScore}},
                     (updateErr) => {
                         if (updateErr) { reject(updateErr); }
-                        if (constants.config.inGameHitMessages) {
-                            DCSLuaCommands.sendMesgToGroup(
+                        if (ddcsController.config.inGameHitMessages) {
+                            ddcsController.sendMesgToGroup(
                                 obj.groupId,
                                 "TmpScore: " + newTmpScore + ", Land at a friendly base/farp to receive these points",
-                                "15"
+                                15
                             );
                         }
                         resolve();
                     }
                 );
             } else {
-                resolve("line 226: no players for id: " + obj._id);
+                resolve();
             }
         });
     });
@@ -260,7 +265,7 @@ export async function srvPlayerActionsAddTempScore(obj: {
 export async function srvPlayerActionsApplyTempToRealScore(obj: {
     _id: string,
     groupId: number
-}) {
+}): Promise<void> {
     return new Promise((resolve, reject) => {
         srvPlayerTable.find({_id: obj._id}, (err, serverObj: any[]) => {
             if (err) { reject(err); }
@@ -288,12 +293,12 @@ export async function srvPlayerActionsApplyTempToRealScore(obj: {
                     (updateErr) => {
                         if (updateErr) { reject(updateErr); }
                         console.log("aplyT2R: ", curPly.name, mesg);
-                        DCSLuaCommands.sendMesgToGroup(obj.groupId, mesg, "15");
+                        ddcsController.sendMesgToGroup(obj.groupId, mesg, 15);
                         resolve();
                     }
                 );
             } else {
-                resolve("line 265: no players for id: " + obj._id);
+                resolve();
             }
         });
     });
@@ -305,7 +310,7 @@ export async function srvPlayerActionsUnitAddToRealScore(obj: {
     unitCoalition: number,
     score?: number,
     unitType?: string
-}) {
+}): Promise<void> {
     return new Promise((resolve, reject) => {
         srvPlayerTable.find({_id: obj._id}, (err, serverObj: any[]) => {
             if (err) { reject(err); }
@@ -331,11 +336,11 @@ export async function srvPlayerActionsUnitAddToRealScore(obj: {
                             if (updateErr) { reject(updateErr); }
                             console.log(obj.unitType + " has given " + addScore +
                                 " to " + curPly.name + " on " + curPly.side + ", Total: ", tObj);
-                            if (constants.config.inGameHitMessages) {
-                                DCSLuaCommands.sendMesgToGroup(
+                            if (ddcsController.config.inGameHitMessages) {
+                                ddcsController.sendMesgToGroup(
                                     obj.groupId,
                                     mesg,
-                                    "15"
+                                    15
                                 );
                             }
                             resolve();
@@ -343,7 +348,7 @@ export async function srvPlayerActionsUnitAddToRealScore(obj: {
                     );
                 }
             } else {
-                resolve("line 315: no players for id: " + obj._id);
+                resolve();
             }
         });
     });
@@ -353,9 +358,9 @@ export async function srvPlayerActionsAddMinutesPlayed(obj: {
     _id: string,
     side: number,
     minutesPlayed?: number
-}) {
+}): Promise<void> {
     return new Promise((resolve, reject) => {
-        const sessionMinutesVar = "currentSessionMinutesPlayed_" + constants.side[obj.side];
+        const sessionMinutesVar = "currentSessionMinutesPlayed_" + ddcsController.side[obj.side];
         srvPlayerTable.find({ _id: obj._id }, (err, serverObj: any) => {
                 if (err) { reject(err); }
                 if (serverObj.length > 0) {
@@ -370,7 +375,7 @@ export async function srvPlayerActionsAddMinutesPlayed(obj: {
                         }
                     );
                 } else {
-                    resolve("line 341: no players for id: " + obj._id);
+                    resolve();
                 }
             });
     });
@@ -379,9 +384,9 @@ export async function srvPlayerActionsAddMinutesPlayed(obj: {
 export async function srvPlayerActionsResetMinutesPlayed(obj: {
     _id: string,
     side: number
-}) {
+}): Promise<void> {
     return new Promise((resolve, reject) => {
-        const sessionMinutesVar = "currentSessionMinutesPlayed_" + constants.side[obj.side];
+        const sessionMinutesVar = "currentSessionMinutesPlayed_" + ddcsController.side[obj.side];
         srvPlayerTable.updateOne(
             {_id: obj._id},
             {$set: {[sessionMinutesVar]: 0}},

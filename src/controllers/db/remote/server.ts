@@ -2,49 +2,48 @@
  * DDCS Licensed under AGPL-3.0 by Andrew "Drex" Finegan https://github.com/afinegan/DynamicDCS
  */
 
-import {remoteConnection} from "../common/connection";
-import {serverSchema} from "./schemas";
+import * as ddcsController from "../../";
 
-const serverTable = remoteConnection.model("servers", serverSchema);
+const serverTable = ddcsController.remoteConnection.model("servers", ddcsController.serverSchema);
 
-export async function serverActionsCreate(obj: any) {
+export async function serverActionsCreate(obj: any): Promise<void> {
     return new Promise((resolve, reject) => {
         const server = new serverTable(obj);
-        server.save((err, servers) => {
+        server.save((err) => {
             if (err) { reject(err); }
-            resolve(servers);
+            resolve();
         });
     });
 }
 
-export async function serverActionsRead(obj: any) {
+export async function serverActionsRead(obj: any): Promise<ddcsController.IServer[]> {
     return new Promise((resolve, reject) => {
-        serverTable.find(obj, (err, servers) => {
+        serverTable.find(obj, (err, servers: ddcsController.IServer[]) => {
             if (err) { reject(err); }
             resolve(servers);
         });
     });
 }
 
-export async function serverActionsUpdate(obj: any) {
+export async function serverActionsUpdate(obj: any): Promise<void> {
     return new Promise((resolve, reject) => {
         serverTable.findOneAndUpdate(
             {name: obj.name},
             {$set: obj},
             {new: true},
-            (err, servers) => {
+            (err) => {
                 if (err) { reject(err); }
-                resolve(servers);
+                resolve();
             }
         );
     });
 }
 
-export async function serverActionsDelete(obj: any) {
+export async function serverActionsDelete(obj: any): Promise<void> {
     return new Promise((resolve, reject) => {
-        serverTable.findOneAndRemove({name: obj.name}, (err, servers) => {
+        serverTable.findOneAndRemove({name: obj.name}, (err) => {
             if (err) { reject(err); }
-            resolve(servers);
+            resolve();
         });
     });
 }

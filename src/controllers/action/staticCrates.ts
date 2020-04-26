@@ -3,25 +3,19 @@
  */
 
 import * as _ from "lodash";
-import * as masterDBController from "../db";
-import * as proximityController from "../proxZone/proximity";
-import * as groupController from "../spawn/group";
-import * as reloadController from "../menu/reload";
-import * as DCSLuaCommands from "../player/DCSLuaCommands";
-import * as menuCmdsController from "../menu/menuCmds";
-import * as neutralCCController from "../action/neutralCC";
+import * as ddcsController from "../";
 
 export async function destroyCrates(grpTypes: any, curCrateType: string, numCrate: number) {
     let cCnt = 1;
     _.forEach(_.get(grpTypes, [curCrateType]), (eCrate) => {
         if ( cCnt <= numCrate) {
             console.log("delCrate: ",  eCrate._id);
-            masterDBController.staticCrateActionDelete({_id: eCrate._id})
+            ddcsController.staticCrateActionDelete({_id: eCrate._id})
                 .catch((err: any) => {
                     console.log("erroring line23: ", err);
                 })
             ;
-            groupController.destroyUnit(eCrate.name);
+            ddcsController.destroyUnit(eCrate.name);
             cCnt ++;
         }
     });
@@ -32,14 +26,14 @@ export async function processStaticCrate(crateObj: any) {
     _.forEach(crateObj.data, (crate, name) => {
         if (crate.alive) {
             // console.log('ACHK: ', name);
-            cPromise.push(masterDBController.staticCrateActionUpdate({_id: name, lonLatLoc: [crate.lon, crate.lat]})
+            cPromise.push(ddcsController.staticCrateActionUpdate({_id: name, lonLatLoc: [crate.lon, crate.lat]})
                 .catch((err) => {
                     console.log("line 17: ", err);
                 })
             );
         } else {
             // console.log('DCHK: ', name);
-            cPromise.push(masterDBController.staticCrateActionDelete({_id: name})
+            cPromise.push(ddcsController.staticCrateActionDelete({_id: name})
                 .catch((err: any) => {
                     console.log("line 23: ", err);
                 })
@@ -49,7 +43,7 @@ export async function processStaticCrate(crateObj: any) {
     Promise.all(cPromise)
         .then(() => {
             if (crateObj.callback === "unpackCrate") {
-                exports.unpackCrate(crateObj);
+                exports.unpackStaticCrate(crateObj);
             }
         })
         .catch((err: any) => {
@@ -57,11 +51,11 @@ export async function processStaticCrate(crateObj: any) {
         });
 }
 
-export async function unpackCrate(crateObj: any) {
-    return masterDBController.unitActionRead({unitId: crateObj.unitId})
+export async function unpackStaticCrate(crateObj: any) {
+    return ddcsController.unitActionRead({unitId: crateObj.unitId})
         .then((pUnit) => {
             const curPlayerUnit = pUnit[0];
-            proximityController.getStaticCratesInProximity(curPlayerUnit.lonLatLoc, 0.2, curPlayerUnit.coalition)
+            ddcsController.getStaticCratesInProximity(curPlayerUnit.lonLatLoc, 0.2, curPlayerUnit.coalition)
                 .then((crates: any) => {
                     let grpTypes: any;
                     let localCrateNum;
@@ -84,7 +78,7 @@ export async function unpackCrate(crateObj: any) {
                         if ( localCrateNum >=  numCrate) {
                             if (curCrateSpecial === "reloadGroup") {
                                 // console.log('reloadGroup: ', serverName, curPlayerUnit, curCrate);
-                                reloadController.reloadSAM(curPlayerUnit)
+                                ddcsController.reloadSAM(curPlayerUnit)
                                     .then((response: any) => {
                                         // console.log('reload resp: ', response);
                                         if (response) {
@@ -97,7 +91,7 @@ export async function unpackCrate(crateObj: any) {
                                 ;
                             } else if (_.includes(curCrateSpecial, "CCBuild|")) {
                                 console.log("trying to build cc on empty base");
-                                neutralCCController.spawnCCAtNeutralBase(curPlayerUnit)
+                                ddcsController.spawnCCAtNeutralBase(curPlayerUnit)
                                     .then((response) => {
                                         console.log("spawn response1: ", response);
                                         if (response) {
@@ -110,7 +104,7 @@ export async function unpackCrate(crateObj: any) {
                                 ;
                             } else {
                                 msg = "G: Unpacking " + _.toUpper(curCrateSpecial) + " " + curCrateType + "!";
-                                menuCmdsController.unpackCrate(
+                                ddcsController.unpackCrate(
                                     curPlayerUnit,
                                     curCrate.country,
                                     curCrateType,
@@ -130,7 +124,7 @@ export async function unpackCrate(crateObj: any) {
                                 ;
                                 // console.log('singleCrateDestroy: ', curCrate.name);
                                 // groupController.destroyUnit(serverName, curCrate.name);
-                                DCSLuaCommands.sendMesgToGroup(
+                                ddcsController.sendMesgToGroup(
                                     curPlayerUnit.groupId,
                                     msg,
                                     5
@@ -139,13 +133,13 @@ export async function unpackCrate(crateObj: any) {
 
                         } else {
                             if (localCrateNum) {
-                                DCSLuaCommands.sendMesgToGroup(
+                                ddcsController.sendMesgToGroup(
                                     curPlayerUnit.groupId,
                                     "G: Not Enough Crates for " + curCrateType + "!(" + localCrateNum + "/" + numCrate + ")",
                                     5
                                 );
                             } else {
-                                DCSLuaCommands.sendMesgToGroup(
+                                ddcsController.sendMesgToGroup(
                                     curPlayerUnit.groupId,
                                     "G: No Crates In Area!",
                                     5
@@ -154,7 +148,7 @@ export async function unpackCrate(crateObj: any) {
                         }
                     } else {
                         // no troops
-                        DCSLuaCommands.sendMesgToGroup(
+                        ddcsController.sendMesgToGroup(
                             curPlayerUnit.groupId,
                             "G: No Crates To Unpack!",
                             5

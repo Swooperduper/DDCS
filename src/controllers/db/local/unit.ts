@@ -3,34 +3,31 @@
  */
 
 import * as _ from "lodash";
-import * as constants from "../../constants";
-import {localConnection} from "../common/connection";
-import {unitSchema} from "./schemas";
-import {IUnit} from "../../../typings";
+import * as ddcsController from "../../";
 
-const unitTable = localConnection.model(process.env.SERVERNAME + "_unit", unitSchema);
+const unitTable = ddcsController.localConnection.model(process.env.SERVERNAME + "_unit", ddcsController.unitSchema);
 
-export async function unitActionRead(obj: any): Promise<any[]> {
+export async function unitActionRead(obj: any): Promise<ddcsController.IUnit[]> {
     return new Promise((resolve, reject) => {
-        unitTable.find(obj).sort( { createdAt: -1 } ).exec((err, dbUnits: any[]) => {
+        unitTable.find(obj).sort( { createdAt: -1 } ).exec((err, dbUnits: ddcsController.IUnit[]) => {
             if (err) { reject(err); }
             resolve(dbUnits);
         });
     });
 }
 
-export async function unitActionReadStd(obj: any): Promise<any[]> {
+export async function unitActionReadStd(obj: any): Promise<ddcsController.IUnit[]> {
     return new Promise((resolve, reject) => {
-        unitTable.find(obj).exec((err, dbUnits: any[]) => {
+        unitTable.find(obj).exec((err, dbUnits: ddcsController.IUnit[]) => {
             if (err) { reject(err); }
             resolve(dbUnits);
         });
     });
 }
 
-export async function unitActionReadMin(obj: any): Promise<any[]> {
+export async function unitActionReadMin(obj: any): Promise<ddcsController.IUnit[]> {
     return new Promise((resolve, reject) => {
-        unitTable.find(obj).exec((err, dbUnits) => {
+        unitTable.find(obj).exec((err, dbUnits: ddcsController.IUnit[]) => {
             const curDbUnits: any[] = [];
             if (err) { reject(err); }
             _.forEach(dbUnits, (unit) => {
@@ -52,61 +49,61 @@ export async function unitActionReadMin(obj: any): Promise<any[]> {
     });
 }
 
-export async function unitActionSave(obj: any): Promise<any[]> {
+export async function unitActionSave(obj: any): Promise<void> {
     return new Promise((resolve, reject) => {
         const unit = new unitTable(obj);
-        unit.save((err, units: any) => {
+        unit.save((err) => {
             if (err) { reject(err); }
-            resolve(units);
+            resolve();
         });
     });
 }
 
-export async function unitActionUpdate(obj: any): Promise<any[]> {
+export async function unitActionUpdate(obj: any): Promise<void> {
     return new Promise((resolve, reject) => {
         unitTable.findOneAndUpdate(
             {_id: obj._id},
             {$set: obj},
-            (err, units: any) => {
+            (err) => {
                 if (err) { reject(err); }
-                resolve(units);
+                resolve();
             }
         );
     });
 }
 
-export async function unitActionUpdateByName(obj: any): Promise<any[]> {
+export async function unitActionUpdateByName(obj: any): Promise<void> {
     return new Promise((resolve, reject) => {
         unitTable.findOneAndUpdate(
             {name: obj.name},
             {$set: obj},
-            (err, units: any) => {
+            (err) => {
                 if (err) { reject(err); }
-                resolve(units);
+                resolve();
             }
         );
     });
 }
 
-export async function unitActionUpdateByUnitId(obj: any): Promise<any[]> {
+export async function unitActionUpdateByUnitId(obj: any): Promise<void> {
     return new Promise((resolve, reject) => {
         unitTable.findOneAndUpdate(
             {unitId: obj.unitId},
             {$set: obj},
-            (err, units: any) => {
+            (err) => {
                 if (err) { reject(err); }
-                resolve(units);
+                resolve();
             }
         );
     });
 }
 
-export async function unitActionChkResync(obj: any): Promise<any[]> {
+export async function unitActionChkResync(): Promise<ddcsController.IUnit[]> {
     return new Promise((resolve, reject) => {
         unitTable.updateMany(
             {},
             {$set: {isResync: false}},
-            (err, units) => {
+            (err, units: ddcsController.IUnit[]) => {
                 if (err) { reject(err); }
                 resolve(units);
             }
@@ -114,12 +111,12 @@ export async function unitActionChkResync(obj: any): Promise<any[]> {
     });
 }
 
-export async function unitActionMarkUndead(obj: any): Promise<any[]> {
+export async function unitActionMarkUndead(): Promise<ddcsController.IUnit[]> {
     return new Promise((resolve, reject) => {
         unitTable.updateMany(
             {isResync: false},
             {$set: {dead: true}},
-            (err, units) => {
+            (err, units: ddcsController.IUnit[]) => {
                 if (err) { reject(err); }
                 resolve(units);
             }
@@ -127,9 +124,9 @@ export async function unitActionMarkUndead(obj: any): Promise<any[]> {
     });
 }
 
-export async function unitActionRemoveAllDead(obj: any): Promise<any[]> {
+export async function unitActionRemoveAllDead(): Promise<void> {
     return new Promise((resolve, reject) => {
-        const fiveMinsAgo = new Date(new Date()).getTime() - _.get(constants, "time.fiveMins");
+        const fiveMinsAgo = new Date(new Date()).getTime() - _.get(ddcsController, "time.fiveMins");
         // console.log('five mins: ', fiveMinsAgo);
         unitTable.deleteOne(
             {
@@ -149,11 +146,11 @@ export async function unitActionRemoveAllDead(obj: any): Promise<any[]> {
     });
 }
 
-export async function unitActionDelete(obj: any): Promise<any[]> {
+export async function unitActionDelete(obj: any): Promise<void> {
     return new Promise((resolve, reject) => {
-        unitTable.findByIdAndRemove(obj._id, (err, units: any) => {
+        unitTable.findByIdAndRemove(obj._id, (err) => {
             if (err) { reject(err); }
-            resolve(units);
+            resolve();
         });
     });
 }
@@ -162,7 +159,7 @@ export async function unitActionRemoveall(): Promise<any> {
     return unitTable.deleteOne({});
 }
 
-export async function unitActionDropall(obj: any): Promise<any> {
+export async function unitActionDropall(): Promise<any> {
     return unitTable.collection.drop();
 }
 

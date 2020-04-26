@@ -3,12 +3,10 @@
  */
 
 import * as _ from "lodash";
-import * as constants from "../constants";
-import * as masterDBController from "../db";
-import * as DCSLuaCommands from "../player/DCSLuaCommands";
+import * as ddcsController from "../";
 
 export async function checkWeaponComplianceOnTakeoff(iPlayer: any, curIUnit: any) {
-    _.forEach(constants.config.weaponRules || [], (weaponRule: any) => {
+    _.forEach(ddcsController.config.weaponRules || [], (weaponRule: any) => {
         const limitedWeapons: any[] = [];
         let maxLimitedWeaponCount = 0;
         _.forEach(curIUnit.ammo || [], (value: any) => {
@@ -23,7 +21,7 @@ export async function checkWeaponComplianceOnTakeoff(iPlayer: any, curIUnit: any
                 maxLimitedWeaponCount + " of " + _.join(limitedWeapons) + ")";
             console.log("Removed " + iPlayer.name + " from aircraft not complying with weapon restrictions, (" +
                 maxLimitedWeaponCount + " of " + _.join(limitedWeapons) + ")");
-            DCSLuaCommands.forcePlayerSpectator(
+            ddcsController.forcePlayerSpectator(
                 iPlayer.playerId,
                 msg
             );
@@ -34,23 +32,23 @@ export async function checkWeaponComplianceOnTakeoff(iPlayer: any, curIUnit: any
 }
 
 export async function checkAircraftWeaponCompliance() {
-    return masterDBController.sessionsActionsReadLatest()
+    return ddcsController.sessionsActionsReadLatest()
         .then((latestSession: any) => {
             if (latestSession.name) {
-                masterDBController.srvPlayerActionsRead({sessionName: latestSession.name, playername: {$ne: ""}})
+                ddcsController.srvPlayerActionsRead({sessionName: latestSession.name, playername: {$ne: ""}})
                     .then((srvPlayers: any) => {
                         _.forEach(srvPlayers, (curPlayer: any) => {
-                            masterDBController.unitActionRead({dead: false, playername: curPlayer.name})
+                            ddcsController.unitActionRead({dead: false, playername: curPlayer.name})
                                 .then((cUnit: any) => {
                                     if (cUnit.length > 0) {
                                         const curUnit = cUnit[0];
-                                        _.forEach(constants.config.weaponRules || [], (weaponRule: any) => {
+                                        _.forEach(ddcsController.config.weaponRules || [], (weaponRule: any) => {
                                             const limitedWeapons: any[] = [];
                                             let maxLimitedWeaponCount = 0;
                                             _.forEach(curUnit.ammo || [], (value: any) => {
                                                 const curTypeName = value.typeName;
                                                 if (curTypeName) {
-                                                    masterDBController.weaponScoreActionsCheck({
+                                                    ddcsController.weaponScoreActionsCheck({
                                                         typeName: curTypeName,
                                                         unitType: curUnit.type
                                                     });
@@ -61,7 +59,7 @@ export async function checkAircraftWeaponCompliance() {
                                                 }
                                             });
                                             if (maxLimitedWeaponCount > weaponRule.maxTotalAllowed && !curUnit.inAir) {
-                                              DCSLuaCommands.sendMesgToGroup(
+                                                ddcsController.sendMesgToGroup(
                                                     curUnit.groupId,
                                                     "G: You have too many/banned weapons(" + maxLimitedWeaponCount + " of " +
                                                         _.join(limitedWeapons) + "), Max Allowed " + weaponRule.maxTotalAllowed,

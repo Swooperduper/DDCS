@@ -3,17 +3,16 @@
  */
 
 import * as _ from "lodash";
-import * as constants from "../constants";
-import * as masterDBController from "../db";
+import * as ddcsController from "../";
 
 let randomMarkId: number;
 
 export async function setFarpMarks() {
-    masterDBController.baseActionRead({_id: {$not: /#/}})
+    ddcsController.baseActionRead({_id: {$not: /#/}})
         .then((bases) => {
             _.forEach(bases, (base) => {
                 if (_.get(base, "baseMarkId")) {
-                    masterDBController.cmdQueActionsSave({
+                    ddcsController.cmdQueActionsSave({
                         actionObj: {
                             action: "CMD",
                             cmd: ["trigger.action.removeMark(" + _.get(base, "baseMarkId") + ")"],
@@ -23,7 +22,7 @@ export async function setFarpMarks() {
                     })
                         .then(() => {
                             randomMarkId = _.random(1000, 9999);
-                            masterDBController.cmdQueActionsSave({
+                            ddcsController.cmdQueActionsSave({
                                 actionObj: {
                                     action: "CMD",
                                     cmd: [
@@ -36,7 +35,7 @@ export async function setFarpMarks() {
                                 queName: "clientArray"
                             })
                                 .then(() => {
-                                    masterDBController.baseActionUpdate({_id: _.get(base, "name")})
+                                    ddcsController.baseActionUpdate({_id: _.get(base, "name")})
                                         .catch((err: any) => {
                                             console.log("erroring line32: ", err);
                                         })
@@ -53,7 +52,7 @@ export async function setFarpMarks() {
                     ;
                 } else {
                     randomMarkId = _.random(1000, 9999);
-                    masterDBController.cmdQueActionsSave({
+                    ddcsController.cmdQueActionsSave({
                         actionObj: {
                             action: "CMD",
                             cmd: [
@@ -66,7 +65,7 @@ export async function setFarpMarks() {
                         queName: "clientArray"
                     })
                         .then(() => {
-                            masterDBController.baseActionUpdate({_id: _.get(base, "name")})
+                            ddcsController.baseActionUpdate({_id: _.get(base, "name")})
                                 .catch((err: any) => {
                                     console.log("erroring line58: ", err);
                                 })
@@ -88,12 +87,12 @@ export async function setFarpMarks() {
 export async function setUnitMark(
     unit: any
 ) {
-    if (!_.includes(_.get(constants, "crateTypes"), _.get(unit, "type"))) {
-        masterDBController.unitActionRead({_id: _.get(unit, "name")})
+    if (!_.includes(_.get(ddcsController, "crateTypes"), _.get(unit, "type"))) {
+        ddcsController.unitActionRead({_id: _.get(unit, "name")})
             .then((cUnit) => {
                 const curUnit = cUnit[0];
                 if (_.get(curUnit, "markId")) {
-                    masterDBController.cmdQueActionsSave({
+                    ddcsController.cmdQueActionsSave({
                         actionObj: {
                             action: "CMD",
                             cmd: [
@@ -105,7 +104,7 @@ export async function setUnitMark(
                     })
                         .then(() => {
                             randomMarkId = _.random(1000, 9999);
-                            masterDBController.cmdQueActionsSave({
+                            ddcsController.cmdQueActionsSave({
                                 actionObj: {
                                     action: "CMD",
                                     cmd: [
@@ -119,7 +118,7 @@ export async function setUnitMark(
                                 queName: "clientArray"
                             })
                                 .then(() => {
-                                    masterDBController.unitActionUpdate({_id: _.get(curUnit, "_id"), markId: randomMarkId})
+                                    ddcsController.unitActionUpdate({_id: _.get(curUnit, "_id"), markId: randomMarkId})
                                         .catch((err: any) => {
                                             console.log("erroring line99: ", err);
                                         })
@@ -136,7 +135,7 @@ export async function setUnitMark(
                     ;
                 } else {
                     randomMarkId = _.random(1000, 9999);
-                    masterDBController.cmdQueActionsSave({
+                    ddcsController.cmdQueActionsSave({
                         actionObj: {
                             action: "CMD",
                             cmd: [
@@ -149,7 +148,7 @@ export async function setUnitMark(
                         queName: "clientArray"
                     })
                         .then(() => {
-                            masterDBController.unitActionUpdate({_id: _.get(curUnit, "_id"), markId: randomMarkId})
+                            ddcsController.unitActionUpdate({_id: _.get(curUnit, "_id"), markId: randomMarkId})
                                 .catch((err: any) => {
                                     console.log("erroring line126: ", err);
                                 })

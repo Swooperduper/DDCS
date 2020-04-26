@@ -385,3 +385,8 @@ export interface IWeaponScore {
     tier: number;
     fox2ModUnder2: number;
 }
+
+export interface IProcess {
+    firingTime: Date;
+    queObj: object;
+}

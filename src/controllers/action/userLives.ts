@@ -3,9 +3,7 @@
  */
 
 import * as _ from "lodash";
-import * as constants from "../constants";
-import * as masterDBController from "../db";
-import * as DCSLuaCommands from "../player/DCSLuaCommands";
+import * as ddcsController from "../";
 
 export async function getPlayerBalance() {
     let blueAll: any;
@@ -13,10 +11,10 @@ export async function getPlayerBalance() {
     const oneMin = 60 * 1000;
     let redAll: any;
     const serverAlloc: any = {};
-    return masterDBController.sessionsActionsReadLatest()
+    return ddcsController.sessionsActionsReadLatest()
         .then((latestSession: any) => {
             if (latestSession.name) {
-                return masterDBController.srvPlayerActionsRead({sessionName: latestSession.name})
+                return ddcsController.srvPlayerActionsRead({sessionName: latestSession.name})
                     .then((playerArray: any) => {
                         _.forEach(playerArray, (ePlayer) => {
                             if ((new Date(ePlayer.updatedAt).getTime() + oneMin > nowTime) && ePlayer.slot !== "") {
@@ -66,7 +64,7 @@ export async function updateServerLifePoints() {
                 if (cPlayer) {
 
                     if (!_.isEmpty(cPlayer.name)) {
-                        masterDBController.unitActionRead({dead: false, playername: cPlayer.name})
+                        ddcsController.unitActionRead({dead: false, playername: cPlayer.name})
                             .then((cUnit) => {
                                 const curUnit = cUnit[0];
                                 if (cPlayer.side === playerBalance.side) {
@@ -107,15 +105,15 @@ export async function updateServerLifePoints() {
 }
 
 export async function lookupLifeResource(playerUcid: string) {
-    masterDBController.srvPlayerActionsRead({_id: playerUcid})
+    ddcsController.srvPlayerActionsRead({_id: playerUcid})
         .then((srvPlayer) => {
             const curPlayer = _.get(srvPlayer, [0]);
             if (curPlayer) {
                 if (curPlayer.name) {
-                    masterDBController.unitActionRead({playername: curPlayer.name})
+                    ddcsController.unitActionRead({playername: curPlayer.name})
                         .then((cUnit: any) => {
                             const curUnit = cUnit[0];
-                            DCSLuaCommands.sendMesgToGroup(
+                            ddcsController.sendMesgToGroup(
                                 curUnit.groupId,
                                 "G: You Have " + curPlayer.curLifePoints.toFixed(2) + " Life Resource Points.",
                                 5
@@ -133,16 +131,16 @@ export async function lookupLifeResource(playerUcid: string) {
 }
 
 export async function lookupAircraftCosts(playerUcid: string) {
-    masterDBController.srvPlayerActionsRead({_id: playerUcid})
+    ddcsController.srvPlayerActionsRead({_id: playerUcid})
         .then((srvPlayer: any) => {
             const curPlayer = srvPlayer[0];
             if (curPlayer) {
                 if (curPlayer.name) {
-                    masterDBController.unitActionRead({playername: curPlayer.name})
+                    ddcsController.unitActionRead({playername: curPlayer.name})
                         .then((cUnit: any) => {
                             if (cUnit.length > 0) {
                                 const curUnit = cUnit[0];
-                                const curUnitDictionary = _.find(constants.unitDictionary, {_id: curUnit.type});
+                                const curUnitDictionary = _.find(ddcsController.unitDictionary, {_id: curUnit.type});
                                 const curUnitLPCost = (curUnitDictionary) ? curUnitDictionary.LPCost : 1;
                                 let curTopWeaponCost = 0;
                                 let curWeaponLookup;
@@ -153,7 +151,7 @@ export async function lookupAircraftCosts(playerUcid: string) {
                                 let weaponCost;
                                 _.forEach(curUnit.ammo || [], (value: any) => {
                                     if (value.typeName === "MATRA") { mantraCHK += value.count; }
-                                    curWeaponLookup = _.find(constants.weaponsDictionary, {_id: value.typeName} );
+                                    curWeaponLookup = _.find(ddcsController.weaponsDictionary, {_id: value.typeName} );
                                     foxAllowance = (value.count > 2) ? 0 : curWeaponLookup.fox2ModUnder2 || 0;
                                     foxAllowance = (mantraCHK > 2) ? 0 : foxAllowance;
                                     weaponCost = curWeaponLookup.tier || 0 + foxAllowance;
@@ -164,7 +162,7 @@ export async function lookupAircraftCosts(playerUcid: string) {
                                     }
                                 });
                                 totalTakeoffCosts = curUnitLPCost + curTopWeaponCost;
-                                DCSLuaCommands.sendMesgToGroup(
+                                ddcsController.sendMesgToGroup(
                                     curUnit.groupId,
                                     "G: You aircraft costs " + totalTakeoffCosts.toFixed(2) + "( " + curUnitLPCost + "(" +
                                         curUnit.type + ")+" + curTopWeaponCost + "(" + curTopAmmo + ") ) Life Points.",
@@ -184,19 +182,19 @@ export async function lookupAircraftCosts(playerUcid: string) {
 }
 
 export async function checkAircraftCosts() {
-    masterDBController.sessionsActionsReadLatest()
+    ddcsController.sessionsActionsReadLatest()
         .then((latestSession: any) => {
             let mesg: string;
             if (latestSession.name) {
-                masterDBController.srvPlayerActionsRead({sessionName: latestSession.name, playername: {$ne: ""}})
+                ddcsController.srvPlayerActionsRead({sessionName: latestSession.name, playername: {$ne: ""}})
                     .then((srvPlayers: any) => {
                         _.forEach(srvPlayers, (curPlayer: any) => {
                             if (curPlayer.name) {
-                                masterDBController.unitActionRead({dead: false, playername: curPlayer.name})
+                                ddcsController.unitActionRead({dead: false, playername: curPlayer.name})
                                     .then((cUnit: any) => {
                                         if (cUnit.length > 0) {
                                             const curUnit = cUnit[0];
-                                            const curUnitDictionary = _.find(constants.unitDictionary, {_id: curUnit.type});
+                                            const curUnitDictionary = _.find(ddcsController.unitDictionary, {_id: curUnit.type});
                                             const curUnitLPCost = (curUnitDictionary) ? curUnitDictionary.LPCost : 1;
                                             let curTopWeaponCost = 0;
                                             let foxAllowance;
@@ -206,7 +204,7 @@ export async function checkAircraftCosts() {
                                             let weaponCost;
                                             _.forEach(curUnit.ammo || [], (value) => {
                                                 if (value.typeName === "MATRA") { mantraCHK += value.count; }
-                                                curWeaponLookup = _.find(constants.weaponsDictionary, {_id: value.typeName} );
+                                                curWeaponLookup = _.find(ddcsController.weaponsDictionary, {_id: value.typeName} );
                                                 foxAllowance = (value.count > 2) ? 0 : curWeaponLookup.fox2ModUnder2 || 0;
                                                 foxAllowance = (mantraCHK > 2) ? 0 : foxAllowance;
                                                 weaponCost = curWeaponLookup.tier || 0 + foxAllowance;
@@ -218,7 +216,7 @@ export async function checkAircraftCosts() {
                                                     totalTakeoffCosts.toFixed(2) + "/" +
                                                     curPlayer.curLifePoints.toFixed(2) + "}";
                                                 console.log(curPlayer.name + " " + mesg);
-                                                DCSLuaCommands.sendMesgToGroup(
+                                                ddcsController.sendMesgToGroup(
                                                     curUnit.groupId,
                                                     mesg,
                                                     30
@@ -244,7 +242,7 @@ export async function checkAircraftCosts() {
 }
 
 export async function addLifePoints(curPlayer: any, curUnit: any, execAction?: string, addLP?: number) {
-    return masterDBController.srvPlayerActionsAddLifePoints({
+    return ddcsController.srvPlayerActionsAddLifePoints({
         _id: curPlayer._id,
         groupId: curUnit.groupId,
         addLifePoints: addLP,
@@ -252,10 +250,16 @@ export async function addLifePoints(curPlayer: any, curUnit: any, execAction?: s
     });
 }
 
-export async function removeLifePoints(curPlayer: any, curUnit: any, execAction: string, isDirect?: boolean, removeLP?: number) {
+export async function removeLifePoints(
+    curPlayer: any,
+    curUnit: any,
+    execAction: string,
+    isDirect?: boolean,
+    removeLP?: number
+): Promise<void> {
     let curRemoveLP = removeLP;
     if (!isDirect) {
-        const curUnitDictionary = _.find(constants.unitDictionary, {_id: curUnit.type});
+        const curUnitDictionary = _.find(ddcsController.unitDictionary, {_id: curUnit.type});
         const curUnitLPCost = (curUnitDictionary) ? curUnitDictionary.LPCost : 1;
         let curTopWeaponCost = 0;
         let foxAllowance;
@@ -264,7 +268,7 @@ export async function removeLifePoints(curPlayer: any, curUnit: any, execAction:
         let weaponCost;
         _.forEach(curUnit.ammo || [], (value: any) => {
             if (value.typeName === "MATRA") { mantraCHK += value.count; }
-            curWeaponLookup = _.find(constants.weaponsDictionary, {_id: value.typeName} );
+            curWeaponLookup = _.find(ddcsController.weaponsDictionary, {_id: value.typeName} );
             foxAllowance = (value.count > 2) ? 0 : curWeaponLookup.fox2ModUnder2 || 0;
             foxAllowance = (mantraCHK > 2) ? 0 : foxAllowance;
             weaponCost = curWeaponLookup.tier || 0 + foxAllowance;
@@ -272,7 +276,7 @@ export async function removeLifePoints(curPlayer: any, curUnit: any, execAction:
         });
         curRemoveLP = curUnitLPCost + curTopWeaponCost;
     }
-    return masterDBController.srvPlayerActionsRemoveLifePoints({
+    return ddcsController.srvPlayerActionsRemoveLifePoints({
         _id: curPlayer._id,
         groupId: curUnit.groupId,
         removeLifePoints: curRemoveLP || 0,

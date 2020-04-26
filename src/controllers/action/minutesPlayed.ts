@@ -3,18 +3,17 @@
  */
 
 import * as _ from "lodash";
-import * as masterDBController from "../db";
-import * as constants from "../constants";
+import * as ddcsController from "../";
 
 export async function checkCurrentPlayerBalance(): Promise<any>  {
     // set to 2:1 or worse
-    return masterDBController.campaignsActionsReadLatest()
+    return ddcsController.campaignsActionsReadLatest()
         .then((latestCampaign: any) => {
             let sideState = {};
             const totalCampaignTime =
                 new Date(_.get(latestCampaign, "updatedAt")).getTime() - new Date(_.get(latestCampaign, "createdAt")).getTime();
             // console.log('tct: ', totalCampaignTime);
-            if (totalCampaignTime > _.get(constants, "time.oneHour")) {
+            if (totalCampaignTime > _.get(ddcsController, "time.oneHour")) {
                 // if (totalCampaignTime > 0) {
                 console.log("STACK: Blue:", latestCampaign.totalMinutesPlayed_blue, " Red:", latestCampaign.totalMinutesPlayed_red);
                 if (_.get(latestCampaign, "name")) {
@@ -49,10 +48,10 @@ export async function checkCurrentPlayerBalance(): Promise<any>  {
 }
 
 export async function updateLatestCampaign() {
-    masterDBController.campaignsActionsReadLatest()
+    ddcsController.campaignsActionsReadLatest()
         .then((campaign: any) => {
             if (campaign) {
-                masterDBController.sessionsActionsRead({campaignName: campaign.name})
+                ddcsController.sessionsActionsRead({campaignName: campaign.name})
                     .then((campSessions: any) => {
                         let totalMinutesPlayedBlue = 0;
                         let totalMinutesPlayedRed = 0;
@@ -60,7 +59,7 @@ export async function updateLatestCampaign() {
                             totalMinutesPlayedBlue += _.get(pa, "totalMinutesPlayed_blue", 0);
                             totalMinutesPlayedRed += _.get(pa, "totalMinutesPlayed_red", 0);
                         });
-                        masterDBController.campaignsActionsUpdate({
+                        ddcsController.campaignsActionsUpdate({
                             name: campaign.name,
                             totalMinutesPlayed_blue: totalMinutesPlayedBlue,
                             totalMinutesPlayed_red: totalMinutesPlayedRed
@@ -79,7 +78,7 @@ export async function updateLatestCampaign() {
 }
 
 export async function updateSession(sessionName: string) {
-    masterDBController.srvPlayerActionsRead({sessionName})
+    ddcsController.srvPlayerActionsRead({sessionName})
         .then((playerArray: any) => {
             let currentSessionMinutesPlayedBlue = 0;
             let currentSessionMinutesPlayedRed = 0;
@@ -87,7 +86,7 @@ export async function updateSession(sessionName: string) {
                 currentSessionMinutesPlayedBlue += _.get(pa, "currentSessionMinutesPlayed_blue", 0);
                 currentSessionMinutesPlayedRed += _.get(pa, "currentSessionMinutesPlayed_red", 0);
             });
-            masterDBController.sessionsActionsUpdate({
+            ddcsController.sessionsActionsUpdate({
                 name: sessionName,
                 totalMinutesPlayed_blue: currentSessionMinutesPlayedBlue,
                 totalMinutesPlayed_red: currentSessionMinutesPlayedRed
@@ -112,11 +111,11 @@ export async function recordFiveMinutesPlayed() {
         1: 0,
         2: 0
     };
-    masterDBController.sessionsActionsReadLatest()
+    ddcsController.sessionsActionsReadLatest()
         .then((latestSession: any) => {
-            const unitsNewThan = new Date().getTime() - _.get(constants, ["time", "fourMins"], 0);
+            const unitsNewThan = new Date().getTime() - _.get(ddcsController, ["time", "fourMins"], 0);
             // update only people who have played in the last 5 minutes
-            masterDBController.srvPlayerActionsRead({
+            ddcsController.srvPlayerActionsRead({
                 sessionName: latestSession.name,
                 updatedAt: {$gt: unitsNewThan}
             })
@@ -127,7 +126,7 @@ export async function recordFiveMinutesPlayed() {
                         // console.log('isPlayerTimeGreater: ', player.name, new Date(player.updatedAt).getTime() >
                         // 		unitsNewThan, new Date(player.updatedAt).getTime() - unitsNewThan);
                         totalMinsPerSide[player.side] = totalMinsPerSide[player.side] + 5;
-                        processPromise.push(masterDBController.srvPlayerActionsAddMinutesPlayed({
+                        processPromise.push(ddcsController.srvPlayerActionsAddMinutesPlayed({
                             _id: player._id,
                             minutesPlayed: 5,
                             side: player.side
@@ -155,13 +154,13 @@ export async function recordFiveMinutesPlayed() {
 }
 
 export async function resetMinutesPlayed() {
-    masterDBController.sessionsActionsReadLatest()
+    ddcsController.sessionsActionsReadLatest()
         .then((latestSession: any) => {
             if (latestSession) {
-                masterDBController.srvPlayerActionsRead({sessionName: latestSession.name})
+                ddcsController.srvPlayerActionsRead({sessionName: latestSession.name})
                     .then((playerArray: any) => {
                         _.forEach(playerArray, (player) => {
-                            masterDBController.srvPlayerActionsResetMinutesPlayed({
+                            ddcsController.srvPlayerActionsResetMinutesPlayed({
                                 _id: player._id,
                                 side: player.side
                             });
