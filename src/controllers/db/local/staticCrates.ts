@@ -24,86 +24,86 @@ export async function staticCrateActionReadStd(obj: any): Promise<ddcsController
     });
 }
 
-export async function staticCrateActionSave(obj: any): Promise<ddcsController.ICrate[]> {
+export async function staticCrateActionSave(obj: any): Promise<void> {
     return new Promise((resolve, reject) => {
         const crate = new staticCratesTable(obj);
-        crate.save((err, units: any) => {
+        crate.save((err) => {
             if (err) { reject(err); }
-            resolve(units);
+            resolve();
         });
     });
 }
 
-export async function staticCrateActionUpdate(obj: any): Promise<ddcsController.ICrate[]> {
+export async function staticCrateActionUpdate(obj: any): Promise<void> {
     return new Promise((resolve, reject) => {
         staticCratesTable.findOneAndUpdate(
             {_id: obj._id},
             {$set: obj},
-            (err, units: any) => {
+            (err) => {
                 if (err) { reject(err); }
-                resolve(units);
+                resolve();
             }
         );
     });
 }
 
-export async function staticCrateActionUpdateByName(obj: any): Promise<ddcsController.ICrate[]> {
+export async function staticCrateActionUpdateByName(obj: any): Promise<void> {
     return new Promise((resolve, reject) => {
         staticCratesTable.findOneAndUpdate(
             {name: obj.name},
             {$set: obj},
-            (err, units: any) => {
+            (err) => {
                 if (err) { reject(err); }
-                resolve(units);
+                resolve();
             }
         );
     });
 }
 
-export async function staticCrateActionUpdateByUnitId(obj: any): Promise<ddcsController.ICrate[]> {
+export async function staticCrateActionUpdateByUnitId(obj: any): Promise<void> {
     return new Promise((resolve, reject) => {
         staticCratesTable.findOneAndUpdate(
             {unitId: obj.unitId},
             {$set: obj},
-            (err, units: any) => {
+            (err) => {
                 if (err) { reject(err); }
-                resolve(units);
+                resolve();
             }
         );
     });
 }
 
-export async function staticCrateActionChkResync(obj: any): Promise<ddcsController.ICrate[]> {
+export async function staticCrateActionChkResync(obj: any): Promise<void> {
     return new Promise((resolve, reject) => {
         staticCratesTable.updateMany(
             {},
             {$set: {isResync: false}},
-            (err, units) => {
+            (err) => {
                 if (err) { reject(err); }
-                resolve(units);
+                resolve();
             }
         );
     });
 }
 
-export async function staticCrateActionMarkUndead(obj: any): Promise<ddcsController.ICrate[]> {
+export async function staticCrateActionMarkUndead(obj: any): Promise<void> {
     return new Promise((resolve, reject) => {
         staticCratesTable.updateMany(
             {isResync: false},
             {$set: {dead: true}},
-            (err, units) => {
+            (err) => {
                 if (err) { reject(err); }
-                resolve(units);
+                resolve();
             }
         );
     });
 }
 
-export async function staticCrateActionDelete(obj: any): Promise<ddcsController.ICrate[]> {
+export async function staticCrateActionDelete(obj: any): Promise<void> {
     return new Promise((resolve, reject) => {
-        staticCratesTable.findByIdAndRemove(obj._id, (err, units: any) => {
+        staticCratesTable.findByIdAndRemove(obj._id, (err) => {
             if (err) { reject(err); }
-            resolve(units);
+            resolve();
         });
     });
 }
@@ -113,5 +113,5 @@ export async function staticCrateActionRemoveall(): Promise<any> {
 }
 
 export async function staticCrateActionDropall(obj: any): Promise<any> {
-    staticCratesTable.collection.drop();
+    return staticCratesTable.collection.drop();
 }

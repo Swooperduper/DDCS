@@ -9,7 +9,7 @@ const webPushTable = ddcsController.localConnection.model(process.env.SERVERNAME
 export async function webPushActionGrabNextQue(obj: any): Promise<ddcsController.IWebPush[]> {
     return new Promise((resolve, reject) => {
         webPushTable.findOneAndRemove({serverName: process.env.SERVERNAME}, (err, wpush: any) => {
-            if(err) {
+            if (err) {
                 reject(err);
             }
             resolve(wpush);
@@ -17,21 +17,21 @@ export async function webPushActionGrabNextQue(obj: any): Promise<ddcsController
     });
 }
 
-export async function webPushActionSave(obj: any): Promise<ddcsController.IWebPush[]> {
+export async function webPushActionSave(obj: any): Promise<void> {
     return new Promise((resolve, reject) => {
         const webpush = new webPushTable(obj);
-        webpush.save((err, wpush: any) => {
+        webpush.save((err) => {
             if (err) { reject(err); }
-            resolve(wpush);
+            resolve();
         });
     });
 }
 
-export async function webPushActionDelete(obj: any): Promise<ddcsController.IWebPush[]> {
+export async function webPushActionDelete(obj: any): Promise<void> {
     return new Promise((resolve, reject) => {
-        webPushTable.findByIdAndRemove(obj._id, (err, wpush: any) => {
+        webPushTable.findByIdAndRemove(obj._id, (err) => {
             if (err) { reject(err); }
-            resolve(wpush);
+            resolve();
         });
     });
 }

@@ -98,27 +98,27 @@ export async function unitActionUpdateByUnitId(obj: any): Promise<void> {
     });
 }
 
-export async function unitActionChkResync(): Promise<ddcsController.IUnit[]> {
+export async function unitActionChkResync(): Promise<void> {
     return new Promise((resolve, reject) => {
         unitTable.updateMany(
             {},
             {$set: {isResync: false}},
-            (err, units: ddcsController.IUnit[]) => {
+            (err) => {
                 if (err) { reject(err); }
-                resolve(units);
+                resolve();
             }
         );
     });
 }
 
-export async function unitActionMarkUndead(): Promise<ddcsController.IUnit[]> {
+export async function unitActionMarkUndead(): Promise<void> {
     return new Promise((resolve, reject) => {
         unitTable.updateMany(
             {isResync: false},
             {$set: {dead: true}},
-            (err, units: ddcsController.IUnit[]) => {
+            (err) => {
                 if (err) { reject(err); }
-                resolve(units);
+                resolve();
             }
         );
     });
