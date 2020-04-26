@@ -2,13 +2,12 @@
  * DDCS Licensed under AGPL-3.0 by Andrew "Drex" Finegan https://github.com/afinegan/DynamicDCS
  */
 
-const _ = require('lodash');
-const radioTowerController = require('../action/radioTower');
-const minutesPlayedController = require('../action/minutesPlayed');
+import * as radioTowerController from "../action/radioTower";
+import * as minutesPlayedController from "../action/minutesPlayed";
 
-_.set(exports, 'processFiveMinuteActions', function (serverName, fullySynced) {
-	if (fullySynced) {
-		radioTowerController.checkBaseWarnings(serverName);
-		minutesPlayedController.recordFiveMinutesPlayed(serverName);
-	}
-});
+export function processFiveMinuteActions(fullySynced: boolean) {
+    if (fullySynced) {
+        radioTowerController.checkBaseWarnings();
+        minutesPlayedController.recordFiveMinutesPlayed();
+    }
+}

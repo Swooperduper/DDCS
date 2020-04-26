@@ -36,7 +36,7 @@ export async function sessionsActionsUpdate(obj: any) {
     });
 }
 
-export async function sessionsActionsSave(obj: ISessions) {
+export async function sessionsActionsSave(obj: any) {
     return new Promise((resolve, reject) => {
         sessionsTable.find({_id: obj._id}, (err, sessionsObj) => {
             if (err) {reject(err); }

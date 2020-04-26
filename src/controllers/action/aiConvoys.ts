@@ -8,17 +8,17 @@ import * as masterDBController from "../db";
 import * as minutesPlayedController from "../action/minutesPlayed";
 import * as groupController from "../spawn/group";
 
-export async function maintainPvEConfig(serverName: any): Promise<any> {
+export async function maintainPvEConfig(): Promise<any> {
     const promiseStack: any = [];
-    return await exports.campaignStackTypes(serverName)
+    return await exports.campaignStackTypes()
         .then((stackObj: any) => {
             let lockedStack: boolean;
             _.forEach(_.get(constants, "config.pveAIConfig", []), (pveConfig) => {
                 lockedStack = false;
                 _.forEach(_.get(pveConfig, "config", []), (aIConfig) => {
                     if (aIConfig.functionCall === "fullAIEnabled") {
-                        exports.processAI(serverName, {underdog: 1}, aIConfig);
-                        exports.processAI(serverName, {underdog: 2}, aIConfig);
+                        exports.processAI({underdog: 1}, aIConfig);
+                        exports.processAI({underdog: 2}, aIConfig);
                     } else {
                         const sideStackedAgainst = _.get(stackObj, [aIConfig.functionCall], {});
                         // get stats
@@ -26,7 +26,7 @@ export async function maintainPvEConfig(serverName: any): Promise<any> {
                         if (sideStackedAgainst.ratio >= aIConfig.stackTrigger && !lockedStack) {
                             lockedStack = true;
                             // console.log('processing pveAI: ', aIConfig.desc);
-                            return exports.processAI(serverName, sideStackedAgainst, aIConfig);
+                            return exports.processAI(sideStackedAgainst, aIConfig);
                         } else {
                             return true;
                         }
@@ -44,7 +44,7 @@ export async function maintainPvEConfig(serverName: any): Promise<any> {
 export async function campaignStackTypes(serverName: string): Promise<any> {
     const promiseArray = [];
     const stackObj = {};
-    promiseArray.push(minutesPlayedController.checkCurrentPlayerBalance(serverName)
+    promiseArray.push(minutesPlayedController.checkCurrentPlayerBalance()
         .then((sideStackedAgainst: any) => {
             _.set(stackObj, "fullCampaignStackStats", sideStackedAgainst);
         })

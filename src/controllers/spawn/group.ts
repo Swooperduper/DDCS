@@ -18,7 +18,7 @@ export function spawnGrp(grpSpawn: string, country: string, category: string) {
     return "coalition.addGroup(" + _.indexOf(constants.countryId, country) + ", Group.Category." + category + ", " + grpSpawn + ")";
 }
 
-export function spawnStatic(serverName: string, staticSpawn: string, country: string) {
+export function spawnStatic(staticSpawn: string, country: string) {
     return [ "coalition.addStaticObject(" + _.indexOf(constants.countryId, country) + ", " + staticSpawn + ")" ];
 }
 
@@ -1544,7 +1544,7 @@ export function spawnSupportBaseGrp( baseName: string, side: number ) {
     return true;
 }
 
-export function spawnBaseReinforcementGroup(serverName: string, side: number, baseName: string, forceSpawn: boolean, init: boolean) {
+export function spawnBaseReinforcementGroup(side: number, baseName: string, forceSpawn: boolean, init: boolean) {
     let curAngle = 0;
     let curCat;
     let curRndSpawn;
@@ -1553,7 +1553,7 @@ export function spawnBaseReinforcementGroup(serverName: string, side: number, ba
     let curSpokeNum;
     let infoSpwn;
     const curBaseSpawnCats = _.get(curServer, "spwnLimitsPerTick");
-    let randLatLonInBase;
+    let randLatLonInBase: number[];
     let groupedUnits = [];
     let totalUnits = 0;
     let compactUnits;
@@ -1563,14 +1563,14 @@ export function spawnBaseReinforcementGroup(serverName: string, side: number, ba
         const curTickVal = _.cloneDeep(tickVal);
         for (let i = 0; i < curTickVal; i++) {
             curAngle = 0;
-            curRndSpawn = _.sortBy(exports.getRndFromSpawnCat(serverName, name, side, false, forceSpawn), "sort");
+            curRndSpawn = _.sortBy(exports.getRndFromSpawnCat(name, side, false, forceSpawn), "sort");
             compactUnits = [];
             infoSpwn = _.first(curRndSpawn);
             centerRadar = _.get(infoSpwn, "centerRadar") ? 1 : 0;
             polyCheck = _.get(infoSpwn, "centerRadar") ? "buildingPoly" : "unitPoly";
 
             if (_.get(infoSpwn, "spoke")) {
-                randLatLonInBase = zoneController.getRandomLatLonFromBase(serverName, baseName, polyCheck);
+                randLatLonInBase = zoneController.getRandomLatLonFromBase(baseName, polyCheck);
                 groupedUnits = [];
                 curSpokeNum = curRndSpawn.length - centerRadar;
                 curSpokeDeg = 359 / curSpokeNum;
@@ -1578,7 +1578,7 @@ export function spawnBaseReinforcementGroup(serverName: string, side: number, ba
                 if (_.get(infoSpwn, "centerRadar")) {
                     // main radar
                     curCat = _.cloneDeep(infoSpwn);
-                    _.set(curCat, "lonLatLoc", randLatLonInBase);
+                    curCat.lonLatLoc = randLatLonInBase;
                     groupedUnits.push(curCat);
                 }
                 // secondary radar
@@ -1600,18 +1600,18 @@ export function spawnBaseReinforcementGroup(serverName: string, side: number, ba
                 compactUnits = _.compact(curRndSpawn);
             }
             totalUnits += compactUnits.length;
-            exports.spawnGroup(serverName, compactUnits, baseName, side);
+            exports.spawnGroup(compactUnits, baseName, side);
         }
         if (name === "samRadar" && !init) {
-            exports.spawnSAMNet(serverName, side, baseName);
+            exports.spawnSAMNet(side, baseName);
             totalUnits += 3;
         }
         if (name === "antiAir" && curTickVal > 0 && _.get(curServer, "timePeriod") === "1978ColdWar") {
-            totalUnits += (curTickVal * exports.spawnLayer2Reinforcements(serverName, "antiAir", 2, curTickVal, side, baseName));
+            totalUnits += (curTickVal * exports.spawnLayer2Reinforcements("antiAir", 2, curTickVal, side, baseName));
         }
 
         if (name === "mobileAntiAir" && curTickVal > 0 && _.get(curServer, "timePeriod") === "modern") {
-            totalUnits += (curTickVal * exports.spawnLayer2Reinforcements(serverName, "mobileAntiAir", 2, curTickVal, side, baseName));
+            totalUnits += (curTickVal * exports.spawnLayer2Reinforcements("mobileAntiAir", 2, curTickVal, side, baseName));
         }
     });
     console.log("return total", totalUnits);
@@ -1689,7 +1689,6 @@ export async function spawnSAMNet(serverName: string, side: number, baseName: st
 }
 
 export function spawnStarSam(
-    serverName: string,
     side: number,
     baseName: string,
     openStarSAM: string,
@@ -1707,9 +1706,9 @@ export function spawnStarSam(
     let randLatLonInBase;
     let infoSpwn;
     let groupedUnits: any[];
-    randLatLonInBase = (lastLonLat) ? lastLonLat : zoneController.getRandomLatLonFromBase(serverName, baseName, "layer2Poly", openStarSAM);
+    randLatLonInBase = (lastLonLat) ? lastLonLat : zoneController.getRandomLatLonFromBase(baseName, "layer2Poly", openStarSAM);
     groupedUnits = [];
-    curRndSpawn = _.sortBy(exports.getRndFromSpawnCat(serverName, "samRadar", side, false, true, launchers, useUnitType ), "sort");
+    curRndSpawn = _.sortBy(exports.getRndFromSpawnCat("samRadar", side, false, true, launchers, useUnitType ), "sort");
     // console.log('RANDSPWN: ', curRndSpawn);
     infoSpwn = _.first(curRndSpawn);
     centerRadar = _.get(infoSpwn, "centerRadar") ? 1 : 0;
@@ -1751,7 +1750,7 @@ export function spawnStarSam(
     // console.log('launchers: ', _.cloneDeep(groupedUnits), _.get(infoSpwn, 'secRadarNum'), centerRadar, curSpokeNum, centerRadar);
     // add ammo truck
     curCat = {
-        ..._.cloneDeep(exports.getRndFromSpawnCat(serverName, "unarmedAmmo", side, false, true)[0]),
+        ..._.cloneDeep(exports.getRndFromSpawnCat("unarmedAmmo", side, false, true)[0]),
         name: "|" + baseName + "|" + openStarSAM + "SAM|" + _.random(1000000, 9999999),
         lonLatLoc: zoneController.getLonLatFromDistanceDirection(randLatLonInBase, 180, _.get(curCat, "spokeDistance") / 2)
     };
@@ -1760,7 +1759,7 @@ export function spawnStarSam(
     // console.log('ammo: ', _.cloneDeep(groupedUnits));
     // console.log('sg: ', serverName, _.compact(groupedUnits), baseName, side);
     compactUnits = _.compact(groupedUnits);
-    exports.spawnGroup(serverName, compactUnits, baseName, side);
+    exports.spawnGroup(compactUnits, baseName, side);
     return _.get(_.cloneDeep(compactUnits), "length", 0);
 }
 
@@ -1870,7 +1869,7 @@ export async function spawnConvoy(
     return masterDBController.cmdQueActionsSave(actionObj)
         .then(() => {
             // save in que to move convoy in 1 min
-            taskController.setMissionTask(serverName, groupName, JSON.stringify(exports.convoyRouteTemplate(curGrpObj)))
+            taskController.setMissionTask(groupName, JSON.stringify(exports.convoyRouteTemplate(curGrpObj)))
                 .then(() => {
                     DCSLuaCommands.sendMesgToCoalition(
                         convoySide,
@@ -1885,8 +1884,7 @@ export async function spawnConvoy(
         })
         .catch((err: any) => {
             console.log("erroring line1783: ", err);
-        })
-    ;
+        });
 }
 
 export async function spawnCAPDefense(
@@ -2362,7 +2360,7 @@ export async function spawnTankerPlane(playerUnitObj: any, tankerObj: any, playe
     ;
 }
 
-export async function spawnSupportPlane(serverName: string, baseObj: any, side: number) {
+export async function spawnSupportPlane(baseObj: any, side: number) {
     // console.log('SPSUPP: ', serverName, baseObj, side);
     let curBaseName;
     let curUnitName;
@@ -2385,11 +2383,11 @@ export async function spawnSupportPlane(serverName: string, baseObj: any, side: 
     console.log("BASE: ", baseLoc);
 
     if (_.includes(_.get(baseObj, "_id"), "_MOB") || _.includes(_.get(baseObj, "_id"), "_FOB")) {
-        curSpwnUnit = _.cloneDeep(exports.getRndFromSpawnCat(serverName, "transportHeli", side, true, true )[0]);
+        curSpwnUnit = _.cloneDeep(exports.getRndFromSpawnCat("transportHeli", side, true, true )[0]);
         // remoteLoc = zoneController.getLonLatFromDistanceDirection(baseLoc, _.get(baseObj, 'spawnAngle'), 40);
         remoteLoc = zoneController.getLonLatFromDistanceDirection(baseLoc, randomDir, 40);
     } else {
-        curSpwnUnit = _.cloneDeep(exports.getRndFromSpawnCat(serverName, "transportAircraft", side, true, true )[0]);
+        curSpwnUnit = _.cloneDeep(exports.getRndFromSpawnCat("transportAircraft", side, true, true )[0]);
         remoteLoc = zoneController.getLonLatFromDistanceDirection(baseLoc, randomDir, 70);
         // remoteLoc = zoneController.getLonLatFromDistanceDirection(baseLoc, _.random(0, 359), 70);
     }
@@ -2546,7 +2544,7 @@ export async function spawnGroup(spawnArray: any[], baseName?: string, side?: nu
             curUnitName = baseName + " #" + unitNum;
 
             if (_.isUndefined(_.get(curSpwnUnit, "lonLatLoc"))) {
-                _.set(curSpwnUnit, "lonLatLoc", zoneController.getRandomLatLonFromBase(serverName, baseName, "unitPoly"));
+                _.set(curSpwnUnit, "lonLatLoc", zoneController.getRandomLatLonFromBase(curBaseName, "unitPoly"));
             }
             if (curGrpObj.country === "UKRAINE") {
                 _.set(curSpwnUnit, "country", "UKRAINE");
@@ -2571,7 +2569,7 @@ export async function spawnGroup(spawnArray: any[], baseName?: string, side?: nu
     }
 }
 
-export async function spawnNewMapGrps( serverName: string ) {
+export async function spawnNewMapGrps() {
     let totalUnitsSpawned = 0;
     const curServer = _.get(constants, ["config"]);
     let totalUnitNum;
@@ -2584,24 +2582,22 @@ export async function spawnNewMapGrps( serverName: string ) {
                     const baseStartSide = _.get(base, "defaultStartSide", 0);
                     totalUnitNum = 0;
                     groupController.spawnLogisticCmdCenter({}, false, base, baseStartSide);
-                    exports.spawnSupportBaseGrp(serverName, baseName, baseStartSide, true);
+                    exports.spawnSupportBaseGrp(baseName, baseStartSide, true);
                     if (_.get(base, "baseType") === "MOB") {
                         while (spawnArray.length + totalUnitNum < curServer.replenThresholdBase) { // UNCOMMENT THESE
                             totalUnitNum += exports.spawnBaseReinforcementGroup(baseStartSide, baseName, true, true);
                         }
-                        exports.spawnSAMNet(serverName, baseStartSide, baseName, true);
+                        exports.spawnSAMNet(baseStartSide, baseName, true);
                         totalUnitNum += 3;
                         exports.spawnRadioTower(
-                            serverName,
                             {},
                             true,
                             _.find(_.get(constants, "bases"), { name: baseName } ),
                             baseStartSide
                         );
                     }
-                    exports.spawnGroup(serverName, spawnArray, baseName, baseStartSide);
+                    exports.spawnGroup(spawnArray, baseName, baseStartSide);
                     exports.spawnLogisticCmdCenter(
-                        serverName,
                         {},
                         true,
                         _.find(_.get(constants, "bases"), {name: baseName}),
@@ -2618,7 +2614,7 @@ export async function spawnNewMapGrps( serverName: string ) {
     ;
 }
 
-export async function spawnLogisticCmdCenter(staticObj: any, init: boolean, baseObj: any, side: number) {
+export async function spawnLogisticCmdCenter(staticObj: any, init: boolean, baseObj?: any, side?: number) {
     // console.log('spawnLogi: ', serverName, staticObj, init, baseObj, side);
     let curGrpObj = _.cloneDeep(staticObj);
     _.set(curGrpObj, "name", _.get(curGrpObj, "name", _.get(baseObj, "name", "") + " Logistics"));
@@ -2655,7 +2651,7 @@ export async function spawnLogisticCmdCenter(staticObj: any, init: boolean, base
     ;
 }
 
-export async function spawnRadioTower(staticObj: any, init: boolean, baseObj: any, side: number) {
+export async function spawnRadioTower(staticObj: any, init: boolean, baseObj?: any, side?: number) {
     // console.log('spawnLogi: ', serverName, staticObj, init, baseObj, side);
     let curGrpObj = _.cloneDeep(staticObj);
     _.set(curGrpObj, "name", _.get(curGrpObj, "name", _.get(baseObj, "name", "") + " Communications"));
@@ -2718,7 +2714,7 @@ export async function spawnBaseEWR(serverName: string, type: string, baseName: s
 }
 
 export async function replenishUnits( baseName: string, side: number ) {
-    return exports.spawnBaseReinforcementGroup(serverName, side, baseName);
+    return exports.spawnBaseReinforcementGroup(side, baseName);
     // exports.spawnGroup(serverName, exports.spawnBaseReinforcementGroup(serverName, side, baseName), baseName, side);
 }
 
@@ -2743,7 +2739,7 @@ export async function healBase( baseName: string, curPlayerUnit: any) {
                     if (_.get(curBase, "baseType") !== "MOB") {
                         neutralCCController.spawnCCAtNeutralBase(curPlayerUnit)
                             .then((resp: any) => {
-                                exports.spawnSupportBaseGrp( serverName, curBase.name, _.get(curPlayerUnit, "coalition") );
+                                exports.spawnSupportBaseGrp( curBase.name, _.get(curPlayerUnit, "coalition") );
                                 resolve(resp);
                             })
                             .catch((err: any) => {
@@ -2759,10 +2755,10 @@ export async function healBase( baseName: string, curPlayerUnit: any) {
                                 if (curUnit) {
                                     _.set(curUnit, "coalition", _.get(curBase, "side"));
                                     // console.log('creating logistics from existing: ', serverName, curUnit, false, curBase, curBase.side);
-                                    exports.spawnLogisticCmdCenter(serverName, curUnit, false, curBase, _.get(curPlayerUnit, "coalition"));
+                                    exports.spawnLogisticCmdCenter(curUnit, false, curBase, _.get(curPlayerUnit, "coalition"));
                                 } else {
                                     // console.log('creating NEW logistics: ', serverName, {}, false, curBase, curBase.side);
-                                    exports.spawnLogisticCmdCenter(serverName, {}, false, curBase, _.get(curPlayerUnit, "coalition"));
+                                    exports.spawnLogisticCmdCenter({}, false, curBase, _.get(curPlayerUnit, "coalition"));
                                 }
                             })
                             .catch((err: any) => {
@@ -2777,10 +2773,10 @@ export async function healBase( baseName: string, curPlayerUnit: any) {
                                     _.set(curCommUnit, "coalition", _.get(curBase, "side"));
                                     // console.log('creating logistics from existing:
                                     // ', serverName, curCommUnit, false, curBase, curBase.side);
-                                    exports.spawnRadioTower(serverName, curCommUnit, false, curBase, _.get(curPlayerUnit, "coalition"));
+                                    exports.spawnRadioTower(curCommUnit, false, curBase, _.get(curPlayerUnit, "coalition"));
                                 } else {
                                     // console.log('creating NEW logistics: ', serverName, {}, false, curBase, curBase.side);
-                                    exports.spawnRadioTower(serverName, {}, false, curBase, _.get(curPlayerUnit, "coalition"));
+                                    exports.spawnRadioTower({}, false, curBase, _.get(curPlayerUnit, "coalition"));
                                 }
                             })
                             .catch((err: any) => {
@@ -2827,7 +2823,7 @@ export async function healBase( baseName: string, curPlayerUnit: any) {
 						}
 						*/
                         // rebuild farp support vehicles
-                        exports.spawnSupportBaseGrp( serverName, curBase.name, _.get(curPlayerUnit, "coalition") );
+                        exports.spawnSupportBaseGrp( curBase.name, _.get(curPlayerUnit, "coalition") );
                         resolve(true);
                     }
                 }

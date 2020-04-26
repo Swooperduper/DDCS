@@ -160,8 +160,8 @@ export async function checkUnitsToBaseForCapture() {
                             console.log("BLUE WON BLUE WON BLUE WON BLUE WON BLUE WON BLUE WON BLUE WON BLUE WON ");
                             masterDBController.serverActionsUpdate({resetFullCampaign: true})
                                 .then(() => {
-                                    unitsStaticsController.lockUpdates = true;
-                                    resetCampaignController.timeToRestart = new Date().getTime() + _.get(constants, "time.fiveMins");
+                                    unitsStaticsController.setLockUpdates(true);
+                                    resetCampaignController.setTimeToRestart(new Date().getTime() + _.get(constants, "time.fiveMins"));
                                     DCSLuaCommands.sendMesgToAll(
                                         "Blue has won the campaign, Map will reset in 5 minutes.",
                                         _.get(constants, "time.fiveMins")
@@ -176,8 +176,8 @@ export async function checkUnitsToBaseForCapture() {
                             console.log("RED WON RED WON RED WON RED WON RED WON RED WON RED WON RED WON RED WON ");
                             masterDBController.serverActionsUpdate({resetFullCampaign: true})
                                 .then(() => {
-                                    unitsStaticsController.lockUpdates = true;
-                                    resetCampaignController.timeToRestart = new Date().getTime() + _.get(constants, "time.fiveMins");
+                                    unitsStaticsController.setLockUpdates(true);
+                                    resetCampaignController.setTimeToRestart(new Date().getTime() + _.get(constants, "time.fiveMins"));
                                     DCSLuaCommands.sendMesgToAll(
                                         "Red has won the campaign, Map will reset in 5 minutes.",
                                         _.get(constants, "time.fiveMins")
@@ -201,6 +201,7 @@ export async function checkUnitsToBaseForCapture() {
     ;
 }
 
+/*
 export async function checkUnitsToBaseForTroops() {
     // check every base that is owned by red or blue, 20 km sphere
     masterDBController.baseActionRead({baseType: "MOB"})
@@ -288,6 +289,7 @@ export async function checkUnitsToLogisticTowers() {
         })
     ;
 }
+*/
 
 export function extractUnitsBackToBase(unit: any) {
     let friendlyBase: string = "";

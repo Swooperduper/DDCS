@@ -2,102 +2,96 @@
  * DDCS Licensed under AGPL-3.0 by Andrew "Drex" Finegan https://github.com/afinegan/DynamicDCS
  */
 
-const	_ = require('lodash');
-const constants = require('../constants');
-const masterDBController = require('../db/masterDB');
-const DCSLuaCommands = require('../player/DCSLuaCommands');
-const groupController = require('../spawn/group');
+import * as _ from "lodash";
+import * as constants from "../constants";
+import * as masterDBController from "../db";
+import * as DCSLuaCommands from "../player/DCSLuaCommands";
+import * as groupController from "../spawn/group";
 
-_.assign(exports, {
-	repairBase: function (serverName, base, curUnit) {
-		var curBaseName = _.first(_.split(_.get(base, 'name'), ' #'));
-		// console.log('repairNase: ', base, curUnit, serverName, crateOriginLogiName, curBaseName + ' Logistics', crateOriginLogiName);
-		groupController.healBase(serverName, curBaseName, curUnit)
-			.then(function (resp) {
-				if (resp) {
-					masterDBController.unitActions('updateByUnitId', serverName, {unitId: curUnit.unitId, intCargoType: ''})
-						.catch(function (err) {
-							console.log('erroring line209: ', err);
-						})
-					;
-					DCSLuaCommands.sendMesgToCoalition(
-						curUnit.coalition,
-						serverName,
-						"C: " + curBaseName + " Base Has Been Repaired/Built!",
-						5
-					);
-				}
-			})
-			.catch(function (err) {
-				console.log('erroring line28: ', err);
-			})
-		;
-		return true;
-	},
-	repairBaseSAMRadars: function (serverName) {
-		var groups;
-		var launcher;
-		// console.log('RS: ', serverName, unitCalling);
-		return new Promise(function(resolve, reject) {
-			//grab all SAM's
-			//group by SAM group
-			var samTypeArray = _.map(_.filter( _.get(constants, 'unitDictionary'), function (filtObj) {
-				return _.get(filtObj, 'spawnCat') === 'samRadar' || _.get(filtObj, 'spawnCat') === 'unarmedAmmo';
-			}) , 'type');
-			// console.log('sa: ', samTypeArray);
-			masterDBController.unitActions('read', serverName, {type: {$in:samTypeArray }, playerOwnerId: null, dead: false})
-				.then(function(units){
-					groups = _.groupBy(units, 'groupName');
-					_.forEach(groups, function (group) {
-						launcher = 0;
-						_.forEach(group, function (element) {
-							_.set(element, 'unitDict', _.find(
-								_.cloneDeep( _.get(constants, 'unitDictionary')),
-								{_id: _.get(element, 'type')}
-							));
-							if(_.get(element, 'unitDict.launcher')) {
-								launcher += 1;
-							}
-						});
-						var curReqArray = _.get(
-							_.find(group, function (curGroup) {
-								return _.get(curGroup, 'unitDict.launcher');
-							}),
-							'unitDict.reloadReqArray'
-						);
+export async function repairBase(base: any, curUnit: any) {
+    const curBaseName = _.split(_.get(base, "name"), " #")[0];
 
-						var unitsMissing = _.difference(curReqArray, _.uniq(_.map(group, 'type')));
+    groupController.healBase(curBaseName, curUnit)
+        .then((resp) => {
+            if (resp) {
+                masterDBController.unitActionUpdateByUnitId({unitId: curUnit.unitId, intCargoType: ""})
+                    .catch((err) => {
+                        console.log("erroring line209: ", err);
+                    })
+                ;
+                DCSLuaCommands.sendMesgToCoalition(
+                    curUnit.coalition,
+                    "C: " + curBaseName + " Base Has Been Repaired/Built!",
+                    5
+                );
+            }
+        })
+        .catch((err) => {
+            console.log("erroring line28: ", err);
+        })
+    ;
+    return true;
+}
 
-						// if there are units missing and the launcher exists, fix the group
-						if(unitsMissing.length && launcher && _.sample([true, false])) {
-							var curSAMTemplate = _.first(group);
-							var tNameArry = _.split(curSAMTemplate, '|');
-							//add missing units to existing array
-							if (tNameArry.length > 1) {
-								console.log('repairStarSam: ', tNameArry, _.get(tNameArry, [2]));
-								groupController.spawnStarSam(
-									serverName,
-									_.get(curSAMTemplate, 'coalition'),
-									_.get(tNameArry, [1]),
-									_.get(tNameArry, [2]).charAt(0),
-									launcher,
-									_.first(unitsMissing),
-									_.get(curSAMTemplate, 'lonLatLoc'),
-								);
-								console.log('TRUCKHERE? ', unitsMissing);
-								_.forEach(group, function (removeElement) {
-									groupController.destroyUnit(serverName, _.get(removeElement, 'name'));
-								});
-							}
-							resolve(true);
-						}
-					});
-				})
-				.catch(function (err) {
-					reject(err);
-					console.log('line 96: ', err);
-				})
-			;
-		});
-	}
-});
+export async function repairBaseSAMRadars() {
+    return new Promise((resolve: any, reject: any) => {
+        // grab all SAM's
+        // group by SAM group
+        const samTypeArray = _.map(_.filter( constants.unitDictionary, (filtObj) => {
+            return filtObj.spawnCat === "samRadar" || filtObj.spawnCat === "unarmedAmmo";
+        }) , "type");
+        // console.log('sa: ', samTypeArray);
+        masterDBController.unitActionRead({type: {$in: samTypeArray }, playerOwnerId: null, dead: false})
+            .then((units: any) => {
+                const groups = _.groupBy(units, "groupName");
+                _.forEach(groups, (group: any) => {
+                    let launcher = 0;
+                    _.forEach(group, (element: any) => {
+                        element.unitDict = _.find(
+                            _.cloneDeep( constants.unitDictionary),
+                            {_id: element.type}
+                        );
+                        if (element.unitDict.launcher) {
+                            launcher += 1;
+                        }
+                    });
+                    const curReqArray = _.get(
+                        _.find(group, (curGroup) => {
+                            return curGroup.unitDict.launcher;
+                        }),
+                        "unitDict.reloadReqArray"
+                    );
+
+                    const unitsMissing = _.difference(curReqArray, _.uniq(_.map(group, "type")));
+
+                    // if there are units missing and the launcher exists, fix the group
+                    if (unitsMissing.length && launcher && _.sample([true, false])) {
+                        const curSAMTemplate = group[0];
+                        const tNameArry = _.split(curSAMTemplate, "|");
+                        // add missing units to existing array
+                        if (tNameArry.length > 1) {
+                            console.log("repairStarSam: ", tNameArry, _.get(tNameArry, [2]));
+                            groupController.spawnStarSam(
+                                curSAMTemplate.coalition,
+                                tNameArry[1],
+                                tNameArry[2].charAt(0),
+                                launcher,
+                                unitsMissing[0],
+                                curSAMTemplate.lonLatLoc
+                            );
+                            console.log("TRUCKHERE? ", unitsMissing);
+                            _.forEach(group, (removeElement) => {
+                                groupController.destroyUnit(removeElement.name);
+                            });
+                        }
+                        resolve(true);
+                    }
+                });
+            })
+            .catch((err) => {
+                reject(err);
+                console.log("line 96: ", err);
+            })
+        ;
+    });
+}

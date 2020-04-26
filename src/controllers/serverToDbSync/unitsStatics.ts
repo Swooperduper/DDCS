@@ -8,8 +8,13 @@ import * as masterDBController from "../db";
 import * as webPushCommands from "../socketIO/webPush";
 import * as menuUpdateController from "../menu/menuUpdate";
 import * as f10MarksController from "../action/f10Marks";
+import {flatMap} from "tslint/lib/utils";
 
 export let lockUpdates = false;
+
+export function setLockUpdates(flag: boolean) {
+    lockUpdates = flag;
+}
 
 export async function processUnitUpdates(sessionName: string, unitObj: any) {
     if (!exports.lockUpdates) {
@@ -68,7 +73,7 @@ export async function processUnitUpdates(sessionName: string, unitObj: any) {
                     }
 
                     if (curData.playername && (unitObj.action === "C")) {
-                        menuUpdateController.logisticsMenu("resetMenu", unitObj.data);
+                        // menuUpdateController.logisticsMenu("resetMenu", unitObj.data);
                     }
 
                     /*

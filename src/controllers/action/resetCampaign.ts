@@ -10,7 +10,11 @@ import * as constants from "../constants";
 import * as masterDBController from "../db";
 import * as serverTimerController from "../action/serverTimer";
 
-exports.timeToRestart = 0;
+export let timeToRestart = 0;
+
+export function setTimeToRestart(timestamp: number) {
+    exports.timeToRestart = timestamp;
+}
 
 // Create shutdown function
 function shutdown(callback: { (output: any): void; (arg0: any): any; }) {

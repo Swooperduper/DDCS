@@ -25,6 +25,6 @@ export async function getDBconnections() {
         }
         remoteConnection = Mongoose.createConnection(connString, { useNewUrlParser: true, useUnifiedTopology: true });
     }
-};
+}
 
 exports.getDBconnections();

@@ -8,7 +8,11 @@ import * as masterDBController from "../db";
 const delayTask = constants.time.oneMin;
 let nowTime;
 
-export const ewrUnitsActivated = {};
+export let ewrUnitsActivated = {};
+
+export function resetEWRUnitsActivated() {
+    ewrUnitsActivated = {};
+}
 
 export async function setEWRTask(unitName: string) {
     nowTime = new Date().getTime();

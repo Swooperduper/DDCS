@@ -2,114 +2,109 @@
  * DDCS Licensed under AGPL-3.0 by Andrew "Drex" Finegan https://github.com/afinegan/DynamicDCS
  */
 
-const	_ = require('lodash');
-const constants = require('../constants');
+import * as _ from "lodash";
+import * as constants from "../constants";
 
-/**
- * Calculate a new coordinate based on start, distance and bearing
- *
- * @param start array - start coordinate as decimal lat/lon pair
- * @param dist  float - distance in kilometers
- * @param brng  float - bearing in degrees (compass direction)
- */
-_.set(Math, 'fmod', function (a,b) { return Number((a - (Math.floor(a / b) * b)).toPrecision(8)); });
-
-function geo_destination(lonLat, dist, brng){
-	lon1 = toRad(lonLat[0]);
-	lat1 = toRad(lonLat[1]);
-	dist = dist/6371.01; //Earth's radius in km
-	brng = toRad(brng);
-
-	lat2 = Math.asin( Math.sin(lat1)* Math.cos(dist) +
-		Math.cos(lat1) * Math.sin(dist) * Math.cos(brng) );
-	lon2 = lon1 + Math.atan2(Math.sin(brng) * Math.sin(dist) * Math.cos(lat1),
-			Math.cos(dist) - Math.sin(lat1) * Math.sin(lat2));
-	lon2 = Math.fmod((lon2 + 3 * Math.PI),(2 * Math.PI)) - Math.PI;
-
-	return [toDeg(lon2), toDeg(lat2)];
-}
-function toRad(deg){
-	return deg * Math.PI / 180;
-}
-function toDeg(rad){
-	return rad * 180 / Math.PI;
+// Calculate a new coordinate based on start, distance and bearing
+export function mathFmod(a: number, b: number ): number {
+    return Number((a - (Math.floor(a / b) * b)).toPrecision(8));
 }
 
-_.set(exports, 'findBearing', function(lat1, lng1, lat2, lng2) {
-	var dLon = (lng2-lng1);
-	var y = Math.sin(dLon) * Math.cos(lat2);
-	var x = Math.cos(lat1)*Math.sin(lat2) - Math.sin(lat1)*Math.cos(lat2)*Math.cos(dLon);
-	var brng = (Math.atan2(y, x)) * 180 / Math.PI;
-	var curDeg = 360 - ((brng + 360) % 360);
-	return (curDeg == 360) ? 0 : curDeg;
-});
+function geo_destination(lonLat: number[], dist: number, brng: number) {
+    const lon1 = toRad(lonLat[0]);
+    const lat1 = toRad(lonLat[1]);
+    dist = dist / 6371.01; // Earth's radius in km
+    brng = toRad(brng);
 
-_.set(exports, 'getLonLatFromDistanceDirection', function (lonLatLoc, direction, distance) {
-	return geo_destination(lonLatLoc, distance, direction);
-});
+    const lat2 = Math.asin( Math.sin(lat1) * Math.cos(dist) +
+        Math.cos(lat1) * Math.sin(dist) * Math.cos(brng) );
+    let lon2: number = lon1 + Math.atan2(Math.sin(brng) * Math.sin(dist) * Math.cos(lat1),
+            Math.cos(dist) - Math.sin(lat1) * Math.sin(lat2)) as number;
+    lon2 = mathFmod((lon2 + 3 * Math.PI), (2 * Math.PI)) - Math.PI;
 
-_.set(exports, 'getBoundingSquare', function (pArray) {
-	var x1 = _.get(pArray, [0, 0]);
-	var y1 = _.get(pArray, [0, 1]);
-	var x2 = _.get(pArray, [0, 0]);
-	var y2 = _.get(pArray, [0, 1]);
-	for (i = 1; i < pArray.length; i++) {
-		x1 = ( x1 > _.get(pArray, [i, 0])) ? _.get(pArray, [i, 0]) : x1;
-		x2 = ( x2 < _.get(pArray, [i, 0])) ? _.get(pArray, [i, 0]) : x2;
-		y1 = ( y1 > _.get(pArray, [i, 1])) ? _.get(pArray, [i, 1]) : y1;
-		y2 = ( y2 < _.get(pArray, [i, 1]) ) ? _.get(pArray, [i, 1]) : y2;
-	}
-	return {
-		x1: x1,
-		y1: y1,
-		x2: x2,
-		y2: y2
-	}
-});
+    return [toDeg(lon2), toDeg(lat2)];
+}
+function toRad(deg: number) {
+    return deg * Math.PI / 180;
+}
+function toDeg(rad: number) {
+    return rad * 180 / Math.PI;
+}
 
-_.set(exports, 'isLatLonInZone', function (lonLat, polyZone) {
+export function findBearing(lat1: number, lng1: number, lat2: number, lng2: number) {
+    const dLon = (lng2 - lng1);
+    const y = Math.sin(dLon) * Math.cos(lat2);
+    const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLon);
+    const brng = (Math.atan2(y, x)) * 180 / Math.PI;
+    const curDeg = 360 - ((brng + 360) % 360);
+    return (curDeg === 360) ? 0 : curDeg;
+}
 
-	var Next;
-	var Prev;
-	var InPolygon = false;
-	var pNum = polyZone.length - 1;
+export function getLonLatFromDistanceDirection(lonLatLoc: number[], direction: number, distance: number) {
+    return geo_destination(lonLatLoc, distance, direction);
+}
 
-	Next = 1;
-	Prev = pNum;
+export function getBoundingSquare(pArray: any[]) {
+    let x1 = _.get(pArray, [0, 0]);
+    let y1 = _.get(pArray, [0, 1]);
+    let x2 = _.get(pArray, [0, 0]);
+    let y2 = _.get(pArray, [0, 1]);
+    for (let i = 1; i < pArray.length; i++) {
+        x1 = ( x1 > _.get(pArray, [i, 0])) ? _.get(pArray, [i, 0]) : x1;
+        x2 = ( x2 < _.get(pArray, [i, 0])) ? _.get(pArray, [i, 0]) : x2;
+        y1 = ( y1 > _.get(pArray, [i, 1])) ? _.get(pArray, [i, 1]) : y1;
+        y2 = ( y2 < _.get(pArray, [i, 1]) ) ? _.get(pArray, [i, 1]) : y2;
+    }
+    return {
+        x1,
+        y1,
+        x2,
+        y2
+    };
+}
 
-	while (Next <= pNum) {
-	if ((( polyZone[Next][1] > lonLat[1] ) !== ( polyZone[Prev][1] > lonLat[1] )) &&
-		( lonLat[0] < ( polyZone[Prev][0] - polyZone[Next][0] ) * ( lonLat[1] - polyZone[Next][1] ) / ( polyZone[Prev][1] - polyZone[Next][1] ) + polyZone[Next][0] )) {
-			InPolygon = ! InPolygon;
-		}
-		Prev = Next;
-		Next = Next + 1;
-	}
-	return InPolygon
-});
+export function isLatLonInZone(lonLat: number[], polyZone: any[]) {
 
-_.set(exports, 'getRandomLatLonFromBase', function (serverName, baseName, polytype, zoneNum) {
-	var baseInfo = _.find(_.get(constants, 'bases'), {_id: baseName});
-	var pGroups = _.get(baseInfo, ['polygonLoc', polytype]);
-	var pickedPoly;
-	if (zoneNum) {
-		pickedPoly = pGroups[zoneNum];
-	} else {
-		pickedPoly = _.sample(pGroups);
-	}
-	if (pickedPoly) {
-		var lonLatFound = false;
-		var lonLat;
-		var bs = exports.getBoundingSquare(pickedPoly);
-		while (!lonLatFound) {
-			lonLat = [
-				_.random( bs.x1, bs.x2 ),
-				_.random( bs.y1, bs.y2 )
-			];
-			if (exports.isLatLonInZone( lonLat, pickedPoly )) {
-				lonLatFound = true;
-			}
-		}
-		return lonLat
-	}
-});
+    let next;
+    let prev;
+    let inPolygon = false;
+    const pNum = polyZone.length - 1;
+
+    next = 1;
+    prev = pNum;
+
+    while (next <= pNum) {
+        if ((( polyZone[next][1] > lonLat[1] ) !== ( polyZone[prev][1] > lonLat[1] )) &&
+            ( lonLat[0] < ( polyZone[prev][0] - polyZone[next][0] ) * ( lonLat[1] - polyZone[next][1] ) /
+            ( polyZone[prev][1] - polyZone[next][1] ) + polyZone[next][0] )) {
+                inPolygon = ! inPolygon;
+            }
+        prev = next;
+        next = next + 1;
+    }
+    return inPolygon;
+}
+
+export function getRandomLatLonFromBase(baseName: string, polytype: string, zoneNum?: string): number[] {
+    const baseInfo = _.find(_.get(constants, "bases"), {_id: baseName});
+    const pGroups = _.get(baseInfo, ["polygonLoc", polytype]);
+    let pickedPoly;
+    if (zoneNum) {
+        pickedPoly = pGroups[zoneNum];
+    } else {
+        pickedPoly = _.sample(pGroups);
+    }
+    let lonLatFound = false;
+    const bs = exports.getBoundingSquare(pickedPoly);
+    while (!lonLatFound) {
+        const lonLat = [
+            _.random(bs.x1, bs.x2),
+            _.random(bs.y1, bs.y2)
+        ];
+        if (exports.isLatLonInZone(lonLat, pickedPoly)) {
+            lonLatFound = true;
+            return lonLat;
+        }
+    }
+    throw new Error("latLon not found line: 111");
+}

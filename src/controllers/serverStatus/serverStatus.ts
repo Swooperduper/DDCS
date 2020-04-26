@@ -1,46 +1,44 @@
 /*
  * DDCS Licensed under AGPL-3.0 by Andrew "Drex" Finegan https://github.com/afinegan/DynamicDCS
  */
+/*
+import * as _ from "lodash";
+import * as constants from "../constants";
+import * as masterDBController from "../db";
 
-const _ = require('lodash');
-const constants = require('../constants');
-const masterDBController = require('../db/masterDB');
 
-_.assign(exports, {
-	checkServers: function () {
-		masterDBController.serverActions('read', {enabled: true})
-			.then(function (servers) {
-				_.forEach(servers, function (server) {
-					var serverName = server.name;
-					var serverDBObj = _.get(masterDBController, ['dbObj', 'dbConn', serverName]);
-					if (!serverDBObj) {
-						masterDBController.connectDB(server.ip, serverName);
-					}
-					masterDBController.sessionsActions('readLatest', serverName)
-						.then(function (lastSession) {
-							masterDBController.serverActions('update', {
-								name: serverName,
-								curTimer: lastSession.curAbsTime - lastSession.startAbsTime,
-								isServerUp: new Date(lastSession.updatedAt).getTime() > new Date().getTime() - _.get(constants, 'time.fiveMins')
-							})
-								.catch(function (err) {
-									console.log('line23: ', err);
-								})
-							;
-						})
-						.catch(function (err) {
-							console.log('line20: ', err);
-						})
-					;
-				})
-			})
-			.catch(function (err) {
-				console.log('line27: ', err);
-			})
-		;
-	}
-});
+export async function checkServers() {
+    return masterDBController.serverActionsRead({enabled: true})
+        .then((servers: any) => {
+            _.forEach(servers, (server: any) => {
+                const serverDBObj = masterDBController.dbObj.dbConn[server.name];
+                if (!serverDBObj) {
+                    masterDBController.connectDB(server.ip, server.name);
+                }
+                masterDBController.sessionsActionsReadLatest()
+                    .then((lastSession: any) => {
+                        masterDBController.serverActionsUpdate({
+                            name: server.name,
+                            curTimer: lastSession.curAbsTime - lastSession.startAbsTime,
+                            isServerUp: new Date(lastSession.updatedAt).getTime() > new Date().getTime() - constants.time.fiveMins
+                        })
+                            .catch((err) => {
+                                console.log("line23: ", err);
+                            })
+                        ;
+                    })
+                    .catch((err) => {
+                        console.log("line20: ", err);
+                    });
+            });
+        })
+        .catch((err) => {
+            console.log("line27: ", err);
+        })
+    ;
+}
 
-setInterval (function (){
-	exports.checkServers();
+setInterval (() => {
+    exports.checkServers();
 }, 60 * 1000);
+*/
