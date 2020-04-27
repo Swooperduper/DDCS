@@ -15,52 +15,32 @@ export function setTimeToRestart(timestamp: number) {
 }
 
 // Create shutdown function
-function shutdown(callback: { (output: any): void; (arg0: any): any; }) {
-    exec("shutdown.exe /r /t 00", (error: any, stdout: any) => callback(stdout) );
+async function shutdown(callback: { (output: any): void; (arg0: any): any; }) {
+    await exec("shutdown.exe /r /t 00", (error: any, stdout: any) => callback(stdout) );
 }
 
-export function checkTimeToRestart() {
+export async function checkTimeToRestart() {
     if (timeToRestart !== 0) {
         if (new Date().getTime() > timeToRestart) {
-            restartCampaign();
+            await restartCampaign();
         }
     }
 }
 
 export async function clearCampaignTables() {
     console.log("clearTables");
-    const groupPromise: any[] = [];
-    groupPromise.push(ddcsController.cmdQueActionsRemoveAll()
-        .catch((err: any) => {
-            console.log("line 32: ", err);
-        }))
-    ;
-    groupPromise.push(ddcsController.staticCrateActionRemoveall()
-        .catch((err: any) => {
-            console.log("line 37: ", err);
-        }))
-    ;
-    groupPromise.push(ddcsController.unitActionRemoveall()
-        .catch((err: any) => {
-            console.log("line 42: ", err);
-        }))
-    ;
-    return Promise.all(groupPromise)
-        .catch((err: any) => {
-            console.log("line 50: ", err);
-        });
+    await ddcsController.cmdQueActionsRemoveAll();
+    await ddcsController.staticCrateActionRemoveall();
+    await ddcsController.unitActionRemoveall();
 }
 
-export function restartCampaign() {
+export async function restartCampaign() {
     console.log("ALL TABLES CLEARED OFF, restart");
-    if (_.get(ddcsController, "config.fullServerRestartOnCampaignWin", false)) {
-        shutdown((output: any) => {
+    if (ddcsController.config.fullServerRestartOnCampaignWin) {
+        await shutdown((output: any) => {
             console.log(output);
         });
     } else {
-        ddcsController.restartServer()
-            .catch((err) => {
-                console.log("line61: ", err);
-            });
+        await ddcsController.restartServer();
     }
 }

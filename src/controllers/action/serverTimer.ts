@@ -10,32 +10,31 @@ let curTime = new Date().getTime();
 let lastSentLoader = _.cloneDeep(curTime);
 let maxTime = 0;
 let mesg;
-const oneHour = _.get(ddcsController, "time.oneHour");
 
 exports.timerObj = {};
 
-export function processTimer(serverSecs: number) {
+export async function processTimer(serverSecs: number) {
     maxTime = ddcsController.config.restartTime;
     mesg = null;
     curSecs = serverSecs;
 
     if (maxTime > 0) {
-        if (serverSecs > (maxTime - (oneHour * 4)) && !exports.timerObj.fourHours) {
+        if (serverSecs > (maxTime - (ddcsController.time.oneHour * 4)) && !exports.timerObj.fourHours) {
             mesg = "Server is restarting in 4 hours!";
             exports.timerObj.fourHours = true;
         }
         // 3 hours
-        if (serverSecs > (maxTime - (oneHour * 3)) && !exports.timerObj.threeHours) {
+        if (serverSecs > (maxTime - (ddcsController.time.oneHour * 3)) && !exports.timerObj.threeHours) {
             mesg = "Server is restarting in 3 hours!";
             exports.timerObj.threeHours = true;
         }
         // 2 hours
-        if (serverSecs > (maxTime - (oneHour * 2)) && !exports.timerObj.twoHours) {
+        if (serverSecs > (maxTime - (ddcsController.time.oneHour * 2)) && !exports.timerObj.twoHours) {
             mesg = "Server is restarting in 2 hours!";
             exports.timerObj.twoHours = true;
         }
         // 1 hour
-        if (serverSecs > (maxTime - oneHour) && !exports.timerObj.oneHour) {
+        if (serverSecs > (maxTime - ddcsController.time.oneHour) && !exports.timerObj.oneHour) {
             mesg = "Server is restarting in 1 hour!";
             exports.timerObj.oneHour = true;
         }
@@ -73,77 +72,40 @@ export function processTimer(serverSecs: number) {
         if (serverSecs > (maxTime - 120) && !exports.timerObj.twoMinutes) {
             mesg = "Server is restarting in 2 minutes, Locking Server Down!";
             exports.timerObj.twoMinutes = true;
-            ddcsController.setIsOpenSlotFlag(0)
-                .catch((err) => {
-                    console.log("line80: ", err);
-                });
+            await ddcsController.setIsOpenSlotFlag(0);
         }
         // 1 min
         if (serverSecs > (maxTime - 60) && !exports.timerObj.oneMinute) {
             mesg = "Server is restarting in 1 minute, Server Is Locked!";
             exports.timerObj.oneMinute = true;
-            ddcsController.setIsOpenSlotFlag(0)
-                .catch((err) => {
-                    console.log("line89: ", err);
-                });
-            ddcsController.sessionsActionsReadLatest()
-                .then((latestSession: any) => {
-                    if (latestSession.name) {
-                        ddcsController.srvPlayerActionsRead({ sessionName: latestSession.name })
-                            .then((playerArray: any) => {
-                                _.forEach(playerArray, (player) => {
-                                    ddcsController.kickPlayer(player.id, "Server is now restarting!")
-                                        .catch((err) => {
-                                            console.log("line99: ", err);
-                                        });
-                                });
-                            })
-                            .catch((err) => {
-                                console.log("line101: ", err);
-                            })
-                        ;
-                    }
-                })
-                .catch((err) => {
-                    console.log("line107: ", err);
-                })
-            ;
+            await ddcsController.setIsOpenSlotFlag(0);
+            const latestSession = await ddcsController.sessionsActionsReadLatest();
+            if (latestSession[0].name) {
+                const playerArray = await ddcsController.srvPlayerActionsRead({ sessionName: latestSession[0].name });
+                for (const player of playerArray) {
+                    await ddcsController.kickPlayer(Number(player.playerId), "Server is now restarting!");
+                }
+            }
         }
         // restart server
         if (serverSecs > maxTime) {
             // restart server on next or same map depending on rotation
             curTime = new Date().getTime();
             if (curTime > lastSentLoader + ddcsController.time.oneMin) {
-                ddcsController.sessionsActionsReadLatest()
-                    .then((latestSession: any) => {
-                        if (latestSession.name) {
-                            ddcsController.srvPlayerActionsRead({ sessionName: latestSession.name })
-                                .then((playerArray: any) => {
-                                    _.forEach(playerArray, (player) => {
-                                        ddcsController.kickPlayer(player.id, "Server is now restarting!")
-                                            .catch((err) => {
-                                                console.log("line127: ", err);
-                                            });
-                                    });
-                                    exports.restartServer();
-                                })
-                                .catch((err) => {
-                                    console.log("line101: ", err);
-                                });
-                        }
-                    })
-                    .catch((err) => {
-                        console.log("line107: ", err);
-                    });
+                const latestSession = await ddcsController.sessionsActionsReadLatest();
+                if (latestSession[0].name) {
+                    const playerArray = await ddcsController.srvPlayerActionsRead({ sessionName: latestSession[0].name });
+                    for (const player of playerArray) {
+                        await ddcsController.kickPlayer(Number(player.playerId), "Server is now restarting!");
+                    }
+                    exports.restartServer();
+                }
                 lastSentLoader = curTime;
             }
         } else {
             if (mesg) {
                 console.log("serverMesg: ", mesg);
-                ddcsController.sendMesgToAll(mesg, 20)
-                    .catch((err) => {
-                        console.log("line135: ", err);
-                    });
+                await ddcsController.sendMesgToAll(mesg, 20);
             }
         }
     }
@@ -154,17 +116,11 @@ export function resetTimerObj() {
 }
 
 export async function restartServer() {
-    ddcsController.serverActionsRead({})
-        .then((server: any) => {
-            const newMap = server[0].curFilePath + "_" + server[0].curSeason + "_" +
-                _.random(1, (server[0].mapCount || 1)) + ".miz";
-
-            console.log("Loading Map: ", newMap);
-            ddcsController.loadMission(newMap);
-        })
-        .catch((err) => {
-            console.log("line73: ", err);
-        });
+    const server = await ddcsController.serverActionsRead({});
+    const newMap = server[0].curFilePath + "_" + server[0].curSeason + "_" +
+        _.random(1, (server[0].mapCount || 1)) + ".miz";
+    console.log("Loading Map: ", newMap);
+    await ddcsController.loadMission(newMap);
 }
 
 export function secondsToHms(d: number) {
@@ -178,9 +134,9 @@ export function secondsToHms(d: number) {
     return hDisplay + mDisplay;
 }
 
-export async function timeLeft(curUnit: any) {
+export async function timeLeft(curUnit: ddcsController.IUnit) {
     const formatTime = exports.secondsToHms(maxTime - curSecs);
-    return ddcsController.sendMesgToGroup(
+    await ddcsController.sendMesgToGroup(
         curUnit.groupId,
         "G: Server has " + formatTime + " left till restart!",
         5

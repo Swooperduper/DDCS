@@ -217,6 +217,7 @@ export interface ISrvPlayers {
     currentSessionMinutesPlayed_blue: number;
     currentSessionMinutesPlayed_red: number;
     side: number;
+    playerId: string;
     sideLock?: number;
     curLifePoints?: number;
     gicTimeLeft?: number;
@@ -232,7 +233,6 @@ export interface ISrvPlayers {
     name?: string;
     ping?: number;
     slot?: string;
-    playerId?: string;
     sessionName?: string;
     createdAt?: Date;
     updatedAt?: Date;
