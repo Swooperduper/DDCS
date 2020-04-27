@@ -20,7 +20,7 @@ export async function baseUnitUnderAttack(unit: ddcsController.IUnit): Promise<v
     }
 }
 
-export async function checkBaseWarnings() {
+export async function checkBaseWarnings(): Promise<void> {
     for (const base of ddcsController.bases) {
         if (base.underAttack > 0) {
             await ddcsController.sendMesgToCoalition(

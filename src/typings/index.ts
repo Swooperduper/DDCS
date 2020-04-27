@@ -218,12 +218,12 @@ export interface ISrvPlayers {
     currentSessionMinutesPlayed_red: number;
     side: number;
     playerId: string;
+    redRSPoints: number;
+    blueRSPoints: number;
+    tmpRSPoints: number;
     sideLock?: number;
     curLifePoints?: number;
     gicTimeLeft?: number;
-    redRSPoints?: number;
-    blueRSPoints?: number;
-    tmpRSPoints?: number;
     safeLifeActionTime?: number;
     banned?: boolean;
     gciAllowed?: boolean;

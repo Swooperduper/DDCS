@@ -5,15 +5,20 @@
 import * as _ from "lodash";
 import * as ddcsController from "../";
 
-export async function spendResourcePoints(player: any, rsCost: number, rsItem: string, itemObj: any) {
+export async function spendResourcePoints(
+    player: ddcsController.ISrvPlayers,
+    rsCost: number,
+    rsItem: string,
+    itemObj: ddcsController.IUnit
+): Promise<void> {
 
     let curUnit: ddcsController.IUnit;
 
-    if (isNaN(player.slot)) {
+    if (isNaN(Number(player.slot))) {
         console.log("player doesnt have slotID: " + player);
-        return Promise.resolve(false);
+        return Promise.resolve();
     } else {
-        const cUnit = await ddcsController.unitActionRead({unitId: _.toNumber(player.slot)});
+        const cUnit = await ddcsController.unitActionRead({unitId: Number(player.slot)});
         let mesg;
         let currentObjUpdate: any;
         curUnit = cUnit[0];
@@ -86,7 +91,7 @@ export async function spendResourcePoints(player: any, rsCost: number, rsItem: s
     }
 }
 
-export async function checkResourcePoints(player: any) {
+export async function checkResourcePoints(player: ddcsController.ISrvPlayers):Promise<void> {
     if (player.name) {
         const cUnit = await ddcsController.unitActionRead({dead: false, playername: player.name});
         let mesg;

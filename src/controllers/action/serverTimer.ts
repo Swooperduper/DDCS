@@ -11,9 +11,9 @@ let lastSentLoader = _.cloneDeep(curTime);
 let maxTime = 0;
 let mesg;
 
-exports.timerObj = {};
+export let timerObj = {};
 
-export async function processTimer(serverSecs: number) {
+export async function processTimer(serverSecs: number): Promise<void> {
     maxTime = ddcsController.config.restartTime;
     mesg = null;
     curSecs = serverSecs;
@@ -111,11 +111,11 @@ export async function processTimer(serverSecs: number) {
     }
 }
 
-export function resetTimerObj() {
-    exports.timerObj = {};
+export function resetTimerObj(): void {
+    timerObj = {};
 }
 
-export async function restartServer() {
+export async function restartServer(): Promise<void> {
     const server = await ddcsController.serverActionsRead({});
     const newMap = server[0].curFilePath + "_" + server[0].curSeason + "_" +
         _.random(1, (server[0].mapCount || 1)) + ".miz";
@@ -123,7 +123,7 @@ export async function restartServer() {
     await ddcsController.loadMission(newMap);
 }
 
-export function secondsToHms(d: number) {
+export function secondsToHms(d: number): string {
     const h = Math.floor(d / 3600);
     const m = Math.floor(d % 3600 / 60);
     // const s = Math.floor(d % 3600 % 60);
@@ -134,7 +134,7 @@ export function secondsToHms(d: number) {
     return hDisplay + mDisplay;
 }
 
-export async function timeLeft(curUnit: ddcsController.IUnit) {
+export async function timeLeft(curUnit: ddcsController.IUnit): Promise<void> {
     const formatTime = exports.secondsToHms(maxTime - curSecs);
     await ddcsController.sendMesgToGroup(
         curUnit.groupId,
