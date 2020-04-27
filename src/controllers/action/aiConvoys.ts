@@ -5,167 +5,105 @@
 import * as _ from "lodash";
 import * as ddcsController from "../";
 
-export async function maintainPvEConfig(): Promise<any> {
-    const promiseStack: any = [];
-    return await exports.campaignStackTypes()
-        .then((stackObj: any) => {
-            let lockedStack: boolean;
-            _.forEach(_.get(ddcsController, "config.pveAIConfig", []), (pveConfig) => {
-                lockedStack = false;
-                _.forEach(_.get(pveConfig, "config", []), (aIConfig) => {
-                    if (aIConfig.functionCall === "fullAIEnabled") {
-                        exports.processAI({underdog: 1}, aIConfig);
-                        exports.processAI({underdog: 2}, aIConfig);
-                    } else {
-                        const sideStackedAgainst = _.get(stackObj, [aIConfig.functionCall], {});
-                        // get stats
-                        // console.log('mt: ', sideStackedAgainst.ratio, ' >= ', aIConfig.stackTrigger);
-                        if (sideStackedAgainst.ratio >= aIConfig.stackTrigger && !lockedStack) {
-                            lockedStack = true;
-                            // console.log('processing pveAI: ', aIConfig.desc);
-                            return exports.processAI(sideStackedAgainst, aIConfig);
-                        } else {
-                            return true;
-                        }
-                    }
-                });
-            });
-            return Promise.all(promiseStack);
-        })
-        .catch((err: any) => {
-            console.log("err line24: ", err);
-        });
-}
-
-
-export async function campaignStackTypes(serverName: string): Promise<any> {
-    const promiseArray = [];
-    const stackObj = {};
-    promiseArray.push(ddcsController.checkCurrentPlayerBalance()
-        .then((sideStackedAgainst: any) => {
-            _.set(stackObj, "fullCampaignStackStats", sideStackedAgainst);
-        })
-        .catch((err: any) => {
-            console.log("err line37: ", err);
-        }))
-    ;
-    return Promise.all(promiseArray)
-        .then(() => {
-            return stackObj;
-        })
-        .catch((err) => {
-            console.log("err line53: ", err);
-        });
-}
-
-export async function processAI(serverName: string, sideStackedAgainst: any, aIConfig: any): Promise<any> {
-    console.log("sideStackedAgainst: ", sideStackedAgainst);
-    if (sideStackedAgainst.underdog > 0) {
-        return ddcsController.baseActionRead({baseType: "MOB", side: sideStackedAgainst.underdog, enabled: true})
-            .then((friendlyBases: any) => {
-                exports.checkBasesToSpawnConvoysFrom(serverName, friendlyBases, aIConfig);
-            })
-            .catch((err: any) => {
-                console.log("err line51: ", err);
-            })
-        ;
+export async function maintainPvEConfig(): Promise<void> {
+    const stackObj: {fullCampaignStackStats: ddcsController.IPlayerBalance} = await campaignStackTypes();
+    let lockedStack: boolean;
+    for (const pveConfig of ddcsController.config.pveAIConfig) {
+        lockedStack = false;
+        for (const aIConfig of pveConfig.config) {
+            if (aIConfig.functionCall === "fullAIEnabled") {
+                await processAI({underdog: 1}, aIConfig);
+                await processAI({underdog: 2}, aIConfig);
+            } else {
+                // @ts-ignore
+                const sideStackedAgainst = stackObj[aIConfig.functionCall];
+                if (sideStackedAgainst.ratio >= aIConfig.stackTrigger && !lockedStack) {
+                    lockedStack = true;
+                    await processAI(sideStackedAgainst, aIConfig);
+                }
+            }
+        }
     }
 }
 
-export async function checkBasesToSpawnConvoysFrom(serverName: string, friendlyBases: any, aIConfig: any): Promise<any> {
-    // console.log('convoyTest: ', serverName, aIConfig);
-    _.forEach(friendlyBases, (base: any) => {
-        _.forEach(_.get(base, ["polygonLoc", "convoyTemplate"]), (baseTemplate) => {
-            // spawn ground convoys
-            // 1 point route is a non-transversable route for ground units
-            if (aIConfig.AIType === "groundConvoy" && _.get(baseTemplate, "route", []).length > 1) {
-                ddcsController.baseActionRead({
-                    _id: _.get(baseTemplate, "destBase"),
-                    side: _.get(ddcsController, ["enemyCountry", _.get(base, "side", 0)]),
+export async function campaignStackTypes(): Promise<{fullCampaignStackStats: ddcsController.IPlayerBalance}> {
+    const sideStackedAgainst = await ddcsController.checkCurrentPlayerBalance();
+    return { fullCampaignStackStats: sideStackedAgainst };
+}
+
+export async function processAI(sideStackedAgainst: {underdog: number}, aIConfig: ddcsController.IAIConfig): Promise<void> {
+    console.log("sideStackedAgainst: ", sideStackedAgainst);
+    if (sideStackedAgainst.underdog > 0) {
+        const friendlyBases = await ddcsController.baseActionRead({
+            baseType: "MOB",
+            side: sideStackedAgainst.underdog,
+            enabled: true
+        });
+        await checkBasesToSpawnConvoysFrom(friendlyBases, aIConfig);
+    }
+}
+
+export async function checkBasesToSpawnConvoysFrom(
+    friendlyBases: ddcsController.IBase[],
+    aIConfig: ddcsController.IAIConfig
+): Promise<void> {
+    for (const base of friendlyBases) {
+        // @ts-ignore
+        for (const baseTemplate of base.polygonLoc.convoyTemplate) {
+            if (aIConfig.AIType === "groundConvoy" && baseTemplate.route.length > 1) {
+                const destBaseInfo = await ddcsController.baseActionRead({
+                    _id: baseTemplate.destBase,
+                    side: ddcsController.enemyCountry[base.side],
                     enabled: true
-                })
-                    .then((destBaseInfo: any) => {
-                        if (destBaseInfo.length > 0) {
-                            const curBase = destBaseInfo[0];
-                            // check if convoy exists first
-                            const baseConvoyGroupName = "AI|" + aIConfig.name +
-                                "|" + _.get(baseTemplate, "sourceBase") +
-                                "_" + _.get(baseTemplate, "destBase") + "|";
-                            ddcsController.unitActionRead({
-                                groupName: baseConvoyGroupName,
-                                isCrate: false,
-                                dead: false
-                            })
-                                .then((convoyGroup: any) => {
-                                    if (convoyGroup.length === 0) {
-                                        // respawn convoy because it doesnt exist
-                                        console.log("convoy ", _.get(base, "name"), " attacking ", _.get(curBase, "name"));
-                                        const message = "C: A convoy just left " + _.get(base, "name") + " is attacking " + _.get(curBase, "name");
-                                        ddcsController.spawnConvoy(
-                                            serverName,
-                                            baseConvoyGroupName,
-                                            _.get(base, "side", 0),
-                                            baseTemplate,
-                                            aIConfig,
-                                            message
-                                        );
-                                    }
-                                })
-                                .catch((err: any) => {
-                                    console.log("err line94: ", err);
-                                })
-                            ;
-                        }
-                    })
-                    .catch((err: any) => {
-                        console.log("err line100: ", err);
-                    })
-                ;
+                });
+                if (destBaseInfo.length > 0) {
+                    const curBase = destBaseInfo[0];
+                    const baseConvoyGroupName = "AI|" + aIConfig.name +
+                        "|" + baseTemplate.sourceBase +
+                        "_" + baseTemplate.destBase + "|";
+                    const convoyGroup = await ddcsController.unitActionRead({
+                        groupName: baseConvoyGroupName,
+                        isCrate: false,
+                        dead: false
+                    });
+                    if (convoyGroup.length === 0) {
+                        console.log("convoy ", base.name, " attacking ", curBase.name);
+                        const message = "C: A convoy just left " + base.name + " is attacking " + curBase.name;
+                        await ddcsController.spawnConvoy(
+                            baseConvoyGroupName,
+                            base.side,
+                            baseTemplate,
+                            aIConfig,
+                            message
+                        );
+                    }
+                }
             }
             if (aIConfig.AIType === "CAPDefense") {
-                ddcsController.baseActionRead({
-                    _id: _.get(baseTemplate, "destBase"),
-                    side: _.get(ddcsController, ["enemyCountry", _.get(base, "side", 0)]),
+                const destBaseInfo = await ddcsController.baseActionRead({
+                    _id: baseTemplate.destBase,
+                    side: ddcsController.enemyCountry[base.side],
                     enabled: true
-                })
-                    .then((destBaseInfo: any) => {
-                        if (destBaseInfo.length > 0) {
-                            const curBase = destBaseInfo[0];
-                            // check if convoy exists first
-                            const baseCapGroupName = "AI|" + aIConfig.name + "|" + _.get(base, "name") + "|";
-                            ddcsController.unitActionRead({
-                                groupName: baseCapGroupName,
-                                isCrate: false,
-                                dead: false
-                            })
-                                .then((capGroup: any) => {
-                                    if (capGroup.length === 0) {
-                                        console.log("RESPAWNCAP: ", baseCapGroupName, capGroup.length);
-                                        // respawn convoy because it doesnt exist
-                                        const mesg = "C: A CAP Defense spawned at " + _.get(base, "name");
-                                        ddcsController.spawnCAPDefense(
-                                            serverName,
-                                            baseCapGroupName,
-                                            _.get(base, "side", 0),
-                                            base,
-                                            aIConfig,
-                                            mesg
-                                        );
-                                    } else {
-                                        console.log("skipCap: ", baseCapGroupName, capGroup.length);
-                                    }
-                                })
-                                .catch((err: any) => {
-                                    console.log("err line94: ", err);
-                                })
-                            ;
-                        }
-                    })
-                    .catch((err: any) => {
-                        console.log("err line100: ", err);
-                    })
-                ;
+                });
+                if (destBaseInfo.length > 0) {
+                    // check if convoy exists first
+                    const baseCapGroupName = "AI|" + aIConfig.name + "|" + base.name + "|";
+                    const capGroup = await ddcsController.unitActionRead({
+                        groupName: baseCapGroupName,
+                        isCrate: false,
+                        dead: false
+                    });
+                    console.log("RESPAWNCAP: ", baseCapGroupName, capGroup.length);
+                    // respawn convoy because it doesnt exist
+                    await ddcsController.spawnCAPDefense(
+                        baseCapGroupName,
+                        base.side,
+                        base,
+                        aIConfig,
+                        "C: A CAP Defense spawned at " + base.name
+                    );
+                }
             }
-        });
-    });
+        }
+    }
 }

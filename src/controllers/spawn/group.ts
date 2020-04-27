@@ -1810,7 +1810,6 @@ export function spawnLayer2Reinforcements(
 }
 
 export async function spawnConvoy(
-    serverName: string,
     groupName: string,
     convoySide: number,
     baseTemplate: any,
@@ -1821,7 +1820,7 @@ export async function spawnConvoy(
     let curUnit;
     _.forEach(aIConfig.makeup, (units) => {
         curUnit = {
-            ...exports.getRndFromSpawnCat(serverName, units.template, convoySide, false, true)[0],
+            ...exports.getRndFromSpawnCat(units.template, convoySide, false, true)[0],
             country: _.get(constants, ["defCountrys", convoySide]),
             speed: "55",
             hidden: false,
@@ -1888,7 +1887,6 @@ export async function spawnConvoy(
 }
 
 export async function spawnCAPDefense(
-    serverName: string,
     groupName: string,
     convoySide: number,
     baseTemplate: any,
@@ -1913,7 +1911,7 @@ export async function spawnCAPDefense(
         capMakeup = [];
         curUnitSpawn = "";
         curUnit = {
-            ..._.cloneDeep(exports.getRndFromSpawnCat(serverName, spawnTemplateName, convoySide, false, true)[0]),
+            ..._.cloneDeep(exports.getRndFromSpawnCat(spawnTemplateName, convoySide, false, true)[0]),
             groupName,
             baseName: baseTemplate.name,
             country: curCountry,

@@ -28,6 +28,7 @@ export interface IBase {
         ];
         convoyTemplate: {
             [key: string]: {
+                sourceBase: string;
                 destBase: string;
                 route: [
                     {
@@ -209,11 +210,13 @@ export interface IMasterCue {
 }
 
 export interface ISrvPlayers {
+    _id: string;
     ucid: string;
     sideLockTime: number;
     cachedRemovedLPPoints: number;
-    _id?: string;
-    side?: number;
+    currentSessionMinutesPlayed_blue: number;
+    currentSessionMinutesPlayed_red: number;
+    side: number;
     sideLock?: number;
     curLifePoints?: number;
     gicTimeLeft?: number;
@@ -224,8 +227,6 @@ export interface ISrvPlayers {
     banned?: boolean;
     gciAllowed?: boolean;
     isGameMaster?: boolean;
-    currentSessionMinutesPlayed_blue?: number;
-    currentSessionMinutesPlayed_red?: number;
     ipaddr?: string;
     lang?: string;
     name?: string;
@@ -300,6 +301,7 @@ export interface IAmmo {
 }
 
 export interface IUnit {
+    threatLvl: number;
     jtacReplenTime: number;
     jtacTarget: any;
     _id: string;
@@ -389,4 +391,22 @@ export interface IWeaponScore {
 export interface IProcess {
     firingTime: Date;
     queObj: object;
+}
+
+export interface IPlayerBalance {
+    underdog: number;
+    ratio: number;
+}
+
+export interface IAIConfig {
+    name: string;
+    AIType: string;
+    functionCall: string;
+    stackTrigger: string;
+    makeup: IMakeup[];
+}
+
+export interface IMakeup {
+    template: string;
+    count: number;
 }

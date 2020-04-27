@@ -4,7 +4,6 @@
 
 import * as _ from "lodash";
 import * as ddcsController from "../../";
-import {IServer} from "../../";
 
 const airfieldTable = ddcsController.localConnection.model(process.env.SERVERNAME + "_airfield", ddcsController.airfieldSchema);
 const curTheater = ddcsController.config.theater;

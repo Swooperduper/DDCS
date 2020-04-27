@@ -4,18 +4,16 @@
 
 import * as ddcsController from "../";
 
-export async function setbaseSides() {
-    return ddcsController.baseActionGetBaseSides()
-        .then((baseSides: any) => {
-            return ddcsController.cmdQueActionsSave({
-                queName: "clientArray",
-                actionObj: {
-                    action: "SETBASEFLAGS",
-                    data: baseSides
-                }
-            });
-        })
-        .catch((err: any) => {
-            console.log("line1491", err);
+export async function setbaseSides(): Promise<void> {
+    const baseSides = await ddcsController.baseActionGetBaseSides();
+    await ddcsController.cmdQueActionsSave({
+        queName: "clientArray",
+        actionObj: {
+            action: "SETBASEFLAGS",
+            data: baseSides
+        }
+    })
+        .catch((err) => {
+            console.log("17", err);
         });
 }

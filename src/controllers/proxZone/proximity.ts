@@ -302,7 +302,7 @@ export function extractUnitsBackToBase(unit: any) {
 }
 
 export async function getCoalitionGroundUnitsInProximity(lonLat: number[], kmDistance: number, side: number) {
-    return masterDBController.unitActionRead({
+    return await masterDBController.unitActionRead({
             dead: false,
             lonLatLoc: {
                 $geoWithin: {
@@ -318,9 +318,6 @@ export async function getCoalitionGroundUnitsInProximity(lonLat: number[], kmDis
         .then((closeUnits) => {
             // console.log('close units ' + closeUnits);
             return closeUnits;
-        })
-        .catch((err: any) => {
-            console.log("line 54: ", err);
         });
 }
 
@@ -447,9 +444,6 @@ export async function getPlayersInProximity(lonLat: number[], kmDistance: number
         .then((closeUnits) => {
             // console.log('close units ' + closeUnits);
             return closeUnits;
-        })
-        .catch((err: any) => {
-            console.log("line 121: ", err);
         });
 }
 

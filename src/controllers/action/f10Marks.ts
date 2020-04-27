@@ -8,162 +8,106 @@ import * as ddcsController from "../";
 let randomMarkId: number;
 
 export async function setFarpMarks() {
-    ddcsController.baseActionRead({_id: {$not: /#/}})
-        .then((bases) => {
-            _.forEach(bases, (base) => {
-                if (_.get(base, "baseMarkId")) {
-                    ddcsController.cmdQueActionsSave({
-                        actionObj: {
-                            action: "CMD",
-                            cmd: ["trigger.action.removeMark(" + _.get(base, "baseMarkId") + ")"],
-                            reqID: 0
-                        },
-                        queName: "clientArray"
-                    })
-                        .then(() => {
-                            randomMarkId = _.random(1000, 9999);
-                            ddcsController.cmdQueActionsSave({
-                                actionObj: {
-                                    action: "CMD",
-                                    cmd: [
-                                        "trigger.action.markToAll(" + randomMarkId + ", [[" + _.get(base, "name") + "]], " +
-                                        "coord.LLtoLO(" + _.get(base, ["centerLoc", 1]) + ", " + _.get(base, ["centerLoc", 0]) +
-                                        ")" + ", true)"
-                                    ],
-                                    reqID: 0
-                                },
-                                queName: "clientArray"
-                            })
-                                .then(() => {
-                                    ddcsController.baseActionUpdate({_id: _.get(base, "name")})
-                                        .catch((err: any) => {
-                                            console.log("erroring line32: ", err);
-                                        })
-                                    ;
-                                })
-                                .catch((err: any) => {
-                                    console.log("erroring line13: ", err);
-                                })
-                            ;
-                        })
-                        .catch((err: any) => {
-                            console.log("erroring line13: ", err);
-                        })
-                    ;
-                } else {
-                    randomMarkId = _.random(1000, 9999);
-                    ddcsController.cmdQueActionsSave({
-                        actionObj: {
-                            action: "CMD",
-                            cmd: [
-                                "trigger.action.markToAll(" + randomMarkId + ", [[" + _.get(base, "name") + "]], " +
-                                "coord.LLtoLO(" + _.get(base, ["centerLoc", 1]) + ", " + _.get(base, ["centerLoc", 0]) + ")" +
-                                ", true)"
-                            ],
-                            reqID: 0
-                        },
-                        queName: "clientArray"
-                    })
-                        .then(() => {
-                            ddcsController.baseActionUpdate({_id: _.get(base, "name")})
-                                .catch((err: any) => {
-                                    console.log("erroring line58: ", err);
-                                })
-                            ;
-                        })
-                        .catch((err) => {
-                            console.log("erroring line13: ", err);
-                        })
-                    ;
-                }
+    const bases = await ddcsController.baseActionRead({_id: {$not: /#/}});
+    for (const base of bases) {
+        randomMarkId = _.random(1000, 9999);
+        if (base.baseMarkId) {
+            await ddcsController.cmdQueActionsSave({
+                actionObj: {
+                    action: "CMD",
+                    cmd: ["trigger.action.removeMark(" + base.baseMarkId + ")"],
+                    reqID: 0
+                },
+                queName: "clientArray"
+            })
+                .catch((err) => {
+                    console.log("24", err);
+                });
+        }
+        await ddcsController.cmdQueActionsSave({
+            actionObj: {
+                action: "CMD",
+                cmd: [
+                    "trigger.action.markToAll(" + randomMarkId + ", [[" + base.name + "]], " +
+                    "coord.LLtoLO(" + base.centerLoc[1] + ", " + base.centerLoc[0] + ")" +
+                    ", true)"
+                ],
+                reqID: 0
+            },
+            queName: "clientArray"
+        })
+            .catch((err) => {
+                console.log("40", err);
             });
-        })
-        .catch((err: any) => {
-            console.log("line168", err);
-        })
-    ;
+        await ddcsController.baseActionUpdate({_id: base.name})
+            .catch((err) => {
+                console.log("44", err);
+            });
+    }
 }
 
 export async function setUnitMark(
     unit: any
 ) {
     if (!_.includes(_.get(ddcsController, "crateTypes"), _.get(unit, "type"))) {
-        ddcsController.unitActionRead({_id: _.get(unit, "name")})
-            .then((cUnit) => {
-                const curUnit = cUnit[0];
-                if (_.get(curUnit, "markId")) {
-                    ddcsController.cmdQueActionsSave({
-                        actionObj: {
-                            action: "CMD",
-                            cmd: [
-                                "trigger.action.removeMark(" + _.get(curUnit, "markId") + ")"
-                            ],
-                            reqID: 0
-                        },
-                        queName: "clientArray"
-                    })
-                        .then(() => {
-                            randomMarkId = _.random(1000, 9999);
-                            ddcsController.cmdQueActionsSave({
-                                actionObj: {
-                                    action: "CMD",
-                                    cmd: [
-                                        "trigger.action.markToCoalition(" + randomMarkId + ", [[" + _.get(curUnit, "name") + "]], " +
-                                        "coord.LLtoLO(" + _.get(curUnit, ["lonLatLoc", 1]) + ", " +
-                                        _.get(curUnit, ["lonLatLoc", 0]) + "), " + " " + _.get(curUnit, "coalition") + "," +
-                                        " true)"
-                                    ],
-                                    reqID: 0
-                                },
-                                queName: "clientArray"
-                            })
-                                .then(() => {
-                                    ddcsController.unitActionUpdate({_id: _.get(curUnit, "_id"), markId: randomMarkId})
-                                        .catch((err: any) => {
-                                            console.log("erroring line99: ", err);
-                                        })
-                                    ;
-                                })
-                                .catch((err: any) => {
-                                    console.log("erroring line13: ", err);
-                                })
-                            ;
-                        })
-                        .catch((err: any) => {
-                            console.log("erroring line13: ", err);
-                        })
-                    ;
-                } else {
-                    randomMarkId = _.random(1000, 9999);
-                    ddcsController.cmdQueActionsSave({
-                        actionObj: {
-                            action: "CMD",
-                            cmd: [
-                                "trigger.action.markToCoalition(" + randomMarkId + ", [[" + _.get(curUnit, "name") + "]], " +
-                                "coord.LLtoLO(" + _.get(curUnit, ["lonLatLoc", 1]) + ", " +
-                                _.get(curUnit, ["lonLatLoc", 0]) + ")," + " " + _.get(curUnit, "coalition") + ", true)"
-                            ],
-                            reqID: 0
-                        },
-                        queName: "clientArray"
-                    })
-                        .then(() => {
-                            ddcsController.unitActionUpdate({_id: _.get(curUnit, "_id"), markId: randomMarkId})
-                                .catch((err: any) => {
-                                    console.log("erroring line126: ", err);
-                                })
-                            ;
-                        })
-                        .catch((err: any) => {
-                            console.log("erroring line13: ", err);
-                        })
-                    ;
-                }
-                // console.log('CMD: ', curCMD);
+        const cUnit = await ddcsController.unitActionRead({_id: _.get(unit, "name")});
+        const curUnit = cUnit[0];
+        if (_.get(curUnit, "markId")) {
+            await ddcsController.cmdQueActionsSave({
+                actionObj: {
+                    action: "CMD",
+                    cmd: [
+                        "trigger.action.removeMark(" + _.get(curUnit, "markId") + ")"
+                    ],
+                    reqID: 0
+                },
+                queName: "clientArray"
             })
-            .catch((err: any) => {
-                console.log("erroring line138: ", err);
+                .catch((err) => {
+                    console.log("67", err);
+                });
+            randomMarkId = _.random(1000, 9999);
+            await ddcsController.cmdQueActionsSave({
+                actionObj: {
+                    action: "CMD",
+                    cmd: [
+                        "trigger.action.markToCoalition(" + randomMarkId + ", [[" + _.get(curUnit, "name") + "]], " +
+                        "coord.LLtoLO(" + _.get(curUnit, ["lonLatLoc", 1]) + ", " +
+                        _.get(curUnit, ["lonLatLoc", 0]) + "), " + " " + _.get(curUnit, "coalition") + "," +
+                        " true)"
+                    ],
+                    reqID: 0
+                },
+                queName: "clientArray"
             })
-        ;
+                .catch((err) => {
+                    console.log("81", err);
+                });
+            await ddcsController.unitActionUpdate({_id: _.get(curUnit, "_id"), markId: randomMarkId})
+                .catch((err) => {
+                    console.log("82", err);
+                });
+        } else {
+            randomMarkId = _.random(1000, 9999);
+            await ddcsController.cmdQueActionsSave({
+                actionObj: {
+                    action: "CMD",
+                    cmd: [
+                        "trigger.action.markToCoalition(" + randomMarkId + ", [[" + curUnit.name + "]], " +
+                        "coord.LLtoLO(" + curUnit.lonLatLoc[1] + ", " +
+                        curUnit.lonLatLoc[0] + ")," + " " + curUnit.coalition + ", true)"
+                    ],
+                    reqID: 0
+                },
+                queName: "clientArray"
+            })
+                .catch((err) => {
+                    console.log("99", err);
+                });
+            await ddcsController.unitActionUpdate({_id: curUnit._id, markId: randomMarkId})
+                .catch((err) => {
+                    console.log("103", err);
+                });
+        }
     }
 }

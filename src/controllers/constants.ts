@@ -3,7 +3,6 @@
  */
 
 import * as ddcsController from "./";
-import {IServer} from "./";
 
 export const blueCountrys: string[] = [
     "AUSTRALIA",
