@@ -36,7 +36,7 @@ export async function checkCmdCenters(): Promise<void> {
     }
 }
 
-export async function spawnCCAtNeutralBase(curPlayerUnit: ddcsController.IUnit): Promise<void> {
+export async function spawnCCAtNeutralBase(curPlayerUnit: ddcsController.IUnit): Promise<boolean> {
     const bases = await ddcsController.baseActionRead({baseType: "FOB", enabled: true});
     const mainNeutralBases = _.remove(bases, (base) => {
         return !_.includes(base.name, "#");
@@ -57,6 +57,7 @@ export async function spawnCCAtNeutralBase(curPlayerUnit: ddcsController.IUnit):
                     );
                     // console.log('SSB: ', serverName, base.name, curPlayerUnit.coalition);
                     await ddcsController.spawnSupportBaseGrp(base.name, curPlayerUnit.coalition);
+                    return false;
                 } else {
                     console.log(" enemy cmdCenter already exists: " + base.name + " " + cmdCenters);
                     await ddcsController.sendMesgToGroup(
@@ -64,6 +65,7 @@ export async function spawnCCAtNeutralBase(curPlayerUnit: ddcsController.IUnit):
                         "G: Enemy " + base.name + " Command Center Already Exists.",
                         5
                     );
+                    return false;
                 }
             } else {
                 console.log("cmdCenter doesnt exist " + base.name);
@@ -76,7 +78,9 @@ export async function spawnCCAtNeutralBase(curPlayerUnit: ddcsController.IUnit):
                     "C: " + base.name + " Command Center Is Now Built!",
                     20
                 );
+                return true;
             }
         }
     }
+    return false;
 }

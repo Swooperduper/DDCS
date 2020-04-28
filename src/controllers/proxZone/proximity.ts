@@ -463,9 +463,6 @@ export async function getStaticCratesInProximity(lonLat: number[], kmDistance: n
         .then((closeUnits) => {
             // console.log('close units ' + closeUnits);
             return closeUnits;
-        })
-        .catch((err: any) => {
-            console.log("line 140: ", err);
         });
 }
 

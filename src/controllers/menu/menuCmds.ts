@@ -1456,7 +1456,7 @@ export async function spawnTanker(curUnit: any, curPlayer: any, tankerType: stri
         });
 }
 
-export async function unpackCrate(playerUnit: any, country: string, type: string, special: string, combo: string, mobile: boolean) {
+export async function unpackCrate(playerUnit: any, country: string, type: string, special: string, combo: boolean, mobile: boolean) {
     return new Promise((resolve, reject) => {
         const curTimePeriod = constants.config.timePeriod || "modern";
         if (playerUnit.inAir) {

@@ -25,6 +25,10 @@ export let isServerSynced = false;
 export let isSyncLockdownMode = false; // lock all processes out until server fully syncs
 export let processInstructions = false;
 
+export function setSyncLockdownMode(flag: boolean) {
+    isSyncLockdownMode = flag;
+}
+
 export async function syncServer(serverUnitCount: number) {
     const remappedunits: any = {};
     masterDBController.unitActionReadStd({dead: false})

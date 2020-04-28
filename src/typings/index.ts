@@ -221,10 +221,10 @@ export interface ISrvPlayers {
     redRSPoints: number;
     blueRSPoints: number;
     tmpRSPoints: number;
-    sideLock?: number;
-    curLifePoints?: number;
-    gicTimeLeft?: number;
-    safeLifeActionTime?: number;
+    sideLock: number;
+    curLifePoints: number;
+    gicTimeLeft: number;
+    safeLifeActionTime: number;
     banned?: boolean;
     gciAllowed?: boolean;
     isGameMaster?: boolean;
@@ -409,4 +409,25 @@ export interface IAIConfig {
 export interface IMakeup {
     template: string;
     count: number;
+}
+
+export interface ISrvMessages {
+    que: any[];
+    unitCount: number;
+    startAbsTime: number;
+    curAbsTime: number;
+    epoc: number;
+}
+
+export interface ISrvCratesPayload {
+    action: string;
+    callback: string;
+    unitId: string;
+    data: ISrvCrate[];
+}
+
+export interface ISrvCrate {
+    lat: number;
+    lon: number;
+    alive: boolean;
 }
