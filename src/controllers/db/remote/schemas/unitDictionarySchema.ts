@@ -40,7 +40,7 @@ export const unitDictionarySchema = new mongoose.Schema({
             default: 0
         },
         reloadReqArray: {
-            type: Schema.Types.Mixed
+            type: Object
         },
         enabled: {
             type: Boolean,

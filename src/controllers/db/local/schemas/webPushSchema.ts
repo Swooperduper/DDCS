@@ -7,7 +7,7 @@ import * as mongoose from "mongoose";
 // Schema defines how chat messages will be stored in MongoDB
 export const webPushSchema = new mongoose.Schema({
         payload: {
-            type: Schema.Types.Mixed,
+            type: Object,
             required: true
         },
         serverName: {

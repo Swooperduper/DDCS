@@ -3,10 +3,7 @@
  */
 
 import * as _ from "lodash";
-// import * as discord from "discord.js";
-// import * as constants from "../constants";
-import * as masterDBController from "../db";
-// import * as fs from "fs";
+import * as ddcsController from "../";
 
 const dBot = {};
 const twoMin = 2 * 60 * 1000;
@@ -42,23 +39,15 @@ export function getName(vcUser: any) {
 
 export async function setDiscordOnlineStatus(onlineStatus: boolean) {
     console.log("firingsetdiscord");
-    masterDBController.serverActionsRead({enabled: true})
-        .then((srvs: any) => {
-            _.forEach(srvs, (srv: any) => {
-                const curServerName = srv._id;
-                console.log("update server: " + curServerName + " " + onlineStatus);
-                masterDBController.serverActionsUpdate({
-                    name: curServerName,
-                    isDiscordOnline: onlineStatus
-                })
-                    .catch((err) => {
-                        console.log("line61: ", err);
-                    });
-            });
-        })
-        .catch((err) => {
-            console.log("line67: ", err);
+    const srvs = await ddcsController.serverActionsRead({enabled: true});
+    for (const srv of srvs) {
+        const curServerName = srv._id;
+        console.log("update server: " + curServerName + " " + onlineStatus);
+        await ddcsController.serverActionsUpdate({
+            name: curServerName,
+            isDiscordOnline: onlineStatus
         });
+    }
 }
 
 export function clientLogin(cObj: any, token: string) {

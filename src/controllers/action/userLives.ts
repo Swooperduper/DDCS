@@ -5,7 +5,7 @@
 import * as _ from "lodash";
 import * as ddcsController from "../";
 
-function getWeaponCost(typeName: string, count: number): number {
+export function getWeaponCost(typeName: string, count: number): number {
     let mantraCHK = 0;
 
     if (typeName === "MATRA") { mantraCHK += count; }

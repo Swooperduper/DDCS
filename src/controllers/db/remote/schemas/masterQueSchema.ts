@@ -6,7 +6,7 @@ import * as mongoose from "mongoose";
 
 export const masterQueSchema = new mongoose.Schema({
     payload: {
-        type: Schema.Types.Mixed,
+        type: Object,
         required: true
     },
     serverName: {
