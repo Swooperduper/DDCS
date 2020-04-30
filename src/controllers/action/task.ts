@@ -6,7 +6,6 @@ import * as constants from "../constants";
 import * as ddcsController from "../";
 
 const delayTask = constants.time.oneMin;
-let nowTime;
 
 export let ewrUnitsActivated = {};
 
@@ -14,8 +13,7 @@ export function resetEWRUnitsActivated() {
     ewrUnitsActivated = {};
 }
 
-export async function setEWRTask(unitName: string) {
-    nowTime = new Date().getTime();
+export async function setEWRTask(unitName: string): Promise<void> {
     const sendClient = {
         action: "ADDTASK",
         taskType: "EWR",
@@ -24,17 +22,12 @@ export async function setEWRTask(unitName: string) {
     const actionObj = {
         actionObj: sendClient,
         queName: "clientArray",
-        timeToExecute: nowTime + delayTask
+        timeToExecute: new Date().getTime() + delayTask
     };
-    return ddcsController.cmdQueActionsSave(actionObj)
-        .catch((err) => {
-            console.log("erroring line13: ", err);
-        })
-    ;
+    await ddcsController.cmdQueActionsSave(actionObj);
 }
 
-export async function setMissionTask(groupName: string, route: string) {
-    nowTime = new Date().getTime();
+export async function setMissionTask(groupName: string, route: string): Promise<void> {
 
     const sendClient = {
         action: "ADDTASK",
@@ -46,11 +39,7 @@ export async function setMissionTask(groupName: string, route: string) {
     const actionObj = {
         actionObj: sendClient,
         queName: "clientArray",
-        timeToExecute: nowTime + delayTask
+        timeToExecute: new Date().getTime() + delayTask
     };
-    return ddcsController.cmdQueActionsSave(actionObj)
-        .catch((err) => {
-            console.log("erroring line13: ", err);
-        })
-    ;
+    await ddcsController.cmdQueActionsSave(actionObj);
 }

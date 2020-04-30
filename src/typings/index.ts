@@ -225,6 +225,7 @@ export interface ISrvPlayers {
     curLifePoints: number;
     gicTimeLeft: number;
     safeLifeActionTime: number;
+    updatedAt: Date;
     banned?: boolean;
     gciAllowed?: boolean;
     isGameMaster?: boolean;
@@ -235,7 +236,6 @@ export interface ISrvPlayers {
     slot?: string;
     sessionName?: string;
     createdAt?: Date;
-    updatedAt?: Date;
     lastLifeAction?: string;
 }
 
@@ -430,4 +430,10 @@ export interface ISrvCrate {
     lat: number;
     lon: number;
     alive: boolean;
+}
+
+export interface ISrvPlayerBalance {
+    side: number;
+    modifier: number;
+    players?: ISrvPlayers[];
 }
