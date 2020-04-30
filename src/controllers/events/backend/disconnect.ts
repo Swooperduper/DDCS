@@ -3,20 +3,16 @@
  */
 
 import * as _ from "lodash";
-import * as constants from "../../constants";
-import * as masterDBController from "../../db";
-import * as DCSLuaCommands from "../../player/DCSLuaCommands";
-import * as playersEvent from "../../events/backend/players";
-import * as webPushCommands from "../../socketIO/webPush";
+import * as ddcsController from "../../";
 
-export async function processDisconnect(sessionName: string, eventObj: any) {
+export async function processDisconnect(sessionName: string, eventObj: any): Promise<void> {
     // "disconnect", playerID, name, playerSide, reason_code
-    const iPlayer = _.find(playersEvent.rtPlayerArray, {id: eventObj.data.arg1});
+    const iPlayer = _.find(ddcsController.rtPlayerArray, {id: eventObj.data.arg1});
 
     if (iPlayer) {
         const iCurObj = {
             sessionName,
-            eventCode: constants.shortNames[eventObj.action],
+            eventCode: ddcsController.shortNames[eventObj.action],
             iucid: iPlayer.ucid,
             iName: iPlayer.name,
             displaySide: "A",
@@ -24,22 +20,19 @@ export async function processDisconnect(sessionName: string, eventObj: any) {
             msg: "A: " + iPlayer.name + " has disconnected - Ping:" + iPlayer.ping + " Lang:" + iPlayer.lang
         };
         if (iCurObj.iucid) {
-            webPushCommands.sendToAll({payload: {action: eventObj.action, data: _.cloneDeep(iCurObj)}})
+            await ddcsController.sendToAll({payload: {action: eventObj.action, data: _.cloneDeep(iCurObj)}})
                 .catch((err: any) => {
                     console.log("err line29: ", err);
                 });
-            masterDBController.simpleStatEventActionsSave(iCurObj)
+            await ddcsController.simpleStatEventActionsSave(iCurObj)
                 .catch((err: any) => {
                     console.log("err line45: ", err);
                 });
         }
-        DCSLuaCommands.sendMesgToCoalition(
+        await ddcsController.sendMesgToCoalition(
             eventObj.data.arg3,
             iCurObj.msg,
             5
-        )
-            .catch((err: any) => {
-                console.log("err line39: ", err);
-            });
+        );
     }
 }
