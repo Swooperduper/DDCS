@@ -5,7 +5,7 @@
 import * as _ from "lodash";
 import * as ddcsController from "../../";
 
-export async function processEventPlayerEnterUnit(sessionName: string, eventObj: any) {
+export async function processEventPlayerEnterUnit(sessionName: string, eventObj: any): Promise<void> {
     const iUnit = await ddcsController.unitActionRead({unitId: eventObj.data.arg3});
     const playerArray = await ddcsController.srvPlayerActionsRead({sessionName});
     const curIUnit = iUnit[0];
