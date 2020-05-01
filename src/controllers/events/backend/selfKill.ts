@@ -5,7 +5,7 @@
 import * as _ from "lodash";
 import * as ddcsController from "../../";
 
-export async function processSelfKill(sessionName: string, eventObj: any) {
+export async function processSelfKill(sessionName: string, eventObj: any): Promise<void> {
     // "self_kill", playerID
     const iPlayer = _.find(ddcsController.rtPlayerArray, {id: eventObj.data.arg1});
 

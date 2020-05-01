@@ -7,7 +7,7 @@ import * as ddcsController from "../../";
 
 export let rtPlayerArray: any;
 
-export async function processPlayerEvent(sessionName: string, playerArray: any) {
+export async function processPlayerEvent(sessionName: string, playerArray: any): Promise<void> {
     rtPlayerArray = playerArray.data;
     for (const player of playerArray.data) {
         if (player) {

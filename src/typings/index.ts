@@ -336,6 +336,7 @@ export interface IUnit {
     intCargoType: string;
     troopType: string;
     virtCrateType: string;
+    playerOwnerId: string;
 }
 
 export interface IWebPush {

@@ -3,55 +3,38 @@
  */
 
 import * as _ from "lodash";
-import * as constants from "../../constants";
-import * as masterDBController from "../../db";
-// import * as DCSLuaCommands from "../../player/DCSLuaCommands";
-// import * as playersEvent from "../../events/backend/players";
-import * as unitsStaticsController from "../../serverToDbSync/unitsStatics";
-import * as webPushCommands from "../../socketIO/webPush";
+import * as ddcsController from "../../";
 
-export async function processEventPlayerLeaveUnit(sessionName: string, eventObj: any) {
-    // Occurs when any player relieves control of a unit to the AI.
-    masterDBController.unitActionRead({unitId: eventObj.data.arg3})
-        .then((iunit: any) => {
-            masterDBController.srvPlayerActionsRead({sessionName})
-                .then((playerArray: any) => {
-                    const curIUnit = iunit[0];
-                    if (curIUnit) {
+export async function processEventPlayerLeaveUnit(sessionName: string, eventObj: any): Promise<void> {
+    const iUnit = await ddcsController.unitActionRead({unitId: eventObj.data.arg3});
+    const playerArray = await ddcsController.srvPlayerActionsRead({sessionName});
+    if (iUnit[0]) {
 
-                        unitsStaticsController.processUnitUpdates(sessionName, {action: "D", data: {name: curIUnit.name}});
+        await ddcsController.processUnitUpdates(sessionName, {action: "D", data: {name: iUnit[0].name}});
 
-                        const iPlayer = _.find(playerArray, {name: curIUnit.playername});
-                        if (iPlayer) {
-                            const iCurObj = {
-                                sessionName,
-                                eventCode: constants.shortNames[eventObj.action],
-                                iucid: iPlayer.ucid,
-                                iName: curIUnit.playername,
-                                displaySide: curIUnit.coalition,
-                                roleCode: "I",
-                                msg: "C: " + curIUnit.playername + " leaves his " + curIUnit.type
-                            };
-                            if (iCurObj.iucid) {
-                                webPushCommands.sendToCoalition({payload: {action: eventObj.action, data: _.cloneDeep(iCurObj)}});
-                                masterDBController.simpleStatEventActionsSave(iCurObj);
-                            }
-                            /*
-                            DCSLuaCommands.sendMesgToCoalition(
-                                _.get(iCurObj, 'displaySide'),
-                                serverName,
-                                _.get(iCurObj, 'msg'),
-                                5
-                            );
-                            */
-                        }
-                    }
-                })
-                .catch((err) => {
-                    console.log("err line45: ", err);
-                });
-        })
-        .catch((err) => {
-            console.log("err line40: ", err);
-        });
+        const iPlayer = _.find(playerArray, {name: iUnit[0].playername});
+        if (iPlayer) {
+            const iCurObj = {
+                sessionName,
+                eventCode: ddcsController.shortNames[eventObj.action],
+                iucid: iPlayer.ucid,
+                iName: iUnit[0].playername,
+                displaySide: iUnit[0].coalition,
+                roleCode: "I",
+                msg: "C: " + iUnit[0].playername + " leaves his " + iUnit[0].type
+            };
+            if (iCurObj.iucid) {
+                await ddcsController.sendToCoalition({payload: {action: eventObj.action, data: _.cloneDeep(iCurObj)}});
+                await ddcsController.simpleStatEventActionsSave(iCurObj);
+            }
+            /*
+            DCSLuaCommands.sendMesgToCoalition(
+                _.get(iCurObj, 'displaySide'),
+                serverName,
+                _.get(iCurObj, 'msg'),
+                5
+            );
+            */
+        }
+    }
 }

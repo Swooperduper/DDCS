@@ -3,17 +3,11 @@
  */
 
 import * as _ from "lodash";
-import * as constants from "../../constants";
-import * as masterDBController from "../../db";
-// import * as DCSLuaCommands from "../../player/DCSLuaCommands";
-import * as groupController from "../../spawn/group";
-import * as webPushCommands from "../../socketIO/webPush";
-import * as userLivesController from "../../action/userLives";
-import * as proximityController from "../../proxZone/proximity";
+import * as ddcsController from "../../";
 
-export async function processEventLand(sessionName: string, eventObj: any) {
+export async function processEventLand(sessionName: string, eventObj: any): Promise<void> {
     let place: string = "";
-    let baseLand: string;
+    let baseLand: string = "";
 
     // Occurs when an aircraft lands at an airbase, farp or ship
     if (eventObj.data.arg6) {
@@ -22,86 +16,61 @@ export async function processEventLand(sessionName: string, eventObj: any) {
         baseLand = eventObj.data.arg5;
     }
 
-    masterDBController.unitActionRead({unitId: eventObj.data.arg3, isCrate: false})
-        .then((iunit: any) => {
-            masterDBController.srvPlayerActionsRead({sessionName})
-                .then((playerArray: any) => {
-                    const curIUnit = iunit[0];
+    const iUnit = await ddcsController.unitActionRead({unitId: eventObj.data.arg3, isCrate: false});
+    const playerArray = await ddcsController.srvPlayerActionsRead({sessionName});
 
-                    if (_.isUndefined(curIUnit)) {
-                        console.log("isUndef: ", eventObj);
-                    }
-                    if (curIUnit) {
-                        const curUnitName = curIUnit.name;
-                        if (_.includes(curUnitName, "LOGISTICS|")) {
-                            const bName = _.split(curUnitName, "|")[2];
-                            const curSide = curIUnit.coalition;
-                            masterDBController.baseActionRead({_id: bName})
-                                .then((bases: any) => {
-                                    const curBase = bases[0]; // does this work?
-                                    console.log("LANDINGCARGO: ", curBase.side === curSide, baseLand === bName, baseLand, " = ", bName,
-                                        curIUnit.category);
-                                    if (curBase.side === curSide) {
-                                        groupController.replenishUnits( bName, curSide);
-                                        groupController.healBase( bName, curIUnit);
-                                    }
-                                })
-                                .catch((err) => {
-                                console.log("err line1323: ", err);
-                                })
-                            ;
-                        }
-                        const iPlayer = _.find(playerArray, {name: curIUnit.playername});
-                        console.log("landing: ", curIUnit.playername);
-                        if (iPlayer) {
-                            const curUnitSide = curIUnit.coalition;
-                            proximityController.getBasesInProximity(curIUnit.lonLatLoc, 5, curUnitSide)
-                                .then((friendlyBases: any) => {
-                                    if (friendlyBases.length > 0) {
-                                        const curBase = _.get(friendlyBases, [0], {});
-                                        place = " at " + curBase._id;
-                                        masterDBController.srvPlayerActionsApplyTempToRealScore({
-                                            _id: iPlayer._id,
-                                            groupId: curIUnit.groupId
-                                        })
-                                            .catch((err) => {
-                                                console.log("line70", err);
-                                            });
-                                        const iCurObj = {
-                                            sessionName,
-                                            eventCode: constants.shortNames[eventObj.action],
-                                            iucid: iPlayer.ucid,
-                                            iName: curIUnit.playername,
-                                            displaySide: curIUnit.coalition,
-                                            roleCode: "I",
-                                            msg: "C: " + curIUnit.type + "(" + curIUnit.playername + ") has landed at friendly " + place
-                                        };
-                                        console.log("FriendBaseLand: ", iCurObj.msg);
-                                        if (iCurObj.iucid && constants.config.lifePointsEnabled) {
-                                            userLivesController.addLifePoints(
-                                                iPlayer,
-                                                curIUnit,
-                                                "Land"
-                                            );
-                                            webPushCommands.sendToCoalition({payload: {
-                                                action: eventObj.action,
-                                                data: _.cloneDeep(iCurObj)
-                                            }});
-                                            masterDBController.simpleStatEventActionsSave(iCurObj);
-                                        }
-                                    }
-                                })
-                                .catch((err) => {
-                                    console.log("err line100: ", err);
-                                });
-                        }
-                    }
-                })
-                .catch((err) => {
-                    console.log("err line108: ", err);
+    if (_.isUndefined(iUnit[0])) {
+        console.log("isUndef: ", eventObj);
+    }
+    if (iUnit[0]) {
+        const curUnitName = iUnit[0].name;
+        if (_.includes(curUnitName, "LOGISTICS|")) {
+            const bName = _.split(curUnitName, "|")[2];
+            const curSide = iUnit[0].coalition;
+            const bases = await ddcsController.baseActionRead({_id: bName});
+            const curBase = bases[0]; // does this work?
+            console.log("LANDINGCARGO: ", curBase.side === curSide, baseLand === bName, baseLand, " = ", bName,
+                iUnit[0].category);
+            if (curBase.side === curSide) {
+                await ddcsController.replenishUnits( bName, curSide);
+                await ddcsController.healBase( bName, iUnit[0]);
+            }
+        }
+        const iPlayer = _.find(playerArray, {name: iUnit[0].playername});
+        console.log("landing: ", iUnit[0].playername);
+        if (iPlayer) {
+            const curUnitSide = iUnit[0].coalition;
+            const friendlyBases = await ddcsController.getBasesInProximity(iUnit[0].lonLatLoc, 5, curUnitSide);
+            if (friendlyBases.length > 0) {
+                const curBase = friendlyBases[0];
+                place = " at " + curBase._id;
+                await ddcsController.srvPlayerActionsApplyTempToRealScore({
+                    _id: iPlayer._id,
+                    groupId: iUnit[0].groupId
                 });
-        })
-        .catch((err) => {
-            console.log("err line113: ", err);
-        });
+                const iCurObj = {
+                    sessionName,
+                    eventCode: ddcsController.shortNames[eventObj.action],
+                    iucid: iPlayer.ucid,
+                    iName: iUnit[0].playername,
+                    displaySide: iUnit[0].coalition,
+                    roleCode: "I",
+                    msg: "C: " + iUnit[0].type + "(" + iUnit[0].playername + ") has landed at friendly " + place
+                };
+                console.log("FriendBaseLand: ", iCurObj.msg);
+                if (iCurObj.iucid && ddcsController.config.lifePointsEnabled) {
+                    await ddcsController.addLifePoints(
+                        iPlayer,
+                        iUnit[0],
+                        "Land"
+                    );
+                    await ddcsController.sendToCoalition({payload: {
+                            action: eventObj.action,
+                            data: _.cloneDeep(iCurObj)
+                        }});
+                    await ddcsController.simpleStatEventActionsSave(iCurObj);
+                }
+            }
+        }
+    }
 }

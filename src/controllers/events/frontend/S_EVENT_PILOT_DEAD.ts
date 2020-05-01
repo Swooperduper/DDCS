@@ -3,60 +3,39 @@
  */
 
 import * as _ from "lodash";
-import * as constants from "../../constants";
-import * as masterDBController from "../../db";
-import * as DCSLuaCommands from "../../player/DCSLuaCommands";
-// import * as playersEvent from "../../events/backend";
-import * as webPushCommands from "../../socketIO/webPush";
+import * as ddcsController from "../../";
 
-export async function processEventPilotDead(sessionName: string, eventObj: any) {
+export async function processEventPilotDead(sessionName: string, eventObj: any): Promise<void> {
     const nowTime = new Date().getTime();
-    // Occurs when the pilot of an aircraft is killed.
-    // Can occur either if the player is alive and crashes or
-    // if a weapon kills the pilot without completely destroying the plane.
-    masterDBController.unitActionRead({unitId: eventObj.data.arg3})
-        .then((iunit: any) => {
-            masterDBController.srvPlayerActionsRead({sessionName})
-                .then((playerArray: any) => {
-                    const curIUnit = iunit[0];
-                    if (curIUnit) {
-                        const iPlayer = _.find(playerArray, {name: curIUnit.playername});
-                        if (iPlayer) {
-                            const iCurObj = {
-                                sessionName,
-                                eventCode: constants.shortNames[eventObj.action],
-                                iucid: iPlayer.ucid,
-                                iName: curIUnit.playername,
-                                displaySide: "A",
-                                roleCode: "I",
-                                msg: "A: " + constants.side[curIUnit.coalition] + " " + curIUnit.type + "(" + curIUnit.playername +
-                                    ") pilot is dead",
-                                groupId: curIUnit.groupId
-                            };
-                            if (iCurObj.iucid) {
-                                webPushCommands.sendToAll({payload: {action: eventObj.action, data: _.cloneDeep(iCurObj)}});
-                                masterDBController.simpleStatEventActionsSave(iCurObj);
-                            }
-                            masterDBController.srvPlayerActionsClearTempScore({_id: iCurObj.iucid, groupId: iCurObj.groupId})
-                                .catch((err) => {
-                                    console.log("line35", err);
-                                });
+    const iUnit = await ddcsController.unitActionRead({unitId: eventObj.data.arg3});
+    const playerArray = await ddcsController.srvPlayerActionsRead({sessionName});
+    if (iUnit[0]) {
+        const iPlayer = _.find(playerArray, {name: iUnit[0].playername});
+        if (iPlayer) {
+            const iCurObj = {
+                sessionName,
+                eventCode: ddcsController.shortNames[eventObj.action],
+                iucid: iPlayer.ucid,
+                iName: iUnit[0].playername,
+                displaySide: "A",
+                roleCode: "I",
+                msg: "A: " + ddcsController.side[iUnit[0].coalition] + " " + iUnit[0].type + "(" + iUnit[0].playername +
+                    ") pilot is dead",
+                groupId: iUnit[0].groupId
+            };
+            if (iCurObj.iucid) {
+                await ddcsController.sendToAll({payload: {action: eventObj.action, data: _.cloneDeep(iCurObj)}});
+                await ddcsController.simpleStatEventActionsSave(iCurObj);
+            }
+            await ddcsController.srvPlayerActionsClearTempScore({_id: iCurObj.iucid, groupId: iCurObj.groupId});
 
-                            if (constants.config.inGameHitMessages) {
-                                DCSLuaCommands.sendMesgToAll(
-                                    iCurObj.msg,
-                                    5,
-                                    nowTime + constants.time.oneMin
-                                );
-                            }
-                        }
-                    }
-                })
-                .catch((err) => {
-                    console.log("err line45: ", err);
-                });
-        })
-        .catch((err) => {
-            console.log("err line41: ", err);
-        });
+            if (ddcsController.config.inGameHitMessages) {
+                await ddcsController.sendMesgToAll(
+                    iCurObj.msg,
+                    5,
+                    nowTime + ddcsController.time.oneMin
+                );
+            }
+        }
+    }
 }

@@ -362,9 +362,6 @@ export async function getBasesInProximity(lonLat: number[], kmDistance: number, 
         .then((closestBase) => {
             // console.log('close units ' + closeUnits);
             return closestBase;
-        })
-        .catch((err) => {
-            console.log("line 27: ", err);
         });
 }
 
