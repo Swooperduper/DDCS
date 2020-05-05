@@ -3,8 +3,7 @@
  */
 /*
 import * as _ from "lodash";
-import * as constants from "../constants";
-import * as masterDBController from "../db";
+import * as ddcsController from "../";
 
 
 export async function checkServers() {

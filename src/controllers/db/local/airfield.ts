@@ -191,10 +191,7 @@ export async function baseActionUpdateReplenTimer(obj: {
     });
 }
 
-export async function baseActionSave(obj: {
-    _id: string,
-    side: number
-}): Promise<void> {
+export async function baseActionSave(obj: any): Promise<void> {
     return new Promise((resolve, reject) => {
         airfieldTable.find({_id: obj._id}, (findErr, airfieldObj: ddcsController.IBase[]) => {
             if (findErr) { reject(findErr); }

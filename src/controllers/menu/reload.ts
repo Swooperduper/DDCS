@@ -3,64 +3,45 @@
  */
 
 import * as _ from "lodash";
-import * as constants from "../constants";
-import * as DCSLuaCommands from "../player/DCSLuaCommands";
-import * as masterDBController from "../db";
-import * as groupController from "../spawn/group";
-import * as proximityController from "../proxZone/proximity";
+import * as ddcsController from "../";
 
-export async function reloadSAM(unitCalling: any) {
-    return new Promise((resolve, reject) => {
-        proximityController.getGroundUnitsInProximity(unitCalling.lonLatLoc, 0.2, false)
-            .then((units: any) => {
-                const closestUnit = _.filter(units, {coalition: unitCalling.coalition})[0];
-                if (closestUnit) {
-                    masterDBController.unitActionRead({groupName: closestUnit.groupName, isCrate: false, dead: false})
-                        .then((samUnits) => {
-                            // console.log('samu: ', samUnits, closestUnit.groupName);
-                            if (samUnits.length) {
-                                const curSamType = samUnits[0].type;
-                                const curUnitDict = _.find(constants.unitDictionary, {_id: curSamType});
-                                const curReloadArray = curUnitDict.reloadReqArray;
-                                // console.log('uD: ', curUnitDict);
-                                if (curReloadArray.length === _.intersection(curReloadArray, _.map(samUnits, "type")).length) {
-                                    groupController.spawnGroup(samUnits);
-                                    resolve(true);
-                                } else {
-                                    DCSLuaCommands.sendMesgToGroup(
-                                        unitCalling.groupId,
-                                        "G: " + curSamType + " Is Too Damaged To Be Reloaded!",
-                                        5
-                                    );
-                                    resolve(false);
-                                }
-                            } else {
-                                DCSLuaCommands.sendMesgToGroup(
-                                    unitCalling.groupId,
-                                    "G: Group does not have all of the pieces to reload",
-                                    5
-                                );
-                                resolve(false);
-                            }
-                        })
-                        .catch((err) => {
-                            reject(err);
-                            console.log("line 26: ", err);
-                        })
-                    ;
+export async function reloadSAM(unitCalling: ddcsController.IUnit): Promise<boolean> {
+    const units = await ddcsController.getGroundUnitsInProximity(unitCalling.lonLatLoc, 0.2, false);
+    const closestUnit = _.filter(units, {coalition: unitCalling.coalition})[0];
+    if (closestUnit) {
+        const samUnits = await ddcsController.unitActionRead({groupName: closestUnit.groupName, isCrate: false, dead: false});
+        if (samUnits.length) {
+            const curSamType = samUnits[0].type;
+            const curUnitDict = _.find(ddcsController.unitDictionary, {_id: curSamType});
+            if (curUnitDict) {
+                const curReloadArray = curUnitDict.reloadReqArray;
+                if (curReloadArray.length === _.intersection(curReloadArray, _.map(samUnits, "type")).length) {
+                    await ddcsController.spawnGroup(samUnits);
+                    return true;
                 } else {
-                    DCSLuaCommands.sendMesgToGroup(
+                    await ddcsController.sendMesgToGroup(
                         unitCalling.groupId,
-                        "G: There are no units close enough to reload",
+                        "G: " + curSamType + " Is Too Damaged To Be Reloaded!",
                         5
                     );
-                    resolve(false);
+                    return false;
                 }
-            })
-            .catch((err) => {
-                reject(err);
-                console.log("line 125: ", err);
-            })
-        ;
-    });
+            }
+        } else {
+            await ddcsController.sendMesgToGroup(
+                unitCalling.groupId,
+                "G: Group does not have all of the pieces to reload",
+                5
+            );
+            return false;
+        }
+    } else {
+        await ddcsController.sendMesgToGroup(
+            unitCalling.groupId,
+            "G: There are no units close enough to reload",
+            5
+        );
+        return false;
+    }
+    return false;
 }

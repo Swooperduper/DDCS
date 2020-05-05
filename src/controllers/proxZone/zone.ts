@@ -3,14 +3,14 @@
  */
 
 import * as _ from "lodash";
-import * as constants from "../constants";
+import * as ddcsController from "../";
 
 // Calculate a new coordinate based on start, distance and bearing
 export function mathFmod(a: number, b: number ): number {
     return Number((a - (Math.floor(a / b) * b)).toPrecision(8));
 }
 
-function geo_destination(lonLat: number[], dist: number, brng: number) {
+function geo_destination(lonLat: number[], dist: number, brng: number): number[] {
     const lon1 = toRad(lonLat[0]);
     const lat1 = toRad(lonLat[1]);
     dist = dist / 6371.01; // Earth's radius in km
@@ -24,14 +24,14 @@ function geo_destination(lonLat: number[], dist: number, brng: number) {
 
     return [toDeg(lon2), toDeg(lat2)];
 }
-function toRad(deg: number) {
+function toRad(deg: number): number {
     return deg * Math.PI / 180;
 }
-function toDeg(rad: number) {
+function toDeg(rad: number): number {
     return rad * 180 / Math.PI;
 }
 
-export function findBearing(lat1: number, lng1: number, lat2: number, lng2: number) {
+export function findBearing(lat1: number, lng1: number, lat2: number, lng2: number): number {
     const dLon = (lng2 - lng1);
     const y = Math.sin(dLon) * Math.cos(lat2);
     const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLon);
@@ -40,11 +40,11 @@ export function findBearing(lat1: number, lng1: number, lat2: number, lng2: numb
     return (curDeg === 360) ? 0 : curDeg;
 }
 
-export function getLonLatFromDistanceDirection(lonLatLoc: number[], direction: number, distance: number) {
+export function getLonLatFromDistanceDirection(lonLatLoc: number[], direction: number, distance: number): number[] {
     return geo_destination(lonLatLoc, distance, direction);
 }
 
-export function getBoundingSquare(pArray: any[]) {
+export function getBoundingSquare(pArray: number[]): object {
     let x1 = _.get(pArray, [0, 0]);
     let y1 = _.get(pArray, [0, 1]);
     let x2 = _.get(pArray, [0, 0]);
@@ -86,25 +86,28 @@ export function isLatLonInZone(lonLat: number[], polyZone: any[]) {
 }
 
 export function getRandomLatLonFromBase(baseName: string, polytype: string, zoneNum?: string): number[] {
-    const baseInfo = _.find(_.get(constants, "bases"), {_id: baseName});
-    const pGroups = _.get(baseInfo, ["polygonLoc", polytype]);
-    let pickedPoly;
-    if (zoneNum) {
-        pickedPoly = pGroups[zoneNum];
-    } else {
-        pickedPoly = _.sample(pGroups);
-    }
-    let lonLatFound = false;
-    const bs = exports.getBoundingSquare(pickedPoly);
-    while (!lonLatFound) {
-        const lonLat = [
-            _.random(bs.x1, bs.x2),
-            _.random(bs.y1, bs.y2)
-        ];
-        if (exports.isLatLonInZone(lonLat, pickedPoly)) {
-            lonLatFound = true;
-            return lonLat;
+    const baseInfo: any = _.find(ddcsController.bases, {_id: baseName});
+    if (baseInfo) {
+        _.get(baseInfo, ["polygonLoc", polytype]);
+        const pGroups = baseInfo.polygonLoc[polytype];
+        let pickedPoly;
+        if (zoneNum) {
+            pickedPoly = pGroups[zoneNum];
+        } else {
+            pickedPoly = _.sample(pGroups);
+        }
+        let lonLatFound = false;
+        const bs = exports.getBoundingSquare(pickedPoly);
+        while (!lonLatFound) {
+            const lonLat = [
+                _.random(bs.x1, bs.x2),
+                _.random(bs.y1, bs.y2)
+            ];
+            if (exports.isLatLonInZone(lonLat, pickedPoly)) {
+                lonLatFound = true;
+                return lonLat;
+            }
         }
     }
-    throw new Error("latLon not found line: 111");
+    return [];
 }

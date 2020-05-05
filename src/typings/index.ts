@@ -226,6 +226,7 @@ export interface ISrvPlayers {
     gicTimeLeft: number;
     safeLifeActionTime: number;
     updatedAt: Date;
+    virtualCrates: true;
     banned?: boolean;
     gciAllowed?: boolean;
     isGameMaster?: boolean;
@@ -337,6 +338,9 @@ export interface IUnit {
     troopType: string;
     virtCrateType: string;
     playerOwnerId: string;
+    spawnCat: string;
+    unitDict: IUnitDictionary;
+    proxChkGrp: string;
 }
 
 export interface IWebPush {
@@ -418,6 +422,21 @@ export interface ISrvMessages {
     startAbsTime: number;
     curAbsTime: number;
     epoc: number;
+}
+
+export interface IBasePayload {
+    action: string;
+    callback: string;
+    unitId: string;
+    mapType: string;
+    data: IBase[];
+}
+
+export interface IUnitPayload {
+    action: string;
+    callback: string;
+    unitId: string;
+    data: IUnit;
 }
 
 export interface ISrvCratesPayload {

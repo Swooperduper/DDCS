@@ -221,102 +221,49 @@ export const crateTypes: string[] = [
     "uh1h_cargo"
 ];
 
-export async function getBases() {
-    return ddcsController.baseActionRead({})
-        .then((curBases: ddcsController.IBase[]) => {
-            return new Promise((resolve) => {
-                if (curBases.length) {
-                    resolve(curBases);
-                } else {
-                    console.log("Rebuilding Base DB");
-                    ddcsController.cmdQueActionsSave({
-                            actionObj: { action: "GETPOLYDEF" },
-                            queName: "clientArray"
-                    })
-                    .catch((err: any) => {
-                        console.log("erroring line790: ", err);
-                    })
-                    ;
-                    resolve("rebuild base DB");
-                }
-            });
-        })
-        .catch((err: any) => {
-            console.log("err line110: ", err);
+export async function getBases(): Promise<ddcsController.IBase[]> {
+    const curBases = await ddcsController.baseActionRead({});
+    if (curBases.length) {
+        return curBases;
+    } else {
+        console.log("Rebuilding Base DB");
+        await ddcsController.cmdQueActionsSave({
+            actionObj: { action: "GETPOLYDEF" },
+            queName: "clientArray"
         });
+        console.log("rebuild base DB");
+        return [];
+    }
 }
 
-export async function getServer(): Promise<any> {
-    return new Promise((resolve: any) => {
-        ddcsController.serverActionsRead({})
-            .then((server: ddcsController.IServer[]) => {
-                resolve(server[0]);
-            })
-            .catch((err) => {
-                console.log("err line101: ", err);
-            });
-    });
+export async function getServer(): Promise<ddcsController.IServer> {
+    const curServer = await ddcsController.serverActionsRead({});
+    return curServer[0];
 }
 
-export const getStaticDictionary = (): Promise<any> => {
-    return ddcsController.staticDictionaryActionsRead({})
-        .then((staticDic: ddcsController.IStaticDictionary[]) => {
-            return staticDic;
-        })
-        .catch((err) => {
-            console.log("err line297: ", err);
-        });
-};
+export async function getStaticDictionary(): Promise<ddcsController.IStaticDictionary[]> {
+    return await ddcsController.staticDictionaryActionsRead({});
+}
 
-export const getUnitDictionary = (curTimePeriod: string) => {
-    return ddcsController.unitDictionaryActionsRead({ timePeriod: curTimePeriod })
-        .then((unitsDic: any) => {
-            return new Promise((resolve) => {
-                resolve(unitsDic);
-            });
-        })
-        .catch((err: any) => {
-            console.log("err line310: ", err);
-        })
-        ;
-};
+export async function getUnitDictionary(curTimePeriod: string): Promise<ddcsController.IUnitDictionary[]> {
+    return await ddcsController.unitDictionaryActionsRead({ timePeriod: curTimePeriod });
+}
 
-export const getWeaponDictionary = async () => {
-    return await ddcsController.weaponScoreActionsRead({})
-        .then((weaponsDic: any) => {
-            return weaponsDic;
-        })
-        .catch ((err: any) => {
-            console.log("err line310: ", err);
-        });
-};
+export async function getWeaponDictionary(): Promise<ddcsController.IWeaponDictionary[]> {
+    return await ddcsController.weaponScoreActionsRead({});
+}
 
-export let config: any;
-export let staticDictionary: any[];
-export let unitDictionary: any[];
-export let weaponsDictionary: any[];
-export let bases: any[];
+// setup defaults to satisfy config object
+export let config: ddcsController.IServer;
+export let staticDictionary: ddcsController.IStaticDictionary[] = [];
+export let unitDictionary: ddcsController.IUnitDictionary[] = [];
+export let weaponsDictionary: ddcsController.IWeaponDictionary[] = [];
+export let bases: ddcsController.IBase[] = [];
 
-export const initServer = async () => {
-    await exports.getServer()
-        .then((server: ddcsController.IServer) => {
-            config = server;
-        });
-    await exports.getStaticDictionary()
-        .then((staticDict: ddcsController.IStaticDictionary[]) => {
-            staticDictionary = staticDict;
-        });
-    await exports.getUnitDictionary(exports.config.timePeriod.modern)
-        .then((unitDict: ddcsController.IUnitDictionary[]) => {
-            unitDictionary = unitDict;
-        });
-    await exports.getWeaponDictionary()
-        .then((weaponsDict: ddcsController.IWeaponDictionary[]) => {
-            weaponsDictionary = weaponsDict;
-        });
-    await exports.getBases()
-        .then((curBases: ddcsController.IBase[]) => {
-            bases = curBases;
-        });
-};
-
+export async function initServer(): Promise<void> {
+    config = await getServer();
+    staticDictionary = await getStaticDictionary();
+    unitDictionary = await getUnitDictionary(config.timePeriod);
+    weaponsDictionary = await getWeaponDictionary();
+    bases = await getBases();
+}

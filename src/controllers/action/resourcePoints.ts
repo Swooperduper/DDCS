@@ -10,13 +10,13 @@ export async function spendResourcePoints(
     rsCost: number,
     rsItem: string,
     itemObj: ddcsController.IUnit
-): Promise<void> {
+): Promise<boolean> {
 
     let curUnit: ddcsController.IUnit;
 
     if (isNaN(Number(player.slot))) {
         console.log("player doesnt have slotID: " + player);
-        return Promise.resolve();
+        return Promise.resolve(false);
     } else {
         const cUnit = await ddcsController.unitActionRead({unitId: Number(player.slot)});
         let mesg;
@@ -31,6 +31,7 @@ export async function spendResourcePoints(
                     mesg,
                     5
                 );
+                return false;
             } else {
                 if (player.side === 1) {
                     if (player.redRSPoints >= rsCost) {
@@ -46,6 +47,7 @@ export async function spendResourcePoints(
                             mesg,
                             5
                         );
+                        return true;
                     } else {
                         mesg = "G: You do not have red " + rsCost + " points to buy a " +
                             rsItem + " (" + player.redRSPoints + "pts)";
@@ -54,6 +56,7 @@ export async function spendResourcePoints(
                             mesg,
                             5
                         );
+                        return false;
                     }
                 } else {
                     if (player.blueRSPoints >= rsCost) {
@@ -69,6 +72,7 @@ export async function spendResourcePoints(
                             mesg,
                             5
                         );
+                        return true;
                     } else {
                         mesg = "G: You do not have " + rsCost + " blue points to buy a " +
                             rsItem + " (" + player.blueRSPoints + "pts)";
@@ -77,6 +81,7 @@ export async function spendResourcePoints(
                             mesg,
                             5
                         );
+                        return false;
                     }
                 }
             }
@@ -87,6 +92,7 @@ export async function spendResourcePoints(
                 mesg,
                 5
             );
+            return false;
         }
     }
 }

@@ -4,8 +4,7 @@
 
 import * as _ from "lodash";
 import * as net from "net";
-import * as masterDBController from "../db";
-import * as sychrontronController from "../sychronize/Sychrontron";
+import * as ddcsController from "../";
 
 const lastSyncTime = new Date().getTime();
 const syncSpawnTimer = 60 * 1000;
@@ -84,10 +83,10 @@ export function createSocket(address: string, port: number, queName: string, cal
 
     setInterval(() => { // sending FULL SPEED AHEAD, 1 per milsec (watch for weird errors, etc)
         const curIntervalTime = new Date().getTime();
-        if (sychrontronController.isSyncLockdownMode && !sychrontronController.isServerSynced) {
-            if (sychrontronController.processInstructions) {
+        if (ddcsController.isSyncLockdownMode && !ddcsController.isServerSynced) {
+            if (ddcsController.processInstructions) {
                 if (lastSyncTime + syncSpawnTimer < curIntervalTime) {
-                    masterDBController.cmdQueActionsGrabNextQue({queName})
+                    ddcsController.cmdQueActionsGrabNextQue({queName})
                         .then((resp: any) => {
                             if (resp) {
                                 sock.cQue.push(resp.actionObj);
@@ -100,7 +99,7 @@ export function createSocket(address: string, port: number, queName: string, cal
                 }
             }
         } else {
-            masterDBController.cmdQueActionsGrabNextQue({queName})
+            ddcsController.cmdQueActionsGrabNextQue({queName})
                 .then((resp: any) => {
                     if (resp) {
                         sock.cQue.push(resp.actionObj);
