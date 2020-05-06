@@ -13,9 +13,9 @@ export async function masterQueGrabNextQue(serverName: string, obj: ddcsControll
             resolve();
         });
     });
-};
+}
 
-export async function masterQueSave(obj: ddcsController.IMasterCue): Promise<void> {
+export async function masterQueSave(obj: any): Promise<void> {
     return new Promise((resolve, reject) => {
         const server = new masterQue(obj);
         server.save((err) => {
@@ -23,4 +23,4 @@ export async function masterQueSave(obj: ddcsController.IMasterCue): Promise<voi
             resolve();
         });
     });
-};
+}

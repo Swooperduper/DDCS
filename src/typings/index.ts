@@ -204,9 +204,11 @@ export interface IMasterCue {
         cmd: string[];
         reqID: string;
     };
+    side: number;
     queName: string;
     createdAt: Date;
     UpdatedAt: Date;
+    payload: any;
 }
 
 export interface ISrvPlayers {
@@ -341,6 +343,12 @@ export interface IUnit {
     spawnCat: string;
     unitDict: IUnitDictionary;
     proxChkGrp: string;
+    routeLocs: number[][];
+    baseId: number;
+    visible: boolean;
+    task: string;
+    heading: number;
+    skill: string;
 }
 
 export interface IWebPush {
@@ -456,4 +464,33 @@ export interface ISrvPlayerBalance {
     side: number;
     modifier: number;
     players?: ISrvPlayers[];
+}
+
+export interface IPointsTemplate {
+    type: string;
+    action: string;
+    x: string;
+    y: string;
+    speed: number;
+    name: string;
+    radioFreq: number;
+    eplrs?: number;
+}
+
+export interface IConvoyRouteTemplate {
+    route: {
+        points: IPointsTemplate[]
+    };
+    routeLocs: any[];
+    alt: number;
+    speed: number;
+    baseId: number;
+    eplrs: number;
+    radioFreq: number;
+    tacan: {
+        channel: number;
+        enabled: boolean;
+        modeChannel: number;
+        frequency: number;
+    };
 }
