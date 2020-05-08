@@ -26,17 +26,6 @@ export async function processEventPlayerEnterUnit(sessionName: string, eventObj:
                 await ddcsController.sendToCoalition({payload: {action: eventObj.action, data: _.cloneDeep(iCurObj)}});
                 await ddcsController.simpleStatEventActionsSave(iCurObj);
             }
-            // userLivesController.updateServerLives(serverName, curIUnit);
-            // console.log('PLAYER ENTER UNIT', curIUnit);
-            // menuUpdateController.logisticsMenu('resetMenu', serverName, curIUnit);
-            /*
-            DCSLuaCommands.sendMesgToCoalition(
-                _.get(iCurObj, 'displaySide'),
-                serverName,
-                _.get(iCurObj, 'msg'),
-                5
-            );
-            */
         }
     }
 }

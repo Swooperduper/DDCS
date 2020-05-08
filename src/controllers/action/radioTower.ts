@@ -13,8 +13,10 @@ export async function baseUnitUnderAttack(unit: ddcsController.IUnit): Promise<v
             const aliveComms = await ddcsController.unitActionRead({name: curDBBase.name + " Communications", dead: false});
             if (aliveComms.length > 0) {
                 const curBase = _.find(ddcsController.bases, {_id: curDBBase._id});
-                curBase.underAttack += 1;
-                console.log(curBase.name + " is under attack " + curBase.underAttack + " times");
+                if (curBase) {
+                    curBase.underAttack += 1;
+                    console.log(curBase.name + " is under attack " + curBase.underAttack + " times");
+                }
             }
         }
     }

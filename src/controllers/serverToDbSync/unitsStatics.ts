@@ -66,22 +66,6 @@ export async function processUnitUpdates(sessionName: string, unitObj: ddcsContr
             if (_.includes(curData.name, "Carrier")) {
                 await ddcsController.baseActionUpdate({_id: curUnitName, centerLoc: curData.lonLatLoc});
             }
-            /*
-            if (curData.playername && (unitObj.action === "C")) {
-                // menuUpdateController.logisticsMenu("resetMenu", unitObj.data);
-            }
-            */
-
-            /*
-            //set ewr task to ewr if new
-                            if (curUnit.type === '1L13 EWR' || curUnit.type === '55G6 EWR' || curUnit.type === 'Dog Ear radar') {
-                                    if (!_.get(taskController, ['ewrUnitsActivated', curUnitName], false)) {
-                                            console.log('Set ewr for: ', curUnitName );
-                                            taskController.setEWRTask(serverName, curUnitName);
-                                            _.set(taskController, ['ewrUnitsActivated', curUnitName], true);
-                                    }
-                            }
-                            */
 
             if ((!_.isEmpty(curUnit) && unitObj.action !== "D")) {
                 iCurObj = {

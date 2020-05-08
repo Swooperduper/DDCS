@@ -26,14 +26,6 @@ export async function processEventRefuelingStop(sessionName: string, eventObj: a
                 await ddcsController.sendToCoalition({payload: {action: eventObj.action, data: _.cloneDeep(iCurObj)}});
                 await ddcsController.simpleStatEventActionsSave(iCurObj);
             }
-            /*
-            DCSLuaCommands.sendMesgToGroup(
-                _.get(iUnit[0], 'groupId'),
-                serverName,
-                _.get(iCurObj, 'msg'),
-                5
-            );
-            */
         }
     }
 }

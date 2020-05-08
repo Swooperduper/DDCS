@@ -5,7 +5,6 @@
 // tslint:disable-next-line:no-var-requires
 const exec = require("child_process").exec;
 
-import * as _ from "lodash";
 import * as ddcsController from "../";
 
 export let timeToRestart = 0;

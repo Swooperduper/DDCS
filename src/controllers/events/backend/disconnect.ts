@@ -20,14 +20,8 @@ export async function processDisconnect(sessionName: string, eventObj: any): Pro
             msg: "A: " + iPlayer.name + " has disconnected - Ping:" + iPlayer.ping + " Lang:" + iPlayer.lang
         };
         if (iCurObj.iucid) {
-            await ddcsController.sendToAll({payload: {action: eventObj.action, data: _.cloneDeep(iCurObj)}})
-                .catch((err: any) => {
-                    console.log("err line29: ", err);
-                });
-            await ddcsController.simpleStatEventActionsSave(iCurObj)
-                .catch((err: any) => {
-                    console.log("err line45: ", err);
-                });
+            await ddcsController.sendToAll({payload: {action: eventObj.action, data: _.cloneDeep(iCurObj)}});
+            await ddcsController.simpleStatEventActionsSave(iCurObj);
         }
         await ddcsController.sendMesgToCoalition(
             eventObj.data.arg3,

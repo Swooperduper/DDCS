@@ -24,12 +24,5 @@ export async function processSelfKill(sessionName: string, eventObj: any): Promi
             await ddcsController.sendToAll({payload: {action: eventObj.action, data: _.cloneDeep(iCurObj)}});
             await ddcsController.simpleStatEventActionsSave(iCurObj);
         }
-        /*
-        DCSLuaCommands.sendMesgToAll(
-            serverName,
-            _.get(iCurObj, 'msg'),
-            15
-        );
-        */
     }
 }

@@ -28,4 +28,11 @@ export async function getDBconnections() {
     }
 }
 
-exports.getDBconnections();
+getDBconnections()
+    .then(() => {
+        console.log("Connection started");
+    })
+    .catch(() => {
+        console.log("Connection error line: 36");
+    })
+;

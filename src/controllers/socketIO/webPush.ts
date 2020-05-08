@@ -4,14 +4,14 @@
 
 import * as ddcsController from "../";
 
-export async function sendToAll(pData: ddcsController.IMasterCue): Promise<void> {
+export async function sendToAll(pData: any): Promise<void> {
     for (let x = 0; x <= 3; x++) {
         pData.side = x;
         await ddcsController.masterQueSave(pData);
     }
 }
 
-export function sendToCoalition(pData: ddcsController.IMasterCue) {
+export function sendToCoalition(pData: any): void {
     const coalition = pData.payload.data.coalition;
     const displaySide = pData.payload.data.displaySide;
 
@@ -23,23 +23,3 @@ export function sendToCoalition(pData: ddcsController.IMasterCue) {
         console.log("no sendToCoalition side for ", pData);
     }
 }
-/*
-    masterDBController.masterQueActions('save', serverName, pData)
-        .catch(function (err) {
-            console.log('line274: ', err);
-        })
-    ;
-
-    _.set(pData, 'side', 3);
-    masterDBController.masterQueActions('save', serverName, pData)
-        .catch(function (err) {
-            console.log('line274: ', err);
-        })
-    ;
-
-});
-
-_.set(exports, 'sendToIndividual', function (serverName, socketId, pData) {
-
-});
-*/

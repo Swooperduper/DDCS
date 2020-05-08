@@ -54,8 +54,6 @@ export function createSocket(address: string, port: number, queName: string, cal
             callback(curStr);
             sock.buffer = sock.buffer.substring(i + 1);
             const nextInst = sock.cQue[0];
-            // console.log('sendPack: ', nextInst);
-            // strJson = (JSON.stringify(nextInst)) ? JSON.stringify(nextInst) : '{"action":"NONE"}' ;
             const strJson = (nextInst) ? JSON.stringify(nextInst) : "{\"action\":\"NONE\"}" ;
             sock.sockConn.write( strJson + "\n");
             if (nextInst) {

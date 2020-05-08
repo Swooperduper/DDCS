@@ -30,14 +30,6 @@ export async function processEventBirth(sessionName: string, eventObj: any): Pro
                         await ddcsController.simpleStatEventActionsSave(iCurObj);
                     }
                     await ddcsController.srvPlayerActionsClearTempScore({_id: iCurObj.iucid, groupId: iCurObj.groupId});
-                    /*
-                    DCSLuaCommands.sendMesgToCoalition(
-                        _.get(iCurObj, 'displaySide'),
-                        serverName,
-                        _.get(iCurObj, 'msg'),
-                        5
-                    );
-                    */
                 }
             }
         }

@@ -52,6 +52,7 @@ export interface IBase {
     updatedAt: Date;
     baseMarkId: number;
     replenTime: string;
+    underAttack: number;
 }
 
 export interface IServer {
@@ -105,6 +106,7 @@ export interface IServer {
     resetFullCampaign: boolean;
     lifePointsEnabled: boolean;
     spwnLimitsPerTick: number;
+    fullServerRestartOnCampaignWin: boolean;
 }
 
 export interface IStaticDictionary {
