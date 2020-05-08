@@ -27,16 +27,7 @@ export interface IBase {
             ]
         ];
         convoyTemplate: {
-            [key: string]: {
-                sourceBase: string;
-                destBase: string;
-                route: [
-                    {
-                        action: string;
-                        lonLat: number[];
-                    }
-                ]
-            }
+            [key: string]: IConvoyTemplate;
         };
         defaults: {
             baseType: string;
@@ -79,22 +70,7 @@ export interface IServer {
     maxUnits: number;
     secsBwtTicks: number;
     replenTimer: number;
-    spawnLimitsPerTick: {
-        samRadar: number;
-        samIR: number;
-        mobileAntiAir: number;
-        antiAir: number;
-        tank: number;
-        APC: number;
-        armoredCar: number;
-        troop: number;
-        armedStructure: number;
-        unarmedAmmo: number;
-        unarmedFuel: number;
-        unarmedPower: number;
-        carrierShip: number;
-        defenseShip: number;
-    };
+    spawnLimitsPerTick: ISpawnCategoryTicks;
     maxCrates: number;
     maxTroops: number;
     maxUnitsMoving: number;
@@ -105,20 +81,7 @@ export interface IServer {
     ];
     pveAIConfig: [
         {
-            config: [
-                {
-                    name: string;
-                    AIType: string;
-                    functionCall: string;
-                    stackTrigger: number;
-                    makeup: [
-                        {
-                            template: string;
-                            count: number;
-                        }
-                    ]
-                }
-            ]
+            config: IAIConfig[]
         }
     ];
     weaponRules: [
@@ -141,6 +104,7 @@ export interface IServer {
     fullServerResetOnCampaign: boolean;
     resetFullCampaign: boolean;
     lifePointsEnabled: boolean;
+    spwnLimitsPerTick: number;
 }
 
 export interface IStaticDictionary {
@@ -170,6 +134,12 @@ export interface IUnitDictionary {
     enabled: boolean;
     timePeriod: string[];
     sort: number;
+    centerRadar: boolean;
+    secRadarNum: number;
+    spoke: boolean;
+    lonLatLoc: number[];
+    spokeDistance: number;
+    routeLocs: number[];
 }
 
 export interface IWeaponDictionary {
@@ -296,6 +266,7 @@ export interface ICrate {
     lonLatLoc: number[];
     createdAt: Date;
     updatedAt: Date;
+    shape_name: string;
 }
 
 export interface IAmmo {
@@ -349,6 +320,17 @@ export interface IUnit {
     task: string;
     heading: number;
     skill: string;
+    parking_id: number;
+    parking: number;
+    payload: string;
+    callsign: {
+        name: string;
+        1: number;
+        2: number;
+        3: number;
+    };
+    onboard_num: number;
+    samType: string;
 }
 
 export interface IWebPush {
@@ -493,4 +475,39 @@ export interface IConvoyRouteTemplate {
         modeChannel: number;
         frequency: number;
     };
+    groupName: string;
+    baseName: string;
+    country: string;
+    hidden: boolean;
+}
+
+export interface ISpawnCategoryTicks {
+    samRadar: number;
+    samIR: number;
+    mobileAntiAir: number;
+    antiAir: number;
+    tank: number;
+    APC: number;
+    armoredCar: number;
+    troop: number;
+    armedStructure: number;
+    unarmedAmmo: number;
+    unarmedFuel: number;
+    unarmedPower: number;
+    carrierShip: number;
+    defenseShip: number;
+}
+
+export interface IConvoyTemplate {
+    sourceBase: string;
+    destBase: string;
+    route: [
+        {
+            action: string;
+            lonLat: number[];
+        }
+    ];
+    polygonLoc: any;
+    name: string;
+    baseId: number;
 }
