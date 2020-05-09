@@ -9,43 +9,7 @@ export interface IBase {
     hdg: number;
     initSide: number;
     name: string;
-    polygonLoc: {
-        AICapTemplate: {
-            sourceBase: string;
-            units: [
-                {
-                    lonLat: number[];
-                    parking: number;
-                    parking_id: number;
-                    type: string;
-                }
-            ]
-        }
-        buildingPoly: [
-            [
-                number[]
-            ]
-        ];
-        convoyTemplate: {
-            [key: string]: IConvoyTemplate;
-        };
-        defaults: {
-            baseType: string;
-            defaultStartSide: number;
-            enabled: boolean;
-            sourceBase: string;
-        };
-        layer2Poly: [
-            [
-                number[]
-            ]
-        ];
-        unitPoly: [
-            [
-                number[]
-            ]
-        ];
-    };
+    polygonLoc: IPolygonLoc;
     side: number;
     mapType: string;
     createdAt: Date;
@@ -107,6 +71,7 @@ export interface IServer {
     lifePointsEnabled: boolean;
     spwnLimitsPerTick: number;
     fullServerRestartOnCampaignWin: boolean;
+    isJtacLocked: boolean;
 }
 
 export interface IStaticDictionary {
@@ -142,6 +107,7 @@ export interface IUnitDictionary {
     lonLatLoc: number[];
     spokeDistance: number;
     routeLocs: number[];
+    LPCost: number;
 }
 
 export interface IWeaponDictionary {
@@ -153,6 +119,7 @@ export interface IWeaponDictionary {
     unitType: string;
     createdAt: Date;
     updatedAt: Date;
+    displayName: string;
 }
 
 export interface ICmdQue {
@@ -512,4 +479,42 @@ export interface IConvoyTemplate {
     polygonLoc: any;
     name: string;
     baseId: number;
+}
+
+export interface IPolygonLoc {
+    AICapTemplate: {
+        sourceBase: string;
+        units: ICapTemplate[];
+    };
+    buildingPoly: [
+        [
+            number[]
+        ]
+    ];
+    convoyTemplate: {
+        [key: string]: IConvoyTemplate;
+    };
+    defaults: {
+        baseType: string;
+        defaultStartSide: number;
+        enabled: boolean;
+        sourceBase: string;
+    };
+    layer2Poly: [
+        [
+            number[]
+        ]
+    ];
+    unitPoly: [
+        [
+            number[]
+        ]
+    ];
+}
+
+export interface ICapTemplate {
+    lonLat: number[];
+    parking: number;
+    parking_id: number;
+    type: string;
 }

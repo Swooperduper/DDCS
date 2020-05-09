@@ -14,7 +14,7 @@ let mesg;
 export let timerObj = {};
 
 export async function processTimer(serverSecs: number): Promise<void> {
-    maxTime = ddcsController.config.restartTime;
+    maxTime = ddcsController.config.restartTimer;
     mesg = null;
     curSecs = serverSecs;
 

@@ -11,7 +11,7 @@ export function setLockUpdates(flag: boolean) {
     lockUpdates = flag;
 }
 
-export async function processUnitUpdates(sessionName: string, unitObj: ddcsController.IUnitPayload): Promise<void> {
+export async function processUnitUpdates(sessionName: string, unitObj: any): Promise<void> {
     if (!exports.lockUpdates) {
         const unit = await ddcsController.unitActionRead({_id: unitObj.data.name});
         let stParse;

@@ -1830,7 +1830,7 @@ export async function spawnConvoy(
 export async function spawnCAPDefense(
     groupName: string,
     convoySide: number,
-    baseTemplate: ddcsController.IConvoyTemplate,
+    baseTemplate: any,
     aIConfig: ddcsController.IAIConfig,
     mesg: string
 ): Promise<void> {

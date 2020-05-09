@@ -10,8 +10,12 @@ export function getWeaponCost(typeName: string, count: number): number {
 
     if (typeName === "MATRA") { mantraCHK += count; }
     const curWeaponLookup = _.find(ddcsController.weaponsDictionary, {_id: typeName} );
-    const foxAllowance = (mantraCHK > 2) ? 0 : (count > 2) ? 0 : curWeaponLookup.fox2ModUnder2 || 0;
-    return curWeaponLookup.tier || 0 + foxAllowance;
+    if (curWeaponLookup) {
+        const foxAllowance = (mantraCHK > 2) ? 0 : (count > 2) ? 0 : curWeaponLookup.fox2ModUnder2 || 0;
+        return curWeaponLookup.tier || 0 + foxAllowance;
+    }
+    console.log("cant find weapon: line17");
+    return 0;
 }
 
 export async function getPlayerBalance(): Promise<ddcsController.ISrvPlayerBalance> {
@@ -101,25 +105,29 @@ export async function lookupAircraftCosts(playerUcid: string): Promise<void> {
             if (cUnit.length > 0) {
                 const curUnit = cUnit[0];
                 const curUnitDictionary = _.find(ddcsController.unitDictionary, {_id: curUnit.type});
-                const curUnitLPCost = (curUnitDictionary) ? curUnitDictionary.LPCost : 1;
-                let curTopWeaponCost = 0;
-                let curTopAmmo = "";
-                let totalTakeoffCosts;
-                for (const value of curUnit.ammo || []) {
-                    const weaponCost = getWeaponCost(value.typeName, value.count);
-                    if (curTopWeaponCost < weaponCost) {
-                        const curAmmoArray = _.split(value.typeName, ".");
-                        curTopAmmo = curAmmoArray[curAmmoArray.length - 1];
-                        curTopWeaponCost = weaponCost;
+                if (curUnitDictionary) {
+                    const curUnitLPCost = (curUnitDictionary) ? curUnitDictionary.LPCost : 1;
+                    let curTopWeaponCost = 0;
+                    let curTopAmmo = "";
+                    let totalTakeoffCosts;
+                    for (const value of curUnit.ammo || []) {
+                        const weaponCost = getWeaponCost(value.typeName, value.count);
+                        if (curTopWeaponCost < weaponCost) {
+                            const curAmmoArray = _.split(value.typeName, ".");
+                            curTopAmmo = curAmmoArray[curAmmoArray.length - 1];
+                            curTopWeaponCost = weaponCost;
+                        }
                     }
+                    totalTakeoffCosts = curUnitLPCost + curTopWeaponCost;
+                    await ddcsController.sendMesgToGroup(
+                        curUnit.groupId,
+                        "G: You aircraft costs " + totalTakeoffCosts.toFixed(2) + "( " + curUnitLPCost + "(" +
+                        curUnit.type + ")+" + curTopWeaponCost + "(" + curTopAmmo + ") ) Life Points.",
+                        5
+                    );
+                } else {
+                    console.log("cant find unit in dictionary: line 129");
                 }
-                totalTakeoffCosts = curUnitLPCost + curTopWeaponCost;
-                await ddcsController.sendMesgToGroup(
-                    curUnit.groupId,
-                    "G: You aircraft costs " + totalTakeoffCosts.toFixed(2) + "( " + curUnitLPCost + "(" +
-                    curUnit.type + ")+" + curTopWeaponCost + "(" + curTopAmmo + ") ) Life Points.",
-                    5
-                );
             }
         }
     }
