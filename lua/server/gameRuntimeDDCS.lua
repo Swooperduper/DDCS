@@ -72,10 +72,13 @@ end
 local _lastSent = 0
 function ddcs.onSimulationFrame()
 	runPerFrame()
+
+	--Run Once Every Second
 	local _now = DCS.getRealTime()
 	if _now > _lastSent + DATA_TIMEOUT_SEC then
 		_lastSent = _now
 		udpClient:send(JSON:encode({
+			["action"] = "playerStats",
 			["missionFileName"] = DCS.getMissionName(),
 			["players"] = buildPlayers(),
 		}))

@@ -5,11 +5,11 @@ const frontendClient = dgram.createSocket('udp4');
 
 setInterval(() => {
     frontendClient.send("NodeJS to Frontend Server: " + new Date().toTimeString(), 3002, 'localhost');
-}, 1);
+}, 1000);
 
 setInterval(() => {
     backendClient.send("NodeJS to Backend Server: " + new Date().toTimeString(), 3003, 'localhost');
-}, 1);
+}, 1000);
 
 
 server.on('error', (err) => {
