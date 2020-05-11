@@ -52,75 +52,79 @@ local function addGroups(groups, coalition)
             if Unit.isActive(unit) then
                 local unitPosition = unit:getPosition()
                 local lat, lon, alt = coord.LOtoLL(unitPosition.p)
-                local pos = unit:getPoint()
-                local unitXYZNorthCorr = coord.LLtoLO(lat + 1, lon)
-                local headingNorthCorr = math.atan2(unitXYZNorthCorr.z - unitPosition.p.z, unitXYZNorthCorr.x - unitPosition.p.x)
-                local heading = math.atan2(unitPosition.x.z, unitPosition.x.x) + headingNorthCorr
-                local velocity = unit:getVelocity()
-                if heading < 0 then
-                    heading = heading + 2 * math.pi
-                end
-                local PlayerName = unit:getPlayerName()
-                local curUnit = {
-                    ["uType"] = "unit",
-                    ["data"] = {
-                        ["category"] = unit:getDesc().category,
-                        ["groupId"] = group:getID(),
-                        ["unitId"] = tonumber(unit:getID()),
-                        ["name"] = unit:getName(),
-                        ["lonLatLoc"] = {
-                            lon,
-                            lat
-                        },
-                        ["alt"] = alt,
-                        ["agl"] = pos.y - land.getHeight({x=pos.x, y = pos.z}),
-                        ["surfType"] = land.getSurfaceType(pos),
-                        ["hdg"] = math.floor(heading / math.pi * 180),
-                        ["inAir"] = unit:inAir()
-                    }
-                }
-                table.insert(completeUnitAliveNames, curUnit.data.name)
-                if (velocity) then
-                    curUnit.data.speed = math.sqrt(velocity.x ^ 2 + velocity.z ^ 2)
-                end
-                if PlayerName ~= nil then
-                    curUnit.data.playername = PlayerName
-                    local curFullAmmo = unit:getAmmo()
-                    if curFullAmmo ~= nil then
-                        curUnit.data.ammo = {}
-                        for ammoIndex = 1, #curFullAmmo do
-                            table.insert(curUnit.data.ammo, {
-                                ["typeName"] = curFullAmmo[ammoIndex].desc.typeName,
-                                ["count"] = curFullAmmo[ammoIndex].count
-                            })
-                        end
+                local curName = unit:getName()
+                table.insert(completeUnitAliveNames, curName)
+
+                if unitCache[curName] == nil or (unitCache[curName] ~= nil and unitCache[curName].lat ~= lat or unitCache[curName].lon ~= lon) then
+                    local pos = unit:getPoint()
+                    local unitXYZNorthCorr = coord.LLtoLO(lat + 1, lon)
+                    local headingNorthCorr = math.atan2(unitXYZNorthCorr.z - unitPosition.p.z, unitXYZNorthCorr.x - unitPosition.p.x)
+                    local heading = math.atan2(unitPosition.x.z, unitPosition.x.x) + headingNorthCorr
+                    local velocity = unit:getVelocity()
+                    if heading < 0 then
+                        heading = heading + 2 * math.pi
                     end
-                else
-                    curUnit.data.playername = ""
-                end
-                if unitCache[curUnit.data.name] ~= nil  then
-                    if unitCache[curUnit.data.name].lat ~= lat or unitCache[curUnit.data.name].lon ~= lon then
-                        unitCache[curUnit.data.name] = {
+                    local PlayerName = unit:getPlayerName()
+                    local curUnit = {
+                        ["uType"] = "unit",
+                        ["data"] = {
+                            ["category"] = unit:getDesc().category,
+                            ["groupId"] = group:getID(),
+                            ["unitId"] = tonumber(unit:getID()),
+                            ["name"] = curName,
+                            ["lonLatLoc"] = {
+                                lon,
+                                lat
+                            },
+                            ["alt"] = alt,
+                            ["agl"] = pos.y - land.getHeight({x=pos.x, y = pos.z}),
+                            ["surfType"] = land.getSurfaceType(pos),
+                            ["hdg"] = math.floor(heading / math.pi * 180),
+                            ["inAir"] = unit:inAir()
+                        }
+                    }
+                    if (velocity) then
+                        curUnit.data.speed = math.sqrt(velocity.x ^ 2 + velocity.z ^ 2)
+                    end
+                    if PlayerName ~= nil then
+                        curUnit.data.playername = PlayerName
+                        local curFullAmmo = unit:getAmmo()
+                        if curFullAmmo ~= nil then
+                            curUnit.data.ammo = {}
+                            for ammoIndex = 1, #curFullAmmo do
+                                table.insert(curUnit.data.ammo, {
+                                    ["typeName"] = curFullAmmo[ammoIndex].desc.typeName,
+                                    ["count"] = curFullAmmo[ammoIndex].count
+                                })
+                            end
+                        end
+                    else
+                        curUnit.data.playername = ""
+                    end
+                    if unitCache[curName] ~= nil  then
+                        if unitCache[curName].lat ~= lat or unitCache[curName].lon ~= lon then
+                            unitCache[curName] = {
+                                ["lat"] = lat,
+                                ["lon"] = lon
+                            }
+                            curUnit.action = "U"
+                            udpClient:send(JSON:encode(curUnit))
+                        end
+                    else
+                        unitCache[curName] = {}
+                        unitCache[curName] = {
                             ["lat"] = lat,
                             ["lon"] = lon
                         }
-                        curUnit.action = "U"
+                        curUnit.data.groupName = group:getName()
+                        curUnit.data.type = unit:getTypeName()
+                        curUnit.data.coalition = coalition
+                        curUnit.data.country = unit:getCountry()
+                        curUnit.action = "C"
                         udpClient:send(JSON:encode(curUnit))
                     end
-                else
-                    unitCache[curUnit.data.name] = {}
-                    unitCache[curUnit.data.name] = {
-                        ["lat"] = lat,
-                        ["lon"] = lon
-                    }
-                    curUnit.data.groupName = group:getName()
-                    curUnit.data.type = unit:getTypeName()
-                    curUnit.data.coalition = coalition
-                    curUnit.data.country = unit:getCountry()
-                    curUnit.action = "C"
-                    udpClient:send(JSON:encode(curUnit))
+                    checkUnitDead[curName] = 1
                 end
-                checkUnitDead[curUnit.data.name] = 1
             end
         end
     end
@@ -131,11 +135,11 @@ function updateGroups(ourArgument, time)
     checkUnitDead = {}
     completeUnitAliveNames = {}
 
-    local redGroups = coalition.getGroups(coalition.side.RED)
+    local redGroups = coalition.getGroups(1)
     if redGroups ~= nil then
         addGroups(redGroups, 1)
     end
-    local blueGroups = coalition.getGroups(coalition.side.BLUE)
+    local blueGroups = coalition.getGroups(2)
     if blueGroups ~= nil then
         addGroups(blueGroups, 2)
     end
@@ -169,47 +173,52 @@ local function addStatics(statics, coalition)
         local static = statics[staticIndex]
         local staticPosition = static:getPosition()
         local lat, lon, alt = coord.LOtoLL(staticPosition.p)
-        local unitXYZNorthCorr = coord.LLtoLO(lat + 1, lon)
-        local headingNorthCorr = math.atan2(unitXYZNorthCorr.z - staticPosition.p.z, unitXYZNorthCorr.x - staticPosition.p.x)
-        local heading = math.atan2(staticPosition.x.z, staticPosition.x.x) + headingNorthCorr
-        if heading < 0 then
-            heading = heading + 2 * math.pi
-        end
-        local curStatic = {
-            ["uType"] = "static",
-            ["data"] = {
-                ["name"] = static:getName(),
-                ["lonLatLoc"] = {
-                    lon,
-                    lat
-                },
-                ["alt"] = alt,
-                ["hdg"] = math.floor(heading / math.pi * 180),
+        local curStaticName = static:getName()
+        table.insert(completeStaticAliveNames, curStaticName)
 
+        if staticCache[curStaticName] == nil or (staticCache[curStaticName] ~= nil and staticCache[curStaticName].lat ~= lat or staticCache[curStaticName].lon ~= lon) then
+            local unitXYZNorthCorr = coord.LLtoLO(lat + 1, lon)
+            local headingNorthCorr = math.atan2(unitXYZNorthCorr.z - staticPosition.p.z, unitXYZNorthCorr.x - staticPosition.p.x)
+            local heading = math.atan2(staticPosition.x.z, staticPosition.x.x) + headingNorthCorr
+            if heading < 0 then
+                heading = heading + 2 * math.pi
+            end
+            local curStatic = {
+                ["uType"] = "static",
+                ["data"] = {
+                    ["name"] = static:getName(),
+                    ["lonLatLoc"] = {
+                        lon,
+                        lat
+                    },
+                    ["alt"] = alt,
+                    ["hdg"] = math.floor(heading / math.pi * 180),
+
+                }
             }
-        }
-        table.insert(completeStaticAliveNames, curStatic.data.name)
-        if staticCache[curStatic.data.name] ~= nil then
-            if staticCache[curStatic.data.name].lat ~= lat or staticCache[curStatic.data.name].lon ~= lon then
-                staticCache[curStatic.data.name] = {}
-                staticCache[curStatic.data.name].lat = lat
-                staticCache[curStatic.data.name].lon = lon
-                curStatic.action = "U"
+
+            if staticCache[curStaticName] ~= nil then
+                if staticCache[curStaticName].lat ~= lat or staticCache[curStaticName].lon ~= lon then
+                    staticCache[curStaticName] = {}
+                    staticCache[curStaticName].lat = lat
+                    staticCache[curStaticName].lon = lon
+                    curStatic.action = "U"
+                    udpClient:send(JSON:encode(curStatic))
+                end
+            else
+                staticCache[curStaticName] = {}
+                staticCache[curStaticName].lat = lat
+                staticCache[curStaticName].lon = lon
+                curStatic.data.groupName = curStaticName
+                curStatic.data.category = static:getDesc().category
+                curStatic.data.type = static:getTypeName()
+                curStatic.data.coalition = coalition
+                curStatic.data.country = static:getCountry()
+                curStatic.action = "C"
                 udpClient:send(JSON:encode(curStatic))
             end
-        else
-            staticCache[curStatic.data.name] = {}
-            staticCache[curStatic.data.name].lat = lat
-            staticCache[curStatic.data.name].lon = lon
-            curStatic.data.groupName = curStatic.data.name
-            curStatic.data.category = static:getDesc().category
-            curStatic.data.type = static:getTypeName()
-            curStatic.data.coalition = coalition
-            curStatic.data.country = static:getCountry()
-            curStatic.action = "C"
-            udpClient:send(JSON:encode(curStatic))
+            checkStaticDead[curStaticName] = 1
         end
-        checkStaticDead[curStatic.data.name] = 1
     end
 end
 
