@@ -1,17 +1,17 @@
-function tprint(tbl, indent)
-	if not indent then indent = 0 end
-	for k, v in pairs(tbl) do
-		formatting = string.rep("  ", indent) .. k .. ": "
-		if type(v) == "table" then
-			net.log(formatting)
-			tprint(v, indent + 1)
-		elseif type(v) == 'boolean' then
-			net.log(formatting .. tostring(v))
-		else
-			net.log(formatting .. tostring(v))
-		end
-	end
-end
+--function tprint(tbl, indent)
+--	if not indent then indent = 0 end
+--	for k, v in pairs(tbl) do
+--		formatting = string.rep("  ", indent) .. k .. ": "
+--		if type(v) == "table" then
+--			net.log(formatting)
+--			tprint(v, indent + 1)
+--		elseif type(v) == 'boolean' then
+--			net.log(formatting .. tostring(v))
+--		else
+--			net.log(formatting .. tostring(v))
+--		end
+--	end
+--end
 
 net.log("startGameRuntimeDDCS")
 
