@@ -72,7 +72,6 @@ end
 local _lastSent = 0
 function ddcs.onSimulationFrame()
 	runPerFrame()
-
 	local _now = DCS.getRealTime()
 	if _now > _lastSent + DATA_TIMEOUT_SEC then
 		_lastSent = _now
