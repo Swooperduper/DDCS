@@ -52,7 +52,7 @@ unitCache = {}
 checkUnitDead = {}
 
 function generateInitialUnitObj(group, unit, curName, lon, lat, alt, unitPosition)
-    return {
+    local curUnit = {
         ["uType"] = "unit",
         ["data"] = {
             ["category"] = unit:getDesc().category,
@@ -72,6 +72,24 @@ function generateInitialUnitObj(group, unit, curName, lon, lat, alt, unitPositio
             ["velocity"] = unit:getVelocity()
         }
     }
+
+    local PlayerName = unit:getPlayerName()
+    if PlayerName ~= nil then
+        curUnit.data.playername = PlayerName
+        local curFullAmmo = unit:getAmmo()
+        if curFullAmmo ~= nil then
+            curUnit.data.ammo = {}
+            for ammoIndex = 1, #curFullAmmo do
+                table.insert(curUnit.data.ammo, {
+                    ["typeName"] = curFullAmmo[ammoIndex].desc.typeName,
+                    ["count"] = curFullAmmo[ammoIndex].count
+                })
+            end
+        end
+    else
+        curUnit.data.playername = ""
+    end
+    return curUnit
 end
 
 local function addGroups(groups, coalition)
@@ -107,28 +125,12 @@ local function addGroups(groups, coalition)
                         sendUDPPacket(curUnit)
                     end
                 else
-                    unitCache[curName] = {}
                     unitCache[curName] = {
                         ["lat"] = lat,
                         ["lon"] = lon
                     }
                     local curUnit = generateInitialUnitObj(group, unit, curName, lon, lat, alt, unitPosition)
-                    local PlayerName = unit:getPlayerName()
-                    if PlayerName ~= nil then
-                        curUnit.data.playername = PlayerName
-                        local curFullAmmo = unit:getAmmo()
-                        if curFullAmmo ~= nil then
-                            curUnit.data.ammo = {}
-                            for ammoIndex = 1, #curFullAmmo do
-                                table.insert(curUnit.data.ammo, {
-                                    ["typeName"] = curFullAmmo[ammoIndex].desc.typeName,
-                                    ["count"] = curFullAmmo[ammoIndex].count
-                                })
-                            end
-                        end
-                    else
-                        curUnit.data.playername = ""
-                    end
+
                     curUnit.data.groupName = group:getName()
                     curUnit.data.type = unit:getTypeName()
                     curUnit.data.coalition = coalition
@@ -178,6 +180,24 @@ end
 staticCache = {}
 checkStaticDead = {}
 
+function generateInitialStaticsObj(staticName, lon, lat, alt, position)
+    local curStatic = {
+        ["uType"] = "static",
+        ["data"] = {
+            ["name"] = staticName,
+            ["lonLatLoc"] = {
+                lon,
+                lat
+            },
+            ["alt"] = alt,
+            ["position"] = position,
+            ["unitXYZNorthCorr"] = coord.LLtoLO(lat + 1, lon)
+        }
+    }
+    return curStatic
+end
+
+
 local function addStatics(statics, coalition)
     for staticIndex = 1, #statics do
         local static = statics[staticIndex]
@@ -188,34 +208,25 @@ local function addStatics(statics, coalition)
 
         if staticCache[curStaticName] ~= nil then
             if staticCache[curStaticName].lat ~= lat or staticCache[curStaticName].lon ~= lon then
-                local unitXYZNorthCorr = coord.LLtoLO(lat + 1, lon)
-                local headingNorthCorr = math.atan2(unitXYZNorthCorr.z - staticPosition.p.z, unitXYZNorthCorr.x - staticPosition.p.x)
-                local heading = math.atan2(staticPosition.x.z, staticPosition.x.x) + headingNorthCorr
-                if heading < 0 then
-                    heading = heading + 2 * math.pi
-                end
-                local curStatic = {
-                    ["uType"] = "static",
-                    ["data"] = {
-                        ["name"] = static:getName(),
-                        ["lonLatLoc"] = {
-                            lon,
-                            lat
-                        },
-                        ["alt"] = alt,
-                        ["hdg"] = math.floor(heading / math.pi * 180),
-                    }
+                --local headingNorthCorr = math.atan2(unitXYZNorthCorr.z - staticPosition.p.z, unitXYZNorthCorr.x - staticPosition.p.x)
+                --local heading = math.atan2(staticPosition.x.z, staticPosition.x.x) + headingNorthCorr
+                --if heading < 0 then
+                --    heading = heading + 2 * math.pi
+                --end
+                local curStatic = generateInitialStaticsObj(curStaticName, lon, lat, alt, staticPosition)
+                staticCache[curStaticName] = {
+                    ["lat"] = lat,
+                    ["lon"] = lon
                 }
-                staticCache[curStaticName] = {}
-                staticCache[curStaticName].lat = lat
-                staticCache[curStaticName].lon = lon
                 curStatic.action = "U"
                 sendUDPPacket(curStatic)
             end
         else
-            staticCache[curStaticName] = {}
-            staticCache[curStaticName].lat = lat
-            staticCache[curStaticName].lon = lon
+            local curStatic = generateInitialStaticsObj(static, lon, lat, alt, staticPosition, unitXYZNorthCorr)
+            staticCache[curStaticName] = {
+                ["lat"] = lat,
+                ["lon"] = lon
+            }
             curStatic.data.groupName = curStaticName
             curStatic.data.category = static:getDesc().category
             curStatic.data.type = static:getTypeName()
