@@ -104,16 +104,6 @@ local function addGroups(groups, coalition)
                 local curName = unit:getName()
                 table.insert(tempUnitAliveNames, curName)
 
-                -- local headingNorthCorr = math.atan2(unitXYZNorthCorr.z - unitPosition.p.z, unitXYZNorthCorr.x - unitPosition.p.x)
-                -- local heading = math.atan2(unitPosition.x.z, unitPosition.x.x) + headingNorthCorr
-                -- local velocity = unit:getVelocity()
-                --if (velocity) then
-                --    curUnit.data.speed = math.sqrt(velocity.x ^ 2 + velocity.z ^ 2)
-                --end
-                -- if heading < 0 then
-                --    curUnit.hdg = math.floor((heading + 2 * math.pi) / math.pi * 180),
-                -- end
-
                 if unitCache[curName] ~= nil then
                     if unitCache[curName].lat ~= lat or unitCache[curName].lon ~= lon then
                         unitCache[curName] = {

@@ -33,7 +33,7 @@ server.on('message', (msg, rinfo) => {
         dataObj.data.hdg = Math.floor(heading / Math.PI * 180);
 
 
-        if (dataObj.data.velocity) {
+        if (dataObj.uType === "unit" && dataObj.data.velocity) {
             dataObj.data.speed = Math.sqrt((dataObj.data.velocity.x * dataObj.data.velocity.x) + (dataObj.data.velocity.z * dataObj.data.velocity.z));
         }
         console.log("DATA: ", dataObj.data.velocity, dataObj.data.speed);
