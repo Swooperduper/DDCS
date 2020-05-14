@@ -20,7 +20,10 @@ local ddcsHost = "localhost"
 local ddcsPort = 3001
 local missionRuntimeHost = "localhost"
 local missionRuntimePort = 3002
+
+local missionStartTime = os.time()
 local DATA_TIMEOUT_SEC = 0.1
+local SEND_SERVER_INFO_SEC = 60
 
 package.path = package.path .. ";.\\LuaSocket\\?.lua"
 package.cpath = package.cpath .. ";.\\LuaSocket\\?.dll"
@@ -37,11 +40,39 @@ assert(udpMissionRuntime:setsockname(socket.dns.toip(missionRuntimeHost), missio
 
 completeUnitAliveNames = {}
 completeStaticAliveNames = {}
+tempUnitAliveNames = {}
+tempStaticAliveNames = {}
+
+function sendUDPPacket(payload)
+    udpClient:send(JSON:encode(payload))
+end
 
 -- update groups section
-local unitCache = {}
-local unitCnt = 0
-local checkUnitDead = {}
+unitCache = {}
+checkUnitDead = {}
+
+function generateInitialUnitObj(group, unit, curName, lon, lat, alt, unitPosition)
+    return {
+        ["uType"] = "unit",
+        ["data"] = {
+            ["category"] = unit:getDesc().category,
+            ["groupId"] = group:getID(),
+            ["unitId"] = unit:getID(),
+            ["name"] = curName,
+            ["lonLatLoc"] = {
+                lon,
+                lat
+            },
+            ["alt"] = alt,
+            ["agl"] = unitPosition.p.y - land.getHeight({x=unitPosition.p.x, y = unitPosition.p.z}),
+            ["surfType"] = land.getSurfaceType(unitPosition.p),
+            ["inAir"] = unit:inAir(),
+            ["unitPosition"] = unitPosition,
+            ["unitXYZNorthCorr"] = coord.LLtoLO(lat + 1, lon),
+            ["velocity"] = unit:getVelocity()
+        }
+    }
+end
 
 local function addGroups(groups, coalition)
     for groupIndex = 1, #groups do
@@ -53,39 +84,36 @@ local function addGroups(groups, coalition)
                 local unitPosition = unit:getPosition()
                 local lat, lon, alt = coord.LOtoLL(unitPosition.p)
                 local curName = unit:getName()
-                table.insert(completeUnitAliveNames, curName)
+                table.insert(tempUnitAliveNames, curName)
 
-                if unitCache[curName] == nil or (unitCache[curName] ~= nil and unitCache[curName].lat ~= lat or unitCache[curName].lon ~= lon) then
-                    local pos = unit:getPoint()
-                    local unitXYZNorthCorr = coord.LLtoLO(lat + 1, lon)
-                    local headingNorthCorr = math.atan2(unitXYZNorthCorr.z - unitPosition.p.z, unitXYZNorthCorr.x - unitPosition.p.x)
-                    local heading = math.atan2(unitPosition.x.z, unitPosition.x.x) + headingNorthCorr
-                    local velocity = unit:getVelocity()
-                    if heading < 0 then
-                        heading = heading + 2 * math.pi
-                    end
-                    local PlayerName = unit:getPlayerName()
-                    local curUnit = {
-                        ["uType"] = "unit",
-                        ["data"] = {
-                            ["category"] = unit:getDesc().category,
-                            ["groupId"] = group:getID(),
-                            ["unitId"] = tonumber(unit:getID()),
-                            ["name"] = curName,
-                            ["lonLatLoc"] = {
-                                lon,
-                                lat
-                            },
-                            ["alt"] = alt,
-                            ["agl"] = pos.y - land.getHeight({x=pos.x, y = pos.z}),
-                            ["surfType"] = land.getSurfaceType(pos),
-                            ["hdg"] = math.floor(heading / math.pi * 180),
-                            ["inAir"] = unit:inAir()
+                -- local headingNorthCorr = math.atan2(unitXYZNorthCorr.z - unitPosition.p.z, unitXYZNorthCorr.x - unitPosition.p.x)
+                -- local heading = math.atan2(unitPosition.x.z, unitPosition.x.x) + headingNorthCorr
+                -- local velocity = unit:getVelocity()
+                --if (velocity) then
+                --    curUnit.data.speed = math.sqrt(velocity.x ^ 2 + velocity.z ^ 2)
+                --end
+                -- if heading < 0 then
+                --    curUnit.hdg = math.floor((heading + 2 * math.pi) / math.pi * 180),
+                -- end
+
+                if unitCache[curName] ~= nil then
+                    if unitCache[curName].lat ~= lat or unitCache[curName].lon ~= lon then
+                        unitCache[curName] = {
+                            ["lat"] = lat,
+                            ["lon"] = lon
                         }
-                    }
-                    if (velocity) then
-                        curUnit.data.speed = math.sqrt(velocity.x ^ 2 + velocity.z ^ 2)
+                        local curUnit = generateInitialUnitObj(group, unit, curName, lon, lat, alt, unitPosition)
+                        curUnit.action = "U"
+                        sendUDPPacket(curUnit)
                     end
+                else
+                    unitCache[curName] = {}
+                    unitCache[curName] = {
+                        ["lat"] = lat,
+                        ["lon"] = lon
+                    }
+                    local curUnit = generateInitialUnitObj(group, unit, curName, lon, lat, alt, unitPosition)
+                    local PlayerName = unit:getPlayerName()
                     if PlayerName ~= nil then
                         curUnit.data.playername = PlayerName
                         local curFullAmmo = unit:getAmmo()
@@ -101,39 +129,22 @@ local function addGroups(groups, coalition)
                     else
                         curUnit.data.playername = ""
                     end
-                    if unitCache[curName] ~= nil  then
-                        if unitCache[curName].lat ~= lat or unitCache[curName].lon ~= lon then
-                            unitCache[curName] = {
-                                ["lat"] = lat,
-                                ["lon"] = lon
-                            }
-                            curUnit.action = "U"
-                            udpClient:send(JSON:encode(curUnit))
-                        end
-                    else
-                        unitCache[curName] = {}
-                        unitCache[curName] = {
-                            ["lat"] = lat,
-                            ["lon"] = lon
-                        }
-                        curUnit.data.groupName = group:getName()
-                        curUnit.data.type = unit:getTypeName()
-                        curUnit.data.coalition = coalition
-                        curUnit.data.country = unit:getCountry()
-                        curUnit.action = "C"
-                        udpClient:send(JSON:encode(curUnit))
-                    end
-                    checkUnitDead[curName] = 1
+                    curUnit.data.groupName = group:getName()
+                    curUnit.data.type = unit:getTypeName()
+                    curUnit.data.coalition = coalition
+                    curUnit.data.country = unit:getCountry()
+                    curUnit.action = "C"
+                    sendUDPPacket(curUnit)
                 end
+                checkUnitDead[curName] = 1
             end
         end
     end
 end
 
 function updateGroups(ourArgument, time)
-    unitCnt = 0
     checkUnitDead = {}
-    completeUnitAliveNames = {}
+    tempUnitAliveNames = {}
 
     local redGroups = coalition.getGroups(1)
     if redGroups ~= nil then
@@ -144,6 +155,7 @@ function updateGroups(ourArgument, time)
         addGroups(blueGroups, 2)
     end
 
+    completeUnitAliveNames = tempUnitAliveNames
     --check dead, send delete action to server if dead detected
     for k, v in pairs(unitCache) do
         if checkUnitDead[k] == nil then
@@ -154,19 +166,17 @@ function updateGroups(ourArgument, time)
                     name = k
                 }
             }
-            udpClient:send(JSON:encode(curUnit))
+            sendUDPPacket(curUnit)
             unitCache[k] = nil
         end
-        unitCnt = unitCnt + 1
     end
+
     return time + DATA_TIMEOUT_SEC
 end
 
 -- update Statics section
-local staticCache = {}
-local staticCnt = 0
-local checkStaticDead = {}
-completeStaticAliveNames = {}
+staticCache = {}
+checkStaticDead = {}
 
 local function addStatics(statics, coalition)
     for staticIndex = 1, #statics do
@@ -174,58 +184,53 @@ local function addStatics(statics, coalition)
         local staticPosition = static:getPosition()
         local lat, lon, alt = coord.LOtoLL(staticPosition.p)
         local curStaticName = static:getName()
-        table.insert(completeStaticAliveNames, curStaticName)
+        table.insert(tempStaticAliveNames, curStaticName)
 
-        if staticCache[curStaticName] == nil or (staticCache[curStaticName] ~= nil and staticCache[curStaticName].lat ~= lat or staticCache[curStaticName].lon ~= lon) then
-            local unitXYZNorthCorr = coord.LLtoLO(lat + 1, lon)
-            local headingNorthCorr = math.atan2(unitXYZNorthCorr.z - staticPosition.p.z, unitXYZNorthCorr.x - staticPosition.p.x)
-            local heading = math.atan2(staticPosition.x.z, staticPosition.x.x) + headingNorthCorr
-            if heading < 0 then
-                heading = heading + 2 * math.pi
-            end
-            local curStatic = {
-                ["uType"] = "static",
-                ["data"] = {
-                    ["name"] = static:getName(),
-                    ["lonLatLoc"] = {
-                        lon,
-                        lat
-                    },
-                    ["alt"] = alt,
-                    ["hdg"] = math.floor(heading / math.pi * 180),
-
-                }
-            }
-
-            if staticCache[curStaticName] ~= nil then
-                if staticCache[curStaticName].lat ~= lat or staticCache[curStaticName].lon ~= lon then
-                    staticCache[curStaticName] = {}
-                    staticCache[curStaticName].lat = lat
-                    staticCache[curStaticName].lon = lon
-                    curStatic.action = "U"
-                    udpClient:send(JSON:encode(curStatic))
+        if staticCache[curStaticName] ~= nil then
+            if staticCache[curStaticName].lat ~= lat or staticCache[curStaticName].lon ~= lon then
+                local unitXYZNorthCorr = coord.LLtoLO(lat + 1, lon)
+                local headingNorthCorr = math.atan2(unitXYZNorthCorr.z - staticPosition.p.z, unitXYZNorthCorr.x - staticPosition.p.x)
+                local heading = math.atan2(staticPosition.x.z, staticPosition.x.x) + headingNorthCorr
+                if heading < 0 then
+                    heading = heading + 2 * math.pi
                 end
-            else
+                local curStatic = {
+                    ["uType"] = "static",
+                    ["data"] = {
+                        ["name"] = static:getName(),
+                        ["lonLatLoc"] = {
+                            lon,
+                            lat
+                        },
+                        ["alt"] = alt,
+                        ["hdg"] = math.floor(heading / math.pi * 180),
+                    }
+                }
                 staticCache[curStaticName] = {}
                 staticCache[curStaticName].lat = lat
                 staticCache[curStaticName].lon = lon
-                curStatic.data.groupName = curStaticName
-                curStatic.data.category = static:getDesc().category
-                curStatic.data.type = static:getTypeName()
-                curStatic.data.coalition = coalition
-                curStatic.data.country = static:getCountry()
-                curStatic.action = "C"
-                udpClient:send(JSON:encode(curStatic))
+                curStatic.action = "U"
+                sendUDPPacket(curStatic)
             end
-            checkStaticDead[curStaticName] = 1
+        else
+            staticCache[curStaticName] = {}
+            staticCache[curStaticName].lat = lat
+            staticCache[curStaticName].lon = lon
+            curStatic.data.groupName = curStaticName
+            curStatic.data.category = static:getDesc().category
+            curStatic.data.type = static:getTypeName()
+            curStatic.data.coalition = coalition
+            curStatic.data.country = static:getCountry()
+            curStatic.action = "C"
+            sendUDPPacket(curStatic)
         end
+        checkStaticDead[curStaticName] = 1
     end
 end
 
 function updateStatics(ourArgument, time)
-    staticCnt = 0
     checkStaticDead = {}
-    completeStaticAliveNames = {}
+    tempStaticAliveNames = {}
 
 
     local redStatics = coalition.getStaticObjects(1)
@@ -236,6 +241,9 @@ function updateStatics(ourArgument, time)
     if blueStatics ~= nil then
         addStatics(blueStatics, 2)
     end
+
+    completeStaticAliveNames = tempStaticAliveNames
+
     for k, v in pairs(staticCache) do
         if checkStaticDead[k] == nil then
             local curStatic = {
@@ -245,13 +253,11 @@ function updateStatics(ourArgument, time)
                     name = k
                 }
             }
-            udpClient:send(JSON:encode(curStatic))
+            sendUDPPacket(curStatic)
             staticCache[k] = nil
         end
-        if k:split(" #")[1] ~= 'New Static Object' then
-            staticCnt = staticCnt + 1
-        end
     end
+
     return time + DATA_TIMEOUT_SEC
 end
 
@@ -261,16 +267,31 @@ function commandExecute(s)
 end
 
 local function runRequest(request)
-    if request.action == "CMD" and request.cmd ~= nil and request.reqID ~= nil then
-        local success, cmdResponse =  pcall(commandExecute, request.cmd)
-        if not success then
-            net.log("Error: " .. resp)
+    if request.action ~= nil and request.cmd ~= nil and request.reqID ~= nil then
+
+        local outObj = {
+            ["reqId"] = request.reqID,
+        }
+
+        if request.action == "getUnitNames" then
+            outObj.completeUnitAliveNames = completeUnitAliveNames
+            sendUDPPacket(outObj)
         end
-        if request.reqID > 0 then
-            udpClient:send(JSON:encode({
-                ["reqId"] = request.reqID,
-                ["cmdResp"] = cmdResponse
-            }))
+
+        if request.action == "getStaticNames" then
+            outObj.completeStaticAliveNames = completeStaticAliveNames
+            sendUDPPacket(outObj)
+        end
+
+        if request.action == "CMD" then
+            local success, cmdResponse =  pcall(commandExecute, request.cmd)
+            if not success then
+                net.log("Error: " .. resp)
+            end
+            if request.reqID > 0 then
+                outObj.cmdResp = cmdResponse
+                sendUDPPacket(outObj)
+            end
         end
     end
 end
@@ -284,6 +305,19 @@ function runPerFrame(ourArgument, time)
     return time + DATA_TIMEOUT_SEC
 end
 
+function sendServerInfo(ourArgument, time)
+    sendUDPPacket({
+        ["action"] = "serverInfo",
+        ["unitCount"] = table.getn(completeUnitAliveNames),
+        ["staticCount"] = table.getn(completeStaticAliveNames),
+        ["startAbsTime"] = timer.getTime0(),
+        ["curAbsTime"] = timer.getAbsTime(),
+        ["epoc"] = missionStartTime * 1000
+    })
+    return time + SEND_SERVER_INFO_SEC
+end
+
+timer.scheduleFunction(sendServerInfo, {}, timer.getTime() + SEND_SERVER_INFO_SEC)
 timer.scheduleFunction(runPerFrame, {}, timer.getTime() + DATA_TIMEOUT_SEC)
 timer.scheduleFunction(updateGroups, {}, timer.getTime() + DATA_TIMEOUT_SEC)
 timer.scheduleFunction(updateStatics, {}, timer.getTime() + DATA_TIMEOUT_SEC)
