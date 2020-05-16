@@ -1,4 +1,11 @@
 import * as mongoose from "mongoose";
+import * as controllers from "../../";
+import * as localModels from "../local/models";
+import * as remoteModels from "../remote/models";
+
+export let localConnection: mongoose.Connection;
+export let remoteConnection: mongoose.Connection;
+export const dbModels: any = {};
 
 export async function getDbConnection(dbType: string): Promise<mongoose.Connection> {
 
@@ -11,4 +18,20 @@ export async function getDbConnection(dbType: string): Promise<mongoose.Connecti
         "mongodb://" + user + host + ":27017/" + database + authSource,
         { useCreateIndex: true, useNewUrlParser: true, useUnifiedTopology: true }
     );
+}
+
+export async function initV3Engine(): Promise<void> {
+
+    localConnection = await getDbConnection("localConnection");
+    remoteConnection = await getDbConnection("remoteConnection");
+
+    for (const [key, value] of Object.entries(localModels)) {
+        dbModels[key] = value(localConnection);
+    }
+    for (const [key, value] of Object.entries(remoteModels)) {
+        dbModels[key] = value(remoteConnection);
+    }
+
+    console.log("DB ", dbModels);
+    await controllers.testRead();
 }

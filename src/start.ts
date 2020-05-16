@@ -1,33 +1,10 @@
-import {Connection} from "mongoose";
 import * as dotEnv from "dotenv";
 import DDCSServer from "./server";
-import * as controllers from "./controllers";
-import * as localModels from "./controllers/db/local/models";
-import * as remoteModels from "./controllers/db/remote/models";
+import {initV3Engine} from "./controllers/db/common";
 
 dotEnv.config({path: `${__dirname}/../config/.env`});
 
-export let localConnection: Connection;
-export let remoteConnection: Connection;
-
-export const dbModels: any = {};
-
-async function startBackendEngine() {
-    localConnection = await controllers.getDbConnection("localConnection");
-    remoteConnection = await controllers.getDbConnection("remoteConnection");
-
-    for (const [key, value] of Object.entries(localModels)) {
-        dbModels[key] = value(remoteConnection);
-    }
-    for (const [key, value] of Object.entries(remoteModels)) {
-        dbModels[key] = value(remoteConnection);
-    }
-
-    console.log("DB ", dbModels);
-    await controllers.testRead();
-}
-
-startBackendEngine()
+initV3Engine()
     .catch((err) => {
         console.log("Engine Error: ", err);
 });

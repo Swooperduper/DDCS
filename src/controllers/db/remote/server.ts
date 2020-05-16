@@ -3,7 +3,7 @@
  */
 
 import * as typings from "../../../typings";
-import { dbModels } from "../../../start";
+import { dbModels } from "../common";
 
 
 export async function serverActionsCreate(obj: any): Promise<void> {
