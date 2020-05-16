@@ -1,5 +1,5 @@
-import * as bodyParser from "body-parser";
-import * as controllers from "./controllers";
+import * as bodyParser from "body-parser";;
+import * as controllers from "./webControllers";
 import { Server } from "@overnightjs/core";
 import { Logger } from "@overnightjs/logger";
 
@@ -15,7 +15,7 @@ class DDCSServer extends Server {
     }
 
 
-    private setupControllers(): void {
+    private async setupControllers(): Promise<void> {
         const ctlrInstances = [];
         for (const name in controllers) {
             if (controllers.hasOwnProperty(name)) {

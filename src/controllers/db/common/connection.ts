@@ -1,38 +1,14 @@
-import * as Mongoose from "mongoose";
-// import * as ddcsController from "../";
+import * as mongoose from "mongoose";
 
-export let localConnection: Mongoose.Connection;
-export let remoteConnection: Mongoose.Connection;
+export async function getDbConnection(dbType: string): Promise<mongoose.Connection> {
 
-export async function getDBconnections() {
-    if (!localConnection) {
-        let connString = "mongodb://" + process.env.DB_LOCAL_HOST + ":27017/" + process.env.DB_LOCAL_DATABASE;
-        if (!!process.env.DB_USER && !!process.env.DB_PASSWORD) {
-            connString = "mongodb://" + process.env.DB_USER +
-                ":" + process.env.DB_PASSWORD +
-                "@" + process.env.DB_LOCAL_HOST +
-                ":27017/" + process.env.DB_LOCAL_DATABASE + "?authSource=admin";
-        }
-        localConnection = Mongoose.createConnection(connString, { useNewUrlParser: true, useUnifiedTopology: true });
-    }
+    const user = (!!process.env.DB_USER && !!process.env.DB_PASSWORD) ? process.env.DB_USER + ":" + process.env.DB_PASSWORD + "@" : "";
+    const host = (dbType === "remoteConnection") ? process.env.DB_REMOTE_HOST : process.env.DB_LOCAL_HOST;
+    const database = (dbType === "remoteConnection") ? process.env.DB_REMOTE_DATABASE : process.env.DB_LOCAL_DATABASE;
+    const authSource = (!!process.env.DB_USER && !!process.env.DB_PASSWORD) ? "?authSource=admin" : "";
 
-    if (!remoteConnection) {
-        let connString = "mongodb://" + process.env.DB_REMOTE_HOST + ":27017/" + process.env.DB_REMOTE_DATABASE;
-        if (!!process.env.DB_USER && !!process.env.DB_PASSWORD) {
-            connString = "mongodb://" + process.env.DB_USER +
-                ":" + process.env.DB_PASSWORD +
-                "@" + process.env.DB_REMOTE_HOST +
-                ":27017/" + process.env.DB_REMOTE_DATABASE + "?authSource=admin";
-        }
-        remoteConnection = Mongoose.createConnection(connString, { useNewUrlParser: true, useUnifiedTopology: true });
-    }
+    return mongoose.createConnection(
+        "mongodb://" + user + host + ":27017/" + database + authSource,
+        { useCreateIndex: true, useNewUrlParser: true, useUnifiedTopology: true }
+    );
 }
-
-getDBconnections()
-    .then(() => {
-        console.log("Connection started");
-    })
-    .catch(() => {
-        console.log("Connection error line: 36");
-    })
-;

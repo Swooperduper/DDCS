@@ -2,48 +2,56 @@
  * DDCS Licensed under AGPL-3.0 by Andrew "Drex" Finegan https://github.com/afinegan/DynamicDCS
  */
 
-import * as ddcsController from "../../";
+import * as typings from "../../../typings";
+import { dbModels } from "../../../start";
 
-const serverTable = ddcsController.remoteConnection.model("servers", ddcsController.serverSchema);
 
 export async function serverActionsCreate(obj: any): Promise<void> {
     return new Promise((resolve, reject) => {
-        const server = new serverTable(obj);
-        server.save((err) => {
+        const server = new dbModels.serverModel(obj);
+        server.save((err: any) => {
             if (err) { reject(err); }
             resolve();
         });
     });
 }
 
-export async function serverActionsRead(obj: any): Promise<ddcsController.IServer[]> {
+export async function serverActionsRead(obj: any): Promise<typings.IServer[]> {
     return new Promise((resolve, reject) => {
-        serverTable.find(obj, (err, servers: ddcsController.IServer[]) => {
+        dbModels.serverModel.find(obj, (err: any, servers: typings.IServer[]) => {
             if (err) { reject(err); }
             resolve(servers);
+        }).catch((err: any) => {
+            console.log("ERR: ", err);
         });
     });
 }
 
 export async function serverActionsUpdate(obj: any): Promise<void> {
     return new Promise((resolve, reject) => {
-        serverTable.findOneAndUpdate(
+        dbModels.serverModel.findOneAndUpdate(
             {name: obj.name},
             {$set: obj},
             {new: true},
-            (err) => {
+            (err: any) => {
                 if (err) { reject(err); }
                 resolve();
             }
-        );
+        )
+            .catch((err: any) => {
+                console.log("ERR: ", err);
+            });
     });
 }
 
 export async function serverActionsDelete(obj: any): Promise<void> {
     return new Promise((resolve, reject) => {
-        serverTable.findOneAndRemove({name: obj.name}, (err) => {
+        dbModels.serverModel.findOneAndRemove({name: obj.name}, (err: any) => {
             if (err) { reject(err); }
             resolve();
-        });
+        })
+            .catch((err: any) => {
+                console.log("ERR: ", err);
+            });
     });
 }

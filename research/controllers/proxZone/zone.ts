@@ -1,0 +1,113 @@
+/*
+ * DDCS Licensed under AGPL-3.0 by Andrew "Drex" Finegan https://github.com/afinegan/DynamicDCS
+ */
+
+import * as _ from "lodash";
+import * as constants from "../../";
+
+// Calculate a new coordinate based on start, distance and bearing
+export function mathFmod(a: number, b: number ): number {
+    return Number((a - (Math.floor(a / b) * b)).toPrecision(8));
+}
+
+function geo_destination(lonLat: number[], dist: number, brng: number): number[] {
+    const lon1 = toRad(lonLat[0]);
+    const lat1 = toRad(lonLat[1]);
+    dist = dist / 6371.01; // Earth's radius in km
+    brng = toRad(brng);
+
+    const lat2 = Math.asin( Math.sin(lat1) * Math.cos(dist) +
+        Math.cos(lat1) * Math.sin(dist) * Math.cos(brng) );
+    let lon2: number = lon1 + Math.atan2(Math.sin(brng) * Math.sin(dist) * Math.cos(lat1),
+            Math.cos(dist) - Math.sin(lat1) * Math.sin(lat2)) as number;
+    lon2 = mathFmod((lon2 + 3 * Math.PI), (2 * Math.PI)) - Math.PI;
+
+    return [toDeg(lon2), toDeg(lat2)];
+}
+function toRad(deg: number): number {
+    return deg * Math.PI / 180;
+}
+function toDeg(rad: number): number {
+    return rad * 180 / Math.PI;
+}
+
+export function findBearing(lat1: number, lng1: number, lat2: number, lng2: number): number {
+    const dLon = (lng2 - lng1);
+    const y = Math.sin(dLon) * Math.cos(lat2);
+    const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLon);
+    const brng = (Math.atan2(y, x)) * 180 / Math.PI;
+    const curDeg = 360 - ((brng + 360) % 360);
+    return (curDeg === 360) ? 0 : curDeg;
+}
+
+export function getLonLatFromDistanceDirection(lonLatLoc: number[], direction: number, distance: number): number[] {
+    return geo_destination(lonLatLoc, distance, direction);
+}
+
+export function getBoundingSquare(pArray: number[]): object {
+    let x1 = _.get(pArray, [0, 0]);
+    let y1 = _.get(pArray, [0, 1]);
+    let x2 = _.get(pArray, [0, 0]);
+    let y2 = _.get(pArray, [0, 1]);
+    for (let i = 1; i < pArray.length; i++) {
+        x1 = ( x1 > _.get(pArray, [i, 0])) ? _.get(pArray, [i, 0]) : x1;
+        x2 = ( x2 < _.get(pArray, [i, 0])) ? _.get(pArray, [i, 0]) : x2;
+        y1 = ( y1 > _.get(pArray, [i, 1])) ? _.get(pArray, [i, 1]) : y1;
+        y2 = ( y2 < _.get(pArray, [i, 1]) ) ? _.get(pArray, [i, 1]) : y2;
+    }
+    return {
+        x1,
+        y1,
+        x2,
+        y2
+    };
+}
+
+export function isLatLonInZone(lonLat: number[], polyZone: any[]) {
+
+    let next;
+    let prev;
+    let inPolygon = false;
+    const pNum = polyZone.length - 1;
+
+    next = 1;
+    prev = pNum;
+
+    while (next <= pNum) {
+        if ((( polyZone[next][1] > lonLat[1] ) !== ( polyZone[prev][1] > lonLat[1] )) &&
+            ( lonLat[0] < ( polyZone[prev][0] - polyZone[next][0] ) * ( lonLat[1] - polyZone[next][1] ) /
+            ( polyZone[prev][1] - polyZone[next][1] ) + polyZone[next][0] )) {
+                inPolygon = ! inPolygon;
+            }
+        prev = next;
+        next = next + 1;
+    }
+    return inPolygon;
+}
+
+export function getRandomLatLonFromBase(baseName: string, polytype: string, zoneNum?: string): number[] {
+    const baseInfo: any = _.find(constants.bases, {_id: baseName});
+    if (baseInfo) {
+        _.get(baseInfo, ["polygonLoc", polytype]);
+        const pGroups = baseInfo.polygonLoc[polytype];
+        let pickedPoly;
+        if (zoneNum) {
+            pickedPoly = pGroups[zoneNum];
+        } else {
+            pickedPoly = _.sample(pGroups);
+        }
+        let lonLatFound = false;
+        const bs = exports.getBoundingSquare(pickedPoly);
+        while (!lonLatFound) {
+            const lonLat = [
+                _.random(bs.x1, bs.x2),
+                _.random(bs.y1, bs.y2)
+            ];
+            if (exports.isLatLonInZone(lonLat, pickedPoly)) {
+                lonLatFound = true;
+                return lonLat;
+            }
+        }
+    }
+    return [];
+}
