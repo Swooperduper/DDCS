@@ -1,0 +1,43 @@
+/*
+ * DDCS Licensed under AGPL-3.0 by Andrew "Drex" Finegan https://github.com/afinegan/DynamicDCS
+ */
+
+import * as _ from "lodash";
+import * as ddcsControllers from "../";
+
+const aIMaxIdleTime = (5 * 60 * 1000); // 5 mins
+const maxCrateLife = (3 * 60 * 60 * 1000); // 3 hrs
+
+export async function processThirtySecActions(fullySynced: boolean) {
+    if (fullySynced) {
+
+        await ddcsControllers.unitActionRemoveAllDead();
+        await ddcsControllers.checkTimeToRestart();
+        if (ddcsControllers.config.lifePointsEnabled) {
+            await ddcsControllers.checkAircraftCosts();
+        }
+
+        await ddcsControllers.checkAircraftWeaponCompliance();
+
+        await ddcsControllers.aliveJtac30SecCheck();
+
+        await ddcsControllers.checkCmdCenters();
+
+        // cleanupAI aIMaxIdleTime
+        const aICleanup = await ddcsControllers.unitActionRead({isAI: true, dead: false});
+        for (const aIUnit of aICleanup) {
+            if (_.isEmpty(aIUnit.playername) && new Date(aIUnit.updatedAt).getTime() + aIMaxIdleTime < new Date().getTime()) {
+                await ddcsControllers.destroyUnit( aIUnit.name );
+            }
+        }
+
+        const crateCleanup = await ddcsControllers.staticCrateActionReadStd({});
+        for (const crate of crateCleanup) {
+            if (new Date(crate.createdAt).getTime() + maxCrateLife < new Date().getTime()) {
+                await ddcsControllers.staticCrateActionDelete({_id: crate._id});
+                console.log("cleanup crate: ", crate.name);
+                await ddcsControllers.destroyUnit( crate.name );
+            }
+        }
+    }
+}
