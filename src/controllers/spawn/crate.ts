@@ -1,0 +1,40 @@
+/*
+ * DDCS Licensed under AGPL-3.0 by Andrew "Drex" Finegan https://github.com/afinegan/DynamicDCS
+ */
+
+import * as ddcsControllers from "../";
+
+export async function spawnLogiCrate(crateObj: any, init?: boolean) {
+    if (init) {
+        const curCrateObj = {
+            ...crateObj,
+            _id: crateObj.name,
+            lonLatLoc: ddcsControllers.getLonLatFromDistanceDirection(crateObj.unitLonLatLoc, crateObj.heading, 0.05)
+        };
+
+        await ddcsControllers.staticCrateActionSave(curCrateObj);
+        await ddcsControllers.cmdQueActionsSave({
+            actionObj: {
+                action: "CMD",
+                cmd: ddcsControllers.spawnStatic(
+                    ddcsControllers.staticTemplate(curCrateObj),
+                    crateObj.country
+                ),
+                reqID: 0
+            },
+            queName: "clientArray"
+        });
+    } else {
+        await ddcsControllers.cmdQueActionsSave({
+            actionObj: {
+                action: "CMD",
+                cmd: ddcsControllers.spawnStatic(
+                    ddcsControllers.staticTemplate(crateObj),
+                    crateObj.country
+                ),
+                reqID: 0
+            },
+            queName: "clientArray"
+        });
+    }
+}
