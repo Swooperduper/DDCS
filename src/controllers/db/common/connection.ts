@@ -32,6 +32,8 @@ export async function initV3Engine(): Promise<void> {
         dbModels[key] = value(remoteConnection);
     }
 
+    await controllers.initServer();
+
     console.log("DB ", dbModels);
     await controllers.testRead();
 }

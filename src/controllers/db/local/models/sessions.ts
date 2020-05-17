@@ -5,7 +5,7 @@
 import * as mongoose from "mongoose";
 
 export function sessionModel(dbconn: mongoose.Connection): mongoose.Document | {} {
-    return dbconn.model("session", new mongoose.Schema({
+    return dbconn.model(process.env.SERVER_NAME + "_session", new mongoose.Schema({
             _id: {
                 type: String,
                 required: true
