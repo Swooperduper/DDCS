@@ -25,10 +25,10 @@ export async function startUpReceiveUDPSocket() {
         server.close();
     });
 
-    server.on("message", (msg: any, rinfo: any) => {
+    server.on("message", (msg: any) => {
 
-        const dataObj = JSON.parse(msg.toString());
-        console.log("DO: ", dataObj);
+        const dataObj = JSON.parse(msg);
+
         if (dataObj.action === "C" || dataObj.action === "U") {
 
             // doing math on nodeJS side, free up more DCS.exe

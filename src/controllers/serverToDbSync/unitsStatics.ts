@@ -13,7 +13,6 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
     if (unit.length > 0) {
         const curUnit = unit[0];
         const curUnitName = curUnit.name;
-        // build out extra info on spawned items isAI
         if (_.includes(curData.name, "AI|")) {
             stParse = _.split(curData.name, "|");
             curData = {
@@ -60,7 +59,7 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
             await ddcsControllers.baseActionUpdate({_id: curUnitName, centerLoc: curData.lonLatLoc});
         }
 
-        if ((!_.isEmpty(curUnit) && unitObj.action !== "D")) {
+        if (unitObj.action !== "D") {
             iCurObj = {
                 action: "U",
                 sessionName: ddcsControllers.sessionName,
@@ -139,36 +138,42 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
             }
         }
     } else {
-        if (curData.name && unitObj.action === "C") {
-            curData._id = curData.name;
-            iCurObj = {
-                action: "C",
-                sessionName: ddcsControllers.sessionName,
-                data: curData
-            };
-            if (curData.category === "STRUCTURE") {
-                if ( _.includes(curData.name, " Logistics")) {
-                    curData.proxChkGrp = "logisticTowers";
-                }
-            }
-            await ddcsControllers.unitActionSave(iCurObj.data);
-            await ddcsControllers.sendToCoalition({payload: {
+        if (unitObj.action !== "D") {
+            console.log("NAME: ", curData.name);
+            if (curData.name) {
+                curData._id = curData.name;
+                iCurObj = {
                     action: "C",
-                    data: {
-                        _id: iCurObj.data._id,
-                        lonLatLoc: iCurObj.data.lonLatLoc,
-                        alt: iCurObj.data.alt,
-                        agl: iCurObj.data.agl,
-                        hdg: iCurObj.data.hdg,
-                        speed: iCurObj.data.speed,
-                        coalition: iCurObj.data.coalition,
-                        type: iCurObj.data.type,
-                        playername: iCurObj.data.playername,
-                        playerOwnerId: iCurObj.data.playerOwnerId
-                    }}});
-            if (curData.category === "STRUCTURE") {
-                // console.log('SUM: ', curData);
-                await ddcsControllers.setUnitMark(curData);
+                    sessionName: ddcsControllers.sessionName,
+                    data: curData
+                };
+                if (curData.category === "STRUCTURE") {
+                    if (_.includes(curData.name, " Logistics")) {
+                        curData.proxChkGrp = "logisticTowers";
+                    }
+                }
+                await ddcsControllers.unitActionSave(iCurObj.data);
+                await ddcsControllers.sendToCoalition({
+                    payload: {
+                        action: "C",
+                        data: {
+                            _id: iCurObj.data._id,
+                            lonLatLoc: iCurObj.data.lonLatLoc,
+                            alt: iCurObj.data.alt,
+                            agl: iCurObj.data.agl,
+                            hdg: iCurObj.data.hdg,
+                            speed: iCurObj.data.speed,
+                            coalition: iCurObj.data.coalition,
+                            type: iCurObj.data.type,
+                            playername: iCurObj.data.playername,
+                            playerOwnerId: iCurObj.data.playerOwnerId
+                        }
+                    }
+                });
+                if (curData.category === "STRUCTURE") {
+                    // console.log('SUM: ', curData);
+                    await ddcsControllers.setUnitMark(curData);
+                }
             }
         }
     }

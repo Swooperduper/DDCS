@@ -5,10 +5,19 @@ export async function processingIncomingData(incomingObj: any) {
         case "serverInfo":
             await ddcsController.getLatestSession(incomingObj);
             break;
-        case "C" || "U" || "D":
+        case "C":
             await ddcsController.processUnitUpdates(incomingObj);
             break;
-        case  "airbaseC" || "airbaseU":
+        case "U":
+            await ddcsController.processUnitUpdates(incomingObj);
+            break;
+        case "D":
+            await ddcsController.processUnitUpdates(incomingObj);
+            break;
+        case  "airbaseC":
+            await ddcsController.processAirbaseUpdates(incomingObj);
+            break;
+        case  "airbaseU":
             await ddcsController.processAirbaseUpdates(incomingObj);
             break;
         case "f10Menu":

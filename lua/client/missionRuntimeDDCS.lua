@@ -51,7 +51,7 @@ end
 unitCache = {}
 checkUnitDead = {}
 
-function generateInitialUnitObj(group, unit, curName, lon, lat, alt, unitPosition)
+function generateInitialUnitObj(group, unit, curName, coalition, lon, lat, alt, unitPosition)
     local curUnit = {
         ["uType"] = "unit",
         ["data"] = {
@@ -69,7 +69,11 @@ function generateInitialUnitObj(group, unit, curName, lon, lat, alt, unitPositio
             ["inAir"] = unit:inAir(),
             ["unitPosition"] = unitPosition,
             ["unitXYZNorthCorr"] = coord.LLtoLO(lat + 1, lon),
-            ["velocity"] = unit:getVelocity()
+            ["velocity"] = unit:getVelocity(),
+            ["groupName"] = group:getName(),
+            ["type"] = unit:getTypeName(),
+            ["coalition"] = coalition,
+            ["country"] = unit:getCountry()
         }
     }
 
@@ -110,7 +114,7 @@ local function addGroups(groups, coalition)
                             ["lat"] = lat,
                             ["lon"] = lon
                         }
-                        local curUnit = generateInitialUnitObj(group, unit, curName, lon, lat, alt, unitPosition)
+                        local curUnit = generateInitialUnitObj(group, unit, curName, coalition, lon, lat, alt, unitPosition)
                         curUnit.action = "U"
                         sendUDPPacket(curUnit)
                     end
@@ -119,12 +123,7 @@ local function addGroups(groups, coalition)
                         ["lat"] = lat,
                         ["lon"] = lon
                     }
-                    local curUnit = generateInitialUnitObj(group, unit, curName, lon, lat, alt, unitPosition)
-
-                    curUnit.data.groupName = group:getName()
-                    curUnit.data.type = unit:getTypeName()
-                    curUnit.data.coalition = coalition
-                    curUnit.data.country = unit:getCountry()
+                    local curUnit = generateInitialUnitObj(group, unit, curName, coalition, lon, lat, alt, unitPosition)
                     curUnit.action = "C"
                     sendUDPPacket(curUnit)
                 end
@@ -170,11 +169,11 @@ end
 staticCache = {}
 checkStaticDead = {}
 
-function generateInitialStaticsObj(staticName, lon, lat, alt, staticPosition)
+function generateInitialStaticsObj(static, coalition, lon, lat, alt, staticPosition)
     local curStatic = {
         ["uType"] = "static",
         ["data"] = {
-            ["name"] = staticName,
+            ["name"] = static.name,
             ["lonLatLoc"] = {
                 lon,
                 lat
@@ -182,7 +181,11 @@ function generateInitialStaticsObj(staticName, lon, lat, alt, staticPosition)
             ["alt"] = alt,
             ["position"] = position,
             ["unitPosition"] = staticPosition,
-            ["unitXYZNorthCorr"] = coord.LLtoLO(lat + 1, lon)
+            ["unitXYZNorthCorr"] = coord.LLtoLO(lat + 1, lon),
+            ["category"] = static:getDesc().category,
+            ["type"] = static:getTypeName(),
+            ["coalition"] = coalition,
+            ["country"] = static:getCountry()
         }
     }
     return curStatic
@@ -204,7 +207,7 @@ local function addStatics(statics, coalition)
                 --if heading < 0 then
                 --    heading = heading + 2 * math.pi
                 --end
-                local curStatic = generateInitialStaticsObj(curStaticName, lon, lat, alt, staticPosition)
+                local curStatic = generateInitialStaticsObj(static, coalition, lon, lat, alt, staticPosition)
                 staticCache[curStaticName] = {
                     ["lat"] = lat,
                     ["lon"] = lon
@@ -213,16 +216,11 @@ local function addStatics(statics, coalition)
                 sendUDPPacket(curStatic)
             end
         else
-            local curStatic = generateInitialStaticsObj(static, lon, lat, alt, staticPosition)
+            local curStatic = generateInitialStaticsObj(static, coalition, lon, lat, alt, staticPosition)
             staticCache[curStaticName] = {
                 ["lat"] = lat,
                 ["lon"] = lon
             }
-            curStatic.data.groupName = curStaticName
-            curStatic.data.category = static:getDesc().category
-            curStatic.data.type = static:getTypeName()
-            curStatic.data.coalition = coalition
-            curStatic.data.country = static:getCountry()
             curStatic.action = "C"
             sendUDPPacket(curStatic)
         end
