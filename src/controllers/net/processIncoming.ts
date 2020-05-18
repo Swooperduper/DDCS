@@ -2,6 +2,9 @@ import * as ddcsController from "../";
 
 export async function processingIncomingData(incomingObj: any) {
     switch (incomingObj.action) {
+        case "serverInfo":
+            await ddcsController.getLatestSession(incomingObj);
+            break;
         case "C" || "U" || "D":
             await ddcsController.processUnitUpdates(incomingObj);
             break;

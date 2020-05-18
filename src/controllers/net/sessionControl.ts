@@ -1,21 +1,17 @@
 import * as ddcsController from "../";
 
 export let sessionName: string = "";
+export let curServerEpoc: number = 0;
 export let curAbsTime: number = 0;
-export let realServerSecs: number = 0;
 export let startAbsTime: number = 0;
 export let curServerUnitCnt: number = 0;
+export let curServerStaticCnt: number = 0;
 
-export async function getLatestSession(serverEpoc: number, startAbs: number, curAbs: number): Promise<void> {
-    if (serverEpoc) {
-        const buildSessionName = process.env.SERVER_NAME + "_" + serverEpoc;
-        const newSession = {
-            _id: buildSessionName,
-            name: buildSessionName,
-            startAbsTime: startAbs,
-            curAbsTime: curAbs,
-            campaignName: ""
-        };
+export async function getLatestSession(serverInfoObj: any): Promise<void> {
+
+
+    if (curServerEpoc) {
+        const buildSessionName = process.env.SERVER_NAME + "_" + curServerEpoc;
         const latestSession = await ddcsController.sessionsActionsReadLatest();
         console.log(
             "create new session: ",
@@ -25,11 +21,18 @@ export async function getLatestSession(serverEpoc: number, startAbs: number, cur
             " || ",
             curAbsTime,
             " > ",
-            curAbs
+            serverInfoObj.curAbsTime
         );
-        if (sessionName !== latestSession[0].name || curAbsTime > curAbs) {
+        if (sessionName !== latestSession[0].name || curAbsTime > serverInfoObj.curAbsTime) {
             await ddcsController.resetMinutesPlayed();
             const campaign = await ddcsController.campaignsActionsReadLatest();
+            const newSession = {
+                _id: buildSessionName,
+                name: buildSessionName,
+                startAbsTime: serverInfoObj.startAbs,
+                curAbsTime: serverInfoObj.curAbsTime,
+                campaignName: ""
+            };
             if (campaign) {
                 newSession.campaignName =  campaign[0].name;
                 await ddcsController.sessionsActionsUpdate(newSession);
@@ -38,8 +41,11 @@ export async function getLatestSession(serverEpoc: number, startAbs: number, cur
             }
         } else {
             console.log("use existing session: ", sessionName);
-            await ddcsController.sessionsActionsUpdate(newSession);
-            sessionName = buildSessionName;
         }
+        curServerEpoc = serverInfoObj.epoc;
+        curAbsTime = serverInfoObj.curAbsTime;
+        startAbsTime = serverInfoObj.startAbs;
+        curServerUnitCnt = serverInfoObj.unitCount;
+        curServerStaticCnt = serverInfoObj.staticCount;
     }
 }
