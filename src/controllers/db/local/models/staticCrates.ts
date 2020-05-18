@@ -5,7 +5,7 @@
 import * as mongoose from "mongoose";
 
 export function staticCratesModel(dbconn: mongoose.Connection): mongoose.Document | {} {
-    return dbconn.model(process.env.SERVER_NAME + "_crates", new mongoose.Schema({
+    return dbconn.model("crates", new mongoose.Schema({
             _id: {
                 type: String,
                 required: true

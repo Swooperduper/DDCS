@@ -34,6 +34,8 @@ export async function initV3Engine(): Promise<void> {
 
     await controllers.initServer();
 
+    await controllers.startUpReceiveUDPSocket();
+
     console.log("DB ", dbModels);
     await controllers.testRead();
 }

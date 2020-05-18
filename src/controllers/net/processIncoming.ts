@@ -59,7 +59,7 @@ export async function processingIncomingData(incomingObj: any) {
         case "unitsAlive":
             await ddcsController.sendMissingUnits(incomingObj.data);
             break;
-        case "players":
+        case "playerStats":
             await ddcsController.processPlayerEvent(incomingObj);
             break;
         case "friendly_fire":

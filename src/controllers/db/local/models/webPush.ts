@@ -6,7 +6,7 @@ import * as mongoose from "mongoose";
 
 // Schema defines how chat messages will be stored in MongoDB
 export function webPushModel(dbconn: mongoose.Connection): mongoose.Document | {} {
-    return dbconn.model(process.env.SERVER_NAME + "_webpush", new mongoose.Schema({
+    return dbconn.model("webpush", new mongoose.Schema({
             payload: {
                 type: Object,
                 required: true

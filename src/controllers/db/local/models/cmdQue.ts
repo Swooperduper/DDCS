@@ -6,7 +6,7 @@ import * as mongoose from "mongoose";
 
 // Schema defines how chat messages will be stored in MongoDB
 export function cmdQueModel(dbconn: mongoose.Connection): mongoose.Document | {} {
-    return dbconn.model(process.env.SERVER_NAME + "_cmdque", new mongoose.Schema({
+    return dbconn.model("cmdque", new mongoose.Schema({
             actionObj: {
                 type: Object,
                 required: true

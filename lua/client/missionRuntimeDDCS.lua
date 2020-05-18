@@ -170,7 +170,7 @@ end
 staticCache = {}
 checkStaticDead = {}
 
-function generateInitialStaticsObj(staticName, lon, lat, alt, position)
+function generateInitialStaticsObj(staticName, lon, lat, alt, staticPosition)
     local curStatic = {
         ["uType"] = "static",
         ["data"] = {
@@ -181,6 +181,7 @@ function generateInitialStaticsObj(staticName, lon, lat, alt, position)
             },
             ["alt"] = alt,
             ["position"] = position,
+            ["unitPosition"] = staticPosition,
             ["unitXYZNorthCorr"] = coord.LLtoLO(lat + 1, lon)
         }
     }
@@ -212,7 +213,7 @@ local function addStatics(statics, coalition)
                 sendUDPPacket(curStatic)
             end
         else
-            local curStatic = generateInitialStaticsObj(static, lon, lat, alt, staticPosition, unitXYZNorthCorr)
+            local curStatic = generateInitialStaticsObj(static, lon, lat, alt, staticPosition)
             staticCache[curStaticName] = {
                 ["lat"] = lat,
                 ["lon"] = lon

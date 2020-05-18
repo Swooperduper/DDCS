@@ -5,7 +5,7 @@
 import * as mongoose from "mongoose";
 
 export function srvPlayersModel(dbconn: mongoose.Connection): mongoose.Document | {} {
-    return dbconn.model(process.env.SERVER_NAME + "_srvPlayer", new mongoose.Schema({
+    return dbconn.model("srvPlayer", new mongoose.Schema({
             _id: {
                 type: String
             },

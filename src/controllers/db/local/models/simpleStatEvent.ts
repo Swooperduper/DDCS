@@ -52,5 +52,5 @@ export function simpleStatEventModel(dbconn: mongoose.Connection): mongoose.Docu
 
     simpleStatEvent.index({sessionName: 1});
 
-    return dbconn.model(process.env.SERVER_NAME + "_simplestatevents", simpleStatEvent);
+    return dbconn.model("simplestatevents", simpleStatEvent);
 }
