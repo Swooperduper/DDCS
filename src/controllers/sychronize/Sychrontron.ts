@@ -23,7 +23,6 @@ export async function syncServer(serverUnitCount: number): Promise<void> {
     const remappedunits: any = {};
     const units = await ddcsControllers.unitActionReadStd({dead: false});
     if (serverUnitCount === 0) { // server is empty
-        ddcsControllers.setLockUpdates(false);
         ddcsControllers.resetEWRUnitsActivated();
         isServerSynced = false;
         isServerFresh = true;
