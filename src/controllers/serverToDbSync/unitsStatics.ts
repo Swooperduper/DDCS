@@ -11,7 +11,7 @@ export function setLockUpdates(flag: boolean) {
     lockUpdates = flag;
 }
 
-export async function processUnitUpdates(sessionName: string, unitObj: any): Promise<void> {
+export async function processUnitUpdates(unitObj: any): Promise<void> {
     if (!exports.lockUpdates) {
         const unit = await ddcsControllers.unitActionRead({_id: unitObj.data.name});
         let stParse;
@@ -70,7 +70,7 @@ export async function processUnitUpdates(sessionName: string, unitObj: any): Pro
             if ((!_.isEmpty(curUnit) && unitObj.action !== "D")) {
                 iCurObj = {
                     action: "U",
-                    sessionName,
+                    sessionName: ddcsControllers.sessionName,
                     data: {
                         _id: curData.name,
                         alt: curData.alt,
@@ -121,7 +121,7 @@ export async function processUnitUpdates(sessionName: string, unitObj: any): Pro
                     curData._id = curData.name;
                     iCurObj = {
                         action: "C",
-                        sessionName,
+                        sessionName: ddcsControllers.sessionName,
                         data: curData
                     };
                     if (curData.category === "STRUCTURE") {
@@ -153,7 +153,7 @@ export async function processUnitUpdates(sessionName: string, unitObj: any): Pro
                 if (curData.name) {
                     iCurObj = {
                         action: "D",
-                        sessionName,
+                        sessionName: ddcsControllers.sessionName,
                         data: {
                             _id: curData.name,
                             name: curData.name,

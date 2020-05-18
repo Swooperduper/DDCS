@@ -5,14 +5,14 @@
 import * as _ from "lodash";
 import * as ddcsControllers from "../../";
 
-export async function processSelfKill(sessionName: string, eventObj: any): Promise<void> {
+export async function processSelfKill(eventObj: any): Promise<void> {
     // "self_kill", playerID
     const iPlayer = _.find(ddcsControllers.rtPlayerArray, {id: eventObj.data.arg1});
 
     if (iPlayer) {
         const iCurObj = {
             iPlayerId: eventObj.data.arg1,
-            sessionName,
+            sessionName: ddcsControllers.sessionName,
             eventCode: ddcsControllers.shortNames[eventObj.action],
             iucid: iPlayer.ucid,
             iName: iPlayer.name,

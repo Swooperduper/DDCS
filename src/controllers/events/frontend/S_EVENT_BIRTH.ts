@@ -5,18 +5,18 @@
 import * as _ from "lodash";
 import * as ddcsControllers from "../../";
 
-export async function processEventBirth(sessionName: string, eventObj: any): Promise<void> {
+export async function processEventBirth(eventObj: any): Promise<void> {
     const curUnitId = eventObj.data.arg3;
     if (curUnitId) {
         const iUnit = await ddcsControllers.unitActionRead({unitId: eventObj.data.arg3});
         const curIUnit = iUnit[0];
         if (curIUnit.playername !== "") {
-            const playerArray = await ddcsControllers.srvPlayerActionsRead({sessionName});
+            const playerArray = await ddcsControllers.srvPlayerActionsRead({sessionName: ddcsControllers.sessionName});
             if (curIUnit) {
                 const iPlayer = _.find(playerArray, {name: curIUnit.playername});
                 if (iPlayer) {
                     const iCurObj = {
-                        sessionName,
+                        sessionName: ddcsControllers.sessionName,
                         eventCode: ddcsControllers.shortNames[eventObj.action],
                         iucid: iPlayer.ucid,
                         iName: curIUnit.playername,

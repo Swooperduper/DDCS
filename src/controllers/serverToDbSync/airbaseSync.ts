@@ -5,11 +5,11 @@
 import * as typing from "../../typings";
 import * as ddcsControllers from "../";
 
-export async function processAirbaseUpdates(mapType: string, airbaseObj: typing.IBasePayload): Promise<void> {
+export async function processAirbaseUpdates(airbaseObj: typing.IBasePayload): Promise<void> {
     if (airbaseObj.action === "airbaseC") {
         await ddcsControllers.baseActionSave({
             ...airbaseObj.data,
-            mapType
+            mapType: process.env.SERVER_NAME
         });
     }
 }

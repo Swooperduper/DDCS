@@ -5,7 +5,7 @@
 import * as _ from "lodash";
 import * as ddcsControllers from "../../";
 
-export async function processEventTakeoff(sessionName: string, eventObj: any): Promise<void> {
+export async function processEventTakeoff(eventObj: any): Promise<void> {
     let place: string;
     if (eventObj.data.arg6) {
         place = " from " + eventObj.data.arg6;
@@ -16,7 +16,7 @@ export async function processEventTakeoff(sessionName: string, eventObj: any): P
     }
 
     const iUnit = await ddcsControllers.unitActionRead({unitId: eventObj.data.arg3});
-    const playerArray = await ddcsControllers.srvPlayerActionsRead({sessionName});
+    const playerArray = await ddcsControllers.srvPlayerActionsRead({sessionName: ddcsControllers.sessionName});
     const curIUnit = iUnit[0];
     const curUnitSide = curIUnit.coalition;
     if (_.isUndefined(curIUnit)) {
@@ -29,7 +29,7 @@ export async function processEventTakeoff(sessionName: string, eventObj: any): P
                 const friendlyBases = await ddcsControllers.getBasesInProximity(curIUnit.lonLatLoc, 5, curUnitSide);
                 if (friendlyBases.length > 0) {
                     const iCurObj = {
-                        sessionName,
+                        sessionName: ddcsControllers.sessionName,
                         eventCode: ddcsControllers.shortNames[eventObj.action],
                         iucid: iPlayer.ucid,
                         iName: curIUnit.playername,

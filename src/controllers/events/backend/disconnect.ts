@@ -5,13 +5,13 @@
 import * as _ from "lodash";
 import * as ddcsControllers from "../../";
 
-export async function processDisconnect(sessionName: string, eventObj: any): Promise<void> {
+export async function processDisconnect(eventObj: any): Promise<void> {
     // "disconnect", playerID, name, playerSide, reason_code
     const iPlayer = _.find(ddcsControllers.rtPlayerArray, {id: eventObj.data.arg1});
 
     if (iPlayer) {
         const iCurObj = {
-            sessionName,
+            sessionName: ddcsControllers.sessionName,
             eventCode: ddcsControllers.shortNames[eventObj.action],
             iucid: iPlayer.ucid,
             iName: iPlayer.name,

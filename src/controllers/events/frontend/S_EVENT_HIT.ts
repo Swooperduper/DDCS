@@ -71,7 +71,7 @@ export async function checkShootingUsers(): Promise<void> {
     }
 }
 
-export async function processEventHit(sessionName: string, eventObj: any): Promise<void> {
+export async function processEventHit(eventObj: any): Promise<void> {
     const iUnitId = eventObj.data.arg3;
     const tUnitId = eventObj.data.arg4;
     let iPName: string = "";
@@ -82,7 +82,7 @@ export async function processEventHit(sessionName: string, eventObj: any): Promi
     const nowTime = new Date().getTime();
     const iUnit = await ddcsControllers.unitActionRead({unitId: iUnitId});
     const tUnit = await ddcsControllers.unitActionRead({unitId: tUnitId});
-    const playerArray = await ddcsControllers.srvPlayerActionsRead({sessionName});
+    const playerArray = await ddcsControllers.srvPlayerActionsRead({sessionName: ddcsControllers.sessionName});
     let isOwnedUnit = false;
     const oId = [];
     const iOwnerId = iUnit[0].playerOwnerId;
@@ -98,7 +98,7 @@ export async function processEventHit(sessionName: string, eventObj: any): Promi
     }
     const ownerIds = await ddcsControllers.srvPlayerActionsRead({_id: {$in: oId}});
     iCurObj = {
-        sessionName,
+        sessionName: ddcsControllers.sessionName,
         eventCode: ddcsControllers.shortNames[eventObj.action],
         iName: iUnit[0].playername,
         iType: iUnit[0].type,

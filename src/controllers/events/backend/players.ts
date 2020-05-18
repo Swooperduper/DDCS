@@ -7,7 +7,7 @@ import * as ddcsControllers from "../../";
 
 export let rtPlayerArray: any;
 
-export async function processPlayerEvent(sessionName: string, playerArray: any): Promise<void> {
+export async function processPlayerEvent(playerArray: any): Promise<void> {
     rtPlayerArray = playerArray.data;
     for (const player of playerArray.data) {
         if (player) {
@@ -78,7 +78,7 @@ export async function processPlayerEvent(sessionName: string, playerArray: any):
                 ...curData,
                 _id: curData.ucid,
                 playerId: curData.id,
-                sessionName
+                sessionName: ddcsControllers.sessionName
             });
         }
     }

@@ -5,7 +5,7 @@
 import * as _ from "lodash";
 import * as ddcsControllers from "../../";
 
-export async function processFriendlyFire(sessionName: string, eventObj: any): Promise<void> {
+export async function processFriendlyFire(eventObj: any): Promise<void> {
     // var iCurObj;
     let iPlayer: any;
     let tPlayer: any;

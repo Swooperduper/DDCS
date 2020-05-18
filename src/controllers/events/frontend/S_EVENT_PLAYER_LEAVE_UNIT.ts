@@ -5,17 +5,17 @@
 import * as _ from "lodash";
 import * as ddcsControllers from "../../";
 
-export async function processEventPlayerLeaveUnit(sessionName: string, eventObj: any): Promise<void> {
+export async function processEventPlayerLeaveUnit(eventObj: any): Promise<void> {
     const iUnit = await ddcsControllers.unitActionRead({unitId: eventObj.data.arg3});
-    const playerArray = await ddcsControllers.srvPlayerActionsRead({sessionName});
+    const playerArray = await ddcsControllers.srvPlayerActionsRead({sessionName: ddcsControllers.sessionName});
     if (iUnit[0]) {
 
-        await ddcsControllers.processUnitUpdates(sessionName, {action: "D", data: {name: iUnit[0].name}});
+        await ddcsControllers.processUnitUpdates({action: "D", data: {name: iUnit[0].name}});
 
         const iPlayer = _.find(playerArray, {name: iUnit[0].playername});
         if (iPlayer) {
             const iCurObj = {
-                sessionName,
+                sessionName: ddcsControllers.sessionName,
                 eventCode: ddcsControllers.shortNames[eventObj.action],
                 iucid: iPlayer.ucid,
                 iName: iUnit[0].playername,

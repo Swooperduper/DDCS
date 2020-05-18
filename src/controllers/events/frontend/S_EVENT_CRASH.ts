@@ -5,19 +5,19 @@
 import * as _ from "lodash";
 import * as ddcsControllers from "../../";
 
-export async function processEventCrash(sessionName: string, eventObj: any): Promise<void> {
+export async function processEventCrash(eventObj: any): Promise<void> {
     const nowTime = new Date().getTime();
     const iUnit = await ddcsControllers.unitActionRead({unitId: eventObj.data.arg3});
-    const playerArray = await ddcsControllers.srvPlayerActionsRead({sessionName});
+    const playerArray = await ddcsControllers.srvPlayerActionsRead({sessionName: ddcsControllers.sessionName});
     const curIUnit = iUnit[0];
     if (curIUnit) {
 
-        await ddcsControllers.processUnitUpdates(sessionName, {action: "D", data: {name: curIUnit.name}});
+        await ddcsControllers.processUnitUpdates({action: "D", data: {name: curIUnit.name}});
 
         const iPlayer = _.find(playerArray, {name: curIUnit.playername});
         if (iPlayer) {
             const iCurObj = {
-                sessionName,
+                sessionName: ddcsControllers.sessionName,
                 eventCode: ddcsControllers.shortNames[eventObj.action],
                 iucid: iPlayer.ucid,
                 iName: curIUnit.playername,

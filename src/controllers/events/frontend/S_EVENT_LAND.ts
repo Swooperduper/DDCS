@@ -5,7 +5,7 @@
 import * as _ from "lodash";
 import * as ddcsControllers from "../../";
 
-export async function processEventLand(sessionName: string, eventObj: any): Promise<void> {
+export async function processEventLand(eventObj: any): Promise<void> {
     let place: string = "";
     let baseLand: string = "";
 
@@ -17,7 +17,7 @@ export async function processEventLand(sessionName: string, eventObj: any): Prom
     }
 
     const iUnit = await ddcsControllers.unitActionRead({unitId: eventObj.data.arg3, isCrate: false});
-    const playerArray = await ddcsControllers.srvPlayerActionsRead({sessionName});
+    const playerArray = await ddcsControllers.srvPlayerActionsRead({sessionName: ddcsControllers.sessionName});
 
     if (_.isUndefined(iUnit[0])) {
         console.log("isUndef: ", eventObj);
@@ -49,7 +49,7 @@ export async function processEventLand(sessionName: string, eventObj: any): Prom
                     groupId: iUnit[0].groupId
                 });
                 const iCurObj = {
-                    sessionName,
+                    sessionName: ddcsControllers.sessionName,
                     eventCode: ddcsControllers.shortNames[eventObj.action],
                     iucid: iPlayer.ucid,
                     iName: iUnit[0].playername,
