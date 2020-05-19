@@ -16,7 +16,7 @@ export async function getDbConnection(dbType: string): Promise<mongoose.Connecti
 
     return mongoose.createConnection(
         "mongodb://" + user + host + ":27017/" + database + authSource,
-        { useCreateIndex: true, useNewUrlParser: true, useUnifiedTopology: true }
+        { useCreateIndex: true, useNewUrlParser: true, useFindAndModify: false, useUnifiedTopology: true }
     );
 }
 
