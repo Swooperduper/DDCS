@@ -53,6 +53,7 @@ export async function srvPlayerActionsUpdateFromServer(obj: {
     ipaddr?: string,
     sideLock?: number
 }): Promise<void> {
+    const engineCache = ddcsController.getEngineCache();
     return new Promise((resolve, reject) => {
         dbModels.srvPlayerModel.find({_id: obj._id}, (err: any, serverObj: typings.ISrvPlayers[]) => {
             if (err) { reject(err); }
@@ -65,7 +66,7 @@ export async function srvPlayerActionsUpdateFromServer(obj: {
                 if (obj.side === 0) { // keep the user on the last side
                     delete obj.side;
                 }
-                obj.curLifePoints = ddcsController.config.startLifePoints;
+                obj.curLifePoints = engineCache.config.startLifePoints;
 
                 const sObj = new dbModels.srvPlayerModel(obj);
                 sObj.save((saveErr: any) => {
@@ -76,7 +77,7 @@ export async function srvPlayerActionsUpdateFromServer(obj: {
                 const curPly = serverObj[0];
                 if ((curPly.sessionName !== obj.sessionName) && curPly.sessionName && obj.sessionName) {
                     const curTime =  new Date().getTime();
-                    obj.curLifePoints = ddcsController.config.startLifePoints;
+                    obj.curLifePoints = engineCache.config.startLifePoints;
                     obj.currentSessionMinutesPlayed_blue = 0;
                     obj.currentSessionMinutesPlayed_red = 0;
                     if (curPly.sideLockTime < curTime) {
@@ -235,6 +236,7 @@ export async function srvPlayerActionsAddTempScore(obj: {
     groupId: number
     score?: number
 }): Promise<void> {
+    const engineCache = ddcsController.getEngineCache();
     return new Promise((resolve, reject) => {
         dbModels.srvPlayerModel.find({_id: obj._id}, (err: any, serverObj: any[]) => {
             if (err) { reject(err); }
@@ -245,7 +247,7 @@ export async function srvPlayerActionsAddTempScore(obj: {
                     {$set: {tmpRSPoints: newTmpScore}},
                     (updateErr: any) => {
                         if (updateErr) { reject(updateErr); }
-                        if (ddcsController.config.inGameHitMessages) {
+                        if (engineCache.config.inGameHitMessages) {
                             ddcsController.sendMesgToGroup(
                                 obj.groupId,
                                 "TmpScore: " + newTmpScore + ", Land at a friendly base/farp to receive these points",
@@ -311,6 +313,7 @@ export async function srvPlayerActionsUnitAddToRealScore(obj: {
     score?: number,
     unitType?: string
 }): Promise<void> {
+    const engineCache = ddcsController.getEngineCache();
     return new Promise((resolve, reject) => {
         dbModels.srvPlayerModel.find({_id: obj._id}, (err: any, serverObj: any[]) => {
             if (err) { reject(err); }
@@ -336,7 +339,7 @@ export async function srvPlayerActionsUnitAddToRealScore(obj: {
                             if (updateErr) { reject(updateErr); }
                             console.log(obj.unitType + " has given " + addScore +
                                 " to " + curPly.name + " on " + curPly.side + ", Total: ", tObj);
-                            if (ddcsController.config.inGameHitMessages) {
+                            if (engineCache.config.inGameHitMessages) {
                                 ddcsController.sendMesgToGroup(
                                     obj.groupId,
                                     mesg,

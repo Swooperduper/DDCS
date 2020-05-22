@@ -6,6 +6,7 @@ import * as _ from "lodash";
 import * as ddcsControllers from "../../";
 
 export async function processEventTakeoff(eventObj: any): Promise<void> {
+    const engineCache = ddcsControllers.getEngineCache();
     let place: string;
     if (eventObj.data.arg6) {
         place = " from " + eventObj.data.arg6;
@@ -37,7 +38,7 @@ export async function processEventTakeoff(eventObj: any): Promise<void> {
                         roleCode: "I",
                         msg: "C: " + curIUnit.type + "(" + curIUnit.playername + ") has taken off" + place
                     };
-                    if (ddcsControllers.config.lifePointsEnabled) {
+                    if (engineCache.config.lifePointsEnabled) {
                         await ddcsControllers.removeLifePoints(
                             iPlayer,
                             curIUnit,

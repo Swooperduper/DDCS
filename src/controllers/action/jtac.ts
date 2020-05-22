@@ -49,7 +49,7 @@ export async function jtacNewTarget(jtUnit: typings.IUnit): Promise<void> {
     const enemyUnits = await ddcsControllers.getCoalitionGroundUnitsInProximity(jtUnit.lonLatLoc, jtacDistance, enemySide);
     const enemyUnitNameArray = _.map(enemyUnits, "name");
     if (enemyUnitNameArray.length > 0) {
-        await ddcsControllers.cmdQueActionsSave({
+        ddcsControllers.sendUDPPacket("frontEnd", {
             actionObj: {
                 action: "ISLOSVISIBLE",
                 jtacUnitName: jtUnit.name,
@@ -61,6 +61,8 @@ export async function jtacNewTarget(jtUnit: typings.IUnit): Promise<void> {
 }
 
 export async function processLOSEnemy(losReply: {jtacUnitName: string, data: string[]}): Promise<void> {
+
+    const engineCache = ddcsControllers.getEngineCache();
     if (losReply.data.length) {
         let enemyUnit;
         const unitPThrArray: any[] = [];
@@ -68,7 +70,7 @@ export async function processLOSEnemy(losReply: {jtacUnitName: string, data: str
         const curJtacUnit = fJtacUnit[0];
         const eJtacUnit = await ddcsControllers.unitActionRead({name: {$in: losReply.data}});
         _.forEach(eJtacUnit, (jtUnit) => {
-            const curUnitDict = _.find(ddcsControllers.unitDictionary, {_id: jtUnit.type});
+            const curUnitDict = _.find(engineCache.unitDictionary, {_id: jtUnit.type});
             if (curUnitDict) {
                 jtUnit.threatLvl = curUnitDict.threatLvl;
                 unitPThrArray.push(jtUnit);
@@ -83,7 +85,7 @@ export async function processLOSEnemy(losReply: {jtacUnitName: string, data: str
 
 export async function removeLaserIR(jtUnit: typings.IUnit): Promise<void> {
     console.log("Removing Laser: ", jtUnit.name);
-    await ddcsControllers.cmdQueActionsSave({
+    ddcsControllers.sendUDPPacket("frontEnd", {
         actionObj: {
             action : "REMOVELASERIR",
             jtacUnitName: jtUnit.name
@@ -100,7 +102,7 @@ export async function setLaserSmoke(jtUnit: typings.IUnit, enemyUnit: typings.IU
         curLaserCode = blueLaserCode;
     }
 
-    await ddcsControllers.cmdQueActionsSave({
+    ddcsControllers.sendUDPPacket("frontEnd", {
         actionObj: {
             action: "SETLASERSMOKE",
             jtacUnitName: jtUnit.name,

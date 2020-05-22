@@ -11,7 +11,7 @@ let lastUnitCount: any;
 let isServerFresh = false;
 let stuckDetect = 0;
 const stuckThreshold = 30;
-export let isServerSynced = false;
+export let isServerSynced = true;
 export let isSyncLockdownMode = false; // lock all processes out until server fully syncs
 export let processInstructions = false;
 
@@ -64,6 +64,7 @@ export async function syncServer(serverUnitCount: number): Promise<void> {
                         });
                     }
                 }
+                console.log("RMU: ", remappedunits);
                 for (const group of remappedunits) {
                     await ddcsControllers.spawnGroup(group);
                 }
@@ -90,7 +91,7 @@ export async function syncServer(serverUnitCount: number): Promise<void> {
                             mesg = "SYNCING|F|" + units.length + ":" + serverUnitCount;
                         }
                         if (stuckDetect > stuckThreshold) {
-                            await ddcsControllers.cmdQueActionsSave({
+                            await ddcsControllers.sendUDPPacket("frontEnd", {
                                 queName: "clientArray",
                                 actionObj: {action: "GETUNITSALIVE"}
                             });
@@ -135,7 +136,7 @@ export async function syncServer(serverUnitCount: number): Promise<void> {
                         mesg = "SYNCING|R1|" + units.length + ":" + serverUnitCount;
                     }
                     if (stuckDetect > stuckThreshold) {
-                        await ddcsControllers.cmdQueActionsSave({
+                        await ddcsControllers.sendUDPPacket("frontEnd", {
                             queName: "clientArray",
                             actionObj: {action: "GETUNITSALIVE"}
                         });

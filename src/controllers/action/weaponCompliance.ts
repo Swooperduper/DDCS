@@ -6,7 +6,8 @@ import * as _ from "lodash";
 import * as ddcsControllers from "../";
 
 export async function checkWeaponComplianceOnTakeoff(iPlayer: any, curIUnit: any): Promise<boolean> {
-    for (const weaponRule of ddcsControllers.config.weaponRules || []) {
+    const engineCache = ddcsControllers.getEngineCache();
+    for (const weaponRule of engineCache.config.weaponRules || []) {
         const limitedWeapons: any[] = [];
         let maxLimitedWeaponCount = 0;
         for ( const value of curIUnit.ammo || []) {
@@ -32,6 +33,7 @@ export async function checkWeaponComplianceOnTakeoff(iPlayer: any, curIUnit: any
 }
 
 export async function checkAircraftWeaponCompliance(): Promise<void> {
+    const engineCache = ddcsControllers.getEngineCache();
     const latestSession = await ddcsControllers.sessionsActionsReadLatest();
     if (latestSession[0].name) {
         const srvPlayers = await ddcsControllers.srvPlayerActionsRead({sessionName: latestSession[0].name, playername: {$ne: ""}});
@@ -39,7 +41,7 @@ export async function checkAircraftWeaponCompliance(): Promise<void> {
             const cUnit = await ddcsControllers.unitActionRead({dead: false, playername: curPlayer.name});
             if (cUnit.length > 0) {
                 const curUnit = cUnit[0];
-                for (const weaponRule of ddcsControllers.config.weaponRules || []) {
+                for (const weaponRule of engineCache.config.weaponRules || []) {
                     const limitedWeapons: any[] = [];
                     let maxLimitedWeaponCount = 0;
                     for (const value of curUnit.ammo || []) {

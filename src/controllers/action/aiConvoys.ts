@@ -6,11 +6,11 @@ import * as _ from "lodash";
 import * as typings from "../../typings";
 import * as ddcsControllers from "../";
 
-
 export async function maintainPvEConfig(): Promise<void> {
+    const engineCache = ddcsControllers.getEngineCache();
     const stackObj: {fullCampaignStackStats: typings.IPlayerBalance} = await campaignStackTypes();
     let lockedStack: boolean;
-    for (const pveConfig of ddcsControllers.config.pveAIConfig) {
+    for (const pveConfig of engineCache.config.pveAIConfig) {
         lockedStack = false;
         for (const aIConfig of pveConfig.config) {
             if (aIConfig.functionCall === "fullAIEnabled") {

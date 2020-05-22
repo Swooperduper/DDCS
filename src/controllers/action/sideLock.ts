@@ -34,7 +34,7 @@ export async function setSideLockFlags(): Promise<void> {
         }
 
         console.log("setSideLock: ", playerSideLockTable);
-        await  ddcsControllers.cmdQueActionsSave({
+        ddcsControllers.sendUDPPacket("frontEnd", {
             actionObj: {
                 action : "SETSIDELOCK",
                 data: playerSideLockTable

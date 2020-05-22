@@ -6,7 +6,7 @@ import * as ddcsController from "../";
 
 export async function forcePlayerSpectator(playerId: string, mesg: string): Promise<void> {
 
-    await ddcsController.cmdQueActionsSave({
+    await ddcsController.sendUDPPacket("backEnd", {
         actionObj: {
             action: "CMD",
             cmd: "net.force_player_slot(" + playerId + ", 0, \"\")",
@@ -15,7 +15,7 @@ export async function forcePlayerSpectator(playerId: string, mesg: string): Prom
         queName: "gameGuiArray"
     });
 
-    await ddcsController.cmdQueActionsSave({
+    await ddcsController.sendUDPPacket("backEnd", {
         actionObj: {
             action: "CMD",
             cmd: "net.send_chat([[" + mesg + "]], all)",
@@ -26,7 +26,7 @@ export async function forcePlayerSpectator(playerId: string, mesg: string): Prom
 }
 
 export async function kickPlayer(playerId: number, mesg: string): Promise<void> {
-    await ddcsController.cmdQueActionsSave({
+    await ddcsController.sendUDPPacket("backEnd", {
         actionObj: {
             action: "CMD",
             cmd: "net.kick(" + playerId + ", [[" + mesg + "]])",
@@ -37,7 +37,7 @@ export async function kickPlayer(playerId: number, mesg: string): Promise<void> 
 }
 
 export async function loadMission(missionName: string): Promise<void> {
-    await ddcsController.cmdQueActionsSave({
+    await ddcsController.sendUDPPacket("backEnd", {
         actionObj: {
             action: "CMD",
             cmd: "net.load_mission([[" + missionName + "]])",
@@ -48,7 +48,7 @@ export async function loadMission(missionName: string): Promise<void> {
 }
 
 export async function sendMesgChatWindow(mesg: string): Promise<void> {
-    await ddcsController.cmdQueActionsSave({
+    await ddcsController.sendUDPPacket("backEnd", {
         actionObj: {
             action: "CMD",
             cmd: "net.send_chat([[" + mesg + "]], true)",
@@ -59,7 +59,7 @@ export async function sendMesgChatWindow(mesg: string): Promise<void> {
 }
 
 export async function sendMesgToAll(mesg: string, time: number, delayTime?: number): Promise<void> {
-    await ddcsController.cmdQueActionsSave({
+    await ddcsController.sendUDPPacket("frontEnd", {
         actionObj: {
             action: "CMD",
             cmd: ["trigger.action.outText([[" + mesg + "]], " + time + ")"],
@@ -71,7 +71,7 @@ export async function sendMesgToAll(mesg: string, time: number, delayTime?: numb
 }
 
 export async function sendMesgToCoalition(coalition: number, mesg: string, time: number, delayTime?: number): Promise<void> {
-    await ddcsController.cmdQueActionsSave({
+    await ddcsController.sendUDPPacket("frontEnd", {
         actionObj: {
             action: "CMD",
             cmd: ["trigger.action.outTextForCoalition(" + coalition + ", [[" + mesg + "]], " + time + ")"],
@@ -83,7 +83,7 @@ export async function sendMesgToCoalition(coalition: number, mesg: string, time:
 }
 
 export async function sendMesgToGroup(groupId: number, mesg: string, time: number, delayTime?: number): Promise<void> {
-    await ddcsController.cmdQueActionsSave({
+    await ddcsController.sendUDPPacket("frontEnd", {
         actionObj: {
             action: "CMD",
             cmd: ["trigger.action.outTextForGroup(" + groupId + ", [[" + mesg + "]], " + time + ")"],
@@ -95,7 +95,7 @@ export async function sendMesgToGroup(groupId: number, mesg: string, time: numbe
 }
 
 export async function setIsOpenSlotFlag(lockFlag: number): Promise<void> {
-    await ddcsController.cmdQueActionsSave({
+    await ddcsController.sendUDPPacket("frontEnd", {
         actionObj: {
             action: "SETISOPENSLOT",
             val: lockFlag

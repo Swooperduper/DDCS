@@ -21,7 +21,8 @@ export async function repairBase(base: typing.IBase, curUnit: typing.IUnit): Pro
 }
 
 export async function repairBaseSAMRadars(): Promise<void> {
-    const samTypeArray = _.map(_.filter( ddcsControllers.unitDictionary, (filtObj) => {
+    const engineCache = ddcsControllers.getEngineCache();
+    const samTypeArray = _.map(_.filter( engineCache.unitDictionary, (filtObj) => {
         return filtObj.spawnCat === "samRadar" || filtObj.spawnCat === "unarmedAmmo";
     }) , "type");
 
@@ -31,7 +32,7 @@ export async function repairBaseSAMRadars(): Promise<void> {
         let launcher = 0;
         for (const element of groups[group]) {
             const curUnitDict = _.find(
-                _.cloneDeep( ddcsControllers.unitDictionary),
+                _.cloneDeep( engineCache.unitDictionary),
                 {_id: element.type}
             );
             if (curUnitDict) {

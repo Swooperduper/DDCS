@@ -6,6 +6,7 @@ import * as _ from "lodash";
 import * as ddcsControllers from "../../";
 
 export async function processFriendlyFire(eventObj: any): Promise<void> {
+    const engineCache = ddcsControllers.getEngineCache();
     // var iCurObj;
     let iPlayer: any;
     let tPlayer: any;
@@ -26,7 +27,7 @@ export async function processFriendlyFire(eventObj: any): Promise<void> {
                 const tunit = await ddcsControllers.unitActionRead({unitId: tPlayer.slot});
                 curIUnit = iunit[0];
                 curTUnit = tunit[0];
-                if (ddcsControllers.config.lifePointsEnabled) {
+                if (engineCache.config.lifePointsEnabled) {
                     await ddcsControllers.removeLifePoints(
                         curIPlayer,
                         curIUnit,
@@ -36,7 +37,7 @@ export async function processFriendlyFire(eventObj: any): Promise<void> {
                     );
                 }
 
-                if (curTUnit.inAir && ddcsControllers.config.lifePointsEnabled) {
+                if (curTUnit.inAir && engineCache.config.lifePointsEnabled) {
                     await ddcsControllers.addLifePoints(
                         curTPlayer,
                         curTUnit

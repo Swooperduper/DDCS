@@ -6,6 +6,7 @@ import * as _ from "lodash";
 import * as ddcsControllers from "../../";
 
 export async function processEventPilotDead(eventObj: any): Promise<void> {
+    const engineCache = ddcsControllers.getEngineCache();
     const nowTime = new Date().getTime();
     const iUnit = await ddcsControllers.unitActionRead({unitId: eventObj.data.arg3});
     const playerArray = await ddcsControllers.srvPlayerActionsRead({sessionName: ddcsControllers.sessionName});
@@ -29,7 +30,7 @@ export async function processEventPilotDead(eventObj: any): Promise<void> {
             }
             await ddcsControllers.srvPlayerActionsClearTempScore({_id: iCurObj.iucid, groupId: iCurObj.groupId});
 
-            if (ddcsControllers.config.inGameHitMessages) {
+            if (engineCache.config.inGameHitMessages) {
                 await ddcsControllers.sendMesgToAll(
                     iCurObj.msg,
                     5,

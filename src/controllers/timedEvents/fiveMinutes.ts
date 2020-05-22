@@ -4,7 +4,7 @@
 
 import * as ddcsControllers from "../";
 
-export async function processFiveMinuteActions(fullySynced: boolean) {
+export async function processFiveMinuteActions(fullySynced: boolean): Promise<void> {
     if (fullySynced) {
         await ddcsControllers.checkBaseWarnings();
         await ddcsControllers.recordFiveMinutesPlayed();

@@ -7,7 +7,7 @@ import * as typing from "../../typings";
 import * as ddcsControllers from "../";
 
 export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: string) {
-
+    const engineCache = ddcsControllers.getEngineCache();
     let crateObj: any;
     let crateCount: number = 0;
     let curBaseName: string;
@@ -79,10 +79,9 @@ export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: 
                         }
                     }
                     if (curIntCrateType === "CCBuild") {  // serverName, curUnit, curPlayer, intCargoType
-                        await ddcsControllers.getServer();
                         const delCrates = await ddcsControllers.staticCrateActionRead({playerOwnerId: curPlayer.ucid});
                         for (const crate of delCrates) {
-                            if (crateCount > ddcsControllers.config.maxCrates - 2) {
+                            if (crateCount > engineCache.config.maxCrates - 2) {
                                 await ddcsControllers.staticCrateActionDelete({
                                     _id: crate._id
                                 });
@@ -310,6 +309,7 @@ export async function loadTroops(unitId: string, troopType: string) {
 }
 
 export async function menuCmdProcess(pObj: any) {
+    const engineCache = ddcsControllers.getEngineCache();
     const defCrate = "iso_container_small";
 
     const units = await ddcsControllers.unitActionRead({unitId: pObj.unitId});
@@ -397,7 +397,7 @@ export async function menuCmdProcess(pObj: any) {
 
                                 for (
                                     let x = 0;
-                                    x < curSpawnUnit.config[ddcsControllers.config.timePeriod].spawnCount;
+                                    x < curSpawnUnit.config[engineCache.config.timePeriod].spawnCount;
                                     x++
                                 ) {
                                     curTroops.push(spawnArray);
@@ -495,7 +495,7 @@ export async function menuCmdProcess(pObj: any) {
                                         unitId: pObj.unitId
                                     };
                                     const actionObj = {actionObj: sendClient, queName: "clientArray"};
-                                    await ddcsControllers.cmdQueActionsSave(actionObj);
+                                    await ddcsControllers.sendUDPPacket("frontEnd", actionObj);
                                 }
                             }
                         }
@@ -523,14 +523,13 @@ export async function menuCmdProcess(pObj: any) {
                         isTroop: false,
                         dead: false
                     });
-                    const serverInfo = await ddcsControllers.getServer();
                     const grpGroups = _.transform(unitsOwned, (result: any, value: any) => {
                         (result[value.groupName] || (result[value.groupName] = [])).push(value);
                     }, {});
 
                     await ddcsControllers.sendMesgToGroup(
                         curUnit.groupId,
-                        "G: You Have " + _.size(grpGroups) + "/" + serverInfo.maxUnitsMoving + " Unit Acquisitions In Play!",
+                        "G: You Have " + _.size(grpGroups) + "/" + engineCache.config.maxUnitsMoving + " Unit Acquisitions In Play!",
                         10
                     );
                     break;
@@ -748,6 +747,7 @@ export async function spawnCrateFromLogi(
     mass: number,
     crateType: string
 ) {
+    const engineCache = ddcsControllers.getEngineCache();
     let spc: string;
     let crateObj;
     let crateCount = 0;
@@ -764,7 +764,6 @@ export async function spawnCrateFromLogi(
             5
         );
     } else {
-        const serverInfo = await ddcsControllers.getServer();
         const player = await ddcsControllers.srvPlayerActionsRead({name: unit.playername});
         const curPlayer = player[0];
         let closeLogi = "";
@@ -786,7 +785,7 @@ export async function spawnCrateFromLogi(
         if (_.some(checkAllBase)) {
             const delCrates = await ddcsControllers.staticCrateActionRead({playerOwnerId: curPlayer.ucid});
             for (const crate of delCrates) {
-                if (crateCount > serverInfo.maxCrates - 2) {
+                if (crateCount > engineCache.config.maxCrates - 2) {
                     await ddcsControllers.staticCrateActionDelete({
                         _id: crate._id
                     });
@@ -795,7 +794,7 @@ export async function spawnCrateFromLogi(
                 crateCount++;
             }
             let curShapeName: string;
-            const curCrate = _.find(ddcsControllers.staticDictionary, {_id: crateType});
+            const curCrate = _.find(engineCache.staticDictionary, {_id: crateType});
             if (curCrate) {
                 curShapeName = curCrate.shape_name;
             } else {
@@ -1065,7 +1064,8 @@ export async function spawnTanker(curUnit: any, curPlayer: any, tankerType: stri
 }
 
 export async function unpackCrate(playerUnit: any, country: string, type: string, special: string, combo: boolean, mobile: boolean) {
-    const curTimePeriod = ddcsControllers.config.timePeriod || "modern";
+    const engineCache = ddcsControllers.getEngineCache();
+    const curTimePeriod = engineCache.config.timePeriod || "modern";
     if (playerUnit.inAir) {
         await ddcsControllers.sendMesgToGroup(
             playerUnit.groupId,
@@ -1082,10 +1082,9 @@ export async function unpackCrate(playerUnit: any, country: string, type: string
             isCrate: false,
             dead: false
         });
-        const serverInfo = await ddcsControllers.getServer();
         let curUnit = 0;
         const grpGroups = _.groupBy(delUnits, "groupName");
-        const tRem = Object.keys(grpGroups).length - serverInfo.maxUnitsMoving;
+        const tRem = Object.keys(grpGroups).length - engineCache.config.maxUnitsMoving;
 
         for (const gUnitKey of Object.keys(grpGroups)) {
             if (curUnit <= tRem) {
@@ -1099,10 +1098,9 @@ export async function unpackCrate(playerUnit: any, country: string, type: string
 
         const newSpawnArray: any[] = [];
         if (combo) {
-            const unitDic = await ddcsControllers.getUnitDictionary(curTimePeriod);
             const addHdg = 30;
             let curUnitHdg = playerUnit.hdg;
-            const findUnits = _.filter(unitDic, (curUnitDict) => {
+            const findUnits = _.filter(engineCache.unitDictionary, (curUnitDict) => {
                 return _.includes(curUnitDict.comboName, type);
             });
             for (const cbUnit of findUnits) {
@@ -1128,12 +1126,11 @@ export async function unpackCrate(playerUnit: any, country: string, type: string
             await ddcsControllers.spawnLogiGroup(newSpawnArray, playerUnit.coalition);
             return true;
         } else {
-            const unitDic = await ddcsControllers.getUnitDictionary(curTimePeriod);
             const addHdg = 30;
             let curUnitHdg = playerUnit.hdg;
             let unitStart;
             let pCountry = country;
-            const findUnit = _.find(unitDic, {_id: type});
+            const findUnit = _.find(engineCache.unitDictionary, {_id: type});
 
             if (findUnit) {
                 const spawnUnitCount = findUnit.config[curTimePeriod].spawnCount;

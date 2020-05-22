@@ -21,7 +21,7 @@ export async function setEWRTask(unitName: string): Promise<void> {
         queName: "clientArray",
         timeToExecute: new Date().getTime() + ddcsControllers.time.oneMin
     };
-    await ddcsControllers.cmdQueActionsSave(actionObj);
+    ddcsControllers.sendUDPPacket("frontEnd", actionObj);
 }
 
 export async function setMissionTask(groupName: string, route: string): Promise<void> {
@@ -38,5 +38,5 @@ export async function setMissionTask(groupName: string, route: string): Promise<
         queName: "clientArray",
         timeToExecute: new Date().getTime() + ddcsControllers.time.oneMin
     };
-    await ddcsControllers.cmdQueActionsSave(actionObj);
+    ddcsControllers.sendUDPPacket("frontEnd", actionObj);
 }

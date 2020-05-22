@@ -6,9 +6,11 @@ import * as _ from "lodash";
 import * as ddcsControllers from "../";
 
 export async function processFiveSecActions(fullySynced: boolean): Promise<void> {
+    const engineCache = ddcsControllers.getEngineCache();
+    console.log("runEveryFiveSeconds");
     const replenThreshold = 1; // percentage under max
-    const replenBase = ddcsControllers.config.replenThresholdBase * replenThreshold;
-    const replenTimer = _.random(ddcsControllers.config.replenTimer / 2, ddcsControllers.config.replenTimer);
+    const replenBase = engineCache.replenThresholdBase * replenThreshold;
+    const replenTimer = _.random(engineCache.replenTimer / 2, engineCache.replenTimer);
 
     if (fullySynced) {
         // resetCampaignController.checkTimeToRestart(serverName); //for testing base capture quickly

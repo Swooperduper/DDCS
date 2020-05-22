@@ -7,13 +7,14 @@ import * as typings from "../../typings";
 import * as ddcsControllers from "../";
 
 export async function baseUnitUnderAttack(unit: typings.IUnit): Promise<void> {
+    const engineCache = ddcsControllers.getEngineCache();
     if (unit.category === "GROUND") {
         const closestBases = await ddcsControllers.getBasesInProximity(unit.lonLatLoc, 18, unit.coalition);
         if (closestBases) {
             const curDBBase = closestBases[0];
             const aliveComms = await ddcsControllers.unitActionRead({name: curDBBase.name + " Communications", dead: false});
             if (aliveComms.length > 0) {
-                const curBase = _.find(ddcsControllers.bases, {_id: curDBBase._id});
+                const curBase = _.find(engineCache.bases, {_id: curDBBase._id});
                 if (curBase) {
                     curBase.underAttack += 1;
                     console.log(curBase.name + " is under attack " + curBase.underAttack + " times");
@@ -24,7 +25,8 @@ export async function baseUnitUnderAttack(unit: typings.IUnit): Promise<void> {
 }
 
 export async function checkBaseWarnings(): Promise<void> {
-    for (const base of ddcsControllers.bases) {
+    const engineCache = ddcsControllers.getEngineCache();
+    for (const base of engineCache.bases) {
         if (base.underAttack > 0) {
             await ddcsControllers.sendMesgToCoalition(
                 _.get(base, "side"),

@@ -8,6 +8,7 @@ import * as ddcsControllers from "../../";
 export let shootingUsers: any = {};
 
 export async function checkShootingUsers(): Promise<void> {
+    const engineCache = ddcsControllers.getEngineCache();
     const nowTime = new Date().getTime();
     const curKeys = _.keys(shootingUsers);
     if (curKeys.length > 0) {
@@ -37,7 +38,7 @@ export async function checkShootingUsers(): Promise<void> {
                 }
                 if (shootObj.tUnit.category === "GROUND") {
                     await ddcsControllers.baseUnitUnderAttack(shootObj.tUnit);
-                    if (ddcsControllers.config.inGameHitMessages) {
+                    if (engineCache.config.inGameHitMessages) {
                         console.log("shooting1: ", shootObj.msg);
                         await ddcsControllers.sendMesgToAll(
                             "A: " + shootObj.msg,
@@ -47,7 +48,7 @@ export async function checkShootingUsers(): Promise<void> {
                     }
                 } else if (shootObj.iUnit.category === "GROUND") {
                     await ddcsControllers.baseUnitUnderAttack(shootObj.tUnit);
-                    if (ddcsControllers.config.inGameHitMessages || exports.shootingUsers[shootKey].isOwnedUnit) {
+                    if (engineCache.config.inGameHitMessages || exports.shootingUsers[shootKey].isOwnedUnit) {
                         console.log("shooting2: ", shootObj.msg);
                         await ddcsControllers.sendMesgToAll(
                             "A: " + shootObj.msg,
@@ -56,7 +57,7 @@ export async function checkShootingUsers(): Promise<void> {
                         );
                     }
                 } else {
-                    if (ddcsControllers.config.inGameHitMessages) {
+                    if (engineCache.config.inGameHitMessages) {
                         console.log("shooting3: ", shootObj.msg);
                         await ddcsControllers.sendMesgToAll(
                             "A: " + shootObj.msg,
@@ -72,6 +73,7 @@ export async function checkShootingUsers(): Promise<void> {
 }
 
 export async function processEventHit(eventObj: any): Promise<void> {
+    const engineCache = ddcsControllers.getEngineCache();
     const iUnitId = eventObj.data.arg3;
     const tUnitId = eventObj.data.arg4;
     let iPName: string = "";
@@ -149,7 +151,7 @@ export async function processEventHit(eventObj: any): Promise<void> {
     }
 
     if (iUnit[0].coalition !== tUnit[0].coalition) {
-        const curWeapon = _.find(ddcsControllers.weaponsDictionary, {_id: eventObj.data.arg7.typeName});
+        const curWeapon = _.find(engineCache.weaponsDictionary, {_id: eventObj.data.arg7.typeName});
 
         if (curWeapon) {
             const curWeaponName = ( curWeapon.displayName) ?  curWeapon.displayName :  curWeapon._id;
@@ -198,7 +200,7 @@ export async function processEventHit(eventObj: any): Promise<void> {
                     }
                     if (iCurObj.tUnit.category === "GROUND") {
                         await ddcsControllers.baseUnitUnderAttack(iCurObj.tUnit);
-                        if (ddcsControllers.config.inGameHitMessages) {
+                        if (engineCache.config.inGameHitMessages) {
                             console.log("groundhit: ", iCurObj.msg);
                             await ddcsControllers.sendMesgToAll(
                                 "A: " + iCurObj.msg,
@@ -207,7 +209,7 @@ export async function processEventHit(eventObj: any): Promise<void> {
                             );
                         }
                     } else if (iCurObj.iUnit.category === "GROUND") {
-                        if (ddcsControllers.config.inGameHitMessages || isOwnedUnit) {
+                        if (engineCache.config.inGameHitMessages || isOwnedUnit) {
                             console.log("groundrecievehit: ", iCurObj.msg);
                             await ddcsControllers.sendMesgToAll(
                                 "A: " + iCurObj.msg,
@@ -216,7 +218,7 @@ export async function processEventHit(eventObj: any): Promise<void> {
                             );
                         }
                     } else {
-                        if (ddcsControllers.config.inGameHitMessages) {
+                        if (engineCache.config.inGameHitMessages) {
                             console.log("reg hit: ", iCurObj.msg);
                             await ddcsControllers.sendMesgToAll(
                                 "A: " + iCurObj.msg,

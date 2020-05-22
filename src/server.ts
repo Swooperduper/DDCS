@@ -1,4 +1,4 @@
-import * as bodyParser from "body-parser";;
+import * as bodyParser from "body-parser";
 import * as controllers from "./webControllers";
 import { Server } from "@overnightjs/core";
 import { Logger } from "@overnightjs/logger";
@@ -11,7 +11,10 @@ class DDCSServer extends Server {
         super(true);
         this.app.use(bodyParser.json());
         this.app.use(bodyParser.urlencoded({extended: true}));
-        this.setupControllers();
+        this.setupControllers()
+            .catch((err) => {
+                console.log("Error setting up controllers: ", err);
+            });
     }
 
 

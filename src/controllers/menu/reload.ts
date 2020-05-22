@@ -7,13 +7,14 @@ import * as typing from "../../typings";
 import * as ddcsControllers from "../";
 
 export async function reloadSAM(unitCalling: typing.IUnit): Promise<boolean> {
+    const engineCache = ddcsControllers.getEngineCache();
     const units = await ddcsControllers.getGroundUnitsInProximity(unitCalling.lonLatLoc, 0.2, false);
     const closestUnit = _.filter(units, {coalition: unitCalling.coalition})[0];
     if (closestUnit) {
         const samUnits = await ddcsControllers.unitActionRead({groupName: closestUnit.groupName, isCrate: false, dead: false});
         if (samUnits.length) {
             const curSamType = samUnits[0].type;
-            const curUnitDict = _.find(ddcsControllers.unitDictionary, {_id: curSamType});
+            const curUnitDict = _.find(engineCache.unitDictionary, {_id: curSamType});
             if (curUnitDict) {
                 const curReloadArray = curUnitDict.reloadReqArray;
                 if (curReloadArray.length === _.intersection(curReloadArray, _.map(samUnits, "type")).length) {

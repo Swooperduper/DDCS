@@ -6,6 +6,7 @@ import * as _ from "lodash";
 import * as ddcsControllers from "../../";
 
 export async function processEventLand(eventObj: any): Promise<void> {
+    const engineCache = ddcsControllers.getEngineCache();
     let place: string = "";
     let baseLand: string = "";
 
@@ -58,7 +59,7 @@ export async function processEventLand(eventObj: any): Promise<void> {
                     msg: "C: " + iUnit[0].type + "(" + iUnit[0].playername + ") has landed at friendly " + place
                 };
                 console.log("FriendBaseLand: ", iCurObj.msg);
-                if (iCurObj.iucid && ddcsControllers.config.lifePointsEnabled) {
+                if (iCurObj.iucid && engineCache.config.lifePointsEnabled) {
                     await ddcsControllers.addLifePoints(
                         iPlayer,
                         iUnit[0],

@@ -7,10 +7,11 @@ import * as typings from "../../typings";
 import * as ddcsControllers from "../";
 
 export function getWeaponCost(typeName: string, count: number): number {
+    const engineCache = ddcsControllers.getEngineCache();
     let mantraCHK = 0;
 
     if (typeName === "MATRA") { mantraCHK += count; }
-    const curWeaponLookup = _.find(ddcsControllers.weaponsDictionary, {_id: typeName} );
+    const curWeaponLookup = _.find(engineCache.weaponsDictionary, {_id: typeName} );
     if (curWeaponLookup) {
         const foxAllowance = (mantraCHK > 2) ? 0 : (count > 2) ? 0 : curWeaponLookup.fox2ModUnder2 || 0;
         return curWeaponLookup.tier || 0 + foxAllowance;
@@ -98,6 +99,7 @@ export async function lookupLifeResource(playerUcid: string): Promise<void> {
 }
 
 export async function lookupAircraftCosts(playerUcid: string): Promise<void> {
+    const engineCache = ddcsControllers.getEngineCache();
     const srvPlayer = await ddcsControllers.srvPlayerActionsRead({_id: playerUcid});
     const curPlayer = srvPlayer[0];
     if (curPlayer) {
@@ -105,7 +107,7 @@ export async function lookupAircraftCosts(playerUcid: string): Promise<void> {
             const cUnit = await ddcsControllers.unitActionRead({playername: curPlayer.name});
             if (cUnit.length > 0) {
                 const curUnit = cUnit[0];
-                const curUnitDictionary = _.find(ddcsControllers.unitDictionary, {_id: curUnit.type});
+                const curUnitDictionary = _.find(engineCache.unitDictionary, {_id: curUnit.type});
                 if (curUnitDictionary) {
                     const curUnitLPCost = (curUnitDictionary) ? curUnitDictionary.LPCost : 1;
                     let curTopWeaponCost = 0;
@@ -135,6 +137,7 @@ export async function lookupAircraftCosts(playerUcid: string): Promise<void> {
 }
 
 export async function checkAircraftCosts(): Promise<void> {
+    const engineCache = ddcsControllers.getEngineCache();
     const latestSession = await ddcsControllers.sessionsActionsReadLatest();
     let mesg: string;
     if (latestSession[0].name) {
@@ -144,7 +147,7 @@ export async function checkAircraftCosts(): Promise<void> {
                 const cUnit = await ddcsControllers.unitActionRead({dead: false, playername: curPlayer.name});
                 if (cUnit.length > 0) {
                     const curUnit = cUnit[0];
-                    const curUnitDictionary = _.find(ddcsControllers.unitDictionary, {_id: curUnit.type});
+                    const curUnitDictionary = _.find(engineCache.unitDictionary, {_id: curUnit.type});
                     const curUnitLPCost = (curUnitDictionary) ? curUnitDictionary.LPCost : 1;
                     let curTopWeaponCost = 0;
                     let totalTakeoffCosts;
@@ -186,9 +189,10 @@ export async function removeLifePoints(
     isDirect?: boolean,
     removeLP?: number
 ): Promise<void> {
+    const engineCache = ddcsControllers.getEngineCache();
     let curRemoveLP = removeLP;
     if (!isDirect) {
-        const curUnitDictionary = _.find(ddcsControllers.unitDictionary, {_id: curUnit.type});
+        const curUnitDictionary = _.find(engineCache.unitDictionary, {_id: curUnit.type});
         const curUnitLPCost = (curUnitDictionary) ? curUnitDictionary.LPCost : 1;
         let curTopWeaponCost = 0;
         for (const value of curUnit.ammo || []) {

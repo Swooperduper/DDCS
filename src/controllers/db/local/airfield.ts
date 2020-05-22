@@ -30,6 +30,8 @@ export async function baseActionUpdate(obj: any): Promise<void> {
 }
 
 export async function baseActionGetClosestBase(obj: { unitLonLatLoc: number[] }): Promise<types.IBase> {
+
+    const engineCache = ddcsController.getEngineCache();
     return new Promise((resolve, reject) => {
         dbModels.airfieldModel.find(
             {
@@ -43,7 +45,7 @@ export async function baseActionGetClosestBase(obj: { unitLonLatLoc: number[] })
                         }
                     }
                 },
-                mapType: ddcsController.config.theater
+                mapType: engineCache.config.theater
             },
             (err: any, dbAirfields: types.IBase[]) => {
                 if (err) { reject(err); }
@@ -57,6 +59,8 @@ export async function baseActionGetClosestFriendlyBase(obj: {
     playerSide: number,
     unitLonLatLoc: number[]
 }): Promise<types.IBase> {
+
+    const engineCache = ddcsController.getEngineCache();
     return new Promise((resolve, reject) => {
         dbModels.airfieldModel.find(
             {
@@ -71,7 +75,7 @@ export async function baseActionGetClosestFriendlyBase(obj: {
                         }
                     }
                 },
-                mapType: ddcsController.config.theater
+                mapType: engineCache.config.theater
             },
             (err: any, dbairfields: types.IBase[]) => {
                 if (err) { reject(err); }
@@ -85,6 +89,8 @@ export async function baseActionGetClosestEnemyBase(obj: {
     playerSide: number,
     unitLonLatLoc: number[]
 }): Promise<types.IBase> {
+
+    const engineCache = ddcsController.getEngineCache();
     return new Promise((resolve, reject) => {
         dbModels.airfieldModel.find(
             {
@@ -99,7 +105,7 @@ export async function baseActionGetClosestEnemyBase(obj: {
                         }
                     }
                 },
-                mapType: ddcsController.config.theater
+                mapType: engineCache.config.theater
             },
             (err: any, dbairfields: types.IBase[]) => {
                 if (err) { reject(err); }
@@ -110,27 +116,22 @@ export async function baseActionGetClosestEnemyBase(obj: {
 }
 
 export async function baseActionGetBaseSides(): Promise<types.IBase[]> {
+
+    const engineCache = ddcsController.getEngineCache();
     return new Promise((resolve, reject) => {
-        if (!ddcsController.config.theater) {
-            ddcsController.getServer()
-                .then((serverConf) => {
-                    dbModels.airfieldModel.find(
-                        {mapType: serverConf.theater, enabled: true},
-                        (err: any, dbAirfields: types.IBase[]) => {
-                            if (err) { reject(err); }
-                            resolve(_.transform(dbAirfields, (result: any, value: any) => {
-                                result.push({name: value.name, baseType: value.baseType, side: value.side});
-                            }, []));
-                        }
-                    );
-                })
-                .catch((err) => {
-                    reject("line:542, failed to connect to db: " + JSON.stringify(err));
-                })
-            ;
+        if (!engineCache.config.theater) {
+            dbModels.airfieldModel.find(
+                {mapType: engineCache.config.theater, enabled: true},
+                (err: any, dbAirfields: types.IBase[]) => {
+                    if (err) { reject(err); }
+                    resolve(_.transform(dbAirfields, (result: any, value: any) => {
+                        result.push({name: value.name, baseType: value.baseType, side: value.side});
+                    }, []));
+                }
+            );
         } else {
             dbModels.airfieldModel.find(
-                {mapType: ddcsController.config.theater, enabled: true},
+                {mapType: engineCache.config.theater, enabled: true},
                 (err: any, dbAirfields: types.IBase[]) => {
                     if (err) { reject(err); }
                     resolve(_.transform(dbAirfields, (result: any, value: any) => {

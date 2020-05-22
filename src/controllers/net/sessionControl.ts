@@ -9,7 +9,6 @@ export let curServerStaticCnt: number = 0;
 
 export async function getLatestSession(serverInfoObj: any): Promise<void> {
 
-
     if (curServerEpoc) {
         const buildSessionName = process.env.SERVER_NAME + "_" + curServerEpoc;
         const latestSession = await ddcsController.sessionsActionsReadLatest();

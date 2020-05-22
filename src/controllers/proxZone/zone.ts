@@ -86,7 +86,8 @@ export function isLatLonInZone(lonLat: number[], polyZone: any[]) {
 }
 
 export function getRandomLatLonFromBase(baseName: string, polytype: string, zoneNum?: string): number[] {
-    const baseInfo: any = _.find(ddcsControllers.bases, {_id: baseName});
+    const engineCache = ddcsControllers.getEngineCache();
+    const baseInfo: any = _.find(engineCache.bases, {_id: baseName});
     if (baseInfo) {
         _.get(baseInfo, ["polygonLoc", polytype]);
         const pGroups = baseInfo.polygonLoc[polytype];

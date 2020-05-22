@@ -4,9 +4,10 @@
 
 import * as ddcsControllers from "../";
 
-export async function processTenMinuteActions(fullySynced: boolean) {
+export async function processTenMinuteActions(fullySynced: boolean): Promise<void> {
+    const engineCache = ddcsControllers.getEngineCache();
     if (fullySynced) {
-        if (ddcsControllers.config.lifePointsEnabled) {
+        if (engineCache.config.lifePointsEnabled) {
             await ddcsControllers.updateServerLifePoints();
         }
     }

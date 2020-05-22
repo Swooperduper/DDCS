@@ -1415,7 +1415,8 @@ export function getRndFromSpawnCat(
     launchers?: number,
     useUnitType?: string
 ): typing.IUnitDictionary[] {
-    const curTimePeriod = ddcsControllers.config.timePeriod;
+    const engineCache = ddcsControllers.getEngineCache();
+    const curTimePeriod = engineCache.config.timePeriod;
     const curEnabledCountrys = ddcsControllers.side[side] + "Countrys";
     let findUnits;
     const cPUnits: any[] = [];
@@ -1426,14 +1427,14 @@ export function getRndFromSpawnCat(
     let curUnits: any[] = [];
 
     if (!_.isEmpty(useUnitType)) {
-        const curComboUnit = _.find(ddcsControllers.unitDictionary, {type: useUnitType});
+        const curComboUnit = _.find(engineCache.unitDictionary, {type: useUnitType});
         if (curComboUnit && curComboUnit.comboName) {
-            findUnits = _.filter(ddcsControllers.unitDictionary, {comboName: curComboUnit.comboName});
+            findUnits = _.filter(engineCache.unitDictionary, {comboName: curComboUnit.comboName});
         }
     } else if (curTimePeriod === "modern" && spawnCat === "samRadar") {
-        findUnits = _.filter(ddcsControllers.unitDictionary, {spawnCat: "samRadar", spawnCatSec: "modern", enabled: true});
+        findUnits = _.filter(engineCache.unitDictionary, {spawnCat: "samRadar", spawnCatSec: "modern", enabled: true});
     } else {
-        findUnits = _.filter(ddcsControllers.unitDictionary, {spawnCat, enabled: true});
+        findUnits = _.filter(engineCache.unitDictionary, {spawnCat, enabled: true});
     }
 
     if (findUnits && findUnits.length > 0) {
@@ -1485,7 +1486,8 @@ export function getRndFromSpawnCat(
 }
 
 export function spawnSupportVehiclesOnFarp( baseName: string, side: number ): typing.IUnit[] | void {
-    const curBase = _.find(ddcsControllers.bases, {name: baseName});
+    const engineCache = ddcsControllers.getEngineCache();
+    const curBase = _.find(engineCache.bases, {name: baseName});
 
     if (curBase) {
         const curFarpArray: any[] = [];
@@ -1516,8 +1518,9 @@ export function spawnSupportVehiclesOnFarp( baseName: string, side: number ): ty
 }
 
 export async function spawnSupportBaseGrp( baseName: string, side: number ): Promise<void> {
+    const engineCache = ddcsControllers.getEngineCache();
     let spawnArray: any[] = [];
-    const farpBases = _.filter(ddcsControllers.bases, (baseObj) => {
+    const farpBases = _.filter(engineCache.bases, (baseObj) => {
         return ((_.includes(baseObj._id, "_MOB") && _.get(baseObj, "initSide") === side) ||
             _.includes(baseObj._id, "_FOB")) && _.first(_.split(baseObj.name, " #")) === baseName;
     });
@@ -1528,10 +1531,11 @@ export async function spawnSupportBaseGrp( baseName: string, side: number ): Pro
 }
 
 export async function spawnBaseReinforcementGroup(side: number, baseName: string, forceSpawn?: boolean, init?: boolean): Promise<number> {
+    const engineCache = ddcsControllers.getEngineCache();
     let curAngle = 0;
     let curCat;
     let curRndSpawn;
-    const curServer = ddcsControllers.config;
+    const curServer = engineCache.config;
     let curSpokeDeg;
     let curSpokeNum;
     let infoSpwn;
@@ -1602,6 +1606,7 @@ export async function spawnBaseReinforcementGroup(side: number, baseName: string
 }
 
 export async function spawnSAMNet(side: number, baseName: string, init?: boolean): Promise<void> {
+    const engineCache = ddcsControllers.getEngineCache();
     const spawnArray = [
         ["1SAM", "3SAM", "5SAM"],
         ["2SAM", "4SAM", "6SAM"]
@@ -1611,7 +1616,7 @@ export async function spawnSAMNet(side: number, baseName: string, init?: boolean
     const samUnits = await ddcsControllers.unitActionRead({$and: [{name: new RegExp(baseName)}, {name: /SAM/}], dead: false});
     if (samUnits.length > 0) {
         const curSamType = samUnits[0].type;
-        const curUnitDict = _.find(ddcsControllers.unitDictionary, {_id: curSamType});
+        const curUnitDict = _.find(engineCache.unitDictionary, {_id: curSamType});
         if (curUnitDict) {
             const curRealArray = curUnitDict.reloadReqArray;
             const curSAMObj: any = {};
@@ -1819,7 +1824,7 @@ export async function spawnConvoy(
     const curCMD = exports.spawnGrp(curGroupSpawn, _.get(curGrpObj, "country"), _.get(curGrpObj, "category"));
     const sendClient = {action: "CMD", cmd: [curCMD], reqID: 0};
     const actionObj = {actionObj: sendClient, queName: "clientArray"};
-    await ddcsControllers.cmdQueActionsSave(actionObj);
+    await ddcsControllers.sendUDPPacket("frontEnd", actionObj);
     await ddcsControllers.setMissionTask(groupName, JSON.stringify(exports.convoyRouteTemplate(curGrpObj)));
     await ddcsControllers.sendMesgToCoalition(
         convoySide,
@@ -1887,7 +1892,7 @@ export async function spawnCAPDefense(
     const curCMD = spawnGrp(curGroupSpawn, ddcsControllers.defCountrys[convoySide], curUnit.category);
     const sendClient = {action: "CMD", cmd: [curCMD], reqID: 0};
     const actionObj = {actionObj: sendClient, queName: "clientArray"};
-    await ddcsControllers.cmdQueActionsSave(actionObj);
+    await ddcsControllers.sendUDPPacket("frontEnd", actionObj);
     await ddcsControllers.sendMesgToCoalition(
         convoySide,
         mesg,
@@ -1958,7 +1963,7 @@ export async function spawnDefenseChopper(playerUnitObj: typing.IUnit, unitObj: 
     const curCMD = spawnGrp(curGroupSpawn, curCountry, curCategory);
     const sendClient = {action: "CMD", cmd: [curCMD], reqID: 0};
     const actionObj = {actionObj: sendClient, queName: "clientArray"};
-    await ddcsControllers.cmdQueActionsSave(actionObj);
+    await ddcsControllers.sendUDPPacket("frontEnd", actionObj);
     const mesg = "C: A pair of " + unitObj.type + " is defending " + friendlyBase.name;
     await ddcsControllers.sendMesgToCoalition(
         playerUnitObj.coalition,
@@ -2038,7 +2043,7 @@ export async function spawnAtkChopper(playerUnitObj: typing.IUnit, unitObj: typi
     const curCMD = spawnGrp(curGroupSpawn, curCountry, curCategory);
     const sendClient = {action: "CMD", cmd: [curCMD], reqID: 0};
     const actionObj = {actionObj: sendClient, queName: "clientArray"};
-    await ddcsControllers.cmdQueActionsSave(actionObj);
+    await ddcsControllers.sendUDPPacket("frontEnd", actionObj);
     const mesg = "C: " + unitObj.type + " Atk Heli is departed " + friendlyBase.name + " and it is patrolling toward " + enemyBase.name;
     await ddcsControllers.sendMesgToCoalition(
         playerUnitObj.coalition,
@@ -2105,7 +2110,7 @@ export async function spawnBomberPlane(playerUnitObj: typing.IUnit, bomberObj: a
     const curCMD = spawnGrp(curGroupSpawn, curCountry, curCategory);
     const sendClient = {action: "CMD", cmd: [curCMD], reqID: 0};
     const actionObj = {actionObj: sendClient, queName: "clientArray"};
-    await ddcsControllers.cmdQueActionsSave(actionObj);
+    await ddcsControllers.sendUDPPacket("frontEnd", actionObj);
     const mesg = "C: " + bomberObj.type + " Bomber is commencing its run BRA " +
         randomDir + " from " + closeBase.name + " " + bomberObj.details;
     await ddcsControllers.sendMesgToCoalition(
@@ -2163,7 +2168,7 @@ export async function spawnAWACSPlane(playerUnitObj: typing.IUnit, awacsObj: any
     const curCMD = spawnGrp(curGroupSpawn, curCountry, curCategory);
     const sendClient = {action: "CMD", cmd: [curCMD], reqID: 0};
     const actionObj = {actionObj: sendClient, queName: "clientArray"};
-    await ddcsControllers.cmdQueActionsSave(actionObj);
+    await ddcsControllers.sendUDPPacket("frontEnd", actionObj);
     const mesg = "C: A " + awacsObj.type + " AWACS Has Been Spawned " +
         playerUnitObj.hdg + " from " + closeBase.name + " " + awacsObj.details;
     await ddcsControllers.sendMesgToCoalition(
@@ -2219,7 +2224,7 @@ export async function spawnTankerPlane(
     const curCMD = spawnGrp(curGroupSpawn, curCountry, curCategory);
     const sendClient = {action: "CMD", cmd: [curCMD], reqID: 0};
     const actionObj = {actionObj: sendClient, queName: "clientArray"};
-    await ddcsControllers.cmdQueActionsSave(actionObj);
+    await ddcsControllers.sendUDPPacket("frontEnd", actionObj);
     const mesg = "C: A " + tankerObj.type + " Tanker Has Been Spawned " +
         playerUnitObj.hdg + " from " + closeBase.name + " " + tankerObj.details;
     await ddcsControllers.sendMesgToCoalition(
@@ -2292,7 +2297,7 @@ export async function spawnSupportPlane(baseObj: typing.IBase, side: number): Pr
     const curCMD = spawnGrp(curGroupSpawn, curSide, curGrpObj.category);
     const sendClient = {action: "CMD", cmd: [curCMD], reqID: 0};
     const actionObj = {actionObj: sendClient, queName: "clientArray"};
-    await ddcsControllers.cmdQueActionsSave(actionObj);
+    await ddcsControllers.sendUDPPacket("frontEnd", actionObj);
     const mesg = "C: Cargo Support Plane 10 mins out, BRA " + randomDir + " from " + baseObj.name;
     await ddcsControllers.sendMesgToCoalition(
         side,
@@ -2356,7 +2361,7 @@ export async function spawnLogiGroup(spawnArray: typing.IUnit[], side: number): 
         const curCMD = spawnGrp(curGroupSpawn, curSide, curGrpObj.category);
         const sendClient = {action: "CMD", cmd: [curCMD], reqID: 0};
         const actionObj = {actionObj: sendClient, queName: "clientArray"};
-        await ddcsControllers.cmdQueActionsSave(actionObj);
+        await ddcsControllers.sendUDPPacket("frontEnd", actionObj);
     }
 }
 
@@ -2414,13 +2419,14 @@ export async function spawnGroup(spawnArray: any[], baseName?: string, side?: nu
         // console.log('cmd: ', curCMD);
         const sendClient = {action: "CMD", cmd: [curCMD], reqID: 0};
         const actionObj = {actionObj: sendClient, queName: "clientArray"};
-        await ddcsControllers.cmdQueActionsSave(actionObj);
+        await ddcsControllers.sendUDPPacket("frontEnd", actionObj);
     }
 }
 
 export async function spawnNewMapGrps(): Promise<number> {
+    const engineCache = ddcsControllers.getEngineCache();
     let totalUnitsSpawned = 0;
-    const curServer = ddcsControllers.config;
+    const curServer = engineCache.config;
     let totalUnitNum;
     const bases = await ddcsControllers.baseActionRead({name: {$not: /#/}, enabled: true});
     for (const base of bases) {
@@ -2440,7 +2446,7 @@ export async function spawnNewMapGrps(): Promise<number> {
                 await spawnRadioTower(
                     {},
                     true,
-                    _.find(ddcsControllers.bases, { name: baseName } ),
+                    _.find(engineCache.bases, { name: baseName } ),
                     baseStartSide
                 );
             }
@@ -2448,7 +2454,7 @@ export async function spawnNewMapGrps(): Promise<number> {
             await spawnLogisticCmdCenter(
                 {},
                 true,
-                _.find(ddcsControllers.bases, {name: baseName}),
+                _.find(engineCache.bases, {name: baseName}),
                 baseStartSide
             );
             totalUnitsSpawned += spawnArray.length + totalUnitNum + 1;
@@ -2477,7 +2483,7 @@ export async function spawnLogisticCmdCenter(staticObj: any, init: boolean, base
     const curCMD = exports.spawnStatic(exports.staticTemplate(curGrpObj), curGrpObj.country, curGrpObj.name, init);
     const sendClient = {action: "CMD", cmd: curCMD, reqID: 0};
     const actionObj = {actionObj: sendClient, queName: "clientArray"};
-    await ddcsControllers.cmdQueActionsSave(actionObj);
+    await ddcsControllers.sendUDPPacket("frontEnd", actionObj);
     await ddcsControllers.unitActionUpdateByName({
         name: curGrpObj.name,
         coalition: curGrpObj.coalition,
@@ -2506,7 +2512,7 @@ export async function spawnRadioTower(staticObj: any, init: boolean, baseObj?: t
     const curCMD = spawnStatic(exports.staticTemplate(curGrpObj), curGrpObj.country);
     const sendClient = {action: "CMD", cmd: curCMD, reqID: 0};
     const actionObj = {actionObj: sendClient, queName: "clientArray"};
-    await ddcsControllers.cmdQueActionsSave(actionObj);
+    await ddcsControllers.sendUDPPacket("frontEnd", actionObj);
     await ddcsControllers.unitActionUpdateByName({
         name: curGrpObj.name,
         coalition: curGrpObj.coalition,
@@ -2516,10 +2522,11 @@ export async function spawnRadioTower(staticObj: any, init: boolean, baseObj?: t
 }
 
 export async function spawnBaseEWR(serverName: string, type: string, baseName: string, side: number): Promise<void> {
+    const engineCache = ddcsControllers.getEngineCache();
     let unitStart: any = {};
     let pCountry = ddcsControllers.defCountrys[side];
-    const curTimePeriod = ddcsControllers.config.timePeriod;
-    const findUnit = _.find(ddcsControllers.unitDictionary, {_id: type});
+    const curTimePeriod = engineCache.config.timePeriod;
+    const findUnit = _.find(engineCache.unitDictionary, {_id: type});
     if ((type === "1L13 EWR" || type === "55G6 EWR" || type === "Dog Ear radar") && side === 2) {
         console.log("EWR: UKRAINE");
         pCountry = "UKRAINE";
@@ -2549,7 +2556,7 @@ export async function destroyUnit( unitName: string ): Promise<void> {
     // DONT USE ON CLIENT AIRCRAFT
     const sendClient = {action: "REMOVEOBJECT", removeObject: unitName, reqID: 0};
     const actionObj = {actionObj: sendClient, queName: "clientArray"};
-    await ddcsControllers.cmdQueActionsSave(actionObj);
+    await ddcsControllers.sendUDPPacket("frontEnd", actionObj);
 }
 
 export async function healBase( baseName: string, curPlayerUnit: any): Promise<boolean> {

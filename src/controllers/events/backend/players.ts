@@ -8,6 +8,7 @@ import * as ddcsControllers from "../../";
 export let rtPlayerArray: any;
 
 export async function processPlayerEvent(playerArray: any): Promise<void> {
+    const engineCache = ddcsControllers.getEngineCache();
     if (playerArray.data > 0) {
         rtPlayerArray = playerArray.data;
         for (const player of playerArray.data) {
@@ -61,7 +62,7 @@ export async function processPlayerEvent(playerArray: any): Promise<void> {
                                     console.log(player.name + " is now locked to " + player.side);
                                 }
                             } else {
-                                if (ddcsControllers.config.isJtacLocked) {
+                                if (engineCache.config.isJtacLocked) {
                                     await ddcsControllers.forcePlayerSpectator(player.id, "You are not allowed to use " +
                                         "GCI/Tac Commander slot. Please contact a Mod for more information.");
                                 }

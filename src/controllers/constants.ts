@@ -2,8 +2,17 @@
  * DDCS Licensed under AGPL-3.0 by Andrew "Drex" Finegan https://github.com/afinegan/DynamicDCS
  */
 
+// setup defaults to satisfy config object
 import * as typings from "../typings";
-import * as ddcsController from "./";
+import {IWeaponDictionary} from "../typings";
+
+export const engineCache = {
+    config: {},
+    staticDictionary: [],
+    unitDictionary: [],
+    weaponsDictionary: [],
+    bases: []
+};
 
 export const blueCountrys: string[] = [
     "AUSTRALIA",
@@ -222,49 +231,26 @@ export const crateTypes: string[] = [
     "uh1h_cargo"
 ];
 
-export async function getBases(): Promise<typings.IBase[]> {
-    const curBases = await ddcsController.baseActionRead({});
-    if (curBases.length) {
-        return curBases;
-    } else {
-        console.log("Rebuilding Base DB");
-        await ddcsController.cmdQueActionsSave({
-            actionObj: { action: "GETPOLYDEF" },
-            queName: "clientArray"
-        });
-        console.log("rebuild base DB");
-        return [];
-    }
+export function getEngineCache(): any {
+    return engineCache;
 }
 
-export async function getServer(): Promise<typings.IServer> {
-    const curServer = await ddcsController.serverActionsRead({});
-    return curServer[0];
+export function setConfig(curConfig: typings.IServer): void {
+    engineCache.config = curConfig;
 }
 
-export async function getStaticDictionary(): Promise<typings.IStaticDictionary[]> {
-    return await ddcsController.staticDictionaryActionsRead({});
+export function setStaticDictionary(curStaticDictionary: any): void {
+    engineCache.staticDictionary = curStaticDictionary;
 }
 
-export async function getUnitDictionary(curTimePeriod: string): Promise<typings.IUnitDictionary[]> {
-    return await ddcsController.unitDictionaryActionsRead({ timePeriod: curTimePeriod });
+export function setUnitDictionary(curUnitDictionary: any): void {
+    engineCache.unitDictionary = curUnitDictionary;
 }
 
-export async function getWeaponDictionary(): Promise<typings.IWeaponDictionary[]> {
-    return await ddcsController.weaponScoreActionsRead({});
+export function setWeaponDictionary(curWeaponDictionary: any): void {
+    engineCache.weaponsDictionary = curWeaponDictionary;
 }
 
-// setup defaults to satisfy config object
-export let config: typings.IServer;
-export let staticDictionary: typings.IStaticDictionary[] = [];
-export let unitDictionary: typings.IUnitDictionary[] = [];
-export let weaponsDictionary: typings.IWeaponDictionary[] = [];
-export let bases: typings.IBase[] = [];
-
-export async function initServer(): Promise<void> {
-    config = await getServer();
-    staticDictionary = await getStaticDictionary();
-    unitDictionary = await getUnitDictionary(config.timePeriod);
-    weaponsDictionary = await getWeaponDictionary();
-    bases = await getBases();
+export function setBases(curBases: any): void {
+    engineCache.bases = curBases;
 }

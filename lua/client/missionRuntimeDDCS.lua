@@ -267,6 +267,7 @@ function commandExecute(s)
 end
 
 local function runRequest(request)
+    tprint(request, 1)
     if request.action ~= nil and request.cmd ~= nil and request.reqID ~= nil then
 
         local outObj = {

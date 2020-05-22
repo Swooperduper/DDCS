@@ -9,11 +9,12 @@ const aIMaxIdleTime = (5 * 60 * 1000); // 5 mins
 const maxCrateLife = (3 * 60 * 60 * 1000); // 3 hrs
 
 export async function processThirtySecActions(fullySynced: boolean) {
+    const engineCache = ddcsControllers.getEngineCache();
     if (fullySynced) {
-
+        console.log("CONFIG2: ", engineCache.config);
         await ddcsControllers.unitActionRemoveAllDead();
         await ddcsControllers.checkTimeToRestart();
-        if (ddcsControllers.config.lifePointsEnabled) {
+        if (engineCache.config.lifePointsEnabled) {
             await ddcsControllers.checkAircraftCosts();
         }
 

@@ -12,19 +12,16 @@ export async function setFarpMarks() {
     for (const base of bases) {
         randomMarkId = _.random(1000, 9999);
         if (base.baseMarkId) {
-            await ddcsControllers.cmdQueActionsSave({
+            ddcsControllers.sendUDPPacket("frontEnd", {
                 actionObj: {
                     action: "CMD",
                     cmd: ["trigger.action.removeMark(" + base.baseMarkId + ")"],
                     reqID: 0
                 },
                 queName: "clientArray"
-            })
-                .catch((err) => {
-                    console.log("24", err);
-                });
+            });
         }
-        await ddcsControllers.cmdQueActionsSave({
+        ddcsControllers.sendUDPPacket("frontEnd", {
             actionObj: {
                 action: "CMD",
                 cmd: [
@@ -35,10 +32,7 @@ export async function setFarpMarks() {
                 reqID: 0
             },
             queName: "clientArray"
-        })
-            .catch((err) => {
-                console.log("40", err);
-            });
+        });
         await ddcsControllers.baseActionUpdate({_id: base.name})
             .catch((err) => {
                 console.log("44", err);
@@ -53,7 +47,7 @@ export async function setUnitMark(
         const cUnit = await ddcsControllers.unitActionRead({_id: _.get(unit, "name")});
         const curUnit = cUnit[0];
         if (_.get(curUnit, "markId")) {
-            await ddcsControllers.cmdQueActionsSave({
+            ddcsControllers.sendUDPPacket("frontEnd", {
                 actionObj: {
                     action: "CMD",
                     cmd: [
@@ -62,12 +56,9 @@ export async function setUnitMark(
                     reqID: 0
                 },
                 queName: "clientArray"
-            })
-                .catch((err) => {
-                    console.log("67", err);
-                });
+            });
             randomMarkId = _.random(1000, 9999);
-            await ddcsControllers.cmdQueActionsSave({
+            ddcsControllers.sendUDPPacket("frontEnd", {
                 actionObj: {
                     action: "CMD",
                     cmd: [
@@ -79,17 +70,14 @@ export async function setUnitMark(
                     reqID: 0
                 },
                 queName: "clientArray"
-            })
-                .catch((err) => {
-                    console.log("81", err);
-                });
+            });
             await ddcsControllers.unitActionUpdate({_id: _.get(curUnit, "_id"), markId: randomMarkId})
                 .catch((err) => {
                     console.log("82", err);
                 });
         } else {
             randomMarkId = _.random(1000, 9999);
-            await ddcsControllers.cmdQueActionsSave({
+            ddcsControllers.sendUDPPacket("frontEnd", {
                 actionObj: {
                     action: "CMD",
                     cmd: [
@@ -100,10 +88,7 @@ export async function setUnitMark(
                     reqID: 0
                 },
                 queName: "clientArray"
-            })
-                .catch((err) => {
-                    console.log("99", err);
-                });
+            });
             await ddcsControllers.unitActionUpdate({_id: curUnit._id, markId: randomMarkId})
                 .catch((err) => {
                     console.log("103", err);

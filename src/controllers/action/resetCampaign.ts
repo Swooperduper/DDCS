@@ -28,14 +28,14 @@ export async function checkTimeToRestart(): Promise<void> {
 
 export async function clearCampaignTables(): Promise<void> {
     console.log("clearTables");
-    await ddcsControllers.cmdQueActionsRemoveAll();
     await ddcsControllers.staticCrateActionRemoveall();
     await ddcsControllers.unitActionRemoveall();
 }
 
 export async function restartCampaign(): Promise<void> {
+    const engineCache = ddcsControllers.getEngineCache();
     console.log("ALL TABLES CLEARED OFF, restart");
-    if (ddcsControllers.config.fullServerRestartOnCampaignWin) {
+    if (engineCache.config.fullServerRestartOnCampaignWin) {
         await shutdown((output: any) => {
             console.log(output);
         });

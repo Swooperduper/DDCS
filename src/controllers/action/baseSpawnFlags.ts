@@ -6,14 +6,11 @@ import * as ddcsControllers from "../";
 
 export async function setbaseSides(): Promise<void> {
     const baseSides = await ddcsControllers.baseActionGetBaseSides();
-    await ddcsControllers.cmdQueActionsSave({
+    ddcsControllers.sendUDPPacket("frontEnd", {
         queName: "clientArray",
         actionObj: {
             action: "SETBASEFLAGS",
             data: baseSides
         }
-    })
-        .catch((err) => {
-            console.log("17", err);
-        });
+    });
 }
