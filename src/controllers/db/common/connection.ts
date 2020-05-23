@@ -69,8 +69,6 @@ export async function initV3Engine(): Promise<void> {
     await updateWeaponDictionary();
     await updateBases();
 
-    console.log("STARTERCONFIG: ", ddcsController.getEngineCache(), ddcsController.engineCache.config);
-
     await ddcsController.startUpReceiveUDPSocket();
 
     setInterval( async () => {

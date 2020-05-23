@@ -47,30 +47,37 @@ export async function syncServer(serverUnitCount: number): Promise<void> {
                 const filterGround = _.filter(units, {category: "GROUND"});
                 // const filterShips = _.filter(units, {category: "SHIP"});
                 masterUnitCount = filterStructure.length + filterGround.length;
-                for (const unit of units) {
-                    const curGrpName = unit.groupName;
-                    if (unit.category === "GROUND" && !unit.isTroop && !unit.isAI) {
-                        remappedunits[curGrpName] = remappedunits[curGrpName] || [];
-                        remappedunits[curGrpName].push(unit);
-                    } else if (unit.type === ".Command Center") {
-                        await ddcsControllers.spawnLogisticCmdCenter(unit, true);
-                    } else if (unit.type === "Comms tower M") {
-                        await ddcsControllers.spawnRadioTower(unit, true);
-                    } else {
-                        await ddcsControllers.unitActionUpdate({
-                            _id: unit.name,
-                            name: unit.name,
-                            dead: true
-                        });
+                if (units.length > 0) {
+                    for (const unit of units) {
+                        const curGrpName = unit.groupName;
+                        if (unit.category === "GROUND" && !unit.isTroop && !unit.isAI) {
+                            remappedunits[curGrpName] = remappedunits[curGrpName] || [];
+                            remappedunits[curGrpName].push(unit);
+                        } else if (unit.type === ".Command Center") {
+                            await ddcsControllers.spawnLogisticCmdCenter(unit, true);
+                        } else if (unit.type === "Comms tower M") {
+                            await ddcsControllers.spawnRadioTower(unit, true);
+                        } else {
+                            await ddcsControllers.unitActionUpdate({
+                                _id: unit.name,
+                                name: unit.name,
+                                dead: true
+                            });
+                        }
                     }
-                }
-                console.log("RMU: ", remappedunits);
-                for (const group of remappedunits) {
-                    await ddcsControllers.spawnGroup(group);
-                }
-                const staticCrates = await ddcsControllers.staticCrateActionRead({});
-                for (const crateObj of staticCrates) {
-                    await ddcsControllers.spawnLogiCrate(crateObj);
+
+                    if ( remappedunits.length > 0 ) {
+                        for (const group of remappedunits) {
+                            await ddcsControllers.spawnGroup(group);
+                        }
+                    }
+
+                    const staticCrates = await ddcsControllers.staticCrateActionRead({});
+                    if ( staticCrates.length > 0 ) {
+                        for (const crateObj of staticCrates) {
+                            await ddcsControllers.spawnLogiCrate(crateObj);
+                        }
+                    }
                 }
             }
             processInstructions = true;

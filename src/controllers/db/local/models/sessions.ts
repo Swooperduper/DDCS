@@ -4,7 +4,7 @@
 
 import * as mongoose from "mongoose";
 
-export function sessionModel(dbconn: mongoose.Connection): mongoose.Document | {} {
+export function sessionsModel(dbconn: mongoose.Connection): mongoose.Document | {} {
     return dbconn.model("session", new mongoose.Schema({
             _id: {
                 type: String,

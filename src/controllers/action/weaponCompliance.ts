@@ -35,7 +35,7 @@ export async function checkWeaponComplianceOnTakeoff(iPlayer: any, curIUnit: any
 export async function checkAircraftWeaponCompliance(): Promise<void> {
     const engineCache = ddcsControllers.getEngineCache();
     const latestSession = await ddcsControllers.sessionsActionsReadLatest();
-    if (latestSession[0].name) {
+    if (latestSession && latestSession[0].name) {
         const srvPlayers = await ddcsControllers.srvPlayerActionsRead({sessionName: latestSession[0].name, playername: {$ne: ""}});
         for (const curPlayer of srvPlayers) {
             const cUnit = await ddcsControllers.unitActionRead({dead: false, playername: curPlayer.name});

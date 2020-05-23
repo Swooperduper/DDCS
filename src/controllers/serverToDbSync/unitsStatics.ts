@@ -139,8 +139,8 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
         }
     } else {
         if (unitObj.action !== "D") {
-            console.log("NAME: ", curData.name);
             if (curData.name) {
+                console.log("NAME: ", curData.name);
                 curData._id = curData.name;
                 iCurObj = {
                     action: "C",

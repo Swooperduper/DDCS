@@ -16,7 +16,7 @@ export async function sessionsActionsRead(obj: any): Promise<typings.ISessions[]
 
 export async function sessionsActionsReadLatest(): Promise<typings.ISessions[]> {
     return new Promise((resolve, reject) => {
-        dbModels.sessionsModel.findOne().sort({ field: "asc", createdAt: -1 }).limit(1).exec((err: any, sessions: typings.ISessions[]) => {
+        dbModels.sessionsModel.findOne().sort({ field: "asc", createdAt: -1 }).exec((err: any, sessions: typings.ISessions[]) => {
             if (err) { reject(err); }
             resolve(sessions);
         });

@@ -101,35 +101,37 @@ export async function lookupLifeResource(playerUcid: string): Promise<void> {
 export async function lookupAircraftCosts(playerUcid: string): Promise<void> {
     const engineCache = ddcsControllers.getEngineCache();
     const srvPlayer = await ddcsControllers.srvPlayerActionsRead({_id: playerUcid});
-    const curPlayer = srvPlayer[0];
-    if (curPlayer) {
-        if (curPlayer.name) {
-            const cUnit = await ddcsControllers.unitActionRead({playername: curPlayer.name});
-            if (cUnit.length > 0) {
-                const curUnit = cUnit[0];
-                const curUnitDictionary = _.find(engineCache.unitDictionary, {_id: curUnit.type});
-                if (curUnitDictionary) {
-                    const curUnitLPCost = (curUnitDictionary) ? curUnitDictionary.LPCost : 1;
-                    let curTopWeaponCost = 0;
-                    let curTopAmmo = "";
-                    let totalTakeoffCosts;
-                    for (const value of curUnit.ammo || []) {
-                        const weaponCost = getWeaponCost(value.typeName, value.count);
-                        if (curTopWeaponCost < weaponCost) {
-                            const curAmmoArray = _.split(value.typeName, ".");
-                            curTopAmmo = curAmmoArray[curAmmoArray.length - 1];
-                            curTopWeaponCost = weaponCost;
+    if (srvPlayer.length > 0) {
+        const curPlayer = srvPlayer[0];
+        if (curPlayer) {
+            if (curPlayer.name) {
+                const cUnit = await ddcsControllers.unitActionRead({playername: curPlayer.name});
+                if (cUnit.length > 0) {
+                    const curUnit = cUnit[0];
+                    const curUnitDictionary = _.find(engineCache.unitDictionary, {_id: curUnit.type});
+                    if (curUnitDictionary) {
+                        const curUnitLPCost = (curUnitDictionary) ? curUnitDictionary.LPCost : 1;
+                        let curTopWeaponCost = 0;
+                        let curTopAmmo = "";
+                        let totalTakeoffCosts;
+                        for (const value of curUnit.ammo || []) {
+                            const weaponCost = getWeaponCost(value.typeName, value.count);
+                            if (curTopWeaponCost < weaponCost) {
+                                const curAmmoArray = _.split(value.typeName, ".");
+                                curTopAmmo = curAmmoArray[curAmmoArray.length - 1];
+                                curTopWeaponCost = weaponCost;
+                            }
                         }
+                        totalTakeoffCosts = curUnitLPCost + curTopWeaponCost;
+                        await ddcsControllers.sendMesgToGroup(
+                            curUnit.groupId,
+                            "G: You aircraft costs " + totalTakeoffCosts.toFixed(2) + "( " + curUnitLPCost + "(" +
+                            curUnit.type + ")+" + curTopWeaponCost + "(" + curTopAmmo + ") ) Life Points.",
+                            5
+                        );
+                    } else {
+                        console.log("cant find unit in dictionary: line 129");
                     }
-                    totalTakeoffCosts = curUnitLPCost + curTopWeaponCost;
-                    await ddcsControllers.sendMesgToGroup(
-                        curUnit.groupId,
-                        "G: You aircraft costs " + totalTakeoffCosts.toFixed(2) + "( " + curUnitLPCost + "(" +
-                        curUnit.type + ")+" + curTopWeaponCost + "(" + curTopAmmo + ") ) Life Points.",
-                        5
-                    );
-                } else {
-                    console.log("cant find unit in dictionary: line 129");
                 }
             }
         }
@@ -140,7 +142,8 @@ export async function checkAircraftCosts(): Promise<void> {
     const engineCache = ddcsControllers.getEngineCache();
     const latestSession = await ddcsControllers.sessionsActionsReadLatest();
     let mesg: string;
-    if (latestSession[0].name) {
+
+    if (latestSession && latestSession.length > 0 && latestSession[0].name) {
         const srvPlayers = await ddcsControllers.srvPlayerActionsRead({sessionName: latestSession[0].name, playername: {$ne: ""}});
         for (const curPlayer of srvPlayers) {
             if (curPlayer.name) {
