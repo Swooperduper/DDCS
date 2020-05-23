@@ -38,10 +38,11 @@ export async function campaignsActionsUpdate(obj: any): Promise<typings.ICampaig
 }
 
 export async function campaignsActionsSave(obj: {
-    _id: string
+    _id: string,
+    name: string
 }): Promise<void> {
     return new Promise((resolve, reject) => {
-        dbModels.campaignsModel.find({_id: obj._id}, (err: any, campaignsObj: typings.ICampaigns[]) => {
+        dbModels.campaignsModel.find({_id: obj._id, name: obj.name}, (err: any, campaignsObj: typings.ICampaigns[]) => {
             if (err) {reject(err); }
             if (campaignsObj.length === 0) {
                 const campaigns = new dbModels.campaignsModel(obj);

@@ -8,8 +8,8 @@ import * as ddcsControllers from "../";
 export async function setSideLockFlags(): Promise<void> {
     const playerSideLockTable: any[] = [];
     const latestSession = await ddcsControllers.sessionsActionsReadLatest();
-    if (latestSession[0].name) {
-        const playerArray = await ddcsControllers.srvPlayerActionsRead({sessionName: latestSession[0].name});
+    if (latestSession.name) {
+        const playerArray = await ddcsControllers.srvPlayerActionsRead({sessionName: latestSession.name});
         for (const player of playerArray) {
             let lockObj;
             if (player.isGameMaster) {

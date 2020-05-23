@@ -62,7 +62,7 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
         if (unitObj.action !== "D") {
             iCurObj = {
                 action: "U",
-                sessionName: ddcsControllers.sessionName,
+                sessionName: ddcsControllers.getSessionName(),
                 data: {
                     _id: curData.name,
                     alt: curData.alt,
@@ -112,7 +112,7 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
             if (curData.name) {
                 iCurObj = {
                     action: "D",
-                    sessionName: ddcsControllers.sessionName,
+                    sessionName: ddcsControllers.getSessionName(),
                     data: {
                         _id: curData.name,
                         name: curData.name,
@@ -144,7 +144,7 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
                 curData._id = curData.name;
                 iCurObj = {
                     action: "C",
-                    sessionName: ddcsControllers.sessionName,
+                    sessionName: ddcsControllers.getSessionName(),
                     data: curData
                 };
                 if (curData.category === "STRUCTURE") {

@@ -82,8 +82,8 @@ export async function processTimer(serverSecs: number): Promise<void> {
             exports.timerObj.oneMinute = true;
             await ddcsControllers.setIsOpenSlotFlag(0);
             const latestSession = await ddcsControllers.sessionsActionsReadLatest();
-            if (latestSession[0].name) {
-                const playerArray = await ddcsControllers.srvPlayerActionsRead({ sessionName: latestSession[0].name });
+            if (latestSession.name) {
+                const playerArray = await ddcsControllers.srvPlayerActionsRead({ sessionName: latestSession.name });
                 for (const player of playerArray) {
                     await ddcsControllers.kickPlayer(Number(player.playerId), "Server is now restarting!");
                 }
@@ -95,8 +95,8 @@ export async function processTimer(serverSecs: number): Promise<void> {
             curTime = new Date().getTime();
             if (curTime > lastSentLoader + ddcsControllers.time.oneMin) {
                 const latestSession = await ddcsControllers.sessionsActionsReadLatest();
-                if (latestSession[0].name) {
-                    const playerArray = await ddcsControllers.srvPlayerActionsRead({ sessionName: latestSession[0].name });
+                if (latestSession.name) {
+                    const playerArray = await ddcsControllers.srvPlayerActionsRead({ sessionName: latestSession.name });
                     for (const player of playerArray) {
                         await ddcsControllers.kickPlayer(Number(player.playerId), "Server is now restarting!");
                     }

@@ -5,7 +5,7 @@
 import * as mongoose from "mongoose";
 
 // Schema defines how chat messages will be stored in MongoDB
-export function campaignModel(dbconn: mongoose.Connection): mongoose.Document | {} {
+export function campaignsModel(dbconn: mongoose.Connection): mongoose.Document | {} {
     return dbconn.model("campaign", new mongoose.Schema({
             _id: {
                 type: String,

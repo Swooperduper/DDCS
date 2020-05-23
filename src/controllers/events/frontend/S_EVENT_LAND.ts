@@ -18,7 +18,7 @@ export async function processEventLand(eventObj: any): Promise<void> {
     }
 
     const iUnit = await ddcsControllers.unitActionRead({unitId: eventObj.data.arg3, isCrate: false});
-    const playerArray = await ddcsControllers.srvPlayerActionsRead({sessionName: ddcsControllers.sessionName});
+    const playerArray = await ddcsControllers.srvPlayerActionsRead({sessionName: ddcsControllers.getSessionName()});
 
     if (_.isUndefined(iUnit[0])) {
         console.log("isUndef: ", eventObj);
@@ -50,7 +50,7 @@ export async function processEventLand(eventObj: any): Promise<void> {
                     groupId: iUnit[0].groupId
                 });
                 const iCurObj = {
-                    sessionName: ddcsControllers.sessionName,
+                    sessionName: ddcsControllers.getSessionName(),
                     eventCode: ddcsControllers.shortNames[eventObj.action],
                     iucid: iPlayer.ucid,
                     iName: iUnit[0].playername,

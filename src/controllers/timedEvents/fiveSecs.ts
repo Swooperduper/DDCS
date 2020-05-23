@@ -7,7 +7,6 @@ import * as ddcsControllers from "../";
 
 export async function processFiveSecActions(fullySynced: boolean): Promise<void> {
     const engineCache = ddcsControllers.getEngineCache();
-    console.log("runEveryFiveSeconds");
     const replenThreshold = 1; // percentage under max
     const replenBase = engineCache.replenThresholdBase * replenThreshold;
     const replenTimer = _.random(engineCache.replenTimer / 2, engineCache.replenTimer);

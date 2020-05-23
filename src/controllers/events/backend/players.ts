@@ -80,7 +80,7 @@ export async function processPlayerEvent(playerArray: any): Promise<void> {
                     ...curData,
                     _id: curData.ucid,
                     playerId: curData.id,
-                    sessionName: ddcsControllers.sessionName
+                    sessionName: ddcsControllers.getSessionName()
                 });
             }
         }

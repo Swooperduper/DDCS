@@ -31,13 +31,6 @@ export async function syncServer(serverUnitCount: number): Promise<void> {
             isSyncLockdownMode = true; // lock down all traffic until sync is complete
             if (units.length === 0) { // DB is empty
                 console.log("DB & Server is empty of Units, Spawn New Units");
-                const newCampaignName = process.env.SERVER_NAME + "_" + new Date().getTime();
-                await ddcsControllers.campaignsActionsSave({_id: newCampaignName});
-                await ddcsControllers.sessionsActionsSave({
-                    _id: newCampaignName,
-                    name: newCampaignName,
-                    campaignName: newCampaignName
-                });
                 masterUnitCount = await ddcsControllers.spawnNewMapGrps(); // respond with server spawned num
                 processInstructions = true;
                 console.log("processed Instructons 1: ", processInstructions);

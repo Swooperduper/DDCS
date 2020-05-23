@@ -14,11 +14,11 @@ export async function sessionsActionsRead(obj: any): Promise<typings.ISessions[]
     });
 }
 
-export async function sessionsActionsReadLatest(): Promise<typings.ISessions[]> {
+export async function sessionsActionsReadLatest(): Promise<typings.ISessions> {
     return new Promise((resolve, reject) => {
-        dbModels.sessionsModel.findOne().sort({ field: "asc", createdAt: -1 }).exec((err: any, sessions: typings.ISessions[]) => {
+        dbModels.sessionsModel.findOne().sort({ field: "asc", createdAt: -1 }).exec((err: any, session: typings.ISessions) => {
             if (err) { reject(err); }
-            resolve(sessions);
+            resolve(session);
         });
     });
 }
@@ -26,7 +26,7 @@ export async function sessionsActionsReadLatest(): Promise<typings.ISessions[]> 
 export async function sessionsActionsUpdate(obj: any): Promise<typings.ISessions[]> {
     return new Promise((resolve, reject) => {
         dbModels.sessionsModel.updateOne(
-            {name: obj.name},
+            {_id: obj._id},
             {$set: obj},
             { upsert : true },
             (err: any, sessions: typings.ISessions[]) => {

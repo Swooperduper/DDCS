@@ -86,19 +86,19 @@ export async function initV3Engine(): Promise<void> {
     setInterval( async () => {
         if (ddcsController.isServerSynced) {
             await ddcsController.processThirtySecActions(ddcsController.isServerSynced);
-            await ddcsController.processTimer(ddcsController.curServerEpoc);
+            await ddcsController.processTimer(ddcsController.getCurServerEpoc());
         } else {
             ddcsController.resetTimerObj();
         }
     }, ddcsController.time.thirtySecs);
 
     setInterval( async () => {
-        if (ddcsController.sessionName !== "") {
+        if (ddcsController.getSessionName() !== "") {
             await ddcsController.sessionsActionsUpdate({
-                _id: ddcsController.sessionName,
-                name: ddcsController.sessionName,
-                startAbsTime: ddcsController.startAbsTime,
-                curAbsTime: ddcsController.curAbsTime
+                _id: ddcsController.getSessionName(),
+                name: ddcsController.getSessionName(),
+                startAbsTime: ddcsController.getStartAbsTime(),
+                curAbsTime: ddcsController.getCurAbsTime()
             });
         }
     }, ddcsController.time.oneMin);
@@ -129,7 +129,7 @@ export async function initV3Engine(): Promise<void> {
 
     setInterval( async () => {
         if (ddcsController.getEngineCache().bases && ddcsController.isServerSynced) {
-            await ddcsController.syncType(ddcsController.curServerUnitCnt);
+            await ddcsController.syncType(ddcsController.getCurServerUnitCnt());
         }
     }, ddcsController.time.sec);
 

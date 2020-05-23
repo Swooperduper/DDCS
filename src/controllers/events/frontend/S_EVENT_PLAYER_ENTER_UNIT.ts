@@ -7,14 +7,14 @@ import * as ddcsControllers from "../../";
 
 export async function processEventPlayerEnterUnit(eventObj: any): Promise<void> {
     const iUnit = await ddcsControllers.unitActionRead({unitId: eventObj.data.arg3});
-    const playerArray = await ddcsControllers.srvPlayerActionsRead({sessionName: ddcsControllers.sessionName});
+    const playerArray = await ddcsControllers.srvPlayerActionsRead({sessionName: ddcsControllers.getSessionName()});
     const curIUnit = iUnit[0];
     if (curIUnit) {
 
         const iPlayer = _.find(playerArray, {name: curIUnit.playername});
         if (iPlayer) {
             const iCurObj = {
-                sessionName: ddcsControllers.sessionName,
+                sessionName: ddcsControllers.getSessionName(),
                 eventCode: ddcsControllers.shortNames[eventObj.action],
                 iucid: iPlayer.ucid,
                 iName: curIUnit.playername,

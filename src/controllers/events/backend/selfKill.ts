@@ -12,7 +12,7 @@ export async function processSelfKill(eventObj: any): Promise<void> {
     if (iPlayer) {
         const iCurObj = {
             iPlayerId: eventObj.data.arg1,
-            sessionName: ddcsControllers.sessionName,
+            sessionName: ddcsControllers.getSessionName(),
             eventCode: ddcsControllers.shortNames[eventObj.action],
             iucid: iPlayer.ucid,
             iName: iPlayer.name,

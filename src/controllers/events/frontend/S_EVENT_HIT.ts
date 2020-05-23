@@ -84,7 +84,7 @@ export async function processEventHit(eventObj: any): Promise<void> {
     const nowTime = new Date().getTime();
     const iUnit = await ddcsControllers.unitActionRead({unitId: iUnitId});
     const tUnit = await ddcsControllers.unitActionRead({unitId: tUnitId});
-    const playerArray = await ddcsControllers.srvPlayerActionsRead({sessionName: ddcsControllers.sessionName});
+    const playerArray = await ddcsControllers.srvPlayerActionsRead({sessionName: ddcsControllers.getSessionName()});
     let isOwnedUnit = false;
     const oId = [];
     const iOwnerId = iUnit[0].playerOwnerId;
@@ -100,7 +100,7 @@ export async function processEventHit(eventObj: any): Promise<void> {
     }
     const ownerIds = await ddcsControllers.srvPlayerActionsRead({_id: {$in: oId}});
     iCurObj = {
-        sessionName: ddcsControllers.sessionName,
+        sessionName: ddcsControllers.getSessionName(),
         eventCode: ddcsControllers.shortNames[eventObj.action],
         iName: iUnit[0].playername,
         iType: iUnit[0].type,

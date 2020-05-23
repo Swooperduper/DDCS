@@ -81,29 +81,31 @@ export async function recordFiveMinutesPlayed() {
         0
     ];
     const latestSession = await ddcsControllers.sessionsActionsReadLatest();
-    const unitsNewThan = new Date().getTime() - ddcsControllers.time.fourMins;
-    const playerArray = await ddcsControllers.srvPlayerActionsRead({
-        sessionName: latestSession[0].name,
-        updatedAt: {$gt: unitsNewThan}
-    });
-    const processPromise: any[] = [];
-    _.forEach(playerArray, (player) => {
-        totalMinsPerSide[player.side] += 5;
-        processPromise.push(ddcsControllers.srvPlayerActionsAddMinutesPlayed({
-            _id: player._id,
-            minutesPlayed: 5,
-            side: player.side
-        }));
-    });
-    await Promise.all(processPromise);
-    await updateSession(latestSession[0].name);
-    console.log("PlayerFiveMinCount: ", totalMinsPerSide);
+    if (latestSession) {
+        const unitsNewThan = new Date().getTime() - ddcsControllers.time.fourMins;
+        const playerArray = await ddcsControllers.srvPlayerActionsRead({
+            sessionName: latestSession.name,
+            updatedAt: {$gt: unitsNewThan}
+        });
+        const processPromise: any[] = [];
+        _.forEach(playerArray, (player) => {
+            totalMinsPerSide[player.side] += 5;
+            processPromise.push(ddcsControllers.srvPlayerActionsAddMinutesPlayed({
+                _id: player._id,
+                minutesPlayed: 5,
+                side: player.side
+            }));
+        });
+        await Promise.all(processPromise);
+        await updateSession(latestSession.name);
+        console.log("PlayerFiveMinCount: ", totalMinsPerSide);
+    }
 }
 
 export async function resetMinutesPlayed() {
     const latestSession = await ddcsControllers.sessionsActionsReadLatest();
-    if (latestSession.length > 0) {
-        const playerArray = await ddcsControllers.srvPlayerActionsRead({sessionName: latestSession[0].name});
+    if (latestSession) {
+        const playerArray = await ddcsControllers.srvPlayerActionsRead({sessionName: latestSession.name});
         for (const player of playerArray) {
             await ddcsControllers.srvPlayerActionsResetMinutesPlayed({
                 _id: player._id,

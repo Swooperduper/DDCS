@@ -23,8 +23,8 @@ export function getWeaponCost(typeName: string, count: number): number {
 export async function getPlayerBalance(): Promise<typings.ISrvPlayerBalance> {
     const serverAlloc: any = {};
     const latestSession = await ddcsControllers.sessionsActionsReadLatest();
-    if (latestSession[0].name) {
-        const playerArray = await ddcsControllers.srvPlayerActionsRead({sessionName: latestSession[0].name});
+    if (latestSession.name) {
+        const playerArray = await ddcsControllers.srvPlayerActionsRead({sessionName: latestSession.name});
         for (const ePlayer of playerArray) {
             if ((new Date(ePlayer.updatedAt).getTime() + ddcsControllers.time.oneMin > new Date().getTime()) && ePlayer.slot !== "") {
                 serverAlloc[ePlayer.side] = serverAlloc[ePlayer.side] || [];
@@ -143,8 +143,8 @@ export async function checkAircraftCosts(): Promise<void> {
     const latestSession = await ddcsControllers.sessionsActionsReadLatest();
     let mesg: string;
 
-    if (latestSession && latestSession.length > 0 && latestSession[0].name) {
-        const srvPlayers = await ddcsControllers.srvPlayerActionsRead({sessionName: latestSession[0].name, playername: {$ne: ""}});
+    if (latestSession && latestSession.name) {
+        const srvPlayers = await ddcsControllers.srvPlayerActionsRead({sessionName: latestSession.name, playername: {$ne: ""}});
         for (const curPlayer of srvPlayers) {
             if (curPlayer.name) {
                 const cUnit = await ddcsControllers.unitActionRead({dead: false, playername: curPlayer.name});

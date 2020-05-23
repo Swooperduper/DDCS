@@ -17,7 +17,7 @@ export async function processEventTakeoff(eventObj: any): Promise<void> {
     }
 
     const iUnit = await ddcsControllers.unitActionRead({unitId: eventObj.data.arg3});
-    const playerArray = await ddcsControllers.srvPlayerActionsRead({sessionName: ddcsControllers.sessionName});
+    const playerArray = await ddcsControllers.srvPlayerActionsRead({sessionName: ddcsControllers.getSessionName()});
     const curIUnit = iUnit[0];
     const curUnitSide = curIUnit.coalition;
     if (_.isUndefined(curIUnit)) {
@@ -30,7 +30,7 @@ export async function processEventTakeoff(eventObj: any): Promise<void> {
                 const friendlyBases = await ddcsControllers.getBasesInProximity(curIUnit.lonLatLoc, 5, curUnitSide);
                 if (friendlyBases.length > 0) {
                     const iCurObj = {
-                        sessionName: ddcsControllers.sessionName,
+                        sessionName: ddcsControllers.getSessionName(),
                         eventCode: ddcsControllers.shortNames[eventObj.action],
                         iucid: iPlayer.ucid,
                         iName: curIUnit.playername,
