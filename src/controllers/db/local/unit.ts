@@ -7,6 +7,15 @@ import * as typings from "../../../typings";
 import { dbModels } from "../common";
 import * as ddcsController from "../../";
 
+export async function unitActionCount(obj: any): Promise<number> {
+    return new Promise((resolve, reject) => {
+        dbModels.unitModel.countDocuments(obj, (err: any, count: number) => {
+            if (err) { reject(err); }
+            resolve(count);
+        });
+    });
+}
+
 export async function unitActionRead(obj: any): Promise<typings.IUnit[]> {
     return new Promise((resolve, reject) => {
         dbModels.unitModel.find(obj).sort( { createdAt: -1 } ).exec((err: any, dbUnits: typings.IUnit[]) => {

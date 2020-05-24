@@ -1,7 +1,7 @@
 import * as ddcsController from "../";
 
 export async function processingIncomingData(incomingObj: any) {
-
+    incomingObj
     switch (incomingObj.action) {
         case "serverInfo":
             await ddcsController.getLatestSession(incomingObj);
@@ -87,6 +87,9 @@ export async function processingIncomingData(incomingObj: any) {
         case "change_slot":
             // console.log('CHANGE EVENT SLOT HAPPENED: ', queObj);
             // await ddcsController.processDisconnect(incomingObj);
+            break;
+        case "processReq":
+            console.log("PROCESSREQ: ", incomingObj);
             break;
     }
 }

@@ -6,6 +6,7 @@ import * as _ from "lodash";
 import * as ddcsControllers from "../";
 
 export async function processFiveSecActions(fullySynced: boolean): Promise<void> {
+
     const engineCache = ddcsControllers.getEngineCache();
     const replenThreshold = 1; // percentage under max
     const replenBase = engineCache.replenThresholdBase * replenThreshold;
@@ -13,7 +14,7 @@ export async function processFiveSecActions(fullySynced: boolean): Promise<void>
 
     if (fullySynced) {
         // resetCampaignController.checkTimeToRestart(serverName); //for testing base capture quickly
-        // set base flags
+        // spawn support planes to replenish base units
         const bases = await ddcsControllers.baseActionRead({baseType: "MOB"});
         for (const base of bases) {
             const curRegEx = "^" + base._id + " #";
@@ -22,7 +23,7 @@ export async function processFiveSecActions(fullySynced: boolean): Promise<void>
             const replenEpoc = new Date(base.replenTime).getTime();
             const aliveComms = await ddcsControllers.unitActionRead({name: base.name + " Communications", dead: false});
             if (aliveComms.length > 0) {
-                if ((units.length < unitCnt) && replenEpoc < new Date().getTime()) { // UNCOMMENT OUT FALSE
+                if ((units.length < unitCnt) && replenEpoc < new Date().getTime()) {
                     await ddcsControllers.baseActionUpdateReplenTimer({
                         name: base._id,
                         replenTime: new Date().getTime() + (replenTimer * 1000)
@@ -32,5 +33,6 @@ export async function processFiveSecActions(fullySynced: boolean): Promise<void>
             }
         }
         await ddcsControllers.checkUnitsToBaseForCapture();
+        await ddcsControllers.syncCheck(ddcsControllers.getCurServerUnitCnt());
     }
 }

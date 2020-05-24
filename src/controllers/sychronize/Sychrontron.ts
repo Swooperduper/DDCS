@@ -2,24 +2,40 @@
  * DDCS Licensed under AGPL-3.0 by Andrew "Drex" Finegan https://github.com/afinegan/DynamicDCS
  */
 
-import * as _ from "lodash";
 import * as ddcsControllers from "../";
+import { getSessionName } from "../";
 
-let mesg;
-let masterUnitCount;
-let lastUnitCount: any;
-let isServerFresh = false;
-let stuckDetect = 0;
-const stuckThreshold = 30;
-export let isServerSynced = true;
-export let isSyncLockdownMode = false; // lock all processes out until server fully syncs
-export let processInstructions = false;
+export const requestJobArray: any[] = [];
 
-export function setSyncLockdownMode(flag: boolean) {
-    isSyncLockdownMode = flag;
+let isServerSynced = true;
+let isSyncLockDownMode = false; // lock all processes out until server fully syncs
+let isReSyncLock = false;
+let nextUniqueId = 0;
+
+export function getNextUniqueId() {
+    const curUniqueId = nextUniqueId;
+    nextUniqueId += 1;
+    return curUniqueId;
 }
 
-export async function syncServer(serverUnitCount: number): Promise<void> {
+export function getServerSynced() {
+    return isServerSynced;
+}
+
+export function setServerSynced(value: boolean) {
+    isServerSynced = value;
+}
+
+export function setReSyncLock(value: boolean) {
+    isReSyncLock = value;
+}
+
+export function setSyncLockdownMode(flag: boolean) {
+    isSyncLockDownMode = flag;
+}
+
+/*
+export async function OldBrokenSyncServer(serverUnitCount: number): Promise<void> {
     const remappedunits: any = {};
     const units = await ddcsControllers.unitActionReadStd({dead: false});
     if (serverUnitCount === 0) { // server is empty
@@ -165,20 +181,94 @@ export async function syncServer(serverUnitCount: number): Promise<void> {
         }
     }
 }
+*/
 
-export async function syncType(serverUnitCount: number): Promise<void> {
-    if (serverUnitCount > -1) {
-        // check if server should be reset
+export function syncStaticNames(nameArray: string[]): void {
+    console.log("syncStaticNames: ", nameArray);
+}
+
+export function syncUnitsNames(nameArray: string[]): void {
+    console.log("UNIT LIST BACK");
+    console.log("syncUnitNames: ", nameArray);
+}
+
+export async function reSyncServerStatics(): Promise<void> {
+    const curNextUniqueId = getNextUniqueId();
+    requestJobArray.push({
+        reqId: curNextUniqueId,
+        callBack: "syncStaticNames",
+        time: new Date()
+    });
+
+    await ddcsControllers.sendUDPPacket("frontEnd", {
+        actionObj: {
+            action: "getStaticNames",
+            reqID: curNextUniqueId,
+            time: new Date()
+        }
+    });
+}
+
+export async function reSyncServerUnits() {
+    const curNextUniqueId = getNextUniqueId();
+    requestJobArray.push({
+        reqId: curNextUniqueId,
+        callBack: "syncUnitsNames"
+    });
+    console.log("SEND UNIT RESYNC PACKET");
+    await ddcsControllers.sendUDPPacket("frontEnd", {
+        actionObj: {
+            action: "getUnitNames",
+            reqID: curNextUniqueId
+        }
+    });
+}
+
+export async function syncCheck(serverUnitCount: number): Promise<void> {
+    if (!isReSyncLock && getSessionName()) {
         const servers = await ddcsControllers.serverActionsRead({_id: process.env.SERVER_NAME});
-        if (servers.length > 0) {
-            // console.log('t: ', _.get(curServer, 'resetFullCampaign', false), ' && ', serverUnitCount === 0);
-            if (servers[0].resetFullCampaign && serverUnitCount === 0) {
-                await ddcsControllers.clearCampaignTables();
-                await ddcsControllers.serverActionsUpdate({resetFullCampaign: false});
-                await syncServer(serverUnitCount);
-            } else {
-                await syncServer(serverUnitCount);
+        if (servers && servers[0]) {
+            const curAliveUnitCount = await ddcsControllers.unitActionCount({dead: false});
+            if ( serverUnitCount !== curAliveUnitCount) {
+                // lock into re-sync mode, so not run this until re-sync are unlocked
+                setReSyncLock(false);
+                console.log("RESYNC START");
+                // await reSyncServerStatics();
+                await reSyncServerUnits();
             }
         }
     }
 }
+
+
+/*
+export async function syncCheck123(serverUnitCount: number): Promise<void> {
+    // if no session is set, server hasn't initiated yet, hold off
+    if (getSessionName()) {
+        const servers = await ddcsControllers.serverActionsRead({_id: process.env.SERVER_NAME});
+        if (servers && servers[0]) {
+            if (serverUnitCount === 0) {
+                // Empty Server
+                await spawnEmptyStaticsServer();
+                await spawnEmptyUnitsServer();
+
+
+
+            } else {
+                // existing server
+                const curDbUnitArray = await ddcsControllers.unitActionRead({});
+                if ( serverUnitCount !== curDbUnitArray.length) {
+                    await resyncServerStatics();
+                    await resyncServerUnits();
+                }
+            }
+
+            // sync base ownership
+
+            // unlock server joining
+
+            //
+        }
+    }
+}
+*/

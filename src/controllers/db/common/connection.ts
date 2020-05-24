@@ -72,20 +72,20 @@ export async function initV3Engine(): Promise<void> {
     await ddcsController.startUpReceiveUDPSocket();
 
     setInterval( async () => {
-        if (ddcsController.isServerSynced) {
-            await ddcsController.processOneSecActions(ddcsController.isServerSynced);
+        if (ddcsController.getServerSynced()) {
+            await ddcsController.processOneSecActions(ddcsController.getServerSynced());
         }
     }, ddcsController.time.sec);
 
     setInterval( async () => {
-        if (ddcsController.isServerSynced) {
-            await ddcsController.processFiveSecActions(ddcsController.isServerSynced);
+        if (ddcsController.getServerSynced()) {
+            await ddcsController.processFiveSecActions(ddcsController.getServerSynced());
         }
     }, ddcsController.time.fiveSecs);
 
     setInterval( async () => {
-        if (ddcsController.isServerSynced) {
-            await ddcsController.processThirtySecActions(ddcsController.isServerSynced);
+        if (ddcsController.getServerSynced()) {
+            await ddcsController.processThirtySecActions(ddcsController.getServerSynced());
             await ddcsController.processTimer(ddcsController.getCurServerEpoc());
         } else {
             ddcsController.resetTimerObj();
@@ -104,34 +104,28 @@ export async function initV3Engine(): Promise<void> {
     }, ddcsController.time.oneMin);
 
     setInterval( async () => {
-        if (ddcsController.isServerSynced) {
-            await ddcsController.processFiveMinuteActions(ddcsController.isServerSynced);
+        if (ddcsController.getServerSynced()) {
+            await ddcsController.processFiveMinuteActions(ddcsController.getServerSynced());
         }
     }, ddcsController.time.fiveMins);
 
     setInterval( async () => {
-        if (ddcsController.isServerSynced) {
-            await ddcsController.processTenMinuteActions(ddcsController.isServerSynced);
+        if (ddcsController.getServerSynced()) {
+            await ddcsController.processTenMinuteActions(ddcsController.getServerSynced());
         }
     }, ddcsController.time.tenMinutes);
 
     setInterval( async () => {
-        if (ddcsController.isServerSynced) {
-            await ddcsController.processThirtyMinuteActions(ddcsController.isServerSynced);
+        if (ddcsController.getServerSynced()) {
+            await ddcsController.processThirtyMinuteActions(ddcsController.getServerSynced());
         }
     }, ddcsController.time.thirtyMinutes);
 
     setInterval( async () => {
-        if (ddcsController.isServerSynced) {
-            await ddcsController.processOneHourActions(ddcsController.isServerSynced);
+        if (ddcsController.getServerSynced()) {
+            await ddcsController.processOneHourActions(ddcsController.getServerSynced());
         }
     }, ddcsController.time.oneHour);
-
-    setInterval( async () => {
-        if (ddcsController.getEngineCache().bases && ddcsController.isServerSynced) {
-            await ddcsController.syncType(ddcsController.getCurServerUnitCnt());
-        }
-    }, ddcsController.time.sec);
 
     await ddcsController.testRead();
 }

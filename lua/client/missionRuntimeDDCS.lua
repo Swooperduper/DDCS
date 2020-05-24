@@ -266,16 +266,17 @@ function commandExecute(s)
     return loadstring("return " ..s)()
 end
 
-local function runRequest(request)
-    tprint(request, 1)
-    if request.action ~= nil and request.cmd ~= nil and request.reqID ~= nil then
+function runRequest(request)
+    if request.action ~= nil and request.reqID ~= nil then
 
         local outObj = {
-            ["reqId"] = request.reqID,
+            ["action"] = "processReq",
+            ["reqId"] = request.reqID
         }
 
         if request.action == "getUnitNames" then
             outObj.completeUnitAliveNames = completeUnitAliveNames
+            tprint(outObj, 1)
             sendUDPPacket(outObj)
         end
 
@@ -287,7 +288,7 @@ local function runRequest(request)
         if request.action == "CMD" then
             local success, cmdResponse =  pcall(commandExecute, request.cmd)
             if not success then
-                net.log("Error: " .. resp)
+                env.info("Error: " .. resp)
             end
             if request.reqID > 0 then
                 outObj.cmdResp = cmdResponse
@@ -301,7 +302,10 @@ function runPerFrame(ourArgument, time)
     local request = udpMissionRuntime:receive()
     if request ~= nil then
         env.info(request)
-        runRequest(request)
+        requestObj = JSON:decode(request)
+        if requestObj.actionObj ~= nil then
+            runRequest(requestObj.actionObj)
+        end
     end
     return time + DATA_TIMEOUT_SEC
 end
