@@ -6,6 +6,11 @@ import * as _ from "lodash";
 import * as ddcsControllers from "../";
 
 export async function processUnitUpdates(unitObj: any): Promise<void> {
+    /*
+    if (unitObj.data.type === "Su-25T") {
+        console.log("INIT: ", unitObj);
+    }
+     */
     const unit = await ddcsControllers.unitActionRead({_id: unitObj.data.name});
     let stParse;
     let iCurObj: any;

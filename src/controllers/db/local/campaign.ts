@@ -14,10 +14,10 @@ export async function campaignsActionsRead(): Promise<typings.ICampaigns[]> {
     });
 }
 
-export async function campaignsActionsReadLatest(): Promise<typings.ICampaigns[]> {
+export async function campaignsActionsReadLatest(): Promise<typings.ICampaigns> {
     return new Promise((resolve, reject) => {
         dbModels.campaignsModel.findOne().sort({ field: "asc", createdAt: -1 }).limit(1)
-            .exec((err: any, campaigns: typings.ICampaigns[]) => {
+            .exec((err: any, campaigns: typings.ICampaigns) => {
             if (err) { reject(err); }
             resolve(campaigns);
         });
@@ -27,7 +27,7 @@ export async function campaignsActionsReadLatest(): Promise<typings.ICampaigns[]
 export async function campaignsActionsUpdate(obj: any): Promise<typings.ICampaigns[]> {
     return new Promise((resolve, reject) => {
         dbModels.campaignsModel.updateOne(
-            {name: obj.name},
+            {_id: obj._id},
             {$set: obj},
             (err: any, campaigns: typings.ICampaigns[]) => {
                 if (err) { reject(err); }

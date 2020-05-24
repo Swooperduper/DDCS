@@ -11,8 +11,7 @@ export async function checkCurrentPlayerBalance(): Promise<typings.IPlayerBalanc
         underdog: 0,
         ratio: 1
     };
-    const latestCampaignArray = await ddcsControllers.campaignsActionsReadLatest();
-    const latestCampaign = latestCampaignArray[0];
+    const latestCampaign = await ddcsControllers.campaignsActionsReadLatest();
     const totalCampaignTime = new Date(latestCampaign.updatedAt).getTime() - new Date(latestCampaign.createdAt).getTime();
     if (totalCampaignTime > ddcsControllers.time.oneHour) {
         console.log("STACK: Blue:", latestCampaign.totalMinutesPlayed_blue, " Red:", latestCampaign.totalMinutesPlayed_red);
@@ -41,7 +40,7 @@ export async function checkCurrentPlayerBalance(): Promise<typings.IPlayerBalanc
 export async function updateLatestCampaign(): Promise<void> {
     const campaign = await ddcsControllers.campaignsActionsReadLatest();
     if (campaign) {
-        const campSessions = await ddcsControllers.sessionsActionsRead({campaignName: campaign[0].name});
+        const campSessions = await ddcsControllers.sessionsActionsRead({campaignName: campaign.name});
         let totalMinutesPlayedBlue = 0;
         let totalMinutesPlayedRed = 0;
         _.forEach(campSessions, (pa) => {
@@ -49,7 +48,7 @@ export async function updateLatestCampaign(): Promise<void> {
             totalMinutesPlayedRed += pa.totalMinutesPlayed_red;
         });
         await ddcsControllers.campaignsActionsUpdate({
-            name: campaign[0].name,
+            _id: campaign._id,
             totalMinutesPlayed_blue: totalMinutesPlayedBlue,
             totalMinutesPlayed_red: totalMinutesPlayedRed
         });
