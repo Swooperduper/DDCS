@@ -46,16 +46,14 @@ export function setCurServerStaticCnt(staticCnt: number) {
 }
 
 export async function getLatestSession(serverInfoObj: any): Promise<void> {
-
     if (serverInfoObj.epoc && serverInfoObj.startAbsTime) {
         const buildSessionName = process.env.SERVER_NAME + "_" + serverInfoObj.epoc;
         const latestSession = await ddcsController.sessionsActionsReadLatest();
-        if ( !latestSession || (getSessionName() !== latestSession.name || curAbsTime > serverInfoObj.curAbsTime)) {
+        if ((buildSessionName !== latestSession.name || curAbsTime > serverInfoObj.curAbsTime)) {
 
-            console.log("LS: ", latestSession);
             console.log(
                 "create new session: ",
-                getSessionName(),
+                buildSessionName,
                 " !== ",
                 (latestSession) ? latestSession.name : buildSessionName,
                 " || ",
@@ -78,15 +76,15 @@ export async function getLatestSession(serverInfoObj: any): Promise<void> {
             };
 
             await ddcsController.sessionsActionsUpdate(newSession);
-            console.log("SESSNAME: ", newSession, buildSessionName);
             setSessionName(buildSessionName);
 
         } else {
-            console.log("use existing session: ", sessionName);
+            // console.log("use existing session: ", sessionName);
             await ddcsController.sessionsActionsUpdate({
-                    _id: buildSessionName,
-                    curAbsTime: serverInfoObj.curAbsTime
-                });
+                _id: buildSessionName,
+                curAbsTime: serverInfoObj.curAbsTime
+            });
+            setSessionName(buildSessionName);
         }
 
         setCurServerEpoc(serverInfoObj.epoc);

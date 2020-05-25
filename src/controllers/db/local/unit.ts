@@ -7,7 +7,16 @@ import * as typings from "../../../typings";
 import { dbModels } from "../common";
 import * as ddcsController from "../../";
 
-export async function unitActionCount(obj: any): Promise<number> {
+export async function actionAliveNames(obj: any): Promise<any> {
+    return new Promise((resolve, reject) => {
+        dbModels.unitModel.find(obj).select({_id: 1}).setOptions({ lean: true }).exec((err: any, unitNames: any) => {
+            if (err) { reject(err); }
+            resolve(unitNames);
+        });
+    });
+}
+
+export async function actionCount(obj: any): Promise<number> {
     return new Promise((resolve, reject) => {
         dbModels.unitModel.countDocuments(obj, (err: any, count: number) => {
             if (err) { reject(err); }

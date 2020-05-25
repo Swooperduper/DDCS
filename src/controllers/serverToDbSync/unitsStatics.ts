@@ -7,10 +7,14 @@ import * as ddcsControllers from "../";
 
 export async function processUnitUpdates(unitObj: any): Promise<void> {
     /*
-    if (unitObj.data.type === "Su-25T") {
-        console.log("INIT: ", unitObj);
+    if (unitObj.uType !== "unit") {
+        console.log("U: ", unitObj);
     }
-     */
+
+    if (unitObj.data.category === "STRUCTURE") {
+        console.log("STRUCT: ", unitObj);
+    }
+*/
     const unit = await ddcsControllers.unitActionRead({_id: unitObj.data.name});
     let stParse;
     let iCurObj: any;

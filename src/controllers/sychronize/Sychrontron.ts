@@ -2,15 +2,24 @@
  * DDCS Licensed under AGPL-3.0 by Andrew "Drex" Finegan https://github.com/afinegan/DynamicDCS
  */
 
+import * as _ from "lodash";
 import * as ddcsControllers from "../";
 import { getSessionName } from "../";
 
-export const requestJobArray: any[] = [];
+const requestJobArray: any[] = [];
 
 let isServerSynced = true;
-let isSyncLockDownMode = false; // lock all processes out until server fully syncs
+let isInitSyncMode = false; // Init Sync Units To Server Mode
 let isReSyncLock = false;
-let nextUniqueId = 0;
+let nextUniqueId = 1;
+
+export function getRequestIndex(reqId: number) {
+    return _.findIndex(requestJobArray, ["reqId", reqId]);
+}
+
+export function getRequestJob(reqId: number) {
+    return requestJobArray.find((r) => r.reqId === reqId);
+}
 
 export function getNextUniqueId() {
     const curUniqueId = nextUniqueId;
@@ -31,7 +40,7 @@ export function setReSyncLock(value: boolean) {
 }
 
 export function setSyncLockdownMode(flag: boolean) {
-    isSyncLockDownMode = flag;
+    isInitSyncMode = flag;
 }
 
 /*
@@ -183,58 +192,129 @@ export async function OldBrokenSyncServer(serverUnitCount: number): Promise<void
 }
 */
 
-export function syncStaticNames(nameArray: string[]): void {
-    console.log("syncStaticNames: ", nameArray);
+export async function syncStaticsNames(incomingObj: any, curReqJobIndex: number): Promise<void> {
+    const curReqJob = requestJobArray[curReqJobIndex];
+    if (curReqJob.reqArgs.serverStaticCount > curReqJob.reqArgs.dbStaticCount) {
+        const aliveStaticNamesObj = await ddcsControllers.actionAliveNames({dead: false, category: 4});
+        const aliveStaticNameArray = aliveStaticNamesObj.map((u: any) => u._id);
+        const missingStaticNames = _.difference(incomingObj.returnObj, aliveStaticNameArray);
+        console.log("Server is missing ", missingStaticNames, " static(s)");
+        // server has more units, get data for specific units
+
+        if (missingStaticNames.length > 0) {
+            await ddcsControllers.sendUDPPacket("frontEnd", {
+                actionObj: {
+                    action: "reSyncStaticInfo",
+                    missingStaticNames,
+                    reqID: 0, // dont run anything with return data
+                    time: new Date()
+                }
+            });
+        }
+    }
+
+    if (curReqJob.reqArgs.serverStaticCount < curReqJob.reqArgs.dbStaticCount) {
+        console.log("DB HAS MORE Statics");
+        // DB more units spawn on server IF IN sync mode
+        if (isInitSyncMode) {
+            // pull diff unit name mode
+            // respawn units through sending lua cmds
+        }
+    }
+
+    if (curReqJob.reqArgs.serverStaticCount === curReqJob.reqArgs.dbStaticCount) {
+        console.log("SERVER IS MATCHED WITH DB, Do Nothing");
+    }
+    requestJobArray.splice(curReqJobIndex, 1);
 }
 
-export function syncUnitsNames(nameArray: string[]): void {
-    console.log("UNIT LIST BACK");
-    console.log("syncUnitNames: ", nameArray);
+export async function syncUnitsNames(incomingObj: any, curReqJobIndex: number): Promise<void> {
+    const curReqJob = requestJobArray[curReqJobIndex];
+    console.log(curReqJob.reqArgs.serverUnitCount, " > ", curReqJob.reqArgs.dbUnitCount);
+    if (curReqJob.reqArgs.serverUnitCount > curReqJob.reqArgs.dbUnitCount) {
+        const aliveUnitNamesObj = await ddcsControllers.actionAliveNames({dead: false, category: { $ne: 4}});
+        const aliveUnitNameArray = aliveUnitNamesObj.map((u: any) => u._id);
+        const missingUnitNames = _.difference(incomingObj.returnObj, aliveUnitNameArray);
+        console.log("Server is missing ", missingUnitNames, " unit(s)");
+        // server has more units, get data for specific units
+
+        if (missingUnitNames.length > 0) {
+            await ddcsControllers.sendUDPPacket("frontEnd", {
+                actionObj: {
+                    action: "reSyncUnitInfo",
+                    missingUnitNames,
+                    reqID: 0, // dont run anything with return data
+                    time: new Date()
+                }
+            });
+        }
+    }
+
+    if (curReqJob.reqArgs.serverUnitCount < curReqJob.reqArgs.dbUnitCount) {
+        console.log("DB HAS MORE UNITS");
+        // DB more units spawn on server IF IN sync mode
+        if (isInitSyncMode) {
+            // pull diff unit name mode
+            // respawn units through sending lua cmds
+        }
+    }
+
+    if (curReqJob.reqArgs.serverUnitCount === curReqJob.reqArgs.dbUnitCount) {
+        console.log("SERVER IS MATCHED WITH DB, Do Nothing");
+    }
+    requestJobArray.splice(curReqJobIndex, 1);
 }
 
-export async function reSyncServerStatics(): Promise<void> {
+export async function reSyncServerStatics(serverStaticCount: number, dbStaticCount: number): Promise<void> {
     const curNextUniqueId = getNextUniqueId();
     requestJobArray.push({
         reqId: curNextUniqueId,
-        callBack: "syncStaticNames",
-        time: new Date()
+        callBack: "syncStaticsNames",
+        reqArgs: {
+            serverStaticCount,
+            dbStaticCount
+        }
     });
 
     await ddcsControllers.sendUDPPacket("frontEnd", {
         actionObj: {
-            action: "getStaticNames",
+            action: "getStaticsNames",
             reqID: curNextUniqueId,
             time: new Date()
         }
     });
 }
 
-export async function reSyncServerUnits() {
+export async function reSyncServerUnits(serverUnitCount: number, dbUnitCount: number) {
     const curNextUniqueId = getNextUniqueId();
     requestJobArray.push({
         reqId: curNextUniqueId,
-        callBack: "syncUnitsNames"
+        callBack: "syncUnitsNames",
+        reqArgs: {
+            serverUnitCount,
+            dbUnitCount
+        }
     });
-    console.log("SEND UNIT RESYNC PACKET");
     await ddcsControllers.sendUDPPacket("frontEnd", {
         actionObj: {
             action: "getUnitNames",
-            reqID: curNextUniqueId
+            reqID: curNextUniqueId,
+            time: new Date()
         }
     });
 }
 
-export async function syncCheck(serverUnitCount: number): Promise<void> {
-    if (!isReSyncLock && getSessionName()) {
+export async function syncCheck(serverUnitCount: number, serverStaticCount: number): Promise<void> {
+    if (getSessionName()) {
         const servers = await ddcsControllers.serverActionsRead({_id: process.env.SERVER_NAME});
         if (servers && servers[0]) {
-            const curAliveUnitCount = await ddcsControllers.unitActionCount({dead: false});
+            const curAliveUnitCount = await ddcsControllers.actionCount({dead: false, category: { $ne: 4}});
+            const curAliveStaticCount = await ddcsControllers.actionCount({dead: false, category: 4});
             if ( serverUnitCount !== curAliveUnitCount) {
-                // lock into re-sync mode, so not run this until re-sync are unlocked
-                setReSyncLock(false);
-                console.log("RESYNC START");
-                // await reSyncServerStatics();
-                await reSyncServerUnits();
+                await reSyncServerUnits(serverUnitCount, curAliveUnitCount);
+            }
+            if ( serverStaticCount !== curAliveStaticCount) {
+                await reSyncServerStatics(serverStaticCount, curAliveStaticCount);
             }
         }
     }

@@ -1,7 +1,6 @@
 import * as ddcsController from "../";
 
 export async function processingIncomingData(incomingObj: any) {
-    incomingObj
     switch (incomingObj.action) {
         case "serverInfo":
             await ddcsController.getLatestSession(incomingObj);
@@ -89,7 +88,14 @@ export async function processingIncomingData(incomingObj: any) {
             // await ddcsController.processDisconnect(incomingObj);
             break;
         case "processReq":
-            console.log("PROCESSREQ: ", incomingObj);
+            const curReqJobIndex = ddcsController.getRequestIndex(incomingObj.reqId);
+            const curReqJobObj = ddcsController.getRequestJob(incomingObj.reqId);
+            if (curReqJobObj && curReqJobIndex) {
+                // @ts-ignore
+                ddcsController[curReqJobObj.callBack](incomingObj, curReqJobIndex);
+            } else {
+                console.log("Cant find req Id: ", incomingObj.reqId);
+            }
             break;
     }
 }

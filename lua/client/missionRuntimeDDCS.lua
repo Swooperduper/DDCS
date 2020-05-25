@@ -23,7 +23,7 @@ local missionRuntimePort = 3002
 
 local missionStartTime = os.time()
 local DATA_TIMEOUT_SEC = 0.1
-local SEND_SERVER_INFO_SEC = 60
+local SEND_SERVER_INFO_SEC = 1
 
 package.path = package.path .. ";.\\LuaSocket\\?.lua"
 package.cpath = package.cpath .. ";.\\LuaSocket\\?.dll"
@@ -96,7 +96,7 @@ function generateInitialUnitObj(group, unit, curName, coalition, lon, lat, alt, 
     return curUnit
 end
 
-local function addGroups(groups, coalition)
+function addGroups(groups, coalition)
     for groupIndex = 1, #groups do
         local group = groups[groupIndex]
         local units = group:getUnits()
@@ -169,17 +169,16 @@ end
 staticCache = {}
 checkStaticDead = {}
 
-function generateInitialStaticsObj(static, coalition, lon, lat, alt, staticPosition)
+function generateInitialStaticsObj(static, curStaticName, coalition, lon, lat, alt, staticPosition)
     local curStatic = {
         ["uType"] = "static",
         ["data"] = {
-            ["name"] = static.name,
+            ["name"] = curStaticName,
             ["lonLatLoc"] = {
                 lon,
                 lat
             },
             ["alt"] = alt,
-            ["position"] = position,
             ["unitPosition"] = staticPosition,
             ["unitXYZNorthCorr"] = coord.LLtoLO(lat + 1, lon),
             ["category"] = static:getDesc().category,
@@ -192,7 +191,7 @@ function generateInitialStaticsObj(static, coalition, lon, lat, alt, staticPosit
 end
 
 
-local function addStatics(statics, coalition)
+function addStatics(statics, coalition)
     for staticIndex = 1, #statics do
         local static = statics[staticIndex]
         local staticPosition = static:getPosition()
@@ -207,7 +206,7 @@ local function addStatics(statics, coalition)
                 --if heading < 0 then
                 --    heading = heading + 2 * math.pi
                 --end
-                local curStatic = generateInitialStaticsObj(static, coalition, lon, lat, alt, staticPosition)
+                local curStatic = generateInitialStaticsObj(static, curStaticName, coalition, lon, lat, alt, staticPosition)
                 staticCache[curStaticName] = {
                     ["lat"] = lat,
                     ["lon"] = lon
@@ -216,7 +215,7 @@ local function addStatics(statics, coalition)
                 sendUDPPacket(curStatic)
             end
         else
-            local curStatic = generateInitialStaticsObj(static, coalition, lon, lat, alt, staticPosition)
+            local curStatic = generateInitialStaticsObj(static, curStaticName, coalition, lon, lat, alt, staticPosition)
             staticCache[curStaticName] = {
                 ["lat"] = lat,
                 ["lon"] = lon
@@ -261,6 +260,33 @@ function updateStatics(ourArgument, time)
     return time + DATA_TIMEOUT_SEC
 end
 
+function updateUnitGroupsByName(unitNames)
+    for k, v in pairs(unitNames) do
+        local curUnit = Unit.getByName(v)
+        if curUnit ~= nil then
+            -- removing from unit cache makes the server think its a new unit, forcing reSync
+            unitCache[v] = nil
+        else
+            -- if dead, add unit back to uniCache, it will send dead packet when it detects unit not exist
+            unitCache[v] = "deadUnit"
+        end
+    end
+end
+
+function updateStaticGroupsByName(staticNames)
+    tprint(staticNames, 1)
+    for k, v in pairs(staticNames) do
+        local curStatic = StaticObject.getByName(v)
+        if curStatic ~= nil then
+            -- removing from unit cache makes the server think its a new unit, forcing reSync
+            staticCache[v] = nil
+        else
+            -- if dead, add unit back to uniCache, it will send dead packet when it detects unit not exist
+            staticCache[v] = "deadStatic"
+        end
+    end
+end
+
 -- command section
 function commandExecute(s)
     return loadstring("return " ..s)()
@@ -275,14 +301,22 @@ function runRequest(request)
         }
 
         if request.action == "getUnitNames" then
-            outObj.completeUnitAliveNames = completeUnitAliveNames
+            outObj.returnObj = completeUnitAliveNames
+            sendUDPPacket(outObj)
+        end
+
+        if request.action == "reSyncUnitInfo" then
+            updateUnitGroupsByName(request.missingUnitNames)
+        end
+
+        if request.action == "getStaticsNames" then
+            outObj.returnObj = completeStaticAliveNames
             tprint(outObj, 1)
             sendUDPPacket(outObj)
         end
 
-        if request.action == "getStaticNames" then
-            outObj.completeStaticAliveNames = completeStaticAliveNames
-            sendUDPPacket(outObj)
+        if request.action == "reSyncStaticInfo" then
+            updateStaticGroupsByName(request.missingStaticNames)
         end
 
         if request.action == "CMD" then
@@ -291,7 +325,7 @@ function runRequest(request)
                 env.info("Error: " .. resp)
             end
             if request.reqID > 0 then
-                outObj.cmdResp = cmdResponse
+                outObj.returnObj = cmdResponse
                 sendUDPPacket(outObj)
             end
         end
