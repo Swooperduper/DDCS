@@ -260,9 +260,9 @@ export interface IUnit {
     ammo: IAmmo[];
     agl: number;
     alt: number;
-    category: string;
+    category: number;
     coalition: number;
-    country: string;
+    country: number;
     groupId: number;
     groupName: string;
     hdg: number;

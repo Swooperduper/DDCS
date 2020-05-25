@@ -29,11 +29,11 @@ export function unitModel(dbconn: mongoose.Connection): mongoose.Document | {} {
                 required: true
             },
             category: {
-                type: String,
+                type: Number,
                 required: true
             },
             country: {
-                type: String,
+                type: Number,
                 required: true
             },
             lonLatLoc: {
@@ -138,7 +138,7 @@ export function unitModel(dbconn: mongoose.Connection): mongoose.Document | {} {
                 type: Number
             },
             surfType: {
-                type: String
+                type: Number
             }
         },
         {

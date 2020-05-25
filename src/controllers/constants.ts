@@ -14,6 +14,48 @@ export const engineCache = {
     bases: []
 };
 
+export const OBJECT_CATEGORY: string[] = [
+    "UNIT",
+    "WEAPON",
+    "STATIC",
+    "BASE",
+    "SCENERY",
+    "Cargo"
+];
+
+export const STATIC_OBJECT_CATEGORY: string[] = [
+    "VOID",
+    "UNIT",
+    "WEAPON",
+    "STATIC",
+    "BASE",
+    "SCENERY",
+    "CARGO"
+];
+
+export const SURFACE_TYPE_CATEGORY: string[] = [
+    "LAND",
+    "SHALLOW_WATER",
+    "WATER",
+    "ROAD",
+    "RUNWAY"
+];
+
+export const WEAPON_CATEGORY: string[] = [
+    "SHELL",
+    "MISSILE",
+    "ROCKET",
+    "BOMB"
+];
+
+export const GROUP_CATEGORY: string[] = [
+    "AIRPLANE",
+    "HELICOPTER",
+    "GROUND",
+    "SHIP",
+    "TRAIN"
+];
+
 export const blueCountrys: string[] = [
     "AUSTRALIA",
     "AUSTRIA",
