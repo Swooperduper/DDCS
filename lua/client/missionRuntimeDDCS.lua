@@ -201,11 +201,6 @@ function addStatics(statics, coalition)
 
         if staticCache[curStaticName] ~= nil then
             if staticCache[curStaticName].lat ~= lat or staticCache[curStaticName].lon ~= lon then
-                --local headingNorthCorr = math.atan2(unitXYZNorthCorr.z - staticPosition.p.z, unitXYZNorthCorr.x - staticPosition.p.x)
-                --local heading = math.atan2(staticPosition.x.z, staticPosition.x.x) + headingNorthCorr
-                --if heading < 0 then
-                --    heading = heading + 2 * math.pi
-                --end
                 local curStatic = generateInitialStaticsObj(static, curStaticName, coalition, lon, lat, alt, staticPosition)
                 staticCache[curStaticName] = {
                     ["lat"] = lat,
