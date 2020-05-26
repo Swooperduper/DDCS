@@ -30,11 +30,6 @@ export async function startUpReceiveUDPSocket() {
         const dataObj = JSON.parse(msg);
 
         if (dataObj.action === "C" || dataObj.action === "U") {
-            // LUA uses 1 as start of array, fix incoming variables
-            // dataObj.data.country -= 1;
-            // dataObj.data.category -= 1;
-
-
             // doing math on nodeJS side, free up more DCS.exe
             const headingNorthCorr = Math.atan2(
                 dataObj.data.unitXYZNorthCorr.z - dataObj.data.unitPosition.p.z,

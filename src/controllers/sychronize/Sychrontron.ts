@@ -193,7 +193,6 @@ export async function OldBrokenSyncServer(serverUnitCount: number): Promise<void
 */
 
 export async function syncStaticsNames(incomingObj: any, curReqJobIndex: number): Promise<void> {
-    console.log("STR: ", ddcsControllers.UNIT_CATEGORY.indexOf("STRUCTURE"));
     const curReqJob = requestJobArray[curReqJobIndex];
     if (curReqJob.reqArgs.serverStaticCount > curReqJob.reqArgs.dbStaticCount) {
         const aliveStaticNamesObj = await ddcsControllers.actionAliveNames({dead: false, category: ddcsControllers.UNIT_CATEGORY.indexOf("STRUCTURE")});
