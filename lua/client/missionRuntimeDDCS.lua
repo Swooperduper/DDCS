@@ -38,10 +38,10 @@ local udpMissionRuntime = socket.udp()
 assert(udpMissionRuntime:settimeout(0))
 assert(udpMissionRuntime:setsockname(socket.dns.toip(missionRuntimeHost), missionRuntimePort))
 
-completeUnitAliveNames = {}
-completeStaticAliveNames = {}
-tempUnitAliveNames = {}
-tempStaticAliveNames = {}
+completeUnitNames = {}
+completeStaticNames = {}
+tempUnitNames = {}
+tempStaticNames = {}
 
 function sendUDPPacket(payload)
     udpClient:send(JSON:encode(payload))
@@ -106,7 +106,7 @@ function addGroups(groups, coalition)
             local curName = unit:getName()
             local unitPosition = unit:getPosition()
             local lat, lon, alt = coord.LOtoLL(unitPosition.p)
-            table.insert(tempUnitAliveNames, curName)
+            table.insert(tempUnitNames, curName)
             if Unit.isActive(unit) then
                 if unitCache[curName] ~= nil then
                     if unitCache[curName].lat ~= lat or unitCache[curName].lon ~= lon then
@@ -161,7 +161,7 @@ end
 
 function updateGroups(ourArgument, time)
     checkUnitDead = {}
-    tempUnitAliveNames = {}
+    tempUnitNames = {}
 
     local redGroups = coalition.getGroups(1)
     if redGroups ~= nil then
@@ -172,7 +172,7 @@ function updateGroups(ourArgument, time)
         addGroups(blueGroups, 2)
     end
 
-    completeUnitAliveNames = tempUnitAliveNames
+    completeUnitNames = tempUnitNames
     --check dead, send delete action to server if dead detected
     for k, v in pairs(unitCache) do
         if checkUnitDead[k] == nil then
@@ -224,7 +224,7 @@ function addStatics(statics, coalition)
         local staticPosition = static:getPosition()
         local lat, lon, alt = coord.LOtoLL(staticPosition.p)
         local curStaticName = static:getName()
-        table.insert(tempStaticAliveNames, curStaticName)
+        table.insert(tempStaticNames, curStaticName)
 
         if staticCache[curStaticName] ~= nil then
             if staticCache[curStaticName].lat ~= lat or staticCache[curStaticName].lon ~= lon then
@@ -251,7 +251,7 @@ end
 
 function updateStatics(ourArgument, time)
     checkStaticDead = {}
-    tempStaticAliveNames = {}
+    tempStaticNames = {}
 
 
     local redStatics = coalition.getStaticObjects(1)
@@ -263,7 +263,7 @@ function updateStatics(ourArgument, time)
         addStatics(blueStatics, 2)
     end
 
-    completeStaticAliveNames = tempStaticAliveNames
+    completeStaticNames = tempStaticNames
 
     for k, v in pairs(staticCache) do
         if checkStaticDead[k] == nil then
@@ -323,7 +323,7 @@ function runRequest(request)
         }
 
         if request.action == "getUnitNames" then
-            outObj.returnObj = completeUnitAliveNames
+            outObj.returnObj = completeUnitNames
             sendUDPPacket(outObj)
         end
 
@@ -332,7 +332,7 @@ function runRequest(request)
         end
 
         if request.action == "getStaticsNames" then
-            outObj.returnObj = completeStaticAliveNames
+            outObj.returnObj = completeStaticNames
             tprint(outObj, 1)
             sendUDPPacket(outObj)
         end
@@ -369,8 +369,8 @@ end
 function sendServerInfo(ourArgument, time)
     sendUDPPacket({
         ["action"] = "serverInfo",
-        ["unitCount"] = table.getn(completeUnitAliveNames),
-        ["staticCount"] = table.getn(completeStaticAliveNames),
+        ["unitCount"] = table.getn(completeUnitNames),
+        ["staticCount"] = table.getn(completeStaticNames),
         ["startAbsTime"] = timer.getTime0(),
         ["curAbsTime"] = timer.getAbsTime(),
         ["epoc"] = missionStartTime * 1000
