@@ -195,7 +195,8 @@ export async function OldBrokenSyncServer(serverUnitCount: number): Promise<void
 export async function syncStaticsNames(incomingObj: any, curReqJobIndex: number): Promise<void> {
     const curReqJob = requestJobArray[curReqJobIndex];
     if (curReqJob.reqArgs.serverStaticCount > curReqJob.reqArgs.dbStaticCount) {
-        const aliveStaticNamesObj = await ddcsControllers.actionAliveNames({dead: false, category: ddcsControllers.UNIT_CATEGORY.indexOf("STRUCTURE")});
+        const aliveStaticNamesObj =
+            await ddcsControllers.actionAliveNames({dead: false, category: ddcsControllers.UNIT_CATEGORY.indexOf("STRUCTURE")});
         const aliveStaticNameArray = aliveStaticNamesObj.map((u: any) => u._id);
         const missingStaticNames = _.difference(incomingObj.returnObj, aliveStaticNameArray);
         console.log("Server is missing ", missingStaticNames, " static(s)");
@@ -232,7 +233,8 @@ export async function syncUnitsNames(incomingObj: any, curReqJobIndex: number): 
     const curReqJob = requestJobArray[curReqJobIndex];
     console.log(curReqJob.reqArgs.serverUnitCount, " > ", curReqJob.reqArgs.dbUnitCount);
     if (curReqJob.reqArgs.serverUnitCount > curReqJob.reqArgs.dbUnitCount) {
-        const aliveUnitNamesObj = await ddcsControllers.actionAliveNames({dead: false, category: { $ne: ddcsControllers.UNIT_CATEGORY.indexOf("STRUCTURE")}});
+        const aliveUnitNamesObj =
+            await ddcsControllers.actionAliveNames({dead: false, category: { $ne: ddcsControllers.UNIT_CATEGORY.indexOf("STRUCTURE")}});
         const aliveUnitNameArray = aliveUnitNamesObj.map((u: any) => u._id);
         const missingUnitNames = _.difference(incomingObj.returnObj, aliveUnitNameArray);
         console.log("Server is missing ", missingUnitNames, " unit(s)");
