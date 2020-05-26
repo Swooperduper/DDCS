@@ -55,44 +55,48 @@ function generateInitialUnitObj(group, unit, isActive, curName, coalition, lon, 
     local curUnit = {
         ["uType"] = "unit",
         ["data"] = {
-            ["isActive"] = isActive,
-            ["category"] = unit:getDesc().category,
-            ["groupId"] = group:getID(),
-            ["unitId"] = unit:getID(),
             ["name"] = curName,
+            ["isActive"] = isActive,
+            ["unitPosition"] = unitPosition,
+            ["unitXYZNorthCorr"] = coord.LLtoLO(lat + 1, lon),
             ["lonLatLoc"] = {
                 lon,
                 lat
             },
             ["alt"] = alt,
-            ["agl"] = unitPosition.p.y - land.getHeight({x=unitPosition.p.x, y = unitPosition.p.z}),
-            ["surfType"] = land.getSurfaceType(unitPosition.p),
-            ["inAir"] = unit:inAir(),
-            ["unitPosition"] = unitPosition,
-            ["unitXYZNorthCorr"] = coord.LLtoLO(lat + 1, lon),
-            ["velocity"] = unit:getVelocity(),
-            ["groupName"] = group:getName(),
-            ["type"] = unit:getTypeName(),
+            ["category"] = unit:getDesc().category,
+            ["country"] = unit:getCountry(),
             ["coalition"] = coalition,
-            ["country"] = unit:getCountry()
+            ["type"] = unit:getTypeName(),
         }
     }
 
-    local PlayerName = unit:getPlayerName()
-    if PlayerName ~= nil then
-        curUnit.data.playername = PlayerName
-        local curFullAmmo = unit:getAmmo()
-        if curFullAmmo ~= nil then
-            curUnit.data.ammo = {}
-            for ammoIndex = 1, #curFullAmmo do
-                table.insert(curUnit.data.ammo, {
-                    ["typeName"] = curFullAmmo[ammoIndex].desc.typeName,
-                    ["count"] = curFullAmmo[ammoIndex].count
-                })
+    if isActive then
+        curUnit.data.groupId = group:getID()
+        curUnit.data.unitId = unit:getID()
+        curUnit.data.agl = unitPosition.p.y - land.getHeight({x=unitPosition.p.x, y = unitPosition.p.z})
+        curUnit.data.surfType = land.getSurfaceType(unitPosition.p)
+        curUnit.data.inAir = unit:inAir()
+        curUnit.data.velocity = unit:getVelocity()
+        curUnit.data.groupName = group:getName()
+        curUnit.data.coalition = coalition
+
+        local PlayerName = unit:getPlayerName()
+        if PlayerName ~= nil then
+            curUnit.data.playername = PlayerName
+            local curFullAmmo = unit:getAmmo()
+            if curFullAmmo ~= nil then
+                curUnit.data.ammo = {}
+                for ammoIndex = 1, #curFullAmmo do
+                    table.insert(curUnit.data.ammo, {
+                        ["typeName"] = curFullAmmo[ammoIndex].desc.typeName,
+                        ["count"] = curFullAmmo[ammoIndex].count
+                    })
+                end
             end
+        else
+            curUnit.data.playername = ""
         end
-    else
-        curUnit.data.playername = ""
     end
     return curUnit
 end
@@ -133,25 +137,9 @@ function addGroups(groups, coalition)
                         ["lat"] = lat,
                         ["lon"] = lon
                     }
-                    local curInactive = {
-                        ["action"] = "C",
-                        ["data"] = {
-                            ["name"] = curName,
-                            ["type"] = unit:getTypeName(),
-                            ["coalition"] = coalition,
-                            ["category"] = unit:getDesc().category,
-                            ["country"] = unit:getCountry(),
-                            ["lonLatLoc"] = {
-                                lon,
-                                lat
-                            },
-                            ["alt"] = alt,
-                            ["unitPosition"] = unitPosition,
-                            ["unitXYZNorthCorr"] = coord.LLtoLO(lat + 1, lon),
-                            ["isActive"] = false
-                        }
-                    }
-                    sendUDPPacket(curInactive)
+                    local curUnit = generateInitialUnitObj(group, unit, false, curName, coalition, lon, lat, alt, unitPosition)
+                    curUnit.action = "C"
+                    sendUDPPacket(curUnit)
                 end
             end
             checkUnitDead[curName] = 1
