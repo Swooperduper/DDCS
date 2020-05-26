@@ -43,6 +43,7 @@ export async function setFarpMarks() {
 export async function setUnitMark(
     unit: any
 ) {
+    /*
     if (!_.includes(ddcsControllers.crateTypes, unit.type)) {
         const cUnit = await ddcsControllers.unitActionRead({_id: _.get(unit, "name")});
         const curUnit = cUnit[0];
@@ -95,4 +96,6 @@ export async function setUnitMark(
                 });
         }
     }
+
+     */
 }

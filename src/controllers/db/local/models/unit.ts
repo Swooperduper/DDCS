@@ -12,12 +12,6 @@ export function unitModel(dbconn: mongoose.Connection): mongoose.Document | {} {
                 type: String,
                 required: true
             },
-            unitId: {
-                type: Number
-            },
-            groupId: {
-                type: Number
-            },
             type: {
                 type: String,
                 required: true
@@ -36,22 +30,32 @@ export function unitModel(dbconn: mongoose.Connection): mongoose.Document | {} {
                 type: Number,
                 required: true
             },
-            lonLatLoc: {
-                type: [Number],
-                index: "2dsphere"
-            },
             alt: {
                 type: Number,
                 required: true
-            },
-            agl: {
-                type: Number
             },
             hdg: {
                 type: Number,
                 min: 0,
                 max: 359,
                 required: true
+            },
+            unitId: {
+                type: Number
+            },
+            groupId: {
+                type: Number
+            },
+            lonLatLoc: {
+                type: [Number],
+                index: "2dsphere"
+            },
+            agl: {
+                type: Number
+            },
+            isActive: {
+                type: Boolean,
+                default: true
             },
             life: {
                 type: Number

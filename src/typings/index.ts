@@ -252,6 +252,7 @@ export interface IUnit {
     hidden: boolean;
     enabled: boolean;
     dead: boolean;
+    isActive: boolean;
     isTroop: boolean;
     isCrate: boolean;
     isCombo: boolean;

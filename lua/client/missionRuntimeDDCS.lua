@@ -51,10 +51,11 @@ end
 unitCache = {}
 checkUnitDead = {}
 
-function generateInitialUnitObj(group, unit, curName, coalition, lon, lat, alt, unitPosition)
+function generateInitialUnitObj(group, unit, isActive, curName, coalition, lon, lat, alt, unitPosition)
     local curUnit = {
         ["uType"] = "unit",
         ["data"] = {
+            ["isActive"] = isActive,
             ["category"] = unit:getDesc().category,
             ["groupId"] = group:getID(),
             ["unitId"] = unit:getID(),
@@ -102,19 +103,18 @@ function addGroups(groups, coalition)
         local units = group:getUnits()
         for unitIndex = 1, #units do
             local unit = units[unitIndex]
+            local curName = unit:getName()
+            local unitPosition = unit:getPosition()
+            local lat, lon, alt = coord.LOtoLL(unitPosition.p)
+            table.insert(tempUnitAliveNames, curName)
             if Unit.isActive(unit) then
-                local unitPosition = unit:getPosition()
-                local lat, lon, alt = coord.LOtoLL(unitPosition.p)
-                local curName = unit:getName()
-                table.insert(tempUnitAliveNames, curName)
-
                 if unitCache[curName] ~= nil then
                     if unitCache[curName].lat ~= lat or unitCache[curName].lon ~= lon then
                         unitCache[curName] = {
                             ["lat"] = lat,
                             ["lon"] = lon
                         }
-                        local curUnit = generateInitialUnitObj(group, unit, curName, coalition, lon, lat, alt, unitPosition)
+                        local curUnit = generateInitialUnitObj(group, unit, true, curName, coalition, lon, lat, alt, unitPosition)
                         curUnit.action = "U"
                         sendUDPPacket(curUnit)
                     end
@@ -123,12 +123,38 @@ function addGroups(groups, coalition)
                         ["lat"] = lat,
                         ["lon"] = lon
                     }
-                    local curUnit = generateInitialUnitObj(group, unit, curName, coalition, lon, lat, alt, unitPosition)
+                    local curUnit = generateInitialUnitObj(group, unit, true, curName, coalition, lon, lat, alt, unitPosition)
                     curUnit.action = "C"
                     sendUDPPacket(curUnit)
                 end
-                checkUnitDead[curName] = 1
+            else
+                if unitCache[curName] == nil then
+                    unitCache[curName] = {
+                        ["lat"] = lat,
+                        ["lon"] = lon
+                    }
+                    local curInactive = {
+                        ["action"] = "C",
+                        ["data"] = {
+                            ["name"] = curName,
+                            ["type"] = unit:getTypeName(),
+                            ["coalition"] = coalition,
+                            ["category"] = unit:getDesc().category,
+                            ["country"] = unit:getCountry(),
+                            ["lonLatLoc"] = {
+                                lon,
+                                lat
+                            },
+                            ["alt"] = alt,
+                            ["unitPosition"] = unitPosition,
+                            ["unitXYZNorthCorr"] = coord.LLtoLO(lat + 1, lon),
+                            ["isActive"] = false
+                        }
+                    }
+                    sendUDPPacket(curInactive)
+                end
             end
+            checkUnitDead[curName] = 1
         end
     end
 end
@@ -173,6 +199,7 @@ function generateInitialStaticsObj(static, curStaticName, coalition, lon, lat, a
     local curStatic = {
         ["uType"] = "static",
         ["data"] = {
+            ["isActive"] = true,
             ["name"] = curStaticName,
             ["lonLatLoc"] = {
                 lon,
