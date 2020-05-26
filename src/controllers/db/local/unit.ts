@@ -5,7 +5,7 @@
 import * as _ from "lodash";
 import * as typings from "../../../typings";
 import { dbModels } from "../common";
-import * as ddcsController from "../../";
+import * as ddcsControllers from "../../";
 
 export async function actionAliveNames(obj: any): Promise<any> {
     return new Promise((resolve, reject) => {
@@ -144,13 +144,14 @@ export async function unitActionMarkUndead(): Promise<void> {
 
 export async function unitActionRemoveAllDead(): Promise<void> {
     return new Promise((resolve, reject) => {
-        const fiveMinsAgo = new Date(new Date()).getTime() - ddcsController.time.fiveMins;
+        const fiveMinsAgo = new Date(new Date()).getTime() - ddcsControllers.time.fiveMins;
         // console.log('five mins: ', fiveMinsAgo);
+        const catNum = ddcsControllers.UNIT_CATEGORY.indexOf("STRUCTURE");
         dbModels.unitModel.deleteOne(
             {
                 dead: true,
                 category: {
-                    $ne: "STRUCTURE"
+                    $ne: catNum
                 },
                 updatedAt: {
                     $lte: fiveMinsAgo

@@ -63,6 +63,7 @@ export async function initV3Engine(): Promise<void> {
         dbModels[key] = value(remoteConnection);
     }
 
+
     await updateConfig();
     await updateStaticDictionary();
     await updateUnitDictionary(ddcsController.getEngineCache().config.timePeriod);
@@ -128,4 +129,5 @@ export async function initV3Engine(): Promise<void> {
     }, ddcsController.time.oneHour);
 
     await ddcsController.testRead();
+
 }

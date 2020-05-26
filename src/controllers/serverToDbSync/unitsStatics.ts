@@ -11,7 +11,7 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
         console.log("U: ", unitObj);
     }
 
-    if (unitObj.data.category === "STRUCTURE") {
+    if (unitObj.data.category === ddcsControllers.UNIT_CATEGORY("STRUCTURE")) {
         console.log("STRUCT: ", unitObj);
     }
 */
@@ -114,7 +114,7 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
                         coalition: iCurObj.data.coalition
                     }
                 }});
-            if (curData.category === "STRUCTURE") {
+            if (ddcsControllers.UNIT_CATEGORY[curData.category] === "STRUCTURE") {
                 await ddcsControllers.setUnitMark(curData);
             }
         } else if (unitObj.action === "D") {
@@ -156,7 +156,7 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
                     sessionName: ddcsControllers.getSessionName(),
                     data: curData
                 };
-                if (curData.category === "STRUCTURE") {
+                if (ddcsControllers.UNIT_CATEGORY[curData.category] === "STRUCTURE") {
                     if (_.includes(curData.name, " Logistics")) {
                         curData.proxChkGrp = "logisticTowers";
                     }
@@ -179,7 +179,7 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
                         }
                     }
                 });
-                if (curData.category === "STRUCTURE") {
+                if (ddcsControllers.UNIT_CATEGORY[curData.category] === "STRUCTURE") {
                     // console.log('SUM: ', curData);
                     await ddcsControllers.setUnitMark(curData);
                 }

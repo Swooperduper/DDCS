@@ -114,6 +114,7 @@ export async function getCoalitionGroundUnitsInProximity(
     kmDistance: number,
     side: number
 ): Promise<typing.IUnit[]> {
+    const catNum = ddcsControllers.UNIT_CATEGORY.indexOf("GROUND");
     return await ddcsControllers.unitActionRead({
             dead: false,
             lonLatLoc: {
@@ -124,7 +125,7 @@ export async function getCoalitionGroundUnitsInProximity(
                     ]
                 }
             },
-            category: "GROUND",
+            category: catNum,
             coalition: side
         });
 }
@@ -163,6 +164,7 @@ export async function getBasesInProximity(lonLat: number[], kmDistance: number, 
 }
 
 export async function getGroundUnitsInProximity(lonLat: number[], kmDistance: number, isTroop: boolean): Promise<typing.IUnit[]> {
+    const catNum = ddcsControllers.UNIT_CATEGORY.indexOf("GROUND");
     return await ddcsControllers.unitActionReadStd({
         dead: false,
         lonLatLoc: {
@@ -174,13 +176,14 @@ export async function getGroundUnitsInProximity(lonLat: number[], kmDistance: nu
                 $maxDistance: kmDistance * 1000
             }
         },
-        category: "GROUND",
+        category: catNum,
         isCrate: false,
         isTroop
     });
 }
 
 export async function getLogiTowersProximity(lonLat: number[], kmDistance: number, coalition: number): Promise<typing.IUnit[]> {
+    const catNum = ddcsControllers.UNIT_CATEGORY.indexOf("STRUCTURE");
     return await ddcsControllers.unitActionRead({
             dead: false,
             lonLatLoc: {
@@ -191,7 +194,7 @@ export async function getLogiTowersProximity(lonLat: number[], kmDistance: numbe
                     ]
                 }
             },
-            category: "STRUCTURE",
+            category: catNum,
             proxChkGrp: "logisticTowers",
             coalition
         });

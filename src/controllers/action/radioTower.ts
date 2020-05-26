@@ -8,7 +8,7 @@ import * as ddcsControllers from "../";
 
 export async function baseUnitUnderAttack(unit: typings.IUnit): Promise<void> {
     const engineCache = ddcsControllers.getEngineCache();
-    if (unit.category === "GROUND") {
+    if (ddcsControllers.UNIT_CATEGORY[unit.category] === "GROUND") {
         const closestBases = await ddcsControllers.getBasesInProximity(unit.lonLatLoc, 18, unit.coalition);
         if (closestBases) {
             const curDBBase = closestBases[0];

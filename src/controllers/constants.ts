@@ -56,6 +56,14 @@ export const GROUP_CATEGORY: string[] = [
     "TRAIN"
 ];
 
+export const UNIT_CATEGORY: string[] = [
+    "AIRPLANE",
+    "HELICOPTER",
+    "GROUND_UNIT",
+    "SHIP",
+    "STRUCTURE"
+];
+
 export const blueCountrys: string[] = [
     "AUSTRALIA",
     "AUSTRIA",

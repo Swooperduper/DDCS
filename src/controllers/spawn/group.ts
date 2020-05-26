@@ -19,7 +19,7 @@ export function spawnStatic(staticSpawn: string, country: string): string[] {
 export function turnOnEWRAuto(groupObj: typing.IUnit): string {
     let setCallSign: any;
     let setFreq: any;
-    if (_.includes(groupObj.country, "UKRAINE")) {
+    if (_.includes(ddcsControllers.countryId[groupObj.country], "UKRAINE")) {
         setCallSign = 254;
         setFreq = 254000000;
     } else if (groupObj.type === "55G6 EWR") {
@@ -1373,7 +1373,7 @@ export function airUnitTemplate( unitObj: typing.IUnit ): string {
             "[\"gun\"] = 200," +
         "},";
 
-    if (unitObj.country === "USA" || unitObj.country === "AGGRESSORS") {
+    if (ddcsControllers.countryId[unitObj.country] === "USA" || ddcsControllers.countryId[unitObj.country] === "AGGRESSORS") {
             // console.log("cs: ", unitObj);
             curAirTemplate = curAirTemplate + "[\"callsign\"] = {" +
             "[1] = " + unitObj.callsign[1] + "," +
@@ -1804,7 +1804,7 @@ export async function spawnConvoy(
         groupName,
         country: curConvoyMakeup[0].country,
         routeLocs: baseTemplate.route,
-        category: "GROUND"
+        category: ddcsControllers.UNIT_CATEGORY.indexOf("GROUND")
     };
 
     curGroupSpawn = grndUnitGroup(curGrpObj);
@@ -1910,7 +1910,7 @@ export async function spawnDefenseChopper(playerUnitObj: typing.IUnit, unitObj: 
     let friendlyLoc;
     const curCategory = "HELICOPTER";
 
-    curCountry = unitObj.country;
+    curCountry = ddcsControllers.countryId[unitObj.country];
     curTkrName = "AI|" + unitObj.name + "|";
     curSpwnUnit = _.cloneDeep(unitObj);
 
@@ -1983,7 +1983,7 @@ export async function spawnAtkChopper(playerUnitObj: typing.IUnit, unitObj: typi
     let enemyLoc;
     const curCategory = "HELICOPTER";
 
-    curCountry = unitObj.country;
+    curCountry = ddcsControllers.countryId[unitObj.country];
     curTkrName = "AI|" + unitObj.name + "|";
     curSpwnUnit = _.cloneDeep(unitObj);
 
