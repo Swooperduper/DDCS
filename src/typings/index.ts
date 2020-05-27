@@ -214,6 +214,21 @@ export interface ISimpleStatEvents {
     updatedAt: Date;
 }
 
+export interface IStaticObject {
+    _id: string;
+    createdAt: Date;
+    updatedAt: Date;
+    lonLatLoc: number[];
+    category: string;
+    country: number;
+    type: string;
+    name: string;
+    hdg: number;
+    shape_name: string;
+    canCargo?: boolean;
+    mass?: number;
+}
+
 export interface ICrate {
     _id: string;
     shapeName: string;

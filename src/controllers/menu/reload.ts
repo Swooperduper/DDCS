@@ -18,7 +18,7 @@ export async function reloadSAM(unitCalling: typing.IUnit): Promise<boolean> {
             if (curUnitDict) {
                 const curReloadArray = curUnitDict.reloadReqArray;
                 if (curReloadArray.length === _.intersection(curReloadArray, _.map(samUnits, "type")).length) {
-                    await ddcsControllers.spawnGroup(samUnits);
+                    await ddcsControllers.spawnUnitGroup(samUnits);
                     return true;
                 } else {
                     await ddcsControllers.sendMesgToGroup(

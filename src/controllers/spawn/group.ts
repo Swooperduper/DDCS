@@ -12,8 +12,8 @@ export function spawnGrp(grpSpawn: string, country: string, category: string): s
     return "coalition.addGroup(" + country + ", " + category + ", " + grpSpawn + ")" ;
 }
 
-export function spawnStatic(staticSpawn: string, country: string): string[] {
-    return [ "coalition.addStaticObject(" + _.indexOf(ddcsControllers.countryId, country) + ", " + staticSpawn + ")" ];
+export function spawnStatic(staticSpawn: string, country: string): string {
+    return "coalition.addStaticObject(" + country + ", " + staticSpawn + ")";
 }
 
 export function turnOnEWRAuto(groupObj: typing.IUnit): string {
@@ -1386,7 +1386,8 @@ export function airUnitTemplate( unitObj: typing.IUnit ): string {
     return curAirTemplate + "}";
 }
 
-export function staticTemplate(staticObj: typing.ICrate): string {
+export function staticTemplate(staticObj: typing.IStaticObject): string {
+    console.log("ST: ", staticObj);
     let retObj = "{" +
         "[\"x\"] = coord.LLtoLO(" + staticObj.lonLatLoc[1] + ", " +  staticObj.lonLatLoc[0] + ").x, " +
         "[\"y\"] = coord.LLtoLO(" + staticObj.lonLatLoc[1] + ", " +  staticObj.lonLatLoc[0] + ").z, " +
@@ -1394,10 +1395,9 @@ export function staticTemplate(staticObj: typing.ICrate): string {
         "[\"country\"] = \"" + staticObj.country + "\"," +
         "[\"type\"] = \"" + staticObj.type + "\"," +
         "[\"name\"] = \"" + staticObj.name + "\"," +
-        // "[\"unitId\"] = " + _.get(staticObj, "unitId") + "," +
-        "[\"heading\"] = " + staticObj.heading || 0 + "," +
+        "[\"heading\"] = " + (staticObj.hdg || 0) + "," +
         "[\"shape_name\"] = \"" + staticObj.shape_name + "\"," +
-        "[\"canCargo\"] = " + staticObj.canCargo || "false" + ",";
+        "[\"canCargo\"] = " + (staticObj.canCargo || "false") + ",";
     if (staticObj.canCargo) {
         retObj += "[\"mass\"] = \"" + staticObj.mass + "\",";
     }
@@ -1524,7 +1524,7 @@ export async function spawnSupportBaseGrp( baseName: string, side: number ): Pro
     for (const farp of farpBases) {
         spawnArray = _.concat(spawnArray, spawnSupportVehiclesOnFarp( _.get(farp, "name"), side ));
     }
-    await spawnGroup(_.compact(spawnArray), baseName, side);
+    await spawnUnitGroup(_.compact(spawnArray), baseName, side);
 }
 
 export async function spawnBaseReinforcementGroup(side: number, baseName: string, forceSpawn?: boolean, init?: boolean): Promise<number> {
@@ -1584,7 +1584,7 @@ export async function spawnBaseReinforcementGroup(side: number, baseName: string
                 compactUnits = _.compact(curRndSpawn);
             }
             totalUnits += compactUnits.length;
-            await spawnGroup(compactUnits, baseName, side);
+            await spawnUnitGroup(compactUnits, baseName, side);
         }
         if (name === "samRadar" && !init) {
             await spawnSAMNet(side, baseName);
@@ -1720,7 +1720,7 @@ export async function spawnStarSam(
     };
     groupedUnits.push(curCat);
     compactUnits = _.compact(groupedUnits);
-    await spawnGroup(compactUnits, baseName, side);
+    await spawnUnitGroup(compactUnits, baseName, side);
     return compactUnits.length;
 }
 
@@ -1764,7 +1764,7 @@ export async function spawnLayer2Reinforcements(
             curAngle += curSpokeDeg;
             groupedL2Units.push(curUnit);
         }
-        await spawnGroup(_.compact(groupedL2Units), baseName, side);
+        await spawnUnitGroup(_.compact(groupedL2Units), baseName, side);
     }
     return _.compact(groupedL2Units).length || 0;
 }
@@ -2362,7 +2362,18 @@ export async function spawnLogiGroup(spawnArray: typing.IUnit[], side: number): 
     }
 }
 
-export async function spawnGroup(spawnArray: any[], baseName?: string, side?: number): Promise<void> {
+export async function spawnStaticBuilding(staticObj: any, baseObj?: any, side?: number): Promise<void> {
+    const curStaticObj = staticObj;
+    curStaticObj.name = (curStaticObj.name || baseObj.name || "") + " " + curStaticObj.type;
+    curStaticObj.coalition = curStaticObj.coalition || side;
+    curStaticObj.lonLatLoc = (curStaticObj.lonLatLoc) ? curStaticObj.lonLatLoc : ddcsControllers.getRandomLatLonFromBase(baseObj.name, "buildingPoly");
+
+    const curCMD = spawnStatic(staticTemplate(curStaticObj), curStaticObj.country);
+    console.log("staticObj: ", curCMD, curStaticObj.country);
+    await ddcsControllers.sendUDPPacket("frontEnd", {actionObj: {action: "CMD", cmd: curCMD, reqID: 0}});
+}
+
+export async function spawnUnitGroup(spawnArray: any[], baseName?: string, side?: number): Promise<void> {
     if (spawnArray.length > 0) {
         const groupNum = _.random(1000000, 9999999);
         const grpObj = spawnArray[0];
@@ -2414,7 +2425,7 @@ export async function spawnNewMapGrps(): Promise<number> {
                     baseStartSide
                 );
             }
-            await spawnGroup(spawnArray, baseName, baseStartSide);
+            await spawnUnitGroup(spawnArray, baseName, baseStartSide);
             await spawnLogisticCmdCenter(
                 {},
                 true,

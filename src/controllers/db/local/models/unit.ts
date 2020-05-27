@@ -143,6 +143,9 @@ export function unitModel(dbconn: mongoose.Connection): mongoose.Document | {} {
             },
             surfType: {
                 type: Number
+            },
+            shape_name: {
+                type: String
             }
         },
         {
