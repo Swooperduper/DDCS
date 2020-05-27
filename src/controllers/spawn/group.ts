@@ -1387,7 +1387,6 @@ export function airUnitTemplate( unitObj: typing.IUnit ): string {
 }
 
 export function staticTemplate(staticObj: typing.IStaticObject): string {
-    console.log("ST: ", staticObj);
     let retObj = "{" +
         "[\"x\"] = coord.LLtoLO(" + staticObj.lonLatLoc[1] + ", " +  staticObj.lonLatLoc[0] + ").x, " +
         "[\"y\"] = coord.LLtoLO(" + staticObj.lonLatLoc[1] + ", " +  staticObj.lonLatLoc[0] + ").z, " +
@@ -2364,12 +2363,12 @@ export async function spawnLogiGroup(spawnArray: typing.IUnit[], side: number): 
 
 export async function spawnStaticBuilding(staticObj: any, baseObj?: any, side?: number): Promise<void> {
     const curStaticObj = staticObj;
-    curStaticObj.name = (curStaticObj.name || baseObj.name || "") + " " + curStaticObj.type;
-    curStaticObj.coalition = curStaticObj.coalition || side;
+    curStaticObj.name = (baseObj) ? baseObj.name + " " + curStaticObj.type : curStaticObj.name;
+    curStaticObj.coalition = (side) ? side : curStaticObj.coalition;
     curStaticObj.lonLatLoc = (curStaticObj.lonLatLoc) ? curStaticObj.lonLatLoc : ddcsControllers.getRandomLatLonFromBase(baseObj.name, "buildingPoly");
 
     const curCMD = spawnStatic(staticTemplate(curStaticObj), curStaticObj.country);
-    console.log("staticObj: ", curCMD, curStaticObj.country);
+    // console.log("staticObj: ", curCMD, curStaticObj.country);
     await ddcsControllers.sendUDPPacket("frontEnd", {actionObj: {action: "CMD", cmd: curCMD, reqID: 0}});
 }
 

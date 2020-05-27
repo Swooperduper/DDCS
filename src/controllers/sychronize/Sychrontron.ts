@@ -235,7 +235,6 @@ export async function syncStaticsNames(incomingObj: any, curReqJobIndex: number)
             if (statics.length > 0) {
                 for (const curStatic of statics) {
                     if (ddcsControllers.UNIT_CATEGORY[curStatic.category] === "STRUCTURE") {
-                        console.log("CUR: ", curStatic);
                         await ddcsControllers.spawnStaticBuilding(curStatic);
                     } else {
                         await ddcsControllers.unitActionUpdate({
