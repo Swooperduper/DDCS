@@ -8,6 +8,7 @@ import { getSessionName } from "../";
 
 const requestJobArray: any[] = [];
 
+let missionStartupReSync = false;
 let isServerSynced = true;
 let isInitSyncMode = false; // Init Sync Units To Server Mode
 let isReSyncLock = false;
@@ -194,14 +195,12 @@ export async function OldBrokenSyncServer(serverUnitCount: number): Promise<void
 
 export async function syncStaticsNames(incomingObj: any, curReqJobIndex: number): Promise<void> {
     const curReqJob = requestJobArray[curReqJobIndex];
+    const aliveStaticNamesObj =
+        await ddcsControllers.actionAliveNames({dead: false, category: ddcsControllers.UNIT_CATEGORY.indexOf("STRUCTURE")});
+    const aliveStaticNameArray = aliveStaticNamesObj.map((u: any) => u._id);
     if (curReqJob.reqArgs.serverStaticCount > curReqJob.reqArgs.dbStaticCount) {
-        const aliveStaticNamesObj =
-            await ddcsControllers.actionAliveNames({dead: false, category: ddcsControllers.UNIT_CATEGORY.indexOf("STRUCTURE")});
-        const aliveStaticNameArray = aliveStaticNamesObj.map((u: any) => u._id);
         const missingStaticNames = _.difference(incomingObj.returnObj, aliveStaticNameArray);
         console.log("Server is missing ", missingStaticNames, " static(s)");
-        // server has more units, get data for specific units
-
         if (missingStaticNames.length > 0) {
             await ddcsControllers.sendUDPPacket("frontEnd", {
                 actionObj: {
@@ -215,11 +214,17 @@ export async function syncStaticsNames(incomingObj: any, curReqJobIndex: number)
     }
 
     if (curReqJob.reqArgs.serverStaticCount < curReqJob.reqArgs.dbStaticCount) {
-        console.log("DB HAS MORE Statics");
-        // DB more units spawn on server IF IN sync mode
-        if (isInitSyncMode) {
-            // pull diff unit name mode
-            // respawn units through sending lua cmds
+        const missingStaticNames = _.difference(aliveStaticNameArray, incomingObj.returnObj);
+        console.log("Db is missing ", missingStaticNames, " static(s)");
+        if (missingStaticNames.length > 0) {
+            await ddcsControllers.sendUDPPacket("frontEnd", {
+                actionObj: {
+                    action: "reSyncStaticInfo",
+                    missingStaticNames,
+                    reqID: 0, // dont run anything with return data
+                    time: new Date()
+                }
+            });
         }
     }
 
@@ -231,15 +236,14 @@ export async function syncStaticsNames(incomingObj: any, curReqJobIndex: number)
 
 export async function syncUnitsNames(incomingObj: any, curReqJobIndex: number): Promise<void> {
     const curReqJob = requestJobArray[curReqJobIndex];
-    console.log(curReqJob.reqArgs.serverUnitCount, " > ", curReqJob.reqArgs.dbUnitCount);
-    if (curReqJob.reqArgs.serverUnitCount > curReqJob.reqArgs.dbUnitCount) {
-        const aliveUnitNamesObj =
-            await ddcsControllers.actionAliveNames({dead: false, category: { $ne: ddcsControllers.UNIT_CATEGORY.indexOf("STRUCTURE")}});
-        const aliveUnitNameArray = aliveUnitNamesObj.map((u: any) => u._id);
-        const missingUnitNames = _.difference(incomingObj.returnObj, aliveUnitNameArray);
-        console.log("Server is missing ", missingUnitNames, " unit(s)");
-        // server has more units, get data for specific units
+    console.log("server: ", curReqJob.reqArgs.serverUnitCount, " > ", "db: ", curReqJob.reqArgs.dbUnitCount);
+    const aliveUnitNamesObj =
+        await ddcsControllers.actionAliveNames({dead: false, category: { $ne: ddcsControllers.UNIT_CATEGORY.indexOf("STRUCTURE")}});
+    const aliveUnitNameArray = aliveUnitNamesObj.map((u: any) => u._id);
 
+    if (curReqJob.reqArgs.serverUnitCount > curReqJob.reqArgs.dbUnitCount) {
+        const missingUnitNames = _.difference(incomingObj.returnObj, aliveUnitNameArray);
+        console.log("Db is missing ", missingUnitNames, " unit(s)");
         if (missingUnitNames.length > 0) {
             await ddcsControllers.sendUDPPacket("frontEnd", {
                 actionObj: {
@@ -253,16 +257,59 @@ export async function syncUnitsNames(incomingObj: any, curReqJobIndex: number): 
     }
 
     if (curReqJob.reqArgs.serverUnitCount < curReqJob.reqArgs.dbUnitCount) {
-        console.log("DB HAS MORE UNITS");
-        // DB more units spawn on server IF IN sync mode
-        if (isInitSyncMode) {
-            // pull diff unit name mode
-            // respawn units through sending lua cmds
-        }
-    }
+        // is missing empty, pull all units that are active and dont have ~ in unit/static name
+        const nonPreBakedNames = await ddcsControllers.actionAliveNames({
+            dead: false,
+            category: { $ne: ddcsControllers.UNIT_CATEGORY.indexOf("STRUCTURE")},
+            $or: [{isActive: false}, {_id: /~/}]
+        });
+        console.log("server: ", curReqJob.reqArgs.serverUnitCount, "bakedUnits: ", nonPreBakedNames.length);
+        if ((curReqJob.reqArgs.serverUnitCount - nonPreBakedNames.length) === 0) {
+            missionStartupReSync = true;
+            console.log("MISSION IS EMPTY, respawn units from DB", missionStartupReSync);
+            // sync up all units on server from database
+            const units = await ddcsControllers.unitActionReadStd({
+                dead: false,
+                isActive: true,
+                _id: {$not: /~/},
+                category: { $ne: ddcsControllers.UNIT_CATEGORY.indexOf("STRUCTURE")}
+            });
 
-    if (curReqJob.reqArgs.serverUnitCount === curReqJob.reqArgs.dbUnitCount) {
-        console.log("SERVER IS MATCHED WITH DB, Do Nothing");
+            if (units.length > 0) {
+                const remappedunits: any = {};
+                for (const unit of units) {
+                    const curGrpName = unit.groupName;
+                    if (ddcsControllers.UNIT_CATEGORY[unit.category] === "GROUND_UNIT" && !unit.isTroop) {
+                        remappedunits[curGrpName] = remappedunits[curGrpName] || [];
+                        remappedunits[curGrpName].push(unit);
+                    } else {
+                        await ddcsControllers.unitActionUpdate({
+                            _id: unit.name,
+                            dead: true
+                        });
+                    }
+                }
+                for (const [key, value] of Object.entries(remappedunits)) {
+                    await ddcsControllers.spawnGroup(value as any[]);
+                }
+            }
+        } else {
+            if (!missionStartupReSync) {
+                console.log("MISSION IS NOT EMPTY, Sync Server -> Db (mark db units not on server as dead)");
+                const missingUnitNames = _.difference(aliveUnitNameArray, incomingObj.returnObj);
+                console.log("Server is missing ", missingUnitNames, " unit(s)");
+                if (missingUnitNames.length > 0) {
+                    await ddcsControllers.sendUDPPacket("frontEnd", {
+                        actionObj: {
+                            action: "reSyncUnitInfo",
+                            missingUnitNames,
+                            reqID: 0, // dont run anything with return data
+                            time: new Date()
+                        }
+                    });
+                }
+            }
+        }
     }
     requestJobArray.splice(curReqJobIndex, 1);
 }

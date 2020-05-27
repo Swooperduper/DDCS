@@ -9,7 +9,7 @@ import * as ddcsControllers from "../";
 let openSAM: string;
 
 export function spawnGrp(grpSpawn: string, country: string, category: string): string {
-    return "coalition.addGroup(" + _.indexOf(ddcsControllers.countryId, country) + ", Group.Category." + category + ", " + grpSpawn + ")";
+    return "coalition.addGroup(" + country + ", " + category + ", " + grpSpawn + ")" ;
 }
 
 export function spawnStatic(staticSpawn: string, country: string): string[] {
@@ -1099,7 +1099,6 @@ export function landHeliRouteTemplate(routes: typing.IConvoyRouteTemplate) {
 }
 
 export function grndUnitGroup( groupObj: any, task?: string, routes?: string ): string {
-
     let curRoute: string;
     const curTask = (task) ? task : "Ground Nothing";
     const uncontrollable = !_.get(groupObj, "playerCanDrive", false);
@@ -1107,13 +1106,16 @@ export function grndUnitGroup( groupObj: any, task?: string, routes?: string ): 
     if (routes) {
         curRoute = routes;
     } else if (groupObj.type === "1L13 EWR" || groupObj.type === "55G6 EWR" ) {
-        curRoute = exports.turnOnEWRAuto(groupObj);
+        curRoute = turnOnEWRAuto(groupObj);
     } else {
-        curRoute = exports.turnOffDisperseUnderFire();
+        curRoute = turnOffDisperseUnderFire();
     }
 
+    const visible = (groupObj.visible) ? groupObj.visible : "false";
+    const hidden = (groupObj.hidden) ? groupObj.hidden : "false";
+    const curTmpTask = (groupObj.task) ? groupObj.task : curTask;
+
     return "{" +
-        // "[\"groupId\"] = " + _.get(groupObj, "groupId") + "," +
         "[\"communication\"] = true," +
         "[\"start_time\"] = 0," +
         "[\"frequency\"] = 251," +
@@ -1121,17 +1123,16 @@ export function grndUnitGroup( groupObj: any, task?: string, routes?: string ): 
         "[\"modulation\"] = 0," +
         "[\"taskSelected\"] = true," +
         "[\"name\"] = \"" + groupObj.groupName + "\"," +
-        "[\"visible\"] = " + groupObj.visible || "false" + "," +
-        // "[\"hidden\"] = " + _.get(groupObj, "hidden", true) + "," +
-        "[\"hidden\"] = " + groupObj.hidden + "," +
+        "[\"visible\"] = " + visible + "," +
+        "[\"hidden\"] = " + hidden + "," +
         "[\"uncontrollable\"] = " + uncontrollable + "," +
         "[\"hiddenOnPlanner\"] = true," +
         "[\"tasks\"] = {}," +
-        "[\"task\"] = \"" + groupObj.task || curTask + "\"," +
+        "[\"task\"] = \"" + curTmpTask + "\"," +
         "[\"taskSelected\"] = true," +
         "[\"units\"] = {#UNITS}," +
-        "[\"category\"] = Group.Category." + groupObj.category + "," +
-        "[\"country\"] = \"" + groupObj.country + "\"," +
+        "[\"category\"] = " + groupObj.category + "," +
+        "[\"country\"] = \"" + ddcsControllers.countryId[groupObj.country] + "\"," +
         curRoute +
     "}";
 }
@@ -1145,14 +1146,11 @@ export function grndUnitTemplate( unitObj: typing.IUnit ): string {
             "[\"randomTransportable\"] = true," +
         "}," +
         "[\"name\"] = \"" + unitObj.name + "\"," +
-        // "[\"unitId\"] = " + _.get(unitObj, "unitId") + "," +
-        "[\"heading\"] = " + unitObj.heading || 0 + "," +
-        "[\"playerCanDrive\"] = " + unitObj.playerCanDrive || false + "," +
-        // "[\"playerCanDrive\"] = false," +
-        "[\"skill\"] = \"" + unitObj.skill || "Excellent" + "\"," +
-        "[\"country\"] = \"" + unitObj.country + "\"," +
-        "}"
-    ;
+        "[\"heading\"] = " + (unitObj.hdg || 0) + "," +
+        "[\"playerCanDrive\"] = " + (unitObj.playerCanDrive || false) + "," +
+        "[\"skill\"] = \"" + (unitObj.skill || "Excellent") + "\"," +
+        "[\"country\"] = \"" + ddcsControllers.countryId[unitObj.country] + "\"," +
+    "}";
 }
 
 export function mi24vTemplate( unitObj: typing.IUnit ): string {
@@ -1356,7 +1354,6 @@ export function capHeliDefenseTemplate( unitObj: any ): string {
 }
 
 export function airUnitTemplate( unitObj: typing.IUnit ): string {
-    // console.log("cOBJ: ", unitObj);
     let curAirTemplate = "{" +
         "[\"x\"] = coord.LLtoLO(" + unitObj.lonLatLoc[1] + ", " +  unitObj.lonLatLoc[0] + ").x, " +
         "[\"y\"] = coord.LLtoLO(" + unitObj.lonLatLoc[1] + ", " +  unitObj.lonLatLoc[0] + ").z, " +
@@ -1804,7 +1801,7 @@ export async function spawnConvoy(
         groupName,
         country: curConvoyMakeup[0].country,
         routeLocs: baseTemplate.route,
-        category: ddcsControllers.UNIT_CATEGORY.indexOf("GROUND")
+        category: ddcsControllers.UNIT_CATEGORY.indexOf("GROUND_UNIT")
     };
 
     curGroupSpawn = grndUnitGroup(curGrpObj);
@@ -2366,60 +2363,27 @@ export async function spawnLogiGroup(spawnArray: typing.IUnit[], side: number): 
 }
 
 export async function spawnGroup(spawnArray: any[], baseName?: string, side?: number): Promise<void> {
-    let grpNum = 0;
-    let unitNum = 0;
-    let curBaseName = "";
-    let curUnitName = "";
-    let curUnitSpawn = "";
-    let curGroupSpawn;
-    let curGrpObj: any;
-    let curSide: string;
-    let curSpwnUnit;
-    const sArray = _.compact(_.cloneDeep(spawnArray));
-    curGrpObj = sArray[0];
-    if (curGrpObj) {
-        grpNum = curGrpObj.groupId || _.random(1000000, 9999999);
-        curBaseName = (baseName) ? baseName + " #" + grpNum : curGrpObj.groupName;
-        curGrpObj.groupId = grpNum;
-        curGrpObj.groupName = curBaseName;
+    if (spawnArray.length > 0) {
+        const groupNum = _.random(1000000, 9999999);
+        const grpObj = spawnArray[0];
+        const curBaseName = (baseName) ? baseName + " #" + groupNum : grpObj.groupName;
+        grpObj.groupName = (baseName) ? baseName + " #" + grpObj.groupId || groupNum : grpObj.groupName;
+        grpObj.coalition = (side) ? side : spawnArray[0].coalition;
+        const groupTemplate = grndUnitGroup(grpObj);
 
-        if (side === 2 && _.includes(curGrpObj.country, "UKRAINE")) {
-            curGrpObj.country = "UKRAINE";
-            curSide = "UKRAINE";
-        } else {
-            curSide = (side) ? ddcsControllers.defCountrys[side] :
-                curGrpObj.country = ddcsControllers.defCountrys[curGrpObj.coalition];
-            curGrpObj.country = curSide;
+        let unitTemplate = "";
+        let unitNum = groupNum;
+        for (const curUnit of spawnArray) {
+            const unitObj = curUnit;
+            unitObj.lonLatLoc = (curUnit.lonLatLoc) ? curUnit.lonLatLoc : ddcsControllers.getRandomLatLonFromBase(curBaseName, "unitPoly");
+            unitObj.name = (curUnit.name) ? curUnit.name : baseName + " #" + unitNum;
+            unitTemplate += ((unitNum !== groupNum) ? "," : "") + grndUnitTemplate(unitObj);
+            unitNum++;
         }
-        curGroupSpawn = grndUnitGroup( curGrpObj );
-        unitNum = _.cloneDeep(grpNum);
-        for (const curUnit of sArray) {
-            curSpwnUnit = _.cloneDeep(curUnit);
-            if (unitNum !== grpNum) {
-                curUnitSpawn += ",";
-            }
-            unitNum += 1;
-            curUnitName = baseName + " #" + unitNum;
 
-            if (_.isUndefined(curSpwnUnit.lonLatLoc)) {
-                curSpwnUnit.lonLatLoc = ddcsControllers.getRandomLatLonFromBase(curBaseName, "unitPoly");
-            }
-            if (curGrpObj.country === "UKRAINE") {
-                curSpwnUnit.country = "UKRAINE";
-            } else {
-                curSpwnUnit.country = curSide;
-            }
-
-            curSpwnUnit.name = curSpwnUnit.name || curUnitName;
-            curUnitSpawn += exports.grndUnitTemplate(curSpwnUnit);
-        }
-        curGroupSpawn = _.replace(curGroupSpawn, "#UNITS", curUnitSpawn);
-        // var curCMD = 'mist.dynAdd(' + curGroupSpawn + ')';
-        const curCMD = spawnGrp(curGroupSpawn, curSide, curGrpObj.category);
-        // console.log('cmd: ', curCMD);
-        const sendClient = {action: "CMD", cmd: [curCMD], reqID: 0};
-        const actionObj = {actionObj: sendClient, queName: "clientArray"};
-        await ddcsControllers.sendUDPPacket("frontEnd", actionObj);
+        const curCMD = spawnGrp(_.replace(groupTemplate, "#UNITS", unitTemplate), grpObj.country, grpObj.category);
+        const sendClient = {actionObj: {action: "CMD", cmd: curCMD, reqID: 0}};
+        await ddcsControllers.sendUDPPacket("frontEnd", sendClient);
     }
 }
 

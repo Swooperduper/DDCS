@@ -109,6 +109,7 @@ export const countryId: string[] = [
     "BELGIUM",
     "NORWAY",
     "DENMARK",
+    "BLANK",
     "ISRAEL",
     "GEORGIA",
     "INSURGENTS",
@@ -173,8 +174,8 @@ export const countryId: string[] = [
 
 export const defCountrys: string[] = [
     "default",
-    "RUSSIA",
-    "USA"
+    "0",
+    "2"
 ];
 
 export const enemyCountry: number[] = [

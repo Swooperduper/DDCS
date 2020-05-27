@@ -36,7 +36,7 @@ export async function checkShootingUsers(): Promise<void> {
                         score: shootObj.score
                     });
                 }
-                if (ddcsControllers.UNIT_CATEGORY[shootObj.tUnit.category] === "GROUND") {
+                if (ddcsControllers.UNIT_CATEGORY[shootObj.tUnit.category] === "GROUND_UNIT") {
                     await ddcsControllers.baseUnitUnderAttack(shootObj.tUnit);
                     if (engineCache.config.inGameHitMessages) {
                         console.log("shooting1: ", shootObj.msg);
@@ -46,7 +46,7 @@ export async function checkShootingUsers(): Promise<void> {
                             nowTime + ddcsControllers.time.oneMin
                         );
                     }
-                } else if (ddcsControllers.UNIT_CATEGORY[shootObj.iUnit.category] === "GROUND") {
+                } else if (ddcsControllers.UNIT_CATEGORY[shootObj.iUnit.category] === "GROUND_UNIT") {
                     await ddcsControllers.baseUnitUnderAttack(shootObj.tUnit);
                     if (engineCache.config.inGameHitMessages || exports.shootingUsers[shootKey].isOwnedUnit) {
                         console.log("shooting2: ", shootObj.msg);
@@ -198,7 +198,7 @@ export async function processEventHit(eventObj: any): Promise<void> {
                             score: iCurObj.score
                         });
                     }
-                    if (ddcsControllers.UNIT_CATEGORY[iCurObj.tUnit.category] === "GROUND") {
+                    if (ddcsControllers.UNIT_CATEGORY[iCurObj.tUnit.category] === "GROUND_UNIT") {
                         await ddcsControllers.baseUnitUnderAttack(iCurObj.tUnit);
                         if (engineCache.config.inGameHitMessages) {
                             console.log("groundhit: ", iCurObj.msg);
@@ -208,7 +208,7 @@ export async function processEventHit(eventObj: any): Promise<void> {
                                 nowTime + ddcsControllers.time.oneMin
                             );
                         }
-                    } else if (ddcsControllers.UNIT_CATEGORY[iCurObj.iUnit.category] === "GROUND") {
+                    } else if (ddcsControllers.UNIT_CATEGORY[iCurObj.iUnit.category] === "GROUND_UNIT") {
                         if (engineCache.config.inGameHitMessages || isOwnedUnit) {
                             console.log("groundrecievehit: ", iCurObj.msg);
                             await ddcsControllers.sendMesgToAll(

@@ -114,7 +114,7 @@ export async function getCoalitionGroundUnitsInProximity(
     kmDistance: number,
     side: number
 ): Promise<typing.IUnit[]> {
-    const catNum = ddcsControllers.UNIT_CATEGORY.indexOf("GROUND");
+    const catNum = ddcsControllers.UNIT_CATEGORY.indexOf("GROUND_UNIT");
     return await ddcsControllers.unitActionRead({
             dead: false,
             lonLatLoc: {
@@ -164,7 +164,7 @@ export async function getBasesInProximity(lonLat: number[], kmDistance: number, 
 }
 
 export async function getGroundUnitsInProximity(lonLat: number[], kmDistance: number, isTroop: boolean): Promise<typing.IUnit[]> {
-    const catNum = ddcsControllers.UNIT_CATEGORY.indexOf("GROUND");
+    const catNum = ddcsControllers.UNIT_CATEGORY.indexOf("GROUND_UNIT");
     return await ddcsControllers.unitActionReadStd({
         dead: false,
         lonLatLoc: {

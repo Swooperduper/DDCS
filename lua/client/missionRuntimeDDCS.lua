@@ -284,7 +284,6 @@ function updateUnitGroupsByName(unitNames)
 end
 
 function updateStaticGroupsByName(staticNames)
-    tprint(staticNames, 1)
     for k, v in pairs(staticNames) do
         local curStatic = StaticObject.getByName(v)
         if curStatic ~= nil then
@@ -321,7 +320,6 @@ function runRequest(request)
 
         if request.action == "getStaticsNames" then
             outObj.returnObj = completeStaticNames
-            tprint(outObj, 1)
             sendUDPPacket(outObj)
         end
 
@@ -330,12 +328,13 @@ function runRequest(request)
         end
 
         if request.action == "CMD" then
-            local success, cmdResponse =  pcall(commandExecute, request.cmd)
+            -- env.info("cmd: "..request.cmd)
+            local success, retVal = pcall(commandExecute, request.cmd)
             if not success then
-                env.info("Error: " .. resp)
+                env.info("Error: " .. retVal)
             end
             if request.reqID > 0 then
-                outObj.returnObj = cmdResponse
+                outObj.returnObj = retVal
                 sendUDPPacket(outObj)
             end
         end
@@ -345,7 +344,7 @@ end
 function runPerFrame(ourArgument, time)
     local request = udpMissionRuntime:receive()
     if request ~= nil then
-        env.info(request)
+        -- env.info(request)
         requestObj = JSON:decode(request)
         if requestObj.actionObj ~= nil then
             runRequest(requestObj.actionObj)
