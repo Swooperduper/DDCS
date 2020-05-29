@@ -137,7 +137,7 @@ export function secondsToHms(d: number): string {
 }
 
 export async function timeLeft(curUnit: typings.IUnit): Promise<void> {
-    const formatTime = exports.secondsToHms(maxTime - curSecs);
+    const formatTime = secondsToHms(maxTime - curSecs);
     await ddcsControllers.sendMesgToGroup(
         curUnit.groupId,
         "G: Server has " + formatTime + " left till restart!",

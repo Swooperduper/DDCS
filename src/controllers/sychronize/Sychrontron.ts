@@ -223,30 +223,38 @@ export async function syncStaticsNames(incomingObj: any, curReqJobIndex: number)
         });
         console.log("Statics server: ", curReqJob.reqArgs.serverStaticCount, "bakedUnits: ", nonPreBakedNames.length);
         if ((curReqJob.reqArgs.serverStaticCount - nonPreBakedNames.length) === 0) {
+            console.log("Server IS EMPTY of statics");
             missionStartupStaticsReSync = true;
-            console.log("MISSION IS EMPTY, respawn statics from DB", missionStartupUnitsReSync);
-            // sync up all statics on server from database
-            const statics = await ddcsControllers.unitActionReadStd({
-                dead: false,
-                isActive: true,
-                _id: {$not: /~/},
-                category: ddcsControllers.UNIT_CATEGORY.indexOf("STRUCTURE")
-            });
-            if (statics.length > 0) {
-                for (const curStatic of statics) {
-                    if (ddcsControllers.UNIT_CATEGORY[curStatic.category] === "STRUCTURE") {
-                        await ddcsControllers.spawnStaticBuilding(curStatic);
-                    } else {
-                        await ddcsControllers.unitActionUpdate({
-                            _id: curStatic.name,
-                            dead: true
-                        });
+            if (ddcsControllers.getEngineCache().config.resetFullCampaign) {
+                // clear unit DB from all non ~ units, respawn fresh server
+                console.log("Spawn New Statics for Campaign: ", missionStartupUnitsReSync);
+
+            } else {
+                // disregard ~prefaced units, respawn db units
+                console.log("Respawn Current Statics From Db: ", missionStartupUnitsReSync);
+                // sync up all statics on server from database
+                const statics = await ddcsControllers.unitActionReadStd({
+                    dead: false,
+                    isActive: true,
+                    _id: {$not: /~/},
+                    category: ddcsControllers.UNIT_CATEGORY.indexOf("STRUCTURE")
+                });
+                if (statics.length > 0) {
+                    for (const curStatic of statics) {
+                        if (ddcsControllers.UNIT_CATEGORY[curStatic.category] === "STRUCTURE") {
+                            await ddcsControllers.spawnStaticBuilding(curStatic);
+                        } else {
+                            await ddcsControllers.unitActionUpdate({
+                                _id: curStatic.name,
+                                dead: true
+                            });
+                        }
                     }
                 }
             }
         } else {
             if (!missionStartupStaticsReSync) {
-                console.log("MISSION IS NOT EMPTY, Sync Server -> Db (mark db statics not on server as dead)");
+                console.log("Server Has Active Units");
                 const missingStaticNames = _.difference(aliveStaticNameArray, incomingObj.returnObj);
                 console.log("Db is missing ", missingStaticNames, " static(s)");
                 if (missingStaticNames.length > 0) {
@@ -299,37 +307,44 @@ export async function syncUnitsNames(incomingObj: any, curReqJobIndex: number): 
         });
         console.log("Units server: ", curReqJob.reqArgs.serverUnitCount, "bakedUnits: ", nonPreBakedNames.length);
         if ((curReqJob.reqArgs.serverUnitCount - nonPreBakedNames.length) === 0) {
+            console.log("Server IS EMPTY of units");
             missionStartupUnitsReSync = true;
-            console.log("MISSION IS EMPTY, respawn units from DB", missionStartupUnitsReSync);
-            // sync up all units on server from database
-            const units = await ddcsControllers.unitActionReadStd({
-                dead: false,
-                isActive: true,
-                _id: {$not: /~/},
-                category: { $ne: ddcsControllers.UNIT_CATEGORY.indexOf("STRUCTURE")}
-            });
+            if (ddcsControllers.getEngineCache().config.resetFullCampaign) {
+                // clear unit DB from all non ~ units, respawn fresh server
+                console.log("Spawn New Units for Campaign: ", missionStartupUnitsReSync);
 
-            if (units.length > 0) {
-                const remappedunits: any = {};
-                for (const unit of units) {
-                    const curGrpName = unit.groupName;
-                    if (ddcsControllers.UNIT_CATEGORY[unit.category] === "GROUND_UNIT" && !unit.isTroop) {
-                        remappedunits[curGrpName] = remappedunits[curGrpName] || [];
-                        remappedunits[curGrpName].push(unit);
-                    } else {
-                        await ddcsControllers.unitActionUpdate({
-                            _id: unit.name,
-                            dead: true
-                        });
+            } else {
+                console.log("Respawn Current Units From Db ", missionStartupUnitsReSync);
+                // sync up all units on server from database
+                const units = await ddcsControllers.unitActionReadStd({
+                    dead: false,
+                    isActive: true,
+                    _id: {$not: /~/},
+                    category: { $ne: ddcsControllers.UNIT_CATEGORY.indexOf("STRUCTURE")}
+                });
+
+                if (units.length > 0) {
+                    const remappedunits: any = {};
+                    for (const unit of units) {
+                        const curGrpName = unit.groupName;
+                        if (ddcsControllers.UNIT_CATEGORY[unit.category] === "GROUND_UNIT" && !unit.isTroop) {
+                            remappedunits[curGrpName] = remappedunits[curGrpName] || [];
+                            remappedunits[curGrpName].push(unit);
+                        } else {
+                            await ddcsControllers.unitActionUpdate({
+                                _id: unit.name,
+                                dead: true
+                            });
+                        }
                     }
-                }
-                for (const [key, value] of Object.entries(remappedunits)) {
-                    await ddcsControllers.spawnUnitGroup(value as any[]);
+                    for (const [key, value] of Object.entries(remappedunits)) {
+                        await ddcsControllers.spawnUnitGroup(value as any[]);
+                    }
                 }
             }
         } else {
             if (!missionStartupUnitsReSync) {
-                console.log("MISSION IS NOT EMPTY, Sync Server -> Db (mark db units not on server as dead)");
+                console.log("Server Has Active Units");
                 const missingUnitNames = _.difference(aliveUnitNameArray, incomingObj.returnObj);
                 console.log("Server is missing ", missingUnitNames, " unit(s)");
                 if (missingUnitNames.length > 0) {
