@@ -33,6 +33,6 @@ export async function processFiveSecActions(fullySynced: boolean): Promise<void>
             }
         }
         await ddcsControllers.checkUnitsToBaseForCapture();
-        await ddcsControllers.syncCheck(ddcsControllers.getCurServerUnitCnt(), ddcsControllers.getCurServerStaticCnt());
+        await ddcsControllers.syncCheck(ddcsControllers.getCurServerCnt());
     }
 }

@@ -5,6 +5,7 @@
 import * as _ from "lodash";
 import * as typing from "../../typings";
 import * as ddcsControllers from "../";
+import {spawn} from "child_process";
 
 let openSAM: string;
 

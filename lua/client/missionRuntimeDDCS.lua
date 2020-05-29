@@ -38,18 +38,14 @@ local udpMissionRuntime = socket.udp()
 assert(udpMissionRuntime:settimeout(0))
 assert(udpMissionRuntime:setsockname(socket.dns.toip(missionRuntimeHost), missionRuntimePort))
 
-completeUnitNames = {}
-completeStaticNames = {}
-tempUnitNames = {}
-tempStaticNames = {}
-
 function sendUDPPacket(payload)
     udpClient:send(JSON:encode(payload))
 end
 
--- update groups section
-unitCache = {}
-checkUnitDead = {}
+completeNames = {}
+tempNames = {}
+objCache = {}
+checkDead = {}
 
 function generateInitialUnitObj(group, unit, isActive, curName, coalition, lon, lat, alt, unitPosition)
     local curUnit = {
@@ -100,89 +96,6 @@ function generateInitialUnitObj(group, unit, isActive, curName, coalition, lon, 
     end
     return curUnit
 end
-
-function addGroups(groups, coalition)
-    for groupIndex = 1, #groups do
-        local group = groups[groupIndex]
-        local units = group:getUnits()
-        for unitIndex = 1, #units do
-            local unit = units[unitIndex]
-            local curName = unit:getName()
-            local unitPosition = unit:getPosition()
-            local lat, lon, alt = coord.LOtoLL(unitPosition.p)
-            table.insert(tempUnitNames, curName)
-            if Unit.isActive(unit) then
-                if unitCache[curName] ~= nil then
-                    if unitCache[curName].lat ~= lat or unitCache[curName].lon ~= lon then
-                        unitCache[curName] = {
-                            ["lat"] = lat,
-                            ["lon"] = lon
-                        }
-                        local curUnit = generateInitialUnitObj(group, unit, true, curName, coalition, lon, lat, alt, unitPosition)
-                        curUnit.action = "U"
-                        sendUDPPacket(curUnit)
-                    end
-                else
-                    unitCache[curName] = {
-                        ["lat"] = lat,
-                        ["lon"] = lon
-                    }
-                    local curUnit = generateInitialUnitObj(group, unit, true, curName, coalition, lon, lat, alt, unitPosition)
-                    curUnit.action = "C"
-                    sendUDPPacket(curUnit)
-                end
-            else
-                if unitCache[curName] == nil then
-                    unitCache[curName] = {
-                        ["lat"] = lat,
-                        ["lon"] = lon
-                    }
-                    local curUnit = generateInitialUnitObj(group, unit, false, curName, coalition, lon, lat, alt, unitPosition)
-                    curUnit.action = "C"
-                    sendUDPPacket(curUnit)
-                end
-            end
-            checkUnitDead[curName] = 1
-        end
-    end
-end
-
-function updateGroups(ourArgument, time)
-    checkUnitDead = {}
-    tempUnitNames = {}
-
-    local redGroups = coalition.getGroups(1)
-    if redGroups ~= nil then
-        addGroups(redGroups, 1)
-    end
-    local blueGroups = coalition.getGroups(2)
-    if blueGroups ~= nil then
-        addGroups(blueGroups, 2)
-    end
-
-    completeUnitNames = tempUnitNames
-    --check dead, send delete action to server if dead detected
-    for k, v in pairs(unitCache) do
-        if checkUnitDead[k] == nil then
-            local curUnit = {
-                action = "D",
-                uType = "unit",
-                data = {
-                    name = k
-                }
-            }
-            sendUDPPacket(curUnit)
-            unitCache[k] = nil
-        end
-    end
-
-    return time + DATA_TIMEOUT_SEC
-end
-
--- update Statics section
-staticCache = {}
-checkStaticDead = {}
-
 function generateInitialStaticsObj(static, curStaticName, coalition, lon, lat, alt, staticPosition)
     local curStatic = {
         ["uType"] = "static",
@@ -205,43 +118,94 @@ function generateInitialStaticsObj(static, curStaticName, coalition, lon, lat, a
     return curStatic
 end
 
-
+function addGroups(groups, coalition)
+    for groupIndex = 1, #groups do
+        local group = groups[groupIndex]
+        local units = group:getUnits()
+        for unitIndex = 1, #units do
+            local unit = units[unitIndex]
+            local curUnitName = unit:getName()
+            local unitPosition = unit:getPosition()
+            local lat, lon, alt = coord.LOtoLL(unitPosition.p)
+            table.insert(tempNames, curUnitName)
+            if Unit.isActive(unit) then
+                if objCache[curUnitName] ~= nil then
+                    if objCache[curUnitName].lat ~= lat or objCache[curUnitName].lon ~= lon then
+                        objCache[curUnitName] = {
+                            ["lat"] = lat,
+                            ["lon"] = lon
+                        }
+                        local curUnitObj = generateInitialUnitObj(group, unit, true, curUnitName, coalition, lon, lat, alt, unitPosition)
+                        curUnitObj.action = "U"
+                        sendUDPPacket(curUnitObj)
+                    end
+                else
+                    objCache[curUnitName] = {
+                        ["lat"] = lat,
+                        ["lon"] = lon
+                    }
+                    local curUnitObj = generateInitialUnitObj(group, unit, true, curUnitName, coalition, lon, lat, alt, unitPosition)
+                    curUnitObj.action = "C"
+                    sendUDPPacket(curUnitObj)
+                end
+            else
+                if objCache[curUnitName] == nil then
+                    objCache[curUnitName] = {
+                        ["lat"] = lat,
+                        ["lon"] = lon
+                    }
+                    local curUnitObj = generateInitialUnitObj(group, unit, false, curUnitName, coalition, lon, lat, alt, unitPosition)
+                    curUnitObj.action = "C"
+                    sendUDPPacket(curUnitObj)
+                end
+            end
+            checkDead[curUnitName] = 1
+        end
+    end
+end
 function addStatics(statics, coalition)
     for staticIndex = 1, #statics do
         local static = statics[staticIndex]
         local staticPosition = static:getPosition()
         local lat, lon, alt = coord.LOtoLL(staticPosition.p)
         local curStaticName = static:getName()
-        table.insert(tempStaticNames, curStaticName)
+        table.insert(tempNames, curStaticName)
 
-        if staticCache[curStaticName] ~= nil then
-            if staticCache[curStaticName].lat ~= lat or staticCache[curStaticName].lon ~= lon then
-                local curStatic = generateInitialStaticsObj(static, curStaticName, coalition, lon, lat, alt, staticPosition)
-                staticCache[curStaticName] = {
+        if objCache[curStaticName] ~= nil then
+            if objCache[curStaticName].lat ~= lat or objCache[curStaticName].lon ~= lon then
+                local curStaticObj = generateInitialStaticsObj(static, curStaticName, coalition, lon, lat, alt, staticPosition)
+                objCache[curStaticName] = {
                     ["lat"] = lat,
                     ["lon"] = lon
                 }
-                curStatic.action = "U"
-                sendUDPPacket(curStatic)
+                curStaticObj.action = "U"
+                sendUDPPacket(curStaticObj)
             end
         else
-            local curStatic = generateInitialStaticsObj(static, curStaticName, coalition, lon, lat, alt, staticPosition)
-            staticCache[curStaticName] = {
+            local curStaticObj = generateInitialStaticsObj(static, curStaticName, coalition, lon, lat, alt, staticPosition)
+            objCache[curStaticName] = {
                 ["lat"] = lat,
                 ["lon"] = lon
             }
-            curStatic.action = "C"
-            sendUDPPacket(curStatic)
+            curStaticObj.action = "C"
+            sendUDPPacket(curStaticObj)
         end
-        checkStaticDead[curStaticName] = 1
+        checkDead[curStaticName] = 1
     end
 end
 
-function updateStatics(ourArgument, time)
-    checkStaticDead = {}
-    tempStaticNames = {}
+function updateObjs(ourArgument, time)
+    checkDead = {}
+    tempNames = {}
 
-
+    local redGroups = coalition.getGroups(1)
+    if redGroups ~= nil then
+        addGroups(redGroups, 1)
+    end
+    local blueGroups = coalition.getGroups(2)
+    if blueGroups ~= nil then
+        addGroups(blueGroups, 2)
+    end
     local redStatics = coalition.getStaticObjects(1)
     if redStatics ~= nil then
         addStatics(redStatics, 1)
@@ -251,56 +215,47 @@ function updateStatics(ourArgument, time)
         addStatics(blueStatics, 2)
     end
 
-    completeStaticNames = tempStaticNames
-
-    for k, v in pairs(staticCache) do
-        if checkStaticDead[k] == nil then
-            local curStatic = {
+    completeNames = tempNames
+    --check dead, send delete action to server if dead detected
+    for k, v in pairs(objCache) do
+        if checkDead[k] == nil then
+            local curUnit = {
                 action = "D",
-                uType = "static",
+                uType = "unit",
                 data = {
                     name = k
                 }
             }
-            sendUDPPacket(curStatic)
-            staticCache[k] = nil
+            sendUDPPacket(curUnit)
+            objCache[k] = nil
         end
     end
 
     return time + DATA_TIMEOUT_SEC
 end
 
-function updateUnitGroupsByName(unitNames)
+function updateObjsByName(unitNames, objType)
     for k, v in pairs(unitNames) do
-        local curUnit = Unit.getByName(v)
-        if curUnit ~= nil then
+        local curObj
+        if objType == "unit" then
+            curObj = Unit.getByName(v)
+        end
+        if objType == "static" then
+            curObj = StaticObject.getByName(v)
+        end
+        if curObj ~= nil then
             -- removing from unit cache makes the server think its a new unit, forcing reSync
-            unitCache[v] = nil
+            objCache[v] = nil
         else
             -- if dead, add unit back to uniCache, it will send dead packet when it detects unit not exist
-            unitCache[v] = "deadUnit"
+            objCache[v] = "deadUnit"
         end
     end
 end
 
-function updateStaticGroupsByName(staticNames)
-    for k, v in pairs(staticNames) do
-        local curStatic = StaticObject.getByName(v)
-        if curStatic ~= nil then
-            -- removing from unit cache makes the server think its a new unit, forcing reSync
-            staticCache[v] = nil
-        else
-            -- if dead, add unit back to uniCache, it will send dead packet when it detects unit not exist
-            staticCache[v] = "deadStatic"
-        end
-    end
-end
-
--- command section
 function commandExecute(s)
     return loadstring("return " ..s)()
 end
-
 function runRequest(request)
     if request.action ~= nil and request.reqID ~= nil then
 
@@ -309,22 +264,13 @@ function runRequest(request)
             ["reqId"] = request.reqID
         }
 
-        if request.action == "getUnitNames" then
-            outObj.returnObj = completeUnitNames
+        if request.action == "getNames" then
+            outObj.returnObj = completeNames
             sendUDPPacket(outObj)
         end
 
-        if request.action == "reSyncUnitInfo" then
-            updateUnitGroupsByName(request.missingUnitNames)
-        end
-
-        if request.action == "getStaticsNames" then
-            outObj.returnObj = completeStaticNames
-            sendUDPPacket(outObj)
-        end
-
-        if request.action == "reSyncStaticInfo" then
-            updateStaticGroupsByName(request.missingStaticNames)
+        if request.action == "reSyncInfo" then
+            updateObjsByName(request.missingNames, request.objType)
         end
 
         if request.action == "CMD" then
@@ -340,7 +286,6 @@ function runRequest(request)
         end
     end
 end
-
 function runPerFrame(ourArgument, time)
     local request = udpMissionRuntime:receive()
     if request ~= nil then
@@ -352,12 +297,10 @@ function runPerFrame(ourArgument, time)
     end
     return time + DATA_TIMEOUT_SEC
 end
-
 function sendServerInfo(ourArgument, time)
     sendUDPPacket({
         ["action"] = "serverInfo",
-        ["unitCount"] = table.getn(completeUnitNames),
-        ["staticCount"] = table.getn(completeStaticNames),
+        ["serverCount"] = table.getn(completeNames),
         ["startAbsTime"] = timer.getTime0(),
         ["curAbsTime"] = timer.getAbsTime(),
         ["epoc"] = missionStartTime * 1000
@@ -367,8 +310,7 @@ end
 
 timer.scheduleFunction(sendServerInfo, {}, timer.getTime() + SEND_SERVER_INFO_SEC)
 timer.scheduleFunction(runPerFrame, {}, timer.getTime() + DATA_TIMEOUT_SEC)
-timer.scheduleFunction(updateGroups, {}, timer.getTime() + DATA_TIMEOUT_SEC)
-timer.scheduleFunction(updateStatics, {}, timer.getTime() + DATA_TIMEOUT_SEC)
+timer.scheduleFunction(updateObjs, {}, timer.getTime() + DATA_TIMEOUT_SEC)
 
 -- world.addEventHandler(ddcs)
 env.info("missionRuntimeDDCS loaded")

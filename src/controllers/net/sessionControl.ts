@@ -4,8 +4,7 @@ let sessionName: string = "";
 let curServerEpoc: number = 0;
 let curAbsTime: number = 0;
 let startAbsTime: number = 0;
-let curServerUnitCnt: number = 0;
-let curServerStaticCnt: number = 0;
+let curServerCnt: number = 0;
 
 export function getSessionName() {
     return sessionName;
@@ -19,11 +18,8 @@ export function getCurAbsTime() {
 export function getStartAbsTime() {
     return startAbsTime;
 }
-export function getCurServerUnitCnt() {
-    return curServerUnitCnt;
-}
-export function getCurServerStaticCnt() {
-    return curServerStaticCnt;
+export function getCurServerCnt() {
+    return curServerCnt;
 }
 
 export function setSessionName(curSessionName: string) {
@@ -38,11 +34,8 @@ export function setCurAbsTime(absTime: number) {
 export function setStartAbsTime(curStartAbsTime: number) {
     startAbsTime = curStartAbsTime;
 }
-export function setCurServerUnitCnt(unitCount: number) {
-    curServerUnitCnt = unitCount;
-}
-export function setCurServerStaticCnt(staticCnt: number) {
-    curServerStaticCnt = staticCnt;
+export function setCurServerCnt(serverCount: number) {
+    curServerCnt = serverCount;
 }
 
 export async function getLatestSession(serverInfoObj: any): Promise<void> {
@@ -90,7 +83,6 @@ export async function getLatestSession(serverInfoObj: any): Promise<void> {
         setCurServerEpoc(serverInfoObj.epoc);
         setCurAbsTime(serverInfoObj.curAbsTime);
         setStartAbsTime(serverInfoObj.startAbsTime);
-        setCurServerUnitCnt(serverInfoObj.unitCount);
-        setCurServerStaticCnt(serverInfoObj.staticCount);
+        setCurServerCnt(serverInfoObj.serverCount);
     }
 }
