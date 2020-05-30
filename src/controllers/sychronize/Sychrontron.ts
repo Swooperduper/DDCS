@@ -14,6 +14,14 @@ let isInitSyncMode = false; // Init Sync Units To Server Mode
 let isReSyncLock = false;
 let nextUniqueId = 1;
 
+export function getMissionStartupReSync(): boolean {
+    return missionStartupReSync;
+}
+
+export function setMissionStartupReSync(value: boolean): void {
+    missionStartupReSync = value;
+}
+
 export function getRequestIndex(reqId: number) {
     return _.findIndex(requestJobArray, ["reqId", reqId]);
 }
@@ -224,7 +232,7 @@ export async function syncByName(incomingObj: any, curReqJobIndex: number): Prom
         });
         console.log("Units server: ", curReqJob.reqArgs.serverCount, "bakedUnits: ", preBakedNames.length);
         if ((curReqJob.reqArgs.serverCount - preBakedNames.length) === 0) {
-            console.log("Server IS EMPTY of objs");
+            console.log("Server is VIRGIN");
             missionStartupReSync = true;
             if (ddcsControllers.getEngineCache().config.resetFullCampaign) {
                 // clear unit DB from all non ~ units, respawn fresh server
@@ -312,7 +320,28 @@ export async function syncCheck(serverCount: number): Promise<void> {
             const dbCount = await ddcsControllers.actionCount({dead: false});
             if ( serverCount !== dbCount) {
                 await reSyncServerObjs(serverCount, dbCount);
+            } else {
+                if (getMissionStartupReSync()) {
+                    // server is synced opening up mission
+                    // sync base captures
+                    // unlock join ports
+                    // make announcement to discord
+
+                    ddcsControllers.setMissionStartupReSync(false);
+                    console.log("Server Is Synced");
+                } else {
+                    // loop hits in normal operation
+                }
             }
         }
     }
+}
+
+const arrayThing = [
+  "a",
+  "b"
+];
+
+for (let i = 0; i < arrayThing.length; i++) {
+    console.log("Each element: ", arrayThing[i]);
 }
