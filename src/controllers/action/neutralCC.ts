@@ -70,7 +70,7 @@ export async function spawnCCAtNeutralBase(curPlayerUnit: typings.IUnit): Promis
                 }
             } else {
                 console.log("cmdCenter doesnt exist " + base.name);
-                await ddcsControllers.spawnLogisticCmdCenter({}, false, base, curPlayerUnit.coalition);
+                // await ddcsControllers.spawnLogisticCmdCenter({}, false, base, curPlayerUnit.coalition);
                 await ddcsControllers.baseActionUpdateSide({name: base.name, side: curPlayerUnit.coalition});
                 await ddcsControllers.setbaseSides();
                 await ddcsControllers.spawnSupportBaseGrp(base.name, curPlayerUnit.coalition);

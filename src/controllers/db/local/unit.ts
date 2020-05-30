@@ -174,11 +174,11 @@ export async function unitActionDelete(obj: any): Promise<void> {
     });
 }
 
-export async function unitActionRemoveall(): Promise<any> {
-    return dbModels.unitModel.deleteOne({});
+export async function unitActionRemoveall(): Promise<void> {
+    return dbModels.unitModel.deleteMany({});
 }
 
-export async function unitActionDropall(): Promise<any> {
+export async function unitActionDropall(): Promise<void> {
     return dbModels.unitModel.collection.drop();
 }
 

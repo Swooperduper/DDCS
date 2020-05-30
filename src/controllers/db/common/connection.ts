@@ -2,6 +2,7 @@ import * as mongoose from "mongoose";
 import * as localModels from "../local/models";
 import * as remoteModels from "../remote/models";
 import * as ddcsController from "../../";
+import * as ddcsControllers from "../../action/aiConvoys";
 
 export let localConnection: mongoose.Connection;
 export let remoteConnection: mongoose.Connection;
@@ -69,6 +70,8 @@ export async function initV3Engine(): Promise<void> {
     await updateUnitDictionary(ddcsController.getEngineCache().config.timePeriod);
     await updateWeaponDictionary();
     await updateBases();
+
+    ddcsController.setResetFullCampaign(ddcsController.getEngineCache().config.resetFullCampaign);
 
     await ddcsController.startUpReceiveUDPSocket();
 

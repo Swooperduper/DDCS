@@ -28,6 +28,7 @@ export async function serverActionsRead(obj: any): Promise<typings.IServer[]> {
 }
 
 export async function serverActionsUpdate(obj: any): Promise<void> {
+    console.log("SV: ", obj);
     return new Promise((resolve, reject) => {
         dbModels.serverModel.findOneAndUpdate(
             {name: obj.name},

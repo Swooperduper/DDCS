@@ -6,6 +6,7 @@ import * as _ from "lodash";
 import * as typing from "../../typings";
 import * as ddcsControllers from "../";
 import {spawn} from "child_process";
+import DDCSServer from "../../server";
 
 let openSAM: string;
 
@@ -2362,15 +2363,35 @@ export async function spawnLogiGroup(spawnArray: typing.IUnit[], side: number): 
     }
 }
 
-export async function spawnStaticBuilding(staticObj: any, baseObj?: any, side?: number): Promise<void> {
-    const curStaticObj = staticObj;
-    curStaticObj.name = (baseObj) ? baseObj.name + " " + curStaticObj.type : curStaticObj.name;
-    curStaticObj.coalition = (side) ? side : curStaticObj.coalition;
-    curStaticObj.lonLatLoc = (curStaticObj.lonLatLoc) ? curStaticObj.lonLatLoc : ddcsControllers.getRandomLatLonFromBase(baseObj.name, "buildingPoly");
+export async function spawnStaticBuilding(staticObj: any, init: any, baseObj?: any, side?: number, staticType?: string): Promise<void> {
 
-    const curCMD = spawnStatic(staticTemplate(curStaticObj), curStaticObj.country);
-    // console.log("staticObj: ", curCMD, curStaticObj.country);
-    await ddcsControllers.sendUDPPacket("frontEnd", {actionObj: {action: "CMD", cmd: curCMD, reqID: 0}});
+    const curStaticObj: any = staticObj;
+    if (init) {
+        const engineCache = ddcsControllers.getEngineCache();
+        const staticLookupLogiBuilding = await ddcsControllers.staticDictionaryActionsRead({_id: staticType});
+        const curCountry = _.intersection(staticLookupLogiBuilding[0].config.modern.country, ddcsControllers.COUNTRY[(side || 0)]);
+        if (curCountry.length > 0) {
+            curStaticObj.country = ddcsControllers.countryId.indexOf(curCountry[0] as string);
+            curStaticObj.coalition = side;
+            curStaticObj.type = staticLookupLogiBuilding[0].type;
+            curStaticObj.shape_name = staticLookupLogiBuilding[0].shape_name;
+            curStaticObj.canCargo = staticLookupLogiBuilding[0].canCargo;
+            curStaticObj.category = ddcsControllers.UNIT_CATEGORY.indexOf("STRUCTURE");
+            curStaticObj.name = baseObj.name + " " + curStaticObj.type;
+            curStaticObj._id = curStaticObj.name;
+            curStaticObj.hdg = _.random(0, 359);
+            curStaticObj.alt = 0;
+            curStaticObj.lonLatLoc = (curStaticObj.lonLatLoc) ? curStaticObj.lonLatLoc :
+                ddcsControllers.getRandomLatLonFromBase(baseObj.name, "buildingPoly");
+            // initial spawn, spawn in DB and sync over
+            await ddcsControllers.unitActionSave(curStaticObj);
+        } else {
+            console.log("country not found: ", side, staticType);
+        }
+    } else {
+        const curCMD = spawnStatic(staticTemplate(curStaticObj), curStaticObj.country);
+        await ddcsControllers.sendUDPPacket("frontEnd", {actionObj: {action: "CMD", cmd: curCMD, reqID: 0}});
+    }
 }
 
 export async function spawnUnitGroup(spawnArray: any[], baseName?: string, side?: number): Promise<void> {
@@ -2398,19 +2419,19 @@ export async function spawnUnitGroup(spawnArray: any[], baseName?: string, side?
     }
 }
 
-export async function spawnNewMapGrps(): Promise<number> {
-    const engineCache = ddcsControllers.getEngineCache();
-    let totalUnitsSpawned = 0;
-    const curServer = engineCache.config;
-    let totalUnitNum;
+export async function spawnNewMapObjs(): Promise<void> {
+    // const engineCache = ddcsControllers.getEngineCache();
+    // const curServer = engineCache.config;
     const bases = await ddcsControllers.baseActionRead({name: {$not: /#/}, enabled: true});
     for (const base of bases) {
         if (!_.includes(base.name, "Carrier")) {
-            const spawnArray: any[] = [];
-            const baseName = base.name;
+            // const spawnArray: any[] = [];
+            // const baseName = base.name;
             const baseStartSide = base.defaultStartSide || 0;
-            totalUnitNum = 0;
-            await ddcsControllers.spawnLogisticCmdCenter({}, false, base, baseStartSide);
+
+            await ddcsControllers.spawnStaticBuilding({}, true, base, baseStartSide, "Shelter");
+
+            /*
             await spawnSupportBaseGrp(baseName, baseStartSide);
             if (_.get(base, "baseType") === "MOB") {
                 while (spawnArray.length + totalUnitNum < curServer.replenThresholdBase) { // UNCOMMENT THESE
@@ -2433,38 +2454,9 @@ export async function spawnNewMapGrps(): Promise<number> {
                 baseStartSide
             );
             totalUnitsSpawned += spawnArray.length + totalUnitNum + 1;
+             */
         }
     }
-    return totalUnitsSpawned;
-}
-
-export async function spawnLogisticCmdCenter(staticObj: any, init: boolean, baseObj?: any, side?: number): Promise<void> {
-    // console.log('spawnLogi: ', serverName, staticObj, init, baseObj, side);
-    let curGrpObj = _.cloneDeep(staticObj);
-    curGrpObj.name = (curGrpObj.name || baseObj.name || "") + " Logistics";
-    curGrpObj.coalition = curGrpObj.coalition || side;
-    if (_.isUndefined(curGrpObj.lonLatLoc)) {
-        curGrpObj.lonLatLoc = ddcsControllers.getRandomLatLonFromBase(baseObj.name, "buildingPoly");
-    }
-
-    curGrpObj = {
-        ..._.cloneDeep(staticObj),
-        country: _.get(ddcsControllers, ["defCountrys", curGrpObj.coalition]),
-        category: "Fortifications",
-        type: ".Command Center",
-        shape_name: "ComCenter"
-    };
-
-    const curCMD = exports.spawnStatic(exports.staticTemplate(curGrpObj), curGrpObj.country, curGrpObj.name, init);
-    const sendClient = {action: "CMD", cmd: curCMD, reqID: 0};
-    const actionObj = {actionObj: sendClient, queName: "clientArray"};
-    await ddcsControllers.sendUDPPacket("frontEnd", actionObj);
-    await ddcsControllers.unitActionUpdateByName({
-        name: curGrpObj.name,
-        coalition: curGrpObj.coalition,
-        country: curGrpObj.country,
-        dead: false
-    });
 }
 
 export async function spawnRadioTower(staticObj: any, init: boolean, baseObj?: typing.IBase, side?: number): Promise<void> {
@@ -2545,9 +2537,9 @@ export async function healBase( baseName: string, curPlayerUnit: any): Promise<b
             const curUnit = logiUnit[0];
             if (curUnit) {
                 curUnit.coalition = curBase.side;
-                await spawnLogisticCmdCenter(curUnit, false, curBase, curPlayerUnit.coalition);
+                // await spawnLogisticCmdCenter(curUnit, false, curBase, curPlayerUnit.coalition);
             } else {
-                await spawnLogisticCmdCenter({}, false, curBase, curPlayerUnit.coalition);
+                // await spawnLogisticCmdCenter({}, false, curBase, curPlayerUnit.coalition);
             }
             const commUnit = await ddcsControllers.unitActionRead({name: curBase.name + " Communications", dead: false});
             const curCommUnit = commUnit[0];

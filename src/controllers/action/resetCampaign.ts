@@ -28,8 +28,8 @@ export async function checkTimeToRestart(): Promise<void> {
 
 export async function clearCampaignTables(): Promise<void> {
     console.log("clearTables");
-    await ddcsControllers.staticCrateActionRemoveall();
-    await ddcsControllers.unitActionRemoveall();
+    // await ddcsControllers.staticCrateActionRemoveall();
+    // await ddcsControllers.unitActionRemoveall();
 }
 
 export async function restartCampaign(): Promise<void> {

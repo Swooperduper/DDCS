@@ -80,6 +80,8 @@ export interface IStaticDictionary {
     country: string[];
     category: string;
     shape_name: string;
+    config: any;
+    canCargo: boolean;
 }
 
 export interface IUnitDictionary {
@@ -220,6 +222,7 @@ export interface IStaticObject {
     updatedAt: Date;
     lonLatLoc: number[];
     category: string;
+    config: any;
     country: number;
     type: string;
     name: string;

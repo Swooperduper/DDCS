@@ -29,6 +29,9 @@ export function staticDictionaryModel(dbconn: mongoose.Connection): mongoose.Doc
             canCargo: {
                 type: Boolean,
                 default: false
+            },
+            config: {
+                type: Object
             }
         },
         {

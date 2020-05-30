@@ -34,7 +34,7 @@ export async function checkUnitsToBaseForCapture(): Promise<void> {
                 await ddcsControllers.setbaseSides();
                 const aliveLogistics = await ddcsControllers.unitActionRead({name: base.name + " Logistics", dead: false});
                 if (aliveLogistics.length > 0) {
-                    await ddcsControllers.spawnLogisticCmdCenter({}, false, base, 2);
+                    // await ddcsControllers.spawnLogisticCmdCenter({}, false, base, 2);
                 }
                 const aliveComms = await ddcsControllers.unitActionRead({name: base.name + " Communications", dead: false});
                 if (aliveComms.length > 0) {
@@ -56,7 +56,7 @@ export async function checkUnitsToBaseForCapture(): Promise<void> {
                 await ddcsControllers.setbaseSides();
                 const aliveLogistics = await ddcsControllers.unitActionRead({name: base.name + " Logistics", dead: false});
                 if (aliveLogistics.length > 0) {
-                    await ddcsControllers.spawnLogisticCmdCenter({}, false, base, 1);
+                    // await ddcsControllers.spawnLogisticCmdCenter({}, false, base, 1);
                 }
             }
         }
@@ -79,7 +79,7 @@ export async function checkUnitsToBaseForCapture(): Promise<void> {
             await ddcsControllers.setbaseSides();
             const aliveLogistics = await ddcsControllers.unitActionRead({name: base.name + " Logistics", dead: false});
             if (aliveLogistics.length > 0) {
-                await ddcsControllers.spawnLogisticCmdCenter({}, false, base, unitSide);
+                // await ddcsControllers.spawnLogisticCmdCenter({}, false, base, unitSide);
             }
             const aliveComms = await ddcsControllers.unitActionRead({name: base.name + " Communications", dead: false});
             if (aliveComms.length > 0) {
