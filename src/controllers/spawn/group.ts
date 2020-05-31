@@ -2365,31 +2365,35 @@ export async function spawnLogiGroup(spawnArray: typing.IUnit[], side: number): 
 
 export async function spawnStaticBuilding(staticObj: any, init: any, baseObj?: any, side?: number, staticType?: string): Promise<void> {
 
-    const curStaticObj: any = staticObj;
     if (init) {
-        const engineCache = ddcsControllers.getEngineCache();
         const staticLookupLogiBuilding = await ddcsControllers.staticDictionaryActionsRead({_id: staticType});
-        const curCountry = _.intersection(staticLookupLogiBuilding[0].config.modern.country, ddcsControllers.COUNTRY[(side || 0)]);
+        const curCountry =
+            _.intersection(
+                staticLookupLogiBuilding[0].config[ddcsControllers.getEngineCache().config.timePeriod].country,
+                ddcsControllers.COUNTRY[(side || 0)]
+            );
         if (curCountry.length > 0) {
-            curStaticObj.country = ddcsControllers.countryId.indexOf(curCountry[0] as string);
-            curStaticObj.coalition = side;
-            curStaticObj.type = staticLookupLogiBuilding[0].type;
-            curStaticObj.shape_name = staticLookupLogiBuilding[0].shape_name;
-            curStaticObj.canCargo = staticLookupLogiBuilding[0].canCargo;
-            curStaticObj.category = ddcsControllers.UNIT_CATEGORY.indexOf("STRUCTURE");
-            curStaticObj.name = baseObj.name + " " + curStaticObj.type;
-            curStaticObj._id = curStaticObj.name;
-            curStaticObj.hdg = _.random(0, 359);
-            curStaticObj.alt = 0;
-            curStaticObj.lonLatLoc = (curStaticObj.lonLatLoc) ? curStaticObj.lonLatLoc :
-                ddcsControllers.getRandomLatLonFromBase(baseObj.name, "buildingPoly");
+            const curStaticObj = {
+                country: ddcsControllers.countryId.indexOf(curCountry[0] as string),
+                coalition: side,
+                type: staticLookupLogiBuilding[0].type,
+                shape_name: staticLookupLogiBuilding[0].shape_name,
+                canCargo: staticLookupLogiBuilding[0].canCargo,
+                category: ddcsControllers.UNIT_CATEGORY.indexOf("STRUCTURE"),
+                name: baseObj.name + " " + staticType,
+                _id: baseObj.name + " " + staticType,
+                hdg: _.random(0, 359),
+                alt: 0,
+                lonLatLoc: ddcsControllers.getRandomLatLonFromBase(baseObj.name, "buildingPoly")
+            };
+
             // initial spawn, spawn in DB and sync over
             await ddcsControllers.unitActionSave(curStaticObj);
         } else {
             console.log("country not found: ", side, staticType);
         }
     } else {
-        const curCMD = spawnStatic(staticTemplate(curStaticObj), curStaticObj.country);
+        const curCMD = spawnStatic(staticTemplate(staticObj), staticObj.country);
         await ddcsControllers.sendUDPPacket("frontEnd", {actionObj: {action: "CMD", cmd: curCMD, reqID: 0}});
     }
 }

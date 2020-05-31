@@ -345,7 +345,7 @@ export async function syncCheck(serverCount: number): Promise<void> {
                     // make announcement to discord
 
                     ddcsControllers.setMissionStartupReSync(false);
-                    console.log("Server Is Synced");
+                    console.log("Server Is Synced, Open Server Up");
                 } else {
                     // loop hits in normal operation
                 }

@@ -71,7 +71,7 @@ export async function initV3Engine(): Promise<void> {
     await updateWeaponDictionary();
     await updateBases();
 
-    ddcsController.setResetFullCampaign(ddcsController.getEngineCache().config.resetFullCampaign);
+    await ddcsController.setResetFullCampaign(ddcsController.getEngineCache().config.resetFullCampaign);
 
     await ddcsController.startUpReceiveUDPSocket();
 
