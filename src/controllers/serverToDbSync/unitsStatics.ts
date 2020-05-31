@@ -65,7 +65,7 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
 
         // update location of carrier in aircraft DB
         if (_.includes(curData.name, "Carrier")) {
-            await ddcsControllers.baseActionUpdate({_id: curUnitName, centerLoc: curData.lonLatLoc});
+            await ddcsControllers.baseActionUpdate({_id: curUnitName, centerLoc: curData.lonLatLoc, isResync: true});
         }
 
         if (unitObj.action !== "D") {
@@ -84,7 +84,8 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
                     lonLatLoc: curData.lonLatLoc,
                     playername: curData.playername,
                     speed: curData.speed,
-                    unitId: curData.unitId
+                    unitId: curData.unitId,
+                    isResync: true
                 }
             };
             if (curData.type) {
@@ -128,7 +129,8 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
                         troopType: null,
                         intCargoType: null,
                         virtCrateType: null,
-                        dead: true
+                        dead: true,
+                        isResync: true
                     }
                 };
 
@@ -151,6 +153,7 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
             if (curData.name) {
                 console.log("NAME: ", curData.name);
                 curData._id = curData.name;
+                curData.isResync = true;
                 iCurObj = {
                     action: "C",
                     sessionName: ddcsControllers.getSessionName(),
@@ -175,7 +178,8 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
                             coalition: iCurObj.data.coalition,
                             type: iCurObj.data.type,
                             playername: iCurObj.data.playername,
-                            playerOwnerId: iCurObj.data.playerOwnerId
+                            playerOwnerId: iCurObj.data.playerOwnerId,
+                            isResync: true
                         }
                     }
                 });

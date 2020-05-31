@@ -391,7 +391,7 @@ export async function menuCmdProcess(pObj: any) {
                                     lonLatLoc: curUnit.lonLatLoc,
                                     heading: curUnit.hdg,
                                     country: curUnit.country,
-                                    category: curSpawnUnit.category,
+                                    category: curSpawnUnit.unitCategory,
                                     playerCanDrive: true
                                 };
 

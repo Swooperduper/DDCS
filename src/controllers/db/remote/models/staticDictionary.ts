@@ -22,9 +22,11 @@ export function staticDictionaryModel(dbconn: mongoose.Connection): mongoose.Doc
                 type: String,
                 required: true
             },
-            category: {
-                type: String,
-                required: true
+            objectCategory: {
+                type: Number
+            },
+            unitCategory: {
+                type: Number
             },
             canCargo: {
                 type: Boolean,

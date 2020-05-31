@@ -31,10 +31,10 @@ export async function processEventLand(eventObj: any): Promise<void> {
             const bases = await ddcsControllers.baseActionRead({_id: bName});
             const curBase = bases[0]; // does this work?
             console.log("LANDINGCARGO: ", curBase.side === curSide, baseLand === bName, baseLand, " = ", bName,
-                iUnit[0].category);
+                iUnit[0].unitCategory);
             if (curBase.side === curSide) {
-                await ddcsControllers.replenishUnits( bName, curSide);
-                await ddcsControllers.healBase( bName, iUnit[0]);
+                await ddcsControllers.replenishUnits( bName, curSide, false);
+                await ddcsControllers.healBase( bName, iUnit[0], false);
             }
         }
         const iPlayer = _.find(playerArray, {name: iUnit[0].playername});

@@ -77,8 +77,8 @@ export interface IServer {
 export interface IStaticDictionary {
     _id: string;
     type: string;
-    country: string[];
-    category: string;
+    objectCategory: number;
+    unitCategory: number;
     shape_name: string;
     config: any;
     canCargo: boolean;
@@ -87,7 +87,8 @@ export interface IStaticDictionary {
 export interface IUnitDictionary {
     _id: string;
     type: string;
-    category: string;
+    objectCategory: number;
+    unitCategory: number;
     config: {
         [key: string]: {
             country: string[];
@@ -110,6 +111,7 @@ export interface IUnitDictionary {
     spokeDistance: number;
     routeLocs: number[];
     LPCost: number;
+    name: string;
 }
 
 export interface IWeaponDictionary {
@@ -221,9 +223,10 @@ export interface IStaticObject {
     createdAt: Date;
     updatedAt: Date;
     lonLatLoc: number[];
-    category: string;
+    objectCategory: number;
+    unitCategory: number;
+    country: string;
     config: any;
-    country: number;
     type: string;
     name: string;
     hdg: number;
@@ -279,7 +282,8 @@ export interface IUnit {
     ammo: IAmmo[];
     agl: number;
     alt: number;
-    category: number;
+    objectCategory: number;
+    unitCategory: number;
     coalition: number;
     country: number;
     groupId: number;

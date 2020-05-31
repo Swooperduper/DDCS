@@ -22,9 +22,12 @@ export function unitModel(dbconn: mongoose.Connection): mongoose.Document | {} {
                 max: 2,
                 required: true
             },
-            category: {
+            unitCategory: {
                 type: Number,
                 required: true
+            },
+            objectCategory: {
+                type: Number
             },
             country: {
                 type: Number,
@@ -71,7 +74,8 @@ export function unitModel(dbconn: mongoose.Connection): mongoose.Document | {} {
                 default: false
             },
             groupName: {
-                type: String
+                type: String,
+                require: true
             },
             playername: {
                 type: String
@@ -117,7 +121,7 @@ export function unitModel(dbconn: mongoose.Connection): mongoose.Document | {} {
             },
             isResync: {
                 type: Boolean,
-                default: true
+                default: false
             },
             isAI: {
                 type: Boolean,

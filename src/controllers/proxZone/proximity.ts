@@ -29,7 +29,7 @@ export async function checkUnitsToBaseForCapture(): Promise<void> {
                     60
                 );
 
-                await ddcsControllers.spawnSupportBaseGrp(base.name, 2);
+                await ddcsControllers.spawnSupportBaseGrp(base.name, 2, false);
                 await ddcsControllers.baseActionUpdateSide({name: base.name, side: 2});
                 await ddcsControllers.setbaseSides();
                 const aliveLogistics = await ddcsControllers.unitActionRead({name: base.name + " Logistics", dead: false});
@@ -51,7 +51,7 @@ export async function checkUnitsToBaseForCapture(): Promise<void> {
                     60
                 );
 
-                await ddcsControllers.spawnSupportBaseGrp(base.name, 1);
+                await ddcsControllers.spawnSupportBaseGrp(base.name, 1, false);
                 await ddcsControllers.baseActionUpdateSide({name: base.name, side: 1});
                 await ddcsControllers.setbaseSides();
                 const aliveLogistics = await ddcsControllers.unitActionRead({name: base.name + " Logistics", dead: false});
@@ -74,7 +74,7 @@ export async function checkUnitsToBaseForCapture(): Promise<void> {
                 60
             );
             // console.log('Spawning Support Units', base, unitSide);
-            await ddcsControllers.spawnSupportBaseGrp(base.name, unitSide);
+            await ddcsControllers.spawnSupportBaseGrp(base.name, unitSide, false);
             await ddcsControllers.baseActionUpdateSide({name: base.name, side: unitSide});
             await ddcsControllers.setbaseSides();
             const aliveLogistics = await ddcsControllers.unitActionRead({name: base.name + " Logistics", dead: false});

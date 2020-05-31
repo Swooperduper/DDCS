@@ -15,15 +15,6 @@ export const engineCache = {
 };
 
 export const OBJECT_CATEGORY: string[] = [
-    "UNIT",
-    "WEAPON",
-    "STATIC",
-    "BASE",
-    "SCENERY",
-    "Cargo"
-];
-
-export const STATIC_OBJECT_CATEGORY: string[] = [
     "VOID",
     "UNIT",
     "WEAPON",

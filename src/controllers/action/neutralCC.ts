@@ -57,7 +57,7 @@ export async function spawnCCAtNeutralBase(curPlayerUnit: typings.IUnit): Promis
                         5
                     );
                     // console.log('SSB: ', serverName, base.name, curPlayerUnit.coalition);
-                    await ddcsControllers.spawnSupportBaseGrp(base.name, curPlayerUnit.coalition);
+                    await ddcsControllers.spawnSupportBaseGrp(base.name, curPlayerUnit.coalition, false);
                     return false;
                 } else {
                     console.log(" enemy cmdCenter already exists: " + base.name + " " + cmdCenters);
@@ -73,7 +73,7 @@ export async function spawnCCAtNeutralBase(curPlayerUnit: typings.IUnit): Promis
                 // await ddcsControllers.spawnLogisticCmdCenter({}, false, base, curPlayerUnit.coalition);
                 await ddcsControllers.baseActionUpdateSide({name: base.name, side: curPlayerUnit.coalition});
                 await ddcsControllers.setbaseSides();
-                await ddcsControllers.spawnSupportBaseGrp(base.name, curPlayerUnit.coalition);
+                await ddcsControllers.spawnSupportBaseGrp(base.name, curPlayerUnit.coalition, false);
                 await ddcsControllers.sendMesgToCoalition(
                     curPlayerUnit.coalition,
                     "C: " + base.name + " Command Center Is Now Built!",

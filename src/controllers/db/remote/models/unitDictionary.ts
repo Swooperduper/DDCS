@@ -14,8 +14,11 @@ export function unitDictionaryModel(dbconn: mongoose.Connection): mongoose.Docum
                 type: String,
                 required: true
             },
-            category: {
-                type: String,
+            objectCategory: {
+                type: Number
+            },
+            unitCategory: {
+                type: Number,
                 required: true
             },
             config: {

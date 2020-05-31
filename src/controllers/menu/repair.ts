@@ -9,7 +9,7 @@ import * as ddcsControllers from "../";
 export async function repairBase(base: typing.IBase, curUnit: typing.IUnit): Promise<void> {
     const curBaseName = _.split(_.get(base, "name"), " #")[0];
 
-    const resp = await ddcsControllers.healBase(curBaseName, curUnit);
+    const resp = await ddcsControllers.healBase(curBaseName, curUnit, false);
     if (resp) {
         await ddcsControllers.unitActionUpdateByUnitId({unitId: curUnit.unitId, intCargoType: ""});
         await ddcsControllers.sendMesgToCoalition(
@@ -62,6 +62,7 @@ export async function repairBaseSAMRadars(): Promise<void> {
                     curSAMTemplate.coalition,
                     tNameArry[1],
                     tNameArry[2].charAt(0),
+                    false,
                     launcher,
                     unitsMissing[0],
                     curSAMTemplate.lonLatLoc

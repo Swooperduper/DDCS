@@ -211,8 +211,44 @@ export async function OldBrokenSyncServer(serverUnitCount: number): Promise<void
 }
 */
 
+export async function spawnUnitsFromDbToServer() {
+    console.log("Respawn Current Units From Db ", missionStartupReSync);
+    // sync up all units on server from database
+    const unitObjs = await ddcsControllers.unitActionReadStd({
+        dead: false,
+        isActive: true,
+        _id: {$not: /~/},
+        isResync: false
+    });
+
+    if (unitObjs.length > 0) {
+        const remappedObjs: any = {};
+        for (const unitObj of unitObjs) {
+            if (ddcsControllers.UNIT_CATEGORY[unitObj.unitCategory] === "GROUND_UNIT" && !unitObj.isTroop) {
+                const curName = unitObj.groupName;
+                remappedObjs[curName] = remappedObjs[curName] || [];
+                remappedObjs[curName].push(unitObj);
+            } else if (ddcsControllers.UNIT_CATEGORY[unitObj.unitCategory] === "STRUCTURE" && !unitObj.isTroop) {
+                await ddcsControllers.spawnStaticBuilding(unitObj, false);
+            } else {
+                await ddcsControllers.unitActionUpdate({
+                    _id: unitObj.name,
+                    dead: true
+                });
+            }
+        }
+
+        for (const [key, value] of Object.entries(remappedObjs)) {
+            await ddcsControllers.spawnUnitGroup(value as any[], false);
+        }
+    } else {
+        console.log("PUSH DB IS SYNCED");
+    }
+}
+
+
 export async function syncByName(incomingObj: any, curReqJobIndex: number): Promise<void> {
-    console.log("GF: ", getResetFullCampaign());
+    console.log("GF: ", getResetFullCampaign(), "MSRESYNC: ", missionStartupReSync);
     if (getResetFullCampaign()) {
         // clear unit DB from all non ~ units, respawn fresh server
         missionStartupReSync = true;
@@ -224,12 +260,12 @@ export async function syncByName(incomingObj: any, curReqJobIndex: number): Prom
     }
 
     const curReqJob = requestJobArray[curReqJobIndex];
-    console.log("server: ", curReqJob.reqArgs.serverCount, "db: ", curReqJob.reqArgs.dbCount);
     const aliveNamesObj =
         await ddcsControllers.actionAliveNames({dead: false});
     const aliveNameArray = aliveNamesObj.map((u: any) => u._id);
 
     if (curReqJob.reqArgs.serverCount > curReqJob.reqArgs.dbCount) {
+        console.log("server: ", curReqJob.reqArgs.serverCount, "db: ", curReqJob.reqArgs.dbCount);
         const missingNames = _.difference(incomingObj.returnObj, aliveNameArray);
         console.log("Db is missing ", missingNames, " unit(s)");
         if (missingNames.length > 0) {
@@ -246,6 +282,7 @@ export async function syncByName(incomingObj: any, curReqJobIndex: number): Prom
     }
 
     if (curReqJob.reqArgs.serverCount < curReqJob.reqArgs.dbCount) {
+        console.log("server: ", curReqJob.reqArgs.serverCount, "db: ", curReqJob.reqArgs.dbCount);
         // is missing empty, pull all units that are active and dont have ~ in unit/static name
         const preBakedNames = await ddcsControllers.actionAliveNames({
             dead: false,
@@ -255,36 +292,8 @@ export async function syncByName(incomingObj: any, curReqJobIndex: number): Prom
         if (((curReqJob.reqArgs.serverCount - preBakedNames.length) === 0) || getResetFullCampaign()) {
             console.log("Server is VIRGIN");
             missionStartupReSync = true;
-            console.log("Respawn Current Units From Db ", missionStartupReSync);
-            // sync up all units on server from database
-            const unitObjs = await ddcsControllers.unitActionReadStd({
-                dead: false,
-                isActive: true,
-                _id: {$not: /~/}
-            });
-
-            if (unitObjs.length > 0) {
-                const remappedObjs: any = {};
-                for (const unitObj of unitObjs) {
-                    if (ddcsControllers.UNIT_CATEGORY[unitObj.category] === "GROUND_UNIT" && !unitObj.isTroop) {
-                        const curName = unitObj.groupName;
-                        remappedObjs[curName] = remappedObjs[curName] || [];
-                        remappedObjs[curName].push(unitObj);
-                    } else if (ddcsControllers.UNIT_CATEGORY[unitObj.category] === "STRUCTURE" && !unitObj.isTroop) {
-                        await ddcsControllers.spawnStaticBuilding(unitObj, false);
-                    } else {
-                        await ddcsControllers.unitActionUpdate({
-                            _id: unitObj.name,
-                            dead: true
-                        });
-                    }
-                }
-
-                for (const [key, value] of Object.entries(remappedObjs)) {
-                    await ddcsControllers.spawnUnitGroup(value as any[]);
-                }
-            }
-
+            await ddcsControllers.unitActionChkResync();
+            await spawnUnitsFromDbToServer();
             await setResetFullCampaign(false);
         } else {
             if (!missionStartupReSync) {
@@ -305,6 +314,7 @@ export async function syncByName(incomingObj: any, curReqJobIndex: number): Prom
             } else {
                 // when server units are fully sync, unlock missing unit names
                 console.log("STILL SYNC OBJS");
+                await spawnUnitsFromDbToServer();
             }
         }
     }
@@ -335,7 +345,7 @@ export async function syncCheck(serverCount: number): Promise<void> {
         const servers = await ddcsControllers.serverActionsRead({_id: process.env.SERVER_NAME});
         if (servers && servers[0]) {
             const dbCount = await ddcsControllers.actionCount({dead: false});
-            if ( serverCount !== dbCount || ddcsControllers.getEngineCache().config.resetFullCampaign) {
+            if (getMissionStartupReSync() || serverCount !== dbCount || ddcsControllers.getEngineCache().config.resetFullCampaign) {
                 await reSyncServerObjs(serverCount, dbCount);
             } else {
                 if (getMissionStartupReSync()) {
