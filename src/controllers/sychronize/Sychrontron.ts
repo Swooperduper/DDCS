@@ -243,7 +243,7 @@ export async function reSyncAllUnitsFromDbToServer(): Promise<void> {
             await ddcsControllers.spawnUnitGroup(value as any[], false);
         }
     } else {
-        console.log("PUSH DB IS SYNCED");
+        console.log("ReSync Finished");
         setMissionStartupReSync(false);
     }
 }
@@ -353,6 +353,9 @@ export async function syncCheck(serverCount: number): Promise<void> {
                     await reSyncAllUnitsFromDbToServer();
                 } else {
                     setMissionStartupReSync(false);
+                    // turn on sync flag
+                    // unlock server port
+                    // send message to discord
                     console.log("Server Is Synchronized");
                 }
             } else {
