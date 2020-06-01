@@ -1441,7 +1441,7 @@ export function getRndFromSpawnCat(
                     ddcsControllers.COUNTRY[(side || 0)]
                 );
             if (curCountry.length > 0) {
-                unit.country = curCountry;
+                unit.country = curCountry[0];
                 cPUnits.push(unit);
             }
         }
@@ -1545,7 +1545,7 @@ export async function spawnSupportBaseGrp( baseName: string, side: number, init:
     }
 }
 
-export async function spawnBaseReinforcementGroup(side: number, baseName: string, init: boolean, forceSpawn?: boolean): Promise<void> {
+export async function spawnBaseReinforcementGroup(side: number, baseName: string, init: boolean, forceSpawn?: boolean): Promise<number> {
     const engineCache = ddcsControllers.getEngineCache();
     let curAngle = 0;
     let curRndSpawn;
@@ -1553,7 +1553,7 @@ export async function spawnBaseReinforcementGroup(side: number, baseName: string
     let curSpokeDeg;
     let curSpokeNum;
     let infoSpwn;
-    const curBaseSpawnCats: any = _.cloneDeep(curServer.spwnLimitsPerTick);
+    const curBaseSpawnCats: any = curServer.spwnLimitsPerTick;
     let randLatLonInBase: number[];
     let groupedUnits = [];
     let totalUnits = 0;
@@ -1565,100 +1565,104 @@ export async function spawnBaseReinforcementGroup(side: number, baseName: string
         for (let i = 0; i < spawnTicks; i++) {
             curAngle = 0;
             curRndSpawn = _.sortBy(getRndFromSpawnCat(spawnCats, side, false, forceSpawn), "sort");
-            compactUnits = [];
-            infoSpwn = curRndSpawn[0];
-            centerRadar = infoSpwn.centerRadar ? 1 : 0;
-            polyCheck = infoSpwn.centerRadar ? "buildingPoly" : "unitPoly";
-            const curCountry = _.intersection(
-                infoSpwn.config[ddcsControllers.getEngineCache().config.timePeriod].country,
-                ddcsControllers.COUNTRY[(side || 0)]
-            );
+            if (curRndSpawn.length > 0) {
+                compactUnits = [];
+                infoSpwn = curRndSpawn[0];
+                centerRadar = infoSpwn.centerRadar ? 1 : 0;
+                polyCheck = infoSpwn.centerRadar ? "buildingPoly" : "unitPoly";
+                const curCountry = _.intersection(
+                    infoSpwn.config[ddcsControllers.getEngineCache().config.timePeriod].country,
+                    ddcsControllers.COUNTRY[(side || 0)]
+                );
 
-            if (infoSpwn.spoke) {
-                randLatLonInBase = ddcsControllers.getRandomLatLonFromBase(baseName, polyCheck);
-                groupedUnits = [];
-                curSpokeNum = curRndSpawn.length - centerRadar;
-                curSpokeDeg = 359 / curSpokeNum;
+                if (infoSpwn.spoke) {
+                    randLatLonInBase = ddcsControllers.getRandomLatLonFromBase(baseName, polyCheck);
+                    groupedUnits = [];
+                    curSpokeNum = curRndSpawn.length - centerRadar;
+                    curSpokeDeg = 359 / curSpokeNum;
 
-                if (infoSpwn.centerRadar) {
-                    // main radar
-                    groupedUnits.push({
-                        hdg: _.random(0, 359),
-                        alt: 0,
-                        coalition: side,
-                        country: ddcsControllers.countryId.indexOf(curCountry[0]),
-                        unitCategory: infoSpwn.unitCategory,
-                        objectCategory: infoSpwn.objectCategory,
-                        type: infoSpwn.type,
-                        lonLatLoc: ddcsControllers.getRandomLatLonFromBase(baseName, polyCheck)
-                    });
-                }
-                // secondary radar
-                for (let j = _.cloneDeep(centerRadar); j < infoSpwn.secRadarNum + centerRadar; j++) {
-                    curAngle += curSpokeDeg;
-                    groupedUnits.push({
-                        hdg: _.random(0, 359),
-                        alt: 0,
-                        coalition: side,
-                        country: ddcsControllers.countryId.indexOf(curCountry[0]),
-                        unitCategory: infoSpwn.unitCategory,
-                        objectCategory: infoSpwn.objectCategory,
-                        type: infoSpwn.type,
-                        lonLatLoc: ddcsControllers.getLonLatFromDistanceDirection(
-                            randLatLonInBase,
-                            curAngle,
-                            curRndSpawn[j].spokeDistance / 2
-                        )
-                    });
-                }
-                // launchers
-                for (let k = infoSpwn.secRadarNum + centerRadar; k < curSpokeNum + centerRadar; k++) {
-                    curAngle += curSpokeDeg;
-                    groupedUnits.push({
-                        hdg: _.random(0, 359),
-                        alt: 0,
-                        coalition: side,
-                        country: ddcsControllers.countryId.indexOf(curCountry[0]),
-                        unitCategory: infoSpwn.unitCategory,
-                        objectCategory: infoSpwn.objectCategory,
-                        type: infoSpwn.type,
-                        lonLatLoc: ddcsControllers.getLonLatFromDistanceDirection(
-                            randLatLonInBase,
-                            curAngle,
-                            curRndSpawn[k].spokeDistance
-                        )
-                    });
-                }
-                compactUnits = _.compact(groupedUnits);
-            } else {
-                compactUnits = _.compact([
-                    {
-                        hdg: _.random(0, 359),
-                        alt: 0,
-                        coalition: side,
-                        country: ddcsControllers.countryId.indexOf(curCountry[0]),
-                        unitCategory: infoSpwn.unitCategory,
-                        objectCategory: infoSpwn.objectCategory,
-                        type: infoSpwn.type,
-                        lonLatLoc: ddcsControllers.getRandomLatLonFromBase(baseName, polyCheck)
+                    if (infoSpwn.centerRadar) {
+                        // main radar
+                        groupedUnits.push({
+                            hdg: _.random(0, 359),
+                            alt: 0,
+                            coalition: side,
+                            country: ddcsControllers.countryId.indexOf(curCountry[0]),
+                            unitCategory: infoSpwn.unitCategory,
+                            objectCategory: infoSpwn.objectCategory,
+                            type: infoSpwn.type,
+                            lonLatLoc: ddcsControllers.getRandomLatLonFromBase(baseName, polyCheck)
+                        });
                     }
-                ]);
+                    // secondary radar
+                    for (let j = _.cloneDeep(centerRadar); j < infoSpwn.secRadarNum + centerRadar; j++) {
+                        curAngle += curSpokeDeg;
+                        groupedUnits.push({
+                            hdg: _.random(0, 359),
+                            alt: 0,
+                            coalition: side,
+                            country: ddcsControllers.countryId.indexOf(curCountry[0]),
+                            unitCategory: curRndSpawn[j].unitCategory,
+                            objectCategory: curRndSpawn[j].objectCategory,
+                            type: curRndSpawn[j].type,
+                            lonLatLoc: ddcsControllers.getLonLatFromDistanceDirection(
+                                randLatLonInBase,
+                                curAngle,
+                                curRndSpawn[j].spokeDistance / 2
+                            )
+                        });
+                    }
+                    // launchers
+                    for (let k = infoSpwn.secRadarNum + centerRadar; k < curSpokeNum + centerRadar; k++) {
+                        curAngle += curSpokeDeg;
+                        groupedUnits.push({
+                            hdg: _.random(0, 359),
+                            alt: 0,
+                            coalition: side,
+                            country: ddcsControllers.countryId.indexOf(curCountry[0]),
+                            unitCategory: curRndSpawn[k].unitCategory,
+                            objectCategory: curRndSpawn[k].objectCategory,
+                            type: curRndSpawn[k].type,
+                            lonLatLoc: ddcsControllers.getLonLatFromDistanceDirection(
+                                randLatLonInBase,
+                                curAngle,
+                                curRndSpawn[k].spokeDistance
+                            )
+                        });
+                    }
+                    compactUnits = _.compact(groupedUnits);
+                } else {
+                    compactUnits = _.compact([
+                        {
+                            hdg: _.random(0, 359),
+                            alt: 0,
+                            coalition: side,
+                            country: ddcsControllers.countryId.indexOf(curCountry[0]),
+                            unitCategory: infoSpwn.unitCategory,
+                            objectCategory: infoSpwn.objectCategory,
+                            type: infoSpwn.type,
+                            lonLatLoc: ddcsControllers.getRandomLatLonFromBase(baseName, polyCheck)
+                        }
+                    ]);
+                }
+                totalUnits += compactUnits.length;
+                await spawnUnitGroup(compactUnits, init, baseName, side);
             }
-            totalUnits += compactUnits.length;
-            await spawnUnitGroup(compactUnits, init, baseName, side);
         }
-        if (name === "samRadar" && !init) {
+        // if its not init, dont touch the SAMnet
+        if (spawnCats === "samRadar" && !init) {
             await spawnSAMNet(side, baseName, init);
             totalUnits += 3;
         }
-        if (name === "antiAir" && spawnTicks > 0 && curServer.timePeriod === "1978ColdWar") {
-            await spawnLayer2Reinforcements("antiAir", 2, spawnTicks, side, baseName, init);
+        if (spawnCats === "antiAir" && spawnTicks > 0 && curServer.timePeriod === "1978ColdWar") {
+            totalUnits += await spawnLayer2Reinforcements("antiAir", 2, spawnTicks, side, baseName, init);
         }
 
-        if (name === "mobileAntiAir" && spawnTicks > 0 && curServer.timePeriod === "modern") {
-            await spawnLayer2Reinforcements("mobileAntiAir", 2, spawnTicks, side, baseName, init);
+        if (spawnCats === "mobileAntiAir" && spawnTicks > 0 && curServer.timePeriod === "modern") {
+            totalUnits += await spawnLayer2Reinforcements("mobileAntiAir", 2, spawnTicks, side, baseName, init);
         }
     }
+    return totalUnits;
 }
 
 export async function spawnSAMNet(side: number, baseName: string, init: boolean): Promise<void> {
@@ -1759,7 +1763,7 @@ export async function spawnStarSam(
         });
     }
     // secondary radar
-    for (let j = _.cloneDeep(centerRadar); j < _.get(infoSpwn, "secRadarNum") + centerRadar; j++) {
+    for (let j = _.cloneDeep(centerRadar); j < infoSpwn.secRadarNum + centerRadar; j++) {
         curAngle += curSpokeDeg;
         groupedUnits.push({
             hdg: _.random(0, 359),
@@ -1767,9 +1771,9 @@ export async function spawnStarSam(
             name: "|" + baseName + "|" + openStarSAM + "SAM|" + _.random(1000000, 9999999),
             coalition: side,
             country: ddcsControllers.countryId.indexOf(curCountry[0]),
-            unitCategory: infoSpwn.unitCategory,
-            objectCategory: infoSpwn.objectCategory,
-            type: infoSpwn.type,
+            unitCategory: curRndSpawn[j].unitCategory,
+            objectCategory: curRndSpawn[j].objectCategory,
+            type: curRndSpawn[j].type,
             lonLatLoc: ddcsControllers.getLonLatFromDistanceDirection(randLatLonInBase, curAngle, infoSpwn.spokeDistance / 2)
         });
     }
@@ -1782,9 +1786,9 @@ export async function spawnStarSam(
             name: "|" + baseName + "|" + openStarSAM + "SAM|" + _.random(1000000, 9999999),
             coalition: side,
             country: ddcsControllers.countryId.indexOf(curCountry[0]),
-            unitCategory: infoSpwn.unitCategory,
-            objectCategory: infoSpwn.objectCategory,
-            type: infoSpwn.type,
+            unitCategory: curRndSpawn[k].unitCategory,
+            objectCategory: curRndSpawn[k].objectCategory,
+            type: curRndSpawn[k].type,
             lonLatLoc: ddcsControllers.getLonLatFromDistanceDirection(randLatLonInBase, curAngle, infoSpwn.spokeDistance)
         });
     }
@@ -1802,7 +1806,6 @@ export async function spawnStarSam(
         lonLatLoc: ddcsControllers.getLonLatFromDistanceDirection(randLatLonInBase, 180, infoSpwn.spokeDistance / 2)
     });
     compactUnits = _.compact(groupedUnits);
-    console.log("STARSAM: ", compactUnits);
     await spawnUnitGroup(compactUnits, init, baseName, side);
 }
 
@@ -1813,7 +1816,8 @@ export async function spawnLayer2Reinforcements(
     side: number,
     baseName: string,
     init: boolean
-): Promise<void> {
+): Promise<number> {
+    let totalUnits = 0;
     const curTickCnt = curTick * rndAmt;
     console.log("spawnBase: ", baseName);
     for (let i = 0; i < curTickCnt; i++) {
@@ -1853,8 +1857,11 @@ export async function spawnLayer2Reinforcements(
                 lonLatLoc: ddcsControllers.getLonLatFromDistanceDirection(randLatLonInBase, curAngle, 0.05)
             });
         }
-        await spawnUnitGroup(_.compact(groupedL2Units), init, baseName, side);
+        const curGroupedUnits = _.compact(groupedL2Units);
+        await spawnUnitGroup(curGroupedUnits, init, baseName, side);
+        totalUnits += curGroupedUnits.length;
     }
+    return totalUnits;
 }
 
 export async function spawnConvoy(
@@ -2556,12 +2563,13 @@ export async function spawnNewMapObjs(): Promise<void> {
                 // spawn radio towers
                 await ddcsControllers.spawnStaticBuilding({} as typing.IStaticSpawnMin, true, base, baseStartSide, "Comms tower M");
                 await spawnSAMNet(baseStartSide, base._id, true);
-                /*
+
+                let totalUnitNum = 0;
                 while (totalUnitNum < ddcsControllers.getEngineCache().config.replenThresholdBase) {
                     totalUnitNum += await spawnBaseReinforcementGroup(baseStartSide, base._id, true, true);
+                    console.log("TOTLOG: ", totalUnitNum, ddcsControllers.getEngineCache().config.replenThresholdBase);
                 }
 
-                 */
             }
 
 
