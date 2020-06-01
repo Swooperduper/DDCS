@@ -38,7 +38,7 @@ export async function checkUnitsToBaseForCapture(): Promise<void> {
                 }
                 const aliveComms = await ddcsControllers.unitActionRead({name: base.name + " Communications", dead: false});
                 if (aliveComms.length > 0) {
-                    await ddcsControllers.spawnRadioTower({}, false, base, 2);
+                    await ddcsControllers.spawnStaticBuilding({} as typing.IStaticSpawnMin, false, base, 2, "Comms tower M");
                 }
             }
         }
@@ -83,7 +83,7 @@ export async function checkUnitsToBaseForCapture(): Promise<void> {
             }
             const aliveComms = await ddcsControllers.unitActionRead({name: base.name + " Communications", dead: false});
             if (aliveComms.length > 0) {
-                await ddcsControllers.spawnRadioTower({}, false, base, unitSide);
+                await ddcsControllers.spawnStaticBuilding({} as typing.IStaticSpawnMin, false, base, unitSide, "Comms tower M");
             }
         }
     }

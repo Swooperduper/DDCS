@@ -392,7 +392,8 @@ export async function menuCmdProcess(pObj: any) {
                                     heading: curUnit.hdg,
                                     country: curUnit.country,
                                     category: curSpawnUnit.unitCategory,
-                                    playerCanDrive: true
+                                    playerCanDrive: true,
+                                    coalition: curUnit.coalition
                                 };
 
                                 for (
@@ -410,7 +411,7 @@ export async function menuCmdProcess(pObj: any) {
                                         console.log("erroring line73: ", err);
                                     })
                                 ;
-                                await ddcsControllers.spawnLogiGroup(curTroops, curUnit.coalition);
+                                await ddcsControllers.spawnUnitGroup(curTroops, false);
                                 await ddcsControllers.sendMesgToGroup(
                                     curUnit.groupId,
                                     "G: " + curSpawnUnit.type + " has been deployed!",
@@ -1116,14 +1117,15 @@ export async function unpackCrate(playerUnit: any, country: string, type: string
                         lonLatLoc: playerUnit.lonLatLoc,
                         heading: curUnitHdg,
                         country,
-                        playerCanDrive: mobile
+                        playerCanDrive: mobile,
+                        coalition: playerUnit.coalition
                     };
 
                     newSpawnArray.push(unitStart);
                     curUnitHdg = curUnitHdg + addHdg;
                 }
             }
-            await ddcsControllers.spawnLogiGroup(newSpawnArray, playerUnit.coalition);
+            await ddcsControllers.spawnUnitGroup(newSpawnArray, false);
             return true;
         } else {
             const addHdg = 30;
@@ -1158,13 +1160,14 @@ export async function unpackCrate(playerUnit: any, country: string, type: string
                         heading: curUnitHdg,
                         country: pCountry,
                         playerCanDrive: mobile,
-                        special
+                        special,
+                        coalition: playerUnit.coalition
                     };
 
                     newSpawnArray.push(unitStart);
                     curUnitHdg = curUnitHdg + addHdg;
                 }
-                await ddcsControllers.spawnLogiGroup(newSpawnArray, playerUnit.coalition);
+                await ddcsControllers.spawnUnitGroup(newSpawnArray, false);
                 return true;
             } else {
                 console.log("Count not find unit: line 1172: ", type);

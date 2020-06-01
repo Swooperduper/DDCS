@@ -323,6 +323,8 @@ export interface IUnit {
     };
     onboard_num: number;
     samType: string;
+    shape_name: string;
+    canCargo: boolean;
 }
 
 export interface IWebPush {
@@ -540,4 +542,54 @@ export interface ICapTemplate {
     parking: number;
     parking_id: number;
     type: string;
+}
+
+export interface IUnitSpawnMin {
+    hdg: number;
+    alt: number;
+    coalition: number;
+    country: number;
+    unitCategory: number;
+    objectCategory: number;
+    type: string;
+    lonLatLoc?: number[];
+    groupName?: string;
+    name?: string;
+    _id?: string;
+}
+
+export interface IStaticSpawnMin {
+    _id: string;
+    name: string;
+    country: number;
+    type: string;
+    shape_name: string;
+    canCargo: boolean;
+    unitCategory: number;
+    objectCategory: number;
+    hdg: number;
+    alt: number;
+    lonLatLoc: number[];
+}
+
+export interface IGroundUnitTemp {
+    lonLatLoc: number[];
+    type: string;
+    name: string;
+    country: number;
+    hdg?: number;
+    playerCanDrive?: boolean;
+    skill?: string;
+}
+
+export interface IStaticUnitTemp {
+    lonLatLoc: number[];
+    unitCategory: number;
+    country: number;
+    type: string;
+    name: string;
+    shape_name: string;
+    canCargo?: boolean;
+    hdg?: number;
+    mass?: number;
 }

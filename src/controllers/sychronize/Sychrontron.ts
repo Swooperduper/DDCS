@@ -344,7 +344,7 @@ export async function syncCheck(serverCount: number): Promise<void> {
                         console.log("Server is new campaign");
                         // new campaign spawn
                         await populateNewCampaignUnits();
-                        await setResetFullCampaign(false);
+                        // await setResetFullCampaign(false); --UNDO
                     }
                 }
                 const dbCount = await ddcsControllers.actionCount({dead: false});

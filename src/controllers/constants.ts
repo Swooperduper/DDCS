@@ -216,10 +216,10 @@ export const countryId: string[] = [
     "UNITED_ARAB_EMIRATES"
 ];
 
-export const defCountrys: string[] = [
-    "default",
-    "0",
-    "2"
+export const defCountrys: number[] = [
+    0,
+    0,
+    2
 ];
 
 export const enemyCountry: number[] = [
