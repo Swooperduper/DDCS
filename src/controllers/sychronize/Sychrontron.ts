@@ -337,9 +337,10 @@ export async function syncCheck(serverCount: number): Promise<void> {
                     console.log("Server is VIRGIN");
                     const getConfig = await ddcsControllers.serverActionsRead({_id: process.env.SERVER_NAME});
                     ddcsControllers.setConfig(getConfig[0]);
+                    await setResetFullCampaign(ddcsControllers.getEngineCache().config.resetFullCampaign);
                     setMissionStartupReSync(true);
                     await ddcsControllers.unitActionChkResync();
-                    console.log("GF: ", getResetFullCampaign(), "MSRESYNC: ", missionStartupReSync);
+                    console.log("ResetCampaign: ", getResetFullCampaign(), "MissionReSync: ", missionStartupReSync);
                     if (getResetFullCampaign()) {
                         console.log("Server is new campaign");
                         // new campaign spawn
@@ -348,12 +349,11 @@ export async function syncCheck(serverCount: number): Promise<void> {
                     }
                 }
                 const dbCount = await ddcsControllers.actionCount({dead: false});
-                console.log("SD: ", serverCount, dbCount);
+                console.log("NORM SYNC: ", serverCount, dbCount);
                 if (serverCount !== dbCount) {
                     await reSyncAllUnitsFromDbToServer();
                 } else {
                     setMissionStartupReSync(false);
-                    // turn on sync flag
                     // unlock server port
                     // send message to discord
                     setServerSynced(true);
@@ -362,6 +362,7 @@ export async function syncCheck(serverCount: number): Promise<void> {
             } else {
                 // normal named sync system
                 const dbCount = await ddcsControllers.actionCount({dead: false});
+                console.log("Server:", serverCount, " Db", dbCount);
                 if (serverCount !== dbCount) {
                     await reSyncServerObjs(serverCount, dbCount);
                 } else {

@@ -12,6 +12,8 @@ export async function processFiveSecActions(fullySynced: boolean): Promise<void>
     const replenBase = engineCache.replenThresholdBase * replenThreshold;
     const replenTimer = _.random(engineCache.replenTimer / 2, engineCache.replenTimer);
 
+    await ddcsControllers.syncCheck(ddcsControllers.getCurServerCnt());
+
     if (fullySynced) {
         // resetCampaignController.checkTimeToRestart(serverName); //for testing base capture quickly
         // spawn support planes to replenish base units
@@ -33,6 +35,5 @@ export async function processFiveSecActions(fullySynced: boolean): Promise<void>
             }
         }
         await ddcsControllers.checkUnitsToBaseForCapture();
-        await ddcsControllers.syncCheck(ddcsControllers.getCurServerCnt());
     }
 }

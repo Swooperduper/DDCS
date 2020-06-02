@@ -2524,6 +2524,7 @@ export async function spawnUnitGroup(spawnArray: typing.IUnitSpawnMin[], init: b
             unitObj._id = unitObj.name;
             unitObj.country = grpObj.country;
             unitObj.groupName = curGroupName;
+            unitObj.type = curUnit.type;
 
 
             if (init) {

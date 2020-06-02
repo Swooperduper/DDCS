@@ -82,9 +82,7 @@ export async function initV3Engine(): Promise<void> {
     }, ddcsController.time.sec);
 
     setInterval( async () => {
-        if (ddcsController.getServerSynced()) {
-            await ddcsController.processFiveSecActions(ddcsController.getServerSynced());
-        }
+        await ddcsController.processFiveSecActions(ddcsController.getServerSynced());
     }, ddcsController.time.fiveSecs);
 
     setInterval( async () => {
