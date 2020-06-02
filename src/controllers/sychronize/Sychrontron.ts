@@ -5,12 +5,11 @@
 import * as _ from "lodash";
 import * as ddcsControllers from "../";
 import { getSessionName } from "../";
-import * as ddcsController from "../db/common/connection";
 
 const requestJobArray: any[] = [];
 
 let missionStartupReSync = true;
-let isServerSynced = true;
+let isServerSynced = false;
 let isInitSyncMode = false; // Init Sync Units To Server Mode
 let isReSyncLock = false;
 let nextUniqueId = 1;
@@ -334,6 +333,7 @@ export async function syncCheck(serverCount: number): Promise<void> {
 
             if (isServerVirgin || getMissionStartupReSync()) {
                 if (isServerVirgin) {
+                    setServerSynced(false);
                     console.log("Server is VIRGIN");
                     const getConfig = await ddcsControllers.serverActionsRead({_id: process.env.SERVER_NAME});
                     ddcsControllers.setConfig(getConfig[0]);
@@ -344,7 +344,7 @@ export async function syncCheck(serverCount: number): Promise<void> {
                         console.log("Server is new campaign");
                         // new campaign spawn
                         await populateNewCampaignUnits();
-                        // await setResetFullCampaign(false); --UNDO
+                        await setResetFullCampaign(false); // UNDO
                     }
                 }
                 const dbCount = await ddcsControllers.actionCount({dead: false});
@@ -356,6 +356,7 @@ export async function syncCheck(serverCount: number): Promise<void> {
                     // turn on sync flag
                     // unlock server port
                     // send message to discord
+                    setServerSynced(true);
                     console.log("Server Is Synchronized");
                 }
             } else {
