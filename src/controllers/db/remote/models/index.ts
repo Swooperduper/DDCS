@@ -6,3 +6,4 @@ export * from "./theater";
 export * from "./unitDictionary";
 export * from "./userAccount";
 export * from "./weaponScore";
+export * from "./template";

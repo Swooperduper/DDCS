@@ -593,3 +593,8 @@ export interface IStaticUnitTemp {
     hdg?: number;
     mass?: number;
 }
+
+export interface ITemplate {
+    _id: string;
+    template: string;
+}

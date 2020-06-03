@@ -9,15 +9,19 @@ import {IGroundUnitTemp, IStaticSpawnMin} from "../../typings";
 
 let openSAM: string;
 
-export function spawnGrp(grpSpawn: string, country: number, category: number): string {
-    return "coalition.addGroup(" + country + ", " + category + ", " + grpSpawn + ")" ;
+export async function spawnGrp(grpSpawn: string, country: number, category: number): Promise<string> {
+    const spawnTemplate = await ddcsControllers.templateRead({_id: "spawnGroup"});
+    const compiled = _.template(spawnTemplate[0].template);
+    return compiled({country, category, grpSpawn});
 }
 
-export function spawnStatic(staticSpawn: string, country: number): string {
-    return "coalition.addStaticObject(" + country + ", " + staticSpawn + ")";
+export async function spawnStatic(staticSpawn: string, country: number): Promise<string> {
+    const spawnTemplate = await ddcsControllers.templateRead({_id: "spawnStatic"});
+    const compiled = _.template(spawnTemplate[0].template);
+    return compiled({country, staticSpawn});
 }
 
-export function turnOnEWRAuto(groupObj: typing.IUnit): string {
+export async function turnOnEWRAuto(groupObj: typing.IUnit): Promise<string> {
     let setCallSign: any;
     let setFreq: any;
     if (_.includes(ddcsControllers.countryId[groupObj.country], "UKRAINE")) {
@@ -31,86 +35,10 @@ export function turnOnEWRAuto(groupObj: typing.IUnit): string {
         setCallSign = 124;
         setFreq = 124000000;
     }
-    return "" +
-        "[\"route\"] = {" +
-            "[\"spans\"] = {}," +
-            "[\"points\"] = {" +
-                "[1] = {" +
-                    // "[\"alt\"] = 252," +
-                    "[\"type\"] = \"Turning Point\"," +
-                    "[\"ETA\"] = 0," +
-                    "[\"alt_type\"] = \"BARO\"," +
-                    "[\"formation_template\"] = \"\"," +
-                    // "[\"y\"] = 440640.41085714," +
-                    // "[\"x\"] = -60694.918271202," +
-                    "[\"name\"] = \"dontdisperse\"," +
-                    "[\"ETA_locked\"] = true," +
-                    "[\"speed\"] = 0," +
-                    "[\"action\"] = \"Off Road\"," +
-                    "[\"task\"] = {" +
-                        "[\"id\"] = \"ComboTask\"," +
-                        "[\"params\"] = {" +
-                            "[\"tasks\"] = {" +
-                                "[1] = {" +
-                                    "[\"enabled\"] = true," +
-                                    "[\"auto\"] = false," +
-                                    "[\"id\"] = \"WrappedAction\"," +
-                                    "[\"number\"] = 1," +
-                                    "[\"params\"] = {" +
-                                        "[\"action\"] = {" +
-                                            "[\"id\"] = \"Option\"," +
-                                            "[\"params\"] = {" +
-                                                "[\"name\"] = 8," +
-                                            "}," +
-                                        "}," +
-                                    "}," +
-                                "}," +
-                                "[2] = {" +
-                                    "[\"number\"] = 2," +
-                                    "[\"name\"] = \"ewr enroute task\"," +
-                                    "[\"id\"] = \"EWR\"," +
-                                    "[\"auto\"] = true," +
-                                    "[\"enabled\"] = true," +
-                                    "[\"params\"] = {}," +
-                                "}," +
-                                "[3] = {" +
-                                    "[\"number\"] = 3," +
-                                    "[\"auto\"] = false," +
-                                    "[\"id\"] = \"WrappedAction\"," +
-                                    "[\"enabled\"] = true," +
-                                    "[\"params\"] = {" +
-                                        "[\"action\"] = {" +
-                                            "[\"id\"] = \"SetFrequency\"," +
-                                            "[\"params\"] = {" +
-                                                "[\"power\"] = 10," +
-                                                "[\"modulation\"] = 0," +
-                                                "[\"frequency\"] = " + setFreq + "," +
-                                            "}," +
-                                        "}," +
-                                    "}," +
-                                "}," +
-                                "[4] = {" +
-                                    "[\"enabled\"] = true," +
-                                    "[\"auto\"] = false," +
-                                    "[\"id\"] = \"WrappedAction\"," +
-                                    "[\"number\"] = 4," +
-                                    "[\"params\"] = {" +
-                                        "[\"action\"] = {" +
-                                            "[\"id\"] = \"setCallSign\"," +
-                                            "[\"params\"] = {" +
-                                                "[\"callsign\"] = " + setCallSign + "," +
-                                                "[\"callnameFlag\"] = false," +
-                                            "}," +
-                                        "}," +
-                                    "}," +
-                                "}," +
-                            "}," +
-                        "}," +
-                    "}," +
-                    "[\"speed_locked\"] = true," +
-                "}," +
-            "}," +
-        "},";
+
+    const spawnTemplate = await ddcsControllers.templateRead({_id: "turnOnEWRAuto"});
+    const compiled = _.template(spawnTemplate[0].template);
+    return compiled({setFreq, setCallSign});
 }
 
 export function convoyRouteTemplate(routes: typing.IConvoyRouteTemplate) {
@@ -149,48 +77,10 @@ export function convoyRouteTemplate(routes: typing.IConvoyRouteTemplate) {
     return buildTemplate;
 }
 
-export function turnOffDisperseUnderFire(): string {
-    return "" +
-        "[\"route\"] = {" +
-            "[\"spans\"] = {}," +
-            "[\"points\"] = {" +
-                "[1] = {" +
-                    // "[\"alt\"] = 252," +
-                    "[\"type\"] = \"Turning Point\"," +
-                    "[\"ETA\"] = 0," +
-                    "[\"alt_type\"] = \"BARO\"," +
-                    "[\"formation_template\"] = \"\"," +
-                    // "[\"y\"] = 440640.41085714," +
-                    // "[\"x\"] = -60694.918271202," +
-                    "[\"name\"] = \"dontdisperse\"," +
-                    "[\"ETA_locked\"] = true," +
-                    "[\"speed\"] = 0," +
-                    "[\"action\"] = \"Off Road\"," +
-                    "[\"task\"] = {" +
-                        "[\"id\"] = \"ComboTask\"," +
-                        "[\"params\"] = {" +
-                            "[\"tasks\"] = {" +
-                                "[1] = {" +
-                                    "[\"enabled\"] = true," +
-                                    "[\"auto\"] = false," +
-                                    "[\"id\"] = \"WrappedAction\"," +
-                                    "[\"number\"] = 1," +
-                                    "[\"params\"] = {" +
-                                        "[\"action\"] = {" +
-                                            "[\"id\"] = \"Option\"," +
-                                            "[\"params\"] = {" +
-                                                "[\"name\"] = 8," +
-                                            "}," +
-                                        "}," +
-                                    "}," +
-                                "}," +
-                            "}," +
-                        "}," +
-                    "}," +
-                    "[\"speed_locked\"] = true," +
-                "}," +
-            "}," +
-        "},";
+export async function turnOffDisperseUnderFire(): Promise<string> {
+    const spawnTemplate = await ddcsControllers.templateRead({_id: "turnOffDisperseUnderFire"});
+    const compiled = _.template(spawnTemplate[0].template);
+    return compiled({});
 }
 
 export function defenseHeliRouteTemplate(routes: typing.IConvoyRouteTemplate): string {
@@ -1099,7 +989,7 @@ export function landHeliRouteTemplate(routes: typing.IConvoyRouteTemplate) {
     ;
 }
 
-export function grndUnitGroup( groupObj: any, task?: string, routes?: string ): string {
+export async function grndUnitGroup( groupObj: any, task?: string, routes?: string ): Promise<string> {
     let curRoute: string;
     const curTask = (task) ? task : "Ground Nothing";
     const uncontrollable = !_.get(groupObj, "playerCanDrive", false);
@@ -1107,9 +997,9 @@ export function grndUnitGroup( groupObj: any, task?: string, routes?: string ): 
     if (routes) {
         curRoute = routes;
     } else if (groupObj.type === "1L13 EWR" || groupObj.type === "55G6 EWR" ) {
-        curRoute = turnOnEWRAuto(groupObj);
+        curRoute = await turnOnEWRAuto(groupObj);
     } else {
-        curRoute = turnOffDisperseUnderFire();
+        curRoute = await turnOffDisperseUnderFire();
     }
 
     const visible = (groupObj.visible) ? groupObj.visible : "false";
@@ -1899,7 +1789,7 @@ export async function spawnConvoy(
         category: ddcsControllers.UNIT_CATEGORY.indexOf("GROUND_UNIT")
     };
 
-    curGroupSpawn = grndUnitGroup(curGrpObj);
+    curGroupSpawn = await grndUnitGroup(curGrpObj);
     let unitNum = 1;
     for (const convUnit of curConvoyMakeup) {
         const curSpwnUnit = {
@@ -1973,15 +1863,15 @@ export async function spawnCAPDefense(
             }
         }
         if (curCapTemp.type === "F-15C") {
-            curGroupSpawn = grndUnitGroup(curUnit, "CAP", capPlaneDefenseRouteTemplate(curUnit));
+            curGroupSpawn = await grndUnitGroup(curUnit, "CAP", capPlaneDefenseRouteTemplate(curUnit));
         }
         if (curCapTemp.type === "AH-1W") {
-            curGroupSpawn = grndUnitGroup(curUnit, "CAS", capHeliDefenseRouteTemplate(curUnit));
+            curGroupSpawn = await grndUnitGroup(curUnit, "CAS", capHeliDefenseRouteTemplate(curUnit));
         }
     }
 
     curGroupSpawn = _.replace(curGroupSpawn, "#UNITS", curUnitSpawn);
-    const curCMD = spawnGrp(curGroupSpawn, ddcsControllers.defCountrys[convoySide], curUnit.category);
+    const curCMD = await spawnGrp(curGroupSpawn, ddcsControllers.defCountrys[convoySide], curUnit.category);
     const sendClient = {action: "CMD", cmd: [curCMD], reqID: 0};
     const actionObj = {actionObj: sendClient, queName: "clientArray"};
     await ddcsControllers.sendUDPPacket("frontEnd", actionObj);
@@ -2030,7 +1920,7 @@ export async function spawnDefenseChopper(playerUnitObj: typing.IUnit, unitObj: 
         ]
     };
 
-    curGroupSpawn = grndUnitGroup( curGrpObj, "CAS", defenseHeliRouteTemplate(curGrpObj));
+    curGroupSpawn = await grndUnitGroup( curGrpObj, "CAS", defenseHeliRouteTemplate(curGrpObj));
 
     curSpwnUnit = {
         ...curSpwnUnit,
@@ -2052,7 +1942,7 @@ export async function spawnDefenseChopper(playerUnitObj: typing.IUnit, unitObj: 
     }
 
     curGroupSpawn = _.replace(curGroupSpawn, "#UNITS", curUnitSpawn);
-    const curCMD = spawnGrp(curGroupSpawn, curCountry, curCategory);
+    const curCMD = await spawnGrp(curGroupSpawn, curCountry, curCategory);
     const sendClient = {action: "CMD", cmd: [curCMD], reqID: 0};
     const actionObj = {actionObj: sendClient, queName: "clientArray"};
     await ddcsControllers.sendUDPPacket("frontEnd", actionObj);
@@ -2110,7 +2000,7 @@ export async function spawnAtkChopper(playerUnitObj: typing.IUnit, unitObj: typi
         ]
     };
 
-    curGroupSpawn = grndUnitGroup( curGrpObj, "CAS", atkHeliRouteTemplate(curGrpObj));
+    curGroupSpawn = await grndUnitGroup( curGrpObj, "CAS", atkHeliRouteTemplate(curGrpObj));
 
     curSpwnUnit = {
         ...curSpwnUnit,
@@ -2132,7 +2022,7 @@ export async function spawnAtkChopper(playerUnitObj: typing.IUnit, unitObj: typi
     }
 
     curGroupSpawn = _.replace(curGroupSpawn, "#UNITS", curUnitSpawn);
-    const curCMD = spawnGrp(curGroupSpawn, curCountry, curCategory);
+    const curCMD = await spawnGrp(curGroupSpawn, curCountry, curCategory);
     const sendClient = {action: "CMD", cmd: [curCMD], reqID: 0};
     const actionObj = {actionObj: sendClient, queName: "clientArray"};
     await ddcsControllers.sendUDPPacket("frontEnd", actionObj);
@@ -2179,7 +2069,7 @@ export async function spawnBomberPlane(playerUnitObj: typing.IUnit, bomberObj: a
         ]
     };
 
-    curGroupSpawn = grndUnitGroup( curGrpObj, "CAS", bombersPlaneRouteTemplate(curGrpObj));
+    curGroupSpawn = await grndUnitGroup( curGrpObj, "CAS", bombersPlaneRouteTemplate(curGrpObj));
 
     curSpwnUnit = {
         ...curSpwnUnit,
@@ -2199,7 +2089,7 @@ export async function spawnBomberPlane(playerUnitObj: typing.IUnit, bomberObj: a
     }
 
     curGroupSpawn = _.replace(curGroupSpawn, "#UNITS", curUnitSpawn);
-    const curCMD = spawnGrp(curGroupSpawn, curCountry, curCategory);
+    const curCMD = await spawnGrp(curGroupSpawn, curCountry, curCategory);
     const sendClient = {action: "CMD", cmd: [curCMD], reqID: 0};
     const actionObj = {actionObj: sendClient, queName: "clientArray"};
     await ddcsControllers.sendUDPPacket("frontEnd", actionObj);
@@ -2244,7 +2134,7 @@ export async function spawnAWACSPlane(playerUnitObj: typing.IUnit, awacsObj: any
         ]
     };
 
-    curGroupSpawn = grndUnitGroup( curGrpObj, "AWACS", awacsPlaneRouteTemplate(curGrpObj));
+    curGroupSpawn = await grndUnitGroup( curGrpObj, "AWACS", awacsPlaneRouteTemplate(curGrpObj));
 
     curSpwnUnit = {
         ...curSpwnUnit,
@@ -2257,7 +2147,7 @@ export async function spawnAWACSPlane(playerUnitObj: typing.IUnit, awacsObj: any
     curUnitSpawn = airUnitTemplate(curSpwnUnit);
 
     curGroupSpawn = _.replace(curGroupSpawn, "#UNITS", curUnitSpawn);
-    const curCMD = spawnGrp(curGroupSpawn, curCountry, curCategory);
+    const curCMD = await spawnGrp(curGroupSpawn, curCountry, curCategory);
     const sendClient = {action: "CMD", cmd: [curCMD], reqID: 0};
     const actionObj = {actionObj: sendClient, queName: "clientArray"};
     await ddcsControllers.sendUDPPacket("frontEnd", actionObj);
@@ -2300,7 +2190,7 @@ export async function spawnTankerPlane(
         ]
     };
 
-    curGroupSpawn = grndUnitGroup( curGrpObj, "Refueling", tankerPlaneRouteTemplate(curGrpObj));
+    curGroupSpawn = await grndUnitGroup( curGrpObj, "Refueling", tankerPlaneRouteTemplate(curGrpObj));
 
     curSpwnUnit = {
         ...curSpwnUnit,
@@ -2313,7 +2203,7 @@ export async function spawnTankerPlane(
     curUnitSpawn = airUnitTemplate(curSpwnUnit);
 
     curGroupSpawn = _.replace(curGroupSpawn, "#UNITS", curUnitSpawn);
-    const curCMD = spawnGrp(curGroupSpawn, curCountry, curCategory);
+    const curCMD = await spawnGrp(curGroupSpawn, curCountry, curCategory);
     const sendClient = {action: "CMD", cmd: [curCMD], reqID: 0};
     const actionObj = {actionObj: sendClient, queName: "clientArray"};
     await ddcsControllers.sendUDPPacket("frontEnd", actionObj);
@@ -2367,9 +2257,9 @@ export async function spawnSupportPlane(baseObj: typing.IBase, side: number): Pr
         ]
     };
     if (_.includes(baseObj._id, "_MOB") || _.includes(baseObj._id, "_FOB")) {
-        curGroupSpawn = grndUnitGroup( curGrpObj, "Transport", landHeliRouteTemplate(curRoutes));
+        curGroupSpawn = await grndUnitGroup( curGrpObj, "Transport", landHeliRouteTemplate(curRoutes));
     } else {
-        curGroupSpawn = grndUnitGroup( curGrpObj, "Transport", landPlaneRouteTemplate(curRoutes));
+        curGroupSpawn = await grndUnitGroup( curGrpObj, "Transport", landPlaneRouteTemplate(curRoutes));
     }
 
     curUnitName = "AI|1010101|" + _.get(baseObj, "name") + "|LOGISTICS|";
@@ -2386,7 +2276,7 @@ export async function spawnSupportPlane(baseObj: typing.IBase, side: number): Pr
 
     curGroupSpawn = _.replace(curGroupSpawn, "#UNITS", curUnitSpawn);
     // console.log('spawnSupportPlane: ', curGroupSpawn, curSide, curGrpObj.category);
-    const curCMD = spawnGrp(curGroupSpawn, curSide, curGrpObj.category);
+    const curCMD = await spawnGrp(curGroupSpawn, curSide, curGrpObj.category);
     const sendClient = {action: "CMD", cmd: [curCMD], reqID: 0};
     const actionObj = {actionObj: sendClient, queName: "clientArray"};
     await ddcsControllers.sendUDPPacket("frontEnd", actionObj);
@@ -2494,7 +2384,7 @@ export async function spawnStaticBuilding(
             console.log("country not found: ", side, staticType);
         }
     } else {
-        const curCMD = spawnStatic(
+        const curCMD = await spawnStatic(
             staticTemplate(staticObj as typing.IStaticUnitTemp),
             staticObj.country
         );
@@ -2512,7 +2402,7 @@ export async function spawnUnitGroup(spawnArray: typing.IUnitSpawnMin[], init: b
         grpObj.groupName = (grpObj.groupName) ? grpObj.groupName : baseName + " #" + groupNum;
         grpObj.coalition = (side) ? side : spawnArray[0].coalition;
         if (!init) {
-            groupTemplate = grndUnitGroup(grpObj);
+            groupTemplate = await grndUnitGroup(grpObj);
         }
 
         let unitTemplate = "";
@@ -2536,7 +2426,7 @@ export async function spawnUnitGroup(spawnArray: typing.IUnitSpawnMin[], init: b
         }
 
         if (!init) {
-            const curCMD = spawnGrp(
+            const curCMD = await spawnGrp(
                 _.replace(groupTemplate, "#UNITS", unitTemplate),
                 grpObj.country,
                 grpObj.unitCategory
