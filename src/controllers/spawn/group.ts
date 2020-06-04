@@ -21,6 +21,7 @@ export async function spawnStatic(staticSpawn: string, country: number): Promise
     return compiled({country, staticSpawn});
 }
 
+// TODO: maybe combine this with the other route templates
 export async function turnOnEWRAuto(groupObj: typing.IUnit): Promise<string> {
     let setCallSign: any;
     let setFreq: any;
@@ -36,7 +37,7 @@ export async function turnOnEWRAuto(groupObj: typing.IUnit): Promise<string> {
         setFreq = 124000000;
     }
 
-    const spawnTemplate = await ddcsControllers.templateRead({_id: "turnOnEWRAuto"});
+    const spawnTemplate = await ddcsControllers.templateRead({_id: "turnOnEWRAutoRoute"});
     const compiled = _.template(spawnTemplate[0].template);
     return compiled({setFreq, setCallSign});
 }
@@ -77,768 +78,31 @@ export function convoyRouteTemplate(routes: typing.IConvoyRouteTemplate) {
     return buildTemplate;
 }
 
-export async function turnOffDisperseUnderFire(): Promise<string> {
-    const spawnTemplate = await ddcsControllers.templateRead({_id: "turnOffDisperseUnderFire"});
+export async function getRouteTemplate(routes: any, templateName: string): Promise<string> {
+    const spawnTemplate = await ddcsControllers.templateRead({_id: templateName});
     const compiled = _.template(spawnTemplate[0].template);
-    return compiled({});
+    return compiled({routes});
 }
 
-export function defenseHeliRouteTemplate(routes: typing.IConvoyRouteTemplate): string {
-    return "" +
-        "[\"route\"] = {" +
-            "[\"points\"] = {" +
-                "[1] = {" +
-                    "[\"alt\"] = " + routes.alt + "," +
-                    "[\"action\"] = \"Turning Point\"," +
-                    "[\"alt_type\"] = \"BARO\"," +
-                    "[\"speed\"] = " + routes.speed + "," +
-                    "[\"task\"] = {" +
-                        "[\"id\"] = \"ComboTask\"," +
-                        "[\"params\"] = {" +
-                            "[\"tasks\"] = {" +
-                                "[1] = {" +
-                                    "[\"number\"] = 1," +
-                                    "[\"auto\"] = true," +
-                                    "[\"id\"] = \"EngageTargets\"," +
-                                    "[\"enabled\"] = true," +
-                                    "[\"key\"] = \"CAS\"," +
-                                    "[\"params\"] = {" +
-                                        "[\"targetTypes\"] = {" +
-                                            "[1] = \"Helicopters\"," +
-                                            "[2] = \"Ground Units\"," +
-                                            "[3] = \"Light armed ships\"," +
-                                        "}," +
-                                        "[\"priority\"] = 0," +
-                                    "}," +
-                                "}," +
-                                "[2] = {" +
-                                    "[\"number\"] = 2," +
-                                    "[\"auto\"] = false," +
-                                    "[\"id\"] = \"WrappedAction\"," +
-                                    "[\"enabled\"] = true," +
-                                    "[\"params\"] = {" +
-                                        "[\"action\"] = {" +
-                                            "[\"id\"] = \"Option\"," +
-                                            "[\"params\"] = {" +
-                                                "[\"value\"]=2," +
-                                                "[\"name\"]=1," +
-                                            "}," +
-                                        "}," +
-                                    "}," +
-                                "}," +
-                                "[3] = {" +
-                                    "[\"number\"] = 3," +
-                                    "[\"auto\"] = false," +
-                                    "[\"id\"] = \"WrappedAction\"," +
-                                    "[\"enabled\"] = true," +
-                                    "[\"params\"] = {" +
-                                        "[\"action\"] = {" +
-                                            "[\"id\"] = \"Option\"," +
-                                            "[\"params\"] = {" +
-                                                "[\"value\"]=0," +
-                                                "[\"name\"]=0," +
-                                            "}," +
-                                        "}," +
-                                    "}," +
-                                "}," +
-                            "}," +
-                        "}," +
-                    "}," +
-                    "[\"type\"] = \"Turning Point\"," +
-                    "[\"x\"] = coord.LLtoLO(" + routes.routeLocs[0][1] + ", " + routes.routeLocs[0][0] + ").x, " +
-                    "[\"y\"] = coord.LLtoLO(" + routes.routeLocs[0][1] + ", " + routes.routeLocs[0][0] + ").z, " +
-                    "[\"speed_locked\"] = true," +
-                "}," +
-                "[2]={" +
-                    "[\"alt\"] = " + routes.alt + "," +
-                    "[\"action\"] = \"Turning Point\"," +
-                    "[\"alt_type\"] = \"BARO\"," +
-                    "[\"speed\"] = " + routes.speed + "," +
-                    "[\"task\"] = {" +
-                        "[\"id\"] = \"ComboTask\"," +
-                        "[\"params\"] = {[\"tasks\"] = {}}" +
-                    "}," +
-                    "[\"type\"] = \"Turning Point\"," +
-                    "[\"x\"] = coord.LLtoLO(" + routes.routeLocs[1][1] + ", " + routes.routeLocs[1][0] + ").x, " +
-                    "[\"y\"] = coord.LLtoLO(" + routes.routeLocs[1][1] + ", " + routes.routeLocs[1][0] + ").z, " +
-                    "[\"speed_locked\"] = true," +
-                "}," +
-                "[3]={" +
-                    "[\"alt\"] = " + routes.alt + "," +
-                    "[\"action\"] = \"Turning Point\"," +
-                    "[\"alt_type\"] = \"BARO\"," +
-                    "[\"speed\"] = " + routes.speed + "," +
-                    "[\"task\"] = {" +
-                        "[\"id\"] = \"ComboTask\"," +
-                        "[\"params\"] = {[\"tasks\"] = {}}" +
-                    "}," +
-                    "[\"type\"] = \"Turning Point\"," +
-                    "[\"x\"] = coord.LLtoLO(" + routes.routeLocs[2][1] + ", " + routes.routeLocs[2][0] + ").x, " +
-                    "[\"y\"] = coord.LLtoLO(" + routes.routeLocs[2][1] + ", " + routes.routeLocs[2][0] + ").z, " +
-                    "[\"speed_locked\"] = true," +
-                "}," +
-                "[4]={" +
-                    "[\"alt\"] = " + routes.alt + "," +
-                    "[\"action\"] = \"Turning Point\"," +
-                    "[\"alt_type\"] = \"BARO\"," +
-                    "[\"speed\"] = " + routes.speed + "," +
-                    "[\"task\"] = {" +
-                        "[\"id\"] = \"ComboTask\"," +
-                        "[\"params\"] = {[\"tasks\"] = {}}" +
-                    "}," +
-                    "[\"type\"] = \"Turning Point\"," +
-                    "[\"x\"] = coord.LLtoLO(" + routes.routeLocs[3][1] + ", " + routes.routeLocs[3][0] + ").x, " +
-                    "[\"y\"] = coord.LLtoLO(" + routes.routeLocs[3][1] + ", " + routes.routeLocs[3][0] + ").z, " +
-                    "[\"speed_locked\"] = true," +
-                "}," +
-                "[5]={" +
-                    "[\"alt\"] = " + routes.alt + "," +
-                    "[\"action\"] = \"Turning Point\"," +
-                    "[\"alt_type\"] = \"BARO\"," +
-                    "[\"speed\"] = " + routes.speed + "," +
-                    "[\"task\"] = {" +
-                        "[\"id\"] = \"ComboTask\"," +
-                        "[\"params\"] = {[\"tasks\"] = {}}" +
-                    "}," +
-                    "[\"type\"] = \"Turning Point\"," +
-                    "[\"x\"] = coord.LLtoLO(" + routes.routeLocs[4][1] + ", " + routes.routeLocs[4][0] + ").x, " +
-                    "[\"y\"] = coord.LLtoLO(" + routes.routeLocs[4][1] + ", " + routes.routeLocs[4][0] + ").z, " +
-                    "[\"speed_locked\"] = true," +
-                "}," +
-                "[6]={" +
-                    "[\"alt\"] = " + routes.alt + "," +
-                    "[\"action\"] = \"Turning Point\"," +
-                    "[\"alt_type\"] = \"BARO\"," +
-                    "[\"speed\"] = " + routes.speed + "," +
-                    "[\"task\"] = {" +
-                        "[\"id\"] = \"ComboTask\"," +
-                        "[\"params\"] = {[\"tasks\"] = {}}" +
-                    "}," +
-                    "[\"type\"] = \"Turning Point\"," +
-                    "[\"x\"] = coord.LLtoLO(" + routes.routeLocs[5][1] + ", " + routes.routeLocs[5][0] + ").x, " +
-                    "[\"y\"] = coord.LLtoLO(" + routes.routeLocs[5][1] + ", " + routes.routeLocs[5][0] + ").z, " +
-                    "[\"speed_locked\"] = true," +
-                "}," +
-                "[7]={" +
-                    "[\"alt\"] = " + routes.alt + "," +
-                    "[\"action\"] = \"Turning Point\"," +
-                    "[\"alt_type\"] = \"BARO\"," +
-                    "[\"speed\"] = " + routes.speed + "," +
-                    "[\"task\"] = {" +
-                        "[\"id\"] = \"ComboTask\"," +
-                        "[\"params\"] = {[\"tasks\"] = {}}" +
-                    "}," +
-                    "[\"type\"] = \"Turning Point\"," +
-                    "[\"x\"] = coord.LLtoLO(" + routes.routeLocs[6][1] + ", " + routes.routeLocs[6][0] + ").x, " +
-                    "[\"y\"] = coord.LLtoLO(" + routes.routeLocs[6][1] + ", " + routes.routeLocs[6][0] + ").z, " +
-                    "[\"speed_locked\"] = true," +
-                "}," +
-                "[8]={" +
-                    "[\"alt\"] = " + routes.alt + "," +
-                    "[\"action\"] = \"Turning Point\"," +
-                    "[\"alt_type\"] = \"BARO\"," +
-                    "[\"speed\"] = " + routes.speed + "," +
-                    "[\"task\"] = {" +
-                        "[\"id\"] = \"ComboTask\"," +
-                        "[\"params\"] = {" +
-                            "[\"tasks\"] = {" +
-                                "[1] = {" +
-                                    "[\"number\"] = 1," +
-                                    "[\"auto\"] = false," +
-                                    "[\"id\"] = \"WrappedAction\"," +
-                                    "[\"enabled\"] = true," +
-                                    "[\"params\"] = {" +
-                                        "[\"action\"] = {" +
-                                            "[\"id\"] = \"SwitchWaypoint\"," +
-                                            "[\"params\"] = {" +
-                                                "[\"goToWaypointIndex\"] = 1," +
-                                                "[\"fromWaypointIndex\"] = 8," +
-                                            "}," +
-                                        "}," +
-                                    "}," +
-                                "}," +
-                            "}," +
-                        "}" +
-                    "}," +
-                    "[\"type\"] = \"Turning Point\"," +
-                    "[\"x\"] = coord.LLtoLO(" + routes.routeLocs[7][1] + ", " + routes.routeLocs[7][0] + ").x, " +
-                    "[\"y\"] = coord.LLtoLO(" + routes.routeLocs[7][1] + ", " + routes.routeLocs[7][0] + ").z, " +
-                    "[\"speed_locked\"] = true," +
-                "}," +
-            "}," +
-        "},"
-    ;
-}
-
-export function atkHeliRouteTemplate(routes: typing.IConvoyRouteTemplate): string {
-    return "" +
-        "[\"route\"] = {" +
-            "[\"points\"] = {" +
-                "[1] = {" +
-                    "[\"alt\"] = " + routes.alt + "," +
-                    "[\"action\"] = \"Turning Point\"," +
-                    "[\"alt_type\"] = \"BARO\"," +
-                    "[\"speed\"] = " + routes.speed + "," +
-                    "[\"task\"] = {" +
-                        "[\"id\"] = \"ComboTask\"," +
-                        "[\"params\"] = {" +
-                            "[\"tasks\"] = {" +
-                                "[1] = {" +
-                                    "[\"number\"] = 1," +
-                                    "[\"auto\"] = true," +
-                                    "[\"id\"] = \"EngageTargets\"," +
-                                    "[\"enabled\"] = true," +
-                                    "[\"key\"] = \"CAS\"," +
-                                    "[\"params\"] = {" +
-                                        "[\"targetTypes\"] = {" +
-                                            "[1] = \"Helicopters\"," +
-                                            "[2] = \"Ground Units\"," +
-                                            "[3] = \"Light armed ships\"," +
-                                        "}," +
-                                        "[\"priority\"] = 0," +
-                                    "}," +
-                                "}," +
-                                "[2] = {" +
-                                    "[\"number\"] = 2," +
-                                    "[\"auto\"] = false," +
-                                    "[\"id\"] = \"WrappedAction\"," +
-                                    "[\"enabled\"] = true," +
-                                    "[\"params\"] = {" +
-                                        "[\"action\"] = {" +
-                                            "[\"id\"] = \"Option\"," +
-                                            "[\"params\"] = {" +
-                                                "[\"value\"]=2," +
-                                                "[\"name\"]=1," +
-                                            "}," +
-                                        "}," +
-                                    "}," +
-                                "}," +
-                                "[3] = {" +
-                                    "[\"number\"] = 3," +
-                                    "[\"auto\"] = false," +
-                                    "[\"id\"] = \"WrappedAction\"," +
-                                    "[\"enabled\"] = true," +
-                                    "[\"params\"] = {" +
-                                        "[\"action\"] = {" +
-                                            "[\"id\"] = \"Option\"," +
-                                            "[\"params\"] = {" +
-                                                "[\"value\"]=0," +
-                                                "[\"name\"]=0," +
-                                            "}," +
-                                        "}," +
-                                    "}," +
-                                "}," +
-                            "}," +
-                        "}," +
-                    "}," +
-                    "[\"type\"] = \"Turning Point\"," +
-                    "[\"x\"] = coord.LLtoLO(" + routes.routeLocs[0][1] + ", " + routes.routeLocs[0][0] + ").x, " +
-                    "[\"y\"] = coord.LLtoLO(" + routes.routeLocs[0][1] + ", " + routes.routeLocs[0][0] + ").z, " +
-                    "[\"speed_locked\"] = true," +
-                "}," +
-                "[2]={" +
-                    "[\"alt\"] = " + routes.alt + "," +
-                    "[\"action\"] = \"Turning Point\"," +
-                    "[\"alt_type\"] = \"BARO\"," +
-                    "[\"speed\"] = " + routes.speed + "," +
-                    "[\"task\"] = {" +
-                        "[\"id\"] = \"ComboTask\"," +
-                        "[\"params\"] = {" +
-                            "[\"tasks\"] = {" +
-                            "}," +
-                        "}," +
-                    "}," +
-                    "[\"type\"] = \"Turning Point\"," +
-                    "[\"x\"] = coord.LLtoLO(" + routes.routeLocs[1][1] + ", " + routes.routeLocs[1][0] + ").x, " +
-                    "[\"y\"] = coord.LLtoLO(" + routes.routeLocs[1][1] + ", " + routes.routeLocs[1][0] + ").z, " +
-                    "[\"speed_locked\"] = true," +
-                "}," +
-            "}," +
-        "},";
-}
-
-export function capPlaneDefenseRouteTemplate(routes: any): string {
-    return "" +
-        "[\"route\"] = {" +
-            "[\"routeRelativeTOT\"] = true," +
-            "[\"points\"] = {" +
-                "[1] = {" +
-                    "[\"action\"] = \"From Parking Area\"," +
-                    "[\"alt_type\"] = \"BARO\"," +
-                    "[\"task\"] = {" +
-                        "[\"id\"] = \"ComboTask\"," +
-                        "[\"params\"] = {" +
-                            "[\"tasks\"] = {" +
-                                "[1] = {" +
-                                    "[\"enabled\"] = true," +
-                                    "[\"auto\"] = true," +
-                                    "[\"id\"] = \"EngageTargets\"," +
-                                    "[\"number\"] = 1," +
-                                    "[\"key\"] = \"CAP\"," +
-                                    "[\"params\"] = {" +
-                                        "[\"targetTypes\"] = {" +
-                                            "[1] = \"Air\"," +
-                                        "}," +
-                                        "[\"priority\"] = 0," +
-                                    "}," +
-                                "}," +
-                            "}," +
-                        "}," +
-                    "}," +
-                    "[\"type\"] = \"TakeOffParking\"," +
-                    "[\"ETA\"] = 0," +
-                    "[\"ETA_locked\"] = true," +
-                    "[\"x\"] = coord.LLtoLO(" + routes.routeLocs[1] + ", " + routes.routeLocs[0] + ").x, " +
-                    "[\"y\"] = coord.LLtoLO(" + routes.routeLocs[1] + ", " + routes.routeLocs[0] + ").z, " +
-                    "[\"formation_template\"] = \"\"," +
-                    "[\"airdromeId\"] = " + routes.baseId + "," +
-                "}," +
-                "[2] = {" +
-                    "[\"alt\"] = 3048," +
-                    "[\"action\"] = \"Turning Point\"," +
-                    "[\"alt_type\"] = \"BARO\"," +
-                    "[\"speed\"] = 256.94444444444," +
-                    "[\"task\"] = {" +
-                        "[\"id\"] = \"ComboTask\"," +
-                        "[\"params\"] = {" +
-                            "[\"tasks\"] = {" +
-                                "[1] = {" +
-                                    "[\"enabled\"] = true," +
-                                    "[\"auto\"] = false," +
-                                    "[\"id\"] = \"Orbit\"," +
-                                    "[\"number\"] = 1," +
-                                    "[\"params\"] = {" +
-                                        "[\"altitude\"] = 3048," +
-                                        "[\"pattern\"] = \"Circle\"," +
-                                        "[\"speed\"] = 179.86111111111," +
-                                        "[\"speedEdited\"] = true," +
-                                    "}," +
-                                "}," +
-                            "}," +
-                        "}," +
-                    "}," +
-                    "[\"type\"] = \"Turning Point\"," +
-                    "[\"x\"] = coord.LLtoLO(" + routes.routeLocs[1] + ", " + routes.routeLocs[0] + ").x, " +
-                    "[\"y\"] = coord.LLtoLO(" + routes.routeLocs[1] + ", " + routes.routeLocs[0] + ").z, " +
-                    "[\"formation_template\"] = \"\"," +
-                "}," +
-            "}," +
-        "},";
-}
-
-export function capHeliDefenseRouteTemplate(routes: any): string {
-    return "" +
-    "[\"route\"] = {" +
-        "[\"points\"] = {" +
-            "[1] = {" +
-                "[\"alt\"] = 30.48," +
-                "[\"alt_type\"] = \"RADIO\"," +
-                "[\"speed\"] = 55.555555555556," +
-                "[\"action\"] = \"From Ground Area\"," +
-                // "[\"helipadId\"] = StaticObject.getByName(" + _.get(routes, "baseName") + ").getID()," +
-                "[\"task\"] = {" +
-                    "[\"id\"] = \"ComboTask\"," +
-                    "[\"params\"] = {" +
-                        "[\"tasks\"] = {" +
-                            "[1] = {" +
-                                "[\"enabled\"] = true," +
-                                "[\"key\"] = \"CAS\"," +
-                                "[\"id\"] = \"EngageTargets\"," +
-                                "[\"number\"] = 1," +
-                                "[\"auto\"] = true," +
-                                "[\"params\"] = {" +
-                                    "[\"targetTypes\"] = {" +
-                                        "[1] = \"Helicopters\"," +
-                                        "[2] = \"Ground Units\"," +
-                                        "[3] = \"Light armed ships\"," +
-                                    "}," +
-                                    "[\"priority\"] = 0," +
-                                "}," +
-                            "}," +
-                            "[1] = {" +
-                                "[\"number\"] = 1," +
-                                "[\"auto\"] = false," +
-                                "[\"id\"] = \"WrappedAction\"," +
-                                "[\"enabled\"] = true," +
-                                "[\"params\"] = {" +
-                                    "[\"action\"] = {" +
-                                        "[\"id\"] = \"Option\"," +
-                                        "[\"params\"] = {" +
-                                            "[\"value\"]=2," +
-                                            "[\"name\"]=1," +
-                                        "}," +
-                                    "}," +
-                                "}," +
-                            "}," +
-                            "[2] = {" +
-                                "[\"number\"] = 2," +
-                                "[\"auto\"] = false," +
-                                "[\"id\"] = \"WrappedAction\"," +
-                                "[\"enabled\"] = true," +
-                                "[\"params\"] = {" +
-                                    "[\"action\"] = {" +
-                                        "[\"id\"] = \"Option\"," +
-                                        "[\"params\"] = {" +
-                                            "[\"value\"]=0," +
-                                            "[\"name\"]=0," +
-                                        "}," +
-                                    "}," +
-                                "}," +
-                            "}," +
-                        "}," +
-                    "}," +
-                "}," +
-                "[\"type\"] = \"TakeOffGround\"," +
-                "[\"x\"] = coord.LLtoLO(" + routes.routeLocs[1] + ", " + routes.routeLocs[0] + ").x, " +
-                "[\"y\"] = coord.LLtoLO(" + routes.routeLocs[1] + ", " + routes.routeLocs[0] + ").z, " +
-            "}," +
-            "[2] = {" +
-                "[\"alt\"] = 304.8," +
-                "[\"action\"] = \"Turning Point\"," +
-                "[\"alt_type\"] = \"RADIO\"," +
-                "[\"speed\"] = 41.666666666667," +
-                "[\"action\"] = \"Turning Point\"," +
-                "[\"task\"] = {" +
-                    "[\"id\"] = \"ComboTask\"," +
-                    "[\"params\"] = {" +
-                        "[\"tasks\"] = {" +
-                            "[1] = {" +
-                                "[\"enabled\"] = true," +
-                                "[\"auto\"] = false," +
-                                "[\"id\"] = \"Orbit\"," +
-                                "[\"number\"] = 1," +
-                                "[\"params\"] = {" +
-                                    "[\"altitude\"] = 304.8," +
-                                    "[\"pattern\"] = \"Circle\"," +
-                                    "[\"speed\"] = 40.277777777778," +
-                                "}," +
-                            "}," +
-                        "}," +
-                    "}," +
-                "}," +
-                "[\"type\"] = \"Turning Point\"," +
-                "[\"x\"] = coord.LLtoLO(" + routes.routeLocs[1] + ", " + routes.routeLocs[0] + ").x, " +
-                "[\"y\"] = coord.LLtoLO(" + routes.routeLocs[1] + ", " + routes.routeLocs[0] + ").z, " +
-            "}," +
-        "}," +
-    "},";
-}
-
-export function bombersPlaneRouteTemplate(routes: typing.IConvoyRouteTemplate): string {
-    return "" +
-        "[\"route\"] = {" +
-            "[\"points\"] = {" +
-                "[1] = {" +
-                    "[\"alt\"] = " + routes.alt + "," +
-                    "[\"action\"] = \"Turning Point\"," +
-                    "[\"alt_type\"] = \"BARO\"," +
-                    "[\"speed\"] = " + routes.speed + "," +
-                    "[\"task\"] = {" +
-                        "[\"id\"] = \"ComboTask\"," +
-                        "[\"params\"] = {" +
-                            "[\"tasks\"] = {" +
-                                "[1] = {" +
-                                    "[\"number\"] = 1," +
-                                    "[\"auto\"] = false," +
-                                    "[\"id\"] = \"WrappedAction\"," +
-                                    "[\"enabled\"] = true," +
-                                    "[\"params\"] = {" +
-                                        "[\"action\"] = {" +
-                                            "[\"id\"] = \"Option\"," +
-                                            "[\"params\"] = {" +
-                                                "[\"value\"]=true," +
-                                                "[\"name\"]=15," +
-                                            "}," +
-                                        "}," +
-                                    "}," +
-                                "}," +
-                                "[2] = {" +
-                                    "[\"number\"] = 2," +
-                                    "[\"auto\"] = false," +
-                                    "[\"id\"] = \"WrappedAction\"," +
-                                    "[\"enabled\"] = true," +
-                                    "[\"params\"] = {" +
-                                        "[\"action\"] = {" +
-                                            "[\"id\"] = \"Option\"," +
-                                            "[\"params\"] = {" +
-                                                "[\"value\"]=2," +
-                                                "[\"name\"]=1," +
-                                            "}," +
-                                        "}," +
-                                    "}," +
-                                "}," +
-                                "[3] = {" +
-                                    "[\"number\"] = 3," +
-                                    "[\"auto\"] = false," +
-                                    "[\"id\"] = \"WrappedAction\"," +
-                                    "[\"enabled\"] = true," +
-                                    "[\"params\"] = {" +
-                                        "[\"action\"] = {" +
-                                            "[\"id\"] = \"Option\"," +
-                                            "[\"params\"] = {" +
-                                                "[\"value\"]=4," +
-                                                "[\"name\"]=0," +
-                                            "}," +
-                                        "}," +
-                                    "}," +
-                                "}," +
-                            "}," +
-                        "}," +
-                    "}," +
-                    "[\"type\"] = \"Turning Point\"," +
-                    "[\"x\"] = coord.LLtoLO(" + routes.routeLocs[0][1] + ", " + routes.routeLocs[0][0] + ").x, " +
-                    "[\"y\"] = coord.LLtoLO(" + routes.routeLocs[0][1] + ", " + routes.routeLocs[0][0] + ").z, " +
-                    "[\"speed_locked\"] = true," +
-                "}," +
-                "[2]={" +
-                    "[\"alt\"] = " + routes.alt + "," +
-                    "[\"action\"] = \"Turning Point\"," +
-                    "[\"alt_type\"] = \"BARO\"," +
-                    "[\"speed\"] = " + routes.speed + "," +
-                    "[\"task\"] = {" +
-                        "[\"id\"] = \"ComboTask\"," +
-                        "[\"params\"] = {" +
-                            "[\"tasks\"] = {" +
-                                "[1] = {" +
-                                    "[\"number\"] = 1," +
-                                    "[\"auto\"] = false," +
-                                    "[\"id\"] = \"EngageTargets\"," +
-                                    "[\"enabled\"] = true," +
-                                    "[\"key\"] = \"CAS\"," +
-                                    "[\"params\"] = {" +
-                                        "[\"targetTypes\"] = {" +
-                                            "[1] = \"Helicopters\"," +
-                                            "[2] = \"Ground Units\"," +
-                                            "[3] = \"Light armed ships\"," +
-                                        "}," +
-                                        "[\"priority\"] = 0," +
-                                    "}," +
-                                "}," +
-                                "[2] = {" +
-                                    "[\"number\"] = 2," +
-                                    "[\"auto\"] = false," +
-                                    "[\"id\"] = \"WrappedAction\"," +
-                                    "[\"enabled\"] = true," +
-                                    "[\"params\"] = {" +
-                                        "[\"action\"] = {" +
-                                            "[\"id\"] = \"Option\"," +
-                                            "[\"params\"] = {" +
-                                                "[\"value\"]=0," +
-                                                "[\"name\"]=0," +
-                                            "}," +
-                                        "}," +
-                                    "}," +
-                                "}," +
-                            "}," +
-                        "}," +
-                    "}," +
-                    "[\"type\"] = \"Turning Point\"," +
-                    "[\"x\"] = coord.LLtoLO(" + routes.routeLocs[1][1] + ", " + routes.routeLocs[1][0] + ").x, " +
-                    "[\"y\"] = coord.LLtoLO(" + routes.routeLocs[1][1] + ", " + routes.routeLocs[1][0] + ").z, " +
-                    "[\"speed_locked\"] = true," +
-                "}," +
-            "}," +
-        "},"
-    ;
-}
-
-export function awacsPlaneRouteTemplate(routes: typing.IConvoyRouteTemplate): string {
+export async function awacsPlaneRouteTemplate(routes: any): Promise<string> {
     const addTaskNum = (routes.eplrs) ? 1 : 0;
-    let curRoute =  "" +
-        "[\"route\"] = {" +
-            "[\"points\"] = {" +
-                "[1] = {" +
-                    "[\"alt\"] = " + routes.alt + "," +
-                    "[\"action\"] = \"Turning Point\"," +
-                    "[\"alt_type\"] = \"BARO\"," +
-                    "[\"speed\"] = " + routes.speed + "," +
-                    "[\"task\"] = {" +
-                        "[\"id\"] = \"ComboTask\"," +
-                        "[\"params\"] = {" +
-                            "[\"tasks\"] = {" +
-                                "[1] = {" +
-                                    "[\"number\"] = 1," +
-                                    "[\"auto\"] = true," +
-                                    "[\"id\"] = \"AWACS\"," +
-                                    "[\"enabled\"] = true," +
-                                    "[\"params\"]={}," +
-                                "},";
+
+    let curRoute = await getRouteTemplate(routes, "awacsPlaneRoute1");
+
     if (routes.eplrs) {
-                                    curRoute += "[2] = {" +
-                                        "[\"number\"] = 2," +
-                                        "[\"auto\"] = true," +
-                                        "[\"id\"] = \"WrappedAction\"," +
-                                        "[\"enabled\"] = true," +
-                                        "[\"params\"] = {" +
-                                            "[\"action\"] = {" +
-                                                "[\"id\"] = \"EPLRS\"," +
-                                                "[\"params\"] = {" +
-                                                    "[\"value\"] = true," +
-                                                "}," +
-                                            "}," +
-                                        "}," +
-                                    "}," ;
-                                }
-    curRoute += "[" + (addTaskNum + 2) + "] = {" +
-                                    "[\"number\"] = " + (addTaskNum + 2) + "," +
-                                    "[\"auto\"] = false," +
-                                    "[\"id\"] = \"WrappedAction\"," +
-                                    "[\"name\"] = \"RadioFreq\"," +
-                                    "[\"enabled\"] = true," +
-                                    "[\"params\"] = {" +
-                                        "[\"action\"] = {" +
-                                            "[\"id\"] = \"SetFrequency\"," +
-                                            "[\"params\"] = {" +
-                                                "[\"power\"]=10," +
-                                                "[\"modulation\"]=0," +
-                                                "[\"frequency\"]=" + routes.radioFreq + "," +
-                                            "}," +
-                                        "}," +
-                                    "}," +
-                                "}," +
-                                "[" + (addTaskNum + 3) + "] = {" +
-                                    "[\"number\"] = " + (addTaskNum + 3) + "," +
-                                    "[\"auto\"] = false," +
-                                    "[\"id\"] = \"Orbit\"," +
-                                    "[\"enabled\"]=true," +
-                                    "[\"params\"] = {" +
-                                        "[\"altitude\"] = " + _.get(routes, "alt") + "," +
-                                        "[\"pattern\"] = \"Race-Track\"," +
-                                        "[\"speed\"] = " + _.get(routes, "speed") + "," +
-                                        "[\"speedEdited\"] = true," +
-                                    "}," +
-                                "}," +
-                         "}," +
-                        "}," +
-                    "}," +
-                    "[\"type\"] = \"Turning Point\"," +
-                    "[\"x\"] = coord.LLtoLO(" + routes.routeLocs[0][1] + ", " + routes.routeLocs[0][0] + ").x, " +
-                    "[\"y\"] = coord.LLtoLO(" + routes.routeLocs[0][1] + ", " + routes.routeLocs[0][0] + ").z, " +
-                    "[\"speed_locked\"] = true," +
-                "}," +
-                "[2]={" +
-                    "[\"alt\"] = " + routes.alt + "," +
-                    "[\"action\"] = \"Turning Point\"," +
-                    "[\"alt_type\"] = \"BARO\"," +
-                    "[\"speed\"] = " + routes.speed + "," +
-                    "[\"task\"] = {" +
-                        "[\"id\"] = \"ComboTask\"," +
-                        "[\"params\"] = {" +
-                            "[\"tasks\"]={}" +
-                        "}," +
-                    "}," +
-                    "[\"type\"] = \"Turning Point\"," +
-                    "[\"x\"] = coord.LLtoLO(" + routes.routeLocs[1][1] + ", " + routes.routeLocs[1][0] + ").x, " +
-                    "[\"y\"] = coord.LLtoLO(" + routes.routeLocs[1][1] + ", " + routes.routeLocs[1][0] + ").z, " +
-                    "[\"speed_locked\"] = true," +
-                "}," +
-            "}," +
-        "},"
-    ;
+        curRoute += await getRouteTemplate(routes, "awacsPlaneRoute2");
+    }
+
+    const spawnTemplate3 = await ddcsControllers.templateRead({_id: "awacsPlaneRoute3"});
+    const compiled3 = _.template(spawnTemplate3[0].template);
+    curRoute += compiled3({routes, num1: (addTaskNum + 2), num2: (addTaskNum + 3)});
     return curRoute;
 }
 
-export function tankerPlaneRouteTemplate(routes: typing.IConvoyRouteTemplate): string {
-    let tankerTemplate = "" +
-        "[\"route\"] = {" +
-            "[\"points\"] = {" +
-                "[1] = {" +
-                    "[\"alt\"] = " + routes.alt + "," +
-                    "[\"action\"] = \"Turning Point\"," +
-                    "[\"alt_type\"] = \"BARO\"," +
-                    "[\"speed\"] = " + routes.speed + "," +
-                    "[\"task\"] = {" +
-                        "[\"id\"] = \"ComboTask\"," +
-                        "[\"params\"] = {" +
-                            "[\"tasks\"] = {" +
-                                "[1] = {" +
-                                    "[\"number\"] = 1," +
-                                    "[\"auto\"] = true," +
-                                    "[\"id\"] = \"Tanker\"," +
-                                    "[\"enabled\"]=true," +
-                                    "[\"params\"]={}," +
-                                "}," +
-                                "[2] = {" +
-                                    "[\"number\"] = 2," +
-                                    "[\"auto\"] = false," +
-                                    "[\"id\"] = \"WrappedAction\"," +
-                                    "[\"name\"] = \"RadioFreq\"," +
-                                    "[\"enabled\"]=true," +
-                                    "[\"params\"] = {" +
-                                        "[\"action\"] = {" +
-                                            "[\"id\"] = \"SetFrequency\"," +
-                                            "[\"params\"] = {" +
-                                                "[\"power\"]=10," +
-                                                "[\"modulation\"]=0," +
-                                                "[\"frequency\"]=" + routes.radioFreq + "," +
-                                            "}," +
-                                        "}," +
-                                    "}," +
-                                "}," +
-                                "[3] = {" +
-                                    "[\"number\"] = 3," +
-                                    "[\"auto\"] = false," +
-                                    "[\"id\"] = \"Orbit\"," +
-                                    "[\"enabled\"]=true," +
-                                    "[\"params\"] = {" +
-                                        "[\"altitude\"] = " + routes.alt + "," +
-                                        "[\"pattern\"] = \"Race-Track\"," +
-                                        "[\"speed\"] = " + routes.speed + "," +
-                                        "[\"speedEdited\"] = true," +
-                                    "}," +
-                                "}," +
-                                "#TACAN" +
-                            "}," +
-                        "}," +
-                    "}," +
-                    "[\"type\"] = \"Turning Point\"," +
-                    "[\"x\"] = coord.LLtoLO(" + routes.routeLocs[0][1] + ", " + routes.routeLocs[0][0] + ").x, " +
-                    "[\"y\"] = coord.LLtoLO(" + routes.routeLocs[0][1] + ", " + routes.routeLocs[0][0] + ").z, " +
-                    "[\"speed_locked\"] = true," +
-                "}," +
-                "[2]={" +
-                    "[\"alt\"] = " + routes.alt + "," +
-                    "[\"action\"] = \"Turning Point\"," +
-                    "[\"alt_type\"] = \"BARO\"," +
-                    "[\"speed\"] = " + routes.speed + "," +
-                    "[\"task\"] = {" +
-                        "[\"id\"] = \"ComboTask\"," +
-                        "[\"params\"] = {" +
-                            "[\"tasks\"]={}" +
-                        "}," +
-                    "}," +
-                    "[\"type\"] = \"Turning Point\"," +
-                    "[\"x\"] = coord.LLtoLO(" + routes.routeLocs[1][1] + ", " + routes.routeLocs[1][0] + ").x, " +
-                    "[\"y\"] = coord.LLtoLO(" + routes.routeLocs[1][1] + ", " + routes.routeLocs[1][0] + ").z, " +
-                    "[\"speed_locked\"] = true," +
-                "}," +
-            "}," +
-        "},"
-        ;
-    const tacanInfo = "[4] = {" +
-        "[\"number\"] = 4," +
-        "[\"auto\"] = true," +
-        "[\"id\"] = \"WrappedAction\"," +
-        "[\"name\"] = \"TACAN\"," +
-        "[\"enabled\"] = true," +
-        "[\"params\"] = {" +
-            "[\"action\"] = {" +
-                "[\"id\"] = \"ActivateBeacon\"," +
-                "[\"params\"] = {" +
-                    "[\"type\"] = 4," +
-                    "[\"AA\"] = true," +
-                    "[\"callsign\"] = \"BHABTKR\"," +
-                    "[\"system\"] = 4," +
-                    "[\"name\"] = \"BHABTKR\"," +
-                    "[\"channel\"] = " + routes.tacan.channel + "," +
-                    "[\"modeChannel\"] = \"" + routes.tacan.modeChannel + "\"," +
-                    "[\"bearing\"] = true," +
-                    "[\"frequency\"]= " + routes.tacan.frequency + "," +
-                "}," +
-            "}," +
-        "}," +
-    "},"
-    ;
+export async function tankerPlaneRouteTemplate(routes: any): Promise<string> {
+
+    let tankerTemplate = await getRouteTemplate(routes, "tankerPlaneRoute1");
+    const tacanInfo = await getRouteTemplate(routes, "tankerPlaneRoute2");
 
     if (routes.tacan.enabled) {
         tankerTemplate = _.replace(tankerTemplate, "#TACAN", tacanInfo);
@@ -848,145 +112,12 @@ export function tankerPlaneRouteTemplate(routes: typing.IConvoyRouteTemplate): s
     return tankerTemplate;
 }
 
-export function landPlaneRouteTemplate(routes: typing.IConvoyRouteTemplate) {
-    return "" +
-        "[\"route\"] = {" +
-            "[\"points\"] = {" +
-                "[1] = {" +
-                    "[\"alt\"] = 2000," +
-                    "[\"action\"] = \"Turning Point\"," +
-                    "[\"alt_type\"] = \"BARO\"," +
-                    "[\"speed\"] = 138," +
-                    "[\"task\"] = {" +
-                        "[\"id\"] = \"ComboTask\"," +
-                        "[\"params\"] = {" +
-                            "[\"tasks\"] = {" +
-                                "[1] = {" +
-                                    "[\"enabled\"]=true," +
-                                    "[\"auto\"]=false," +
-                                    "[\"id\"]=\"WrappedAction\"," +
-                                    "[\"number\"] = 1," +
-                                    "[\"params\"]={" +
-                                        "[\"action\"]={" +
-                                            "[\"id\"] = \"Option\"," +
-                                            "[\"params\"] = {" +
-                                                "[\"value\"] = 2," +
-                                                "[\"name\"] = 1," +
-                                            "}," +
-                                        "}," +
-                                    "}," +
-                                "}," +
-                            "}," +
-                        "}," +
-                    "}," +
-                    "[\"type\"] = \"Turning Point\"," +
-                    // "[\"ETA\"] = 0," +
-                    // "[\"ETA_locked\"] = true," +
-                    "[\"x\"] = coord.LLtoLO(" + routes.routeLocs[0][1] + ", " + routes.routeLocs[0][0] + ").x, " +
-                    "[\"y\"] = coord.LLtoLO(" + routes.routeLocs[0][1] + ", " + routes.routeLocs[0][0] + ").z, " +
-                    // "[\"name\"] = \"waypoint 1\"," +
-                    // "[\"formation_template\"] = \"\"," +
-                    // "[\"speed_locked\"] = true," +
-                "}," +
-                "[2]={" +
-                    "[\"alt\"] = 25," +
-                    "[\"action\"] = \"Landing\"," +
-                    "[\"alt_type\"] = \"BARO\"," +
-                    "[\"speed\"] = 168," +
-                    "[\"task\"]={" +
-                        "[\"id\"] = \"ComboTask\"," +
-                        "[\"params\"] = {" +
-                            "[\"tasks\"]={" +
-                                "[1] = {" +
-                                    "[\"number\"] = 1," +
-                                    "[\"auto\"] = false," +
-                                    "[\"id\"] = \"WrappedAction\"," +
-                                    "[\"enabled\"] = true," +
-                                    "[\"params\"] = {" +
-                                        "[\"action\"] = {" +
-                                            "[\"id\"] = \"Option\"," +
-                                            "[\"params\"] = {" +
-                                                "[\"value\"] = 2," +
-                                                "[\"name\"] = 1," +
-                                            "}," +
-                                        "}," +
-                                    "}," +
-                                "}," +
-                            "}," +
-                        "}," +
-                    "}," +
-                    "[\"type\"] = \"Land\"," +
-                    // "[\"ETA\"] = 712.36534243372," +
-                    // "[\"ETA_locked\"] = false," +
-                    "[\"x\"] = coord.LLtoLO(" + routes.routeLocs[1][1] + ", " + routes.routeLocs[1][0] + ").x, " +
-                    "[\"y\"] = coord.LLtoLO(" + routes.routeLocs[1][1] + ", " + routes.routeLocs[1][0] + ").z, " +
-                    // "[\"name\"] = \"DictKey_WptName_21362\"," +
-                    // "[\"formation_template\"] = \"\"," +
-                    "[\"airdromeId\"] = " + _.get(routes, "baseId") + "," +
-                    // "[\"speed_locked\"] = true," +
-                "}," +
-            "}" +
-        "},"
-    ;
+export async function landPlaneRouteTemplate(routes: any) {
+    return await getRouteTemplate(routes, "landPlaneRoute");
 }
 
-export function landHeliRouteTemplate(routes: typing.IConvoyRouteTemplate) {
-    return 	"" +
-        "[\"route\"] = {" +
-            "[\"points\"] = {" +
-                "[1] = {" +
-                    "[\"alt\"] = 500," +
-                    "[\"action\"] = \"Turning Point\"," +
-                    "[\"alt_type\"] = \"BARO\"," +
-                    "[\"speed\"] = 70," +
-                    "[\"task\"] = {" +
-                        "[\"id\"] = \"ComboTask\"," +
-                        "[\"params\"]={" +
-                            "[\"tasks\"]={" +
-                                "[1]={" +
-                                    "[\"enabled\"]=true," +
-                                    "[\"auto\"]=false," +
-                                    "[\"id\"]=\"WrappedAction\"," +
-                                    "[\"number\"] = 1," +
-                                    "[\"params\"]={" +
-                                        "[\"action\"]={" +
-                                            "[\"id\"] = \"Option\"," +
-                                            "[\"params\"]={" +
-                                                "[\"value\"] = 2," +
-                                                "[\"name\"] = 1," +
-                                            "}," +
-                                        "}," +
-                                    "}," +
-                                "}," +
-                                "[2] = {" +
-                                    "[\"enabled\"] = true," +
-                                    "[\"auto\"]=false," +
-                                    "[\"id\"]=\"Land\"," +
-                                    "[\"number\"]= 2," +
-                                    "[\"params\"]={" +
-                                        "[\"x\"] = coord.LLtoLO(" + routes.routeLocs[1][1] + ", " +
-                                            routes.routeLocs[1][0] + ").x, " +
-                                        "[\"y\"] = coord.LLtoLO(" + routes.routeLocs[1][1] + ", " +
-                                            routes.routeLocs[1][0] + ").z, " +
-                                        "[\"duration\"] = 300," +
-                                        "[\"durationFlag\"] = false," +
-                                    "}," +
-                                "}," +
-                            "}," +
-                        "}," +
-                    "}," +
-                    "[\"type\"] = \"Turning Point\"," +
-                    // "[\"ETA\"] = 0," +
-                    // "[\"ETA_locked\"] = true," +
-                    "[\"x\"] = coord.LLtoLO(" + routes.routeLocs[0][1] + ", " +  routes.routeLocs[0][0] + ").x, " +
-                    "[\"y\"] = coord.LLtoLO(" + routes.routeLocs[0][1] + ", " +  routes.routeLocs[0][0] + ").z, " +
-                    // "[\"name\"] = \"waypoint 1\"," +
-                    // "[\"formation_template\"] = \"\"," +
-                    // "[\"speed_locked\"] = true," +
-                "}," +
-            "}," +
-        "},"
-    ;
+export async function landHeliRouteTemplate(routes: any) {
+    return await getRouteTemplate(routes, "landHeliRoute");
 }
 
 export async function grndUnitGroup( groupObj: any, task?: string, routes?: string ): Promise<string> {
@@ -999,33 +130,25 @@ export async function grndUnitGroup( groupObj: any, task?: string, routes?: stri
     } else if (groupObj.type === "1L13 EWR" || groupObj.type === "55G6 EWR" ) {
         curRoute = await turnOnEWRAuto(groupObj);
     } else {
-        curRoute = await turnOffDisperseUnderFire();
+        curRoute = await getRouteTemplate({} as typing.IConvoyRouteTemplate, "turnOffDisperseUnderFireRoute");
     }
 
     const visible = (groupObj.visible) ? groupObj.visible : "false";
     const hidden = (groupObj.hidden) ? groupObj.hidden : "false";
     const curTmpTask = (groupObj.task) ? groupObj.task : curTask;
 
-    return "{" +
-        "[\"communication\"] = true," +
-        "[\"start_time\"] = 0," +
-        "[\"frequency\"] = 251," +
-        "[\"radioSet\"] = false," +
-        "[\"modulation\"] = 0," +
-        "[\"taskSelected\"] = true," +
-        "[\"name\"] = \"" + groupObj.groupName + "\"," +
-        "[\"visible\"] = " + visible + "," +
-        "[\"hidden\"] = " + hidden + "," +
-        "[\"uncontrollable\"] = " + uncontrollable + "," +
-        "[\"hiddenOnPlanner\"] = true," +
-        "[\"tasks\"] = {}," +
-        "[\"task\"] = \"" + curTmpTask + "\"," +
-        "[\"taskSelected\"] = true," +
-        "[\"units\"] = {#UNITS}," +
-        "[\"category\"] = " + groupObj.category + "," +
-        "[\"country\"] = \"" + ddcsControllers.countryId[groupObj.country] + "\"," +
-        curRoute +
-    "}";
+    const spawnTemplate = await ddcsControllers.templateRead({_id: "groundGroup"});
+    const compiled = _.template(spawnTemplate[0].template);
+    return compiled({
+        groupName: groupObj.groupName,
+        visible,
+        hidden,
+        uncontrollable,
+        curTmpTask,
+        category: groupObj.category,
+        country: groupObj.country,
+        curRoute
+    });
 }
 
 export function grndUnitTemplate( unitObj: typing.IGroundUnitTemp ): string {
@@ -1863,10 +986,10 @@ export async function spawnCAPDefense(
             }
         }
         if (curCapTemp.type === "F-15C") {
-            curGroupSpawn = await grndUnitGroup(curUnit, "CAP", capPlaneDefenseRouteTemplate(curUnit));
+            curGroupSpawn = await grndUnitGroup(curUnit, "CAP", await getRouteTemplate(curUnit, "capPlaneDefenseRoute"));
         }
         if (curCapTemp.type === "AH-1W") {
-            curGroupSpawn = await grndUnitGroup(curUnit, "CAS", capHeliDefenseRouteTemplate(curUnit));
+            curGroupSpawn = await grndUnitGroup(curUnit, "CAS", await getRouteTemplate(curUnit, "capHeliDefenseRoute"));
         }
     }
 
@@ -1920,7 +1043,7 @@ export async function spawnDefenseChopper(playerUnitObj: typing.IUnit, unitObj: 
         ]
     };
 
-    curGroupSpawn = await grndUnitGroup( curGrpObj, "CAS", defenseHeliRouteTemplate(curGrpObj));
+    curGroupSpawn = await grndUnitGroup( curGrpObj, "CAS", await getRouteTemplate(curGrpObj, "defenseHeliRoute"));
 
     curSpwnUnit = {
         ...curSpwnUnit,
@@ -2000,7 +1123,7 @@ export async function spawnAtkChopper(playerUnitObj: typing.IUnit, unitObj: typi
         ]
     };
 
-    curGroupSpawn = await grndUnitGroup( curGrpObj, "CAS", atkHeliRouteTemplate(curGrpObj));
+    curGroupSpawn = await grndUnitGroup( curGrpObj, "CAS", await getRouteTemplate(curGrpObj, "atkHeliRoute"));
 
     curSpwnUnit = {
         ...curSpwnUnit,
@@ -2069,7 +1192,7 @@ export async function spawnBomberPlane(playerUnitObj: typing.IUnit, bomberObj: a
         ]
     };
 
-    curGroupSpawn = await grndUnitGroup( curGrpObj, "CAS", bombersPlaneRouteTemplate(curGrpObj));
+    curGroupSpawn = await grndUnitGroup( curGrpObj, "CAS", await getRouteTemplate(curGrpObj, "bombersPlaneRoute"));
 
     curSpwnUnit = {
         ...curSpwnUnit,
@@ -2134,7 +1257,7 @@ export async function spawnAWACSPlane(playerUnitObj: typing.IUnit, awacsObj: any
         ]
     };
 
-    curGroupSpawn = await grndUnitGroup( curGrpObj, "AWACS", awacsPlaneRouteTemplate(curGrpObj));
+    curGroupSpawn = await grndUnitGroup( curGrpObj, "AWACS", await awacsPlaneRouteTemplate(curGrpObj));
 
     curSpwnUnit = {
         ...curSpwnUnit,
@@ -2190,7 +1313,7 @@ export async function spawnTankerPlane(
         ]
     };
 
-    curGroupSpawn = await grndUnitGroup( curGrpObj, "Refueling", tankerPlaneRouteTemplate(curGrpObj));
+    curGroupSpawn = await grndUnitGroup( curGrpObj, "Refueling", await tankerPlaneRouteTemplate(curGrpObj));
 
     curSpwnUnit = {
         ...curSpwnUnit,
@@ -2257,9 +1380,9 @@ export async function spawnSupportPlane(baseObj: typing.IBase, side: number): Pr
         ]
     };
     if (_.includes(baseObj._id, "_MOB") || _.includes(baseObj._id, "_FOB")) {
-        curGroupSpawn = await grndUnitGroup( curGrpObj, "Transport", landHeliRouteTemplate(curRoutes));
+        curGroupSpawn = await grndUnitGroup( curGrpObj, "Transport", await landHeliRouteTemplate(curRoutes));
     } else {
-        curGroupSpawn = await grndUnitGroup( curGrpObj, "Transport", landPlaneRouteTemplate(curRoutes));
+        curGroupSpawn = await grndUnitGroup( curGrpObj, "Transport", await landPlaneRouteTemplate(curRoutes));
     }
 
     curUnitName = "AI|1010101|" + _.get(baseObj, "name") + "|LOGISTICS|";
