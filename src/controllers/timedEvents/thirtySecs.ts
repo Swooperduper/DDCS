@@ -27,7 +27,7 @@ export async function processThirtySecActions(fullySynced: boolean) {
         const aICleanup = await ddcsControllers.unitActionRead({isAI: true, dead: false});
         for (const aIUnit of aICleanup) {
             if (_.isEmpty(aIUnit.playername) && new Date(aIUnit.updatedAt).getTime() + aIMaxIdleTime < new Date().getTime()) {
-                await ddcsControllers.destroyUnit( aIUnit.name );
+                await ddcsControllers.destroyUnit( aIUnit.name, "unit" );
             }
         }
 
@@ -36,7 +36,7 @@ export async function processThirtySecActions(fullySynced: boolean) {
             if (new Date(crate.createdAt).getTime() + maxCrateLife < new Date().getTime()) {
                 await ddcsControllers.staticCrateActionDelete({_id: crate._id});
                 console.log("cleanup crate: ", crate.name);
-                await ddcsControllers.destroyUnit( crate.name );
+                await ddcsControllers.destroyUnit( crate.name, "static" );
             }
         }
     }

@@ -85,7 +85,7 @@ export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: 
                                 await ddcsControllers.staticCrateActionDelete({
                                     _id: crate._id
                                 });
-                                await ddcsControllers.destroyUnit(crate._id);
+                                await ddcsControllers.destroyUnit(crate._id, "static");
                             }
                             crateCount++;
                         }
@@ -375,7 +375,7 @@ export async function menuCmdProcess(pObj: any) {
                                         unitId: unit.unitId,
                                         dead: true
                                     });
-                                    await ddcsControllers.destroyUnit(unit.name);
+                                    await ddcsControllers.destroyUnit(unit.name, "unit");
                                 }
 
                                 curSpawnUnit = _.cloneDeep(await ddcsControllers.getRndFromSpawnCat(
@@ -429,7 +429,7 @@ export async function menuCmdProcess(pObj: any) {
                                     dead: false
                                 });
                                 for (const curTroopUnit of grpUnits) {
-                                    await ddcsControllers.destroyUnit(curTroopUnit.name);
+                                    await ddcsControllers.destroyUnit(curTroopUnit.name, "unit");
                                 }
                                 await ddcsControllers.unitActionUpdateByUnitId({
                                     unitId: pObj.unitId,
@@ -790,7 +790,7 @@ export async function spawnCrateFromLogi(
                     await ddcsControllers.staticCrateActionDelete({
                         _id: crate._id
                     });
-                    await ddcsControllers.destroyUnit(crate._id);
+                    await ddcsControllers.destroyUnit(crate._id, "static");
                 }
                 crateCount++;
             }
@@ -1091,7 +1091,7 @@ export async function unpackCrate(playerUnit: any, country: string, type: string
             if (curUnit <= tRem) {
                 for (const unit of grpGroups[gUnitKey]) {
                     await ddcsControllers.unitActionUpdateByUnitId({unitId: unit.unitId, dead: true});
-                    await ddcsControllers.destroyUnit(unit.name);
+                    await ddcsControllers.destroyUnit(unit.name, "unit");
                 }
                 curUnit++;
             }

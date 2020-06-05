@@ -17,7 +17,7 @@ export async function spawnLogiCrate(crateObj: any, init?: boolean) {
             actionObj: {
                 action: "CMD",
                 cmd: await ddcsControllers.spawnStatic(
-                    ddcsControllers.staticTemplate(curCrateObj),
+                    await ddcsControllers.staticTemplate(curCrateObj),
                     crateObj.country
                 ),
                 reqID: 0
@@ -29,7 +29,7 @@ export async function spawnLogiCrate(crateObj: any, init?: boolean) {
             actionObj: {
                 action: "CMD",
                 cmd: await ddcsControllers.spawnStatic(
-                    ddcsControllers.staticTemplate(crateObj),
+                    await ddcsControllers.staticTemplate(crateObj),
                     crateObj.country
                 ),
                 reqID: 0

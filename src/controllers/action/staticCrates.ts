@@ -20,7 +20,7 @@ export async function destroyCrates(
                     console.log("erroring line23: ", err);
                 })
             ;
-            await ddcsControllers.destroyUnit(eCrate.name);
+            await ddcsControllers.destroyUnit(eCrate.name, "static");
             cCnt ++;
         }
     }

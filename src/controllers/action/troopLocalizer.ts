@@ -17,7 +17,7 @@ export async function checkTroopProx() {
             !isPlayerProximity
         );
         if (!isPlayerProximity) {
-            await ddcsControllers.destroyUnit(troop.name);
+            await ddcsControllers.destroyUnit(troop.name, "unit");
         }
     }
 }

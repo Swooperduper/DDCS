@@ -151,270 +151,76 @@ export async function grndUnitGroup( groupObj: any, task?: string, routes?: stri
     });
 }
 
-export function grndUnitTemplate( unitObj: typing.IGroundUnitTemp ): string {
-    return "{" +
-        "[\"x\"] = coord.LLtoLO(" + unitObj.lonLatLoc[1] + ", " +  unitObj.lonLatLoc[0] + ").x, " +
-        "[\"y\"] = coord.LLtoLO(" + unitObj.lonLatLoc[1] + ", " +  unitObj.lonLatLoc[0] + ").z, " +
-        "[\"type\"] = \"" + unitObj.type + "\"," +
-        "[\"transportable\"] = {" +
-            "[\"randomTransportable\"] = true," +
-        "}," +
-        "[\"name\"] = \"" + unitObj.name + "\"," +
-        "[\"heading\"] = " + (unitObj.hdg || 0) + "," +
-        "[\"playerCanDrive\"] = " + (unitObj.playerCanDrive || false) + "," +
-        "[\"skill\"] = \"" + (unitObj.skill || "Excellent") + "\"," +
-        "[\"country\"] = \"" + ddcsControllers.countryId[unitObj.country] + "\"," +
-    "}";
+export async function grndUnitTemplate( unitObj: any ): Promise<string> {
+    const spawnTemplate = await ddcsControllers.templateRead({_id: "groundUnit"});
+    const compiled = _.template(spawnTemplate[0].template);
+    return compiled({unitObj});
 }
 
-export function mi24vTemplate( unitObj: typing.IUnit ): string {
-    return "{" +
-        "[\"x\"] = coord.LLtoLO(" + unitObj.lonLatLoc[1] + ", " +  unitObj.lonLatLoc[0] + ").x, " +
-        "[\"y\"] = coord.LLtoLO(" + unitObj.lonLatLoc[1] + ", " +  unitObj.lonLatLoc[0] + ").z, " +
-        "[\"livery_id\"] = \"standard 1\"," +
-        "[\"type\"] = \"Mi-24V\"," +
-        "[\"name\"] = \"" + unitObj.name + "\"," +
-        // "[\"unitId\"] = " + _.get(unitObj, "unitId") + "," +
-        "[\"heading\"] = " + unitObj.heading || 0 + "," +
-        "[\"skill\"] = \"" + unitObj.skill || "Excellent" + "\"," +
-        "[\"payload\"]={" +
-            "[\"pylons\"]={}," +
-            "[\"fuel\"] = \"1704\"," +
-            "[\"flare\"] = 192," +
-            "[\"chaff\"] = 0," +
-            "[\"gun\"] = 100," +
-        "}," +
-    "},";
+export async function mi24vTemplate( unitObj: any ): Promise<string> {
+    const spawnTemplate = await ddcsControllers.templateRead({_id: "mi24vUnit"});
+    const compiled = _.template(spawnTemplate[0].template);
+    return compiled({unitObj});
 }
 
-export function ah1wTemplate( unitObj: typing.IUnit ): string {
-    return "{" +
-        "[\"x\"] = coord.LLtoLO(" + unitObj.lonLatLoc[1] + ", " +  unitObj.lonLatLoc[0] + ").x, " +
-        "[\"y\"] = coord.LLtoLO(" + unitObj.lonLatLoc[1] + ", " +  unitObj.lonLatLoc[0] + ").z, " +
-        "[\"livery_id\"] = \"USA X Black\"," +
-        "[\"type\"] = \"AH-1W\"," +
-        "[\"name\"] = \"" + unitObj.name + "\"," +
-        // "[\"unitId\"] = " + _.get(unitObj, "unitId") + "," +
-        "[\"heading\"] = " + unitObj.heading || 0 + "," +
-        "[\"skill\"] = \"" + unitObj.skill || "Excellent" + "\"," +
-        "[\"payload\"]={" +
-            "[\"pylons\"]={}," +
-                "[\"fuel\"] = \"1250\"," +
-                "[\"flare\"] = 30," +
-                "[\"chaff\"] = 30," +
-                "[\"gun\"] = 100," +
-            "}," +
-        "},";
+export async function ah1wTemplate( unitObj: any ): Promise<string> {
+    const spawnTemplate = await ddcsControllers.templateRead({_id: "ah1wUnit"});
+    const compiled = _.template(spawnTemplate[0].template);
+    return compiled({unitObj});
 }
 
-export function mi28nTemplate( unitObj: typing.IUnit ): string {
-    return "{" +
-        "[\"x\"] = coord.LLtoLO(" + unitObj.lonLatLoc[1] + ", " +  unitObj.lonLatLoc[0] + ").x, " +
-        "[\"y\"] = coord.LLtoLO(" + unitObj.lonLatLoc[1] + ", " +  unitObj.lonLatLoc[0] + ").z, " +
-        "[\"type\"] = \"Mi-28N\"," +
-        "[\"name\"] = \"" + unitObj.name + "\"," +
-        // "[\"unitId\"] = " + _.get(unitObj, "unitId") + "," +
-        "[\"heading\"] = " + unitObj.heading || 0 + "," +
-        "[\"skill\"] = \"" + unitObj.skill || "Excellent" + "\"," +
-        "[\"hardpoint_racks\"] = true," +
-        "[\"payload\"]={" +
-            "[\"pylons\"]={" +
-                "[1] = {" +
-                    "[\"CLSID\"] = \"{57232979-8B0F-4db7-8D9A-55197E06B0F5}\"," +
-                "}," +
-            "}," +
-            "[\"fuel\"] = \"1500\"," +
-            "[\"flare\"] = 128," +
-            "[\"chaff\"] = 0," +
-            "[\"gun\"] = 100," +
-        "}," +
-    "},";
+export async function mi28nTemplate( unitObj: any ): Promise<string> {
+    const spawnTemplate = await ddcsControllers.templateRead({_id: "mi28nUnit"});
+    const compiled = _.template(spawnTemplate[0].template);
+    return compiled({unitObj});
 }
 
-export function ah64dTemplate( unitObj: typing.IUnit ): string {
-    return "{" +
-        "[\"x\"] = coord.LLtoLO(" + unitObj.lonLatLoc[1] + ", " +  unitObj.lonLatLoc[0] + ").x, " +
-        "[\"y\"] = coord.LLtoLO(" + unitObj.lonLatLoc[1] + ", " +  unitObj.lonLatLoc[0] + ").z, " +
-        "[\"type\"] = \"AH-64D\"," +
-        "[\"name\"] = \"" + unitObj.name + "\"," +
-        // "[\"unitId\"] = " + _.get(unitObj, "unitId") + "," +
-        "[\"heading\"] = " + unitObj.heading || 0 + "," +
-        "[\"skill\"] = \"" + unitObj.skill || "Excellent" + "\"," +
-        "[\"hardpoint_racks\"] = true," +
-        "[\"payload\"]={" +
-            "[\"pylons\"]={" +
-                "[1] = {" +
-                    "[\"CLSID\"] = \"{88D18A5E-99C8-4B04-B40B-1C02F2018B6E}\"," +
-                "}," +
-                "[4] = {" +
-                    "[\"CLSID\"] = \"{88D18A5E-99C8-4B04-B40B-1C02F2018B6E}\"," +
-                "}," +
-            "}," +
-            "[\"fuel\"] = \"1157\"," +
-            "[\"flare\"] = 30," +
-            "[\"chaff\"] = 30," +
-            "[\"gun\"] = 50," +
-        "}," +
-    "},";
+export async function ah64dTemplate( unitObj: any ): Promise<string> {
+    const spawnTemplate = await ddcsControllers.templateRead({_id: "ah64dUnit"});
+    const compiled = _.template(spawnTemplate[0].template);
+    return compiled({unitObj});
 }
 
-export function b1bTemplate( unitObj: typing.IUnit ): string {
-    return "{" +
-        "[\"x\"] = coord.LLtoLO(" + unitObj.lonLatLoc[1] + ", " +  unitObj.lonLatLoc[0] + ").x, " +
-        "[\"y\"] = coord.LLtoLO(" + unitObj.lonLatLoc[1] + ", " +  unitObj.lonLatLoc[0] + ").z, " +
-        "[\"type\"] = \"B-1B\"," +
-        "[\"name\"] = \"" + unitObj.name + "\"," +
-        // "[\"unitId\"] = " + _.get(unitObj, "unitId") + "," +
-        "[\"heading\"] = " + unitObj.heading || 0 + "," +
-        "[\"skill\"] = \"" + unitObj.skill || "Excellent" + "\"," +
-        "[\"hardpoint_racks\"] = true," +
-        "[\"payload\"]={" +
-            "[\"pylons\"]={" +
-                "[1] = {" +
-                    "[\"CLSID\"] = \"B-1B_Mk-84*8\"," +
-                "}," +
-                "[2] = {" +
-                    "[\"CLSID\"] = \"GBU-31V3B*8\"," +
-                "}," +
-                "[3] = {" +
-                    "[\"CLSID\"] = \"B-1B_Mk-84*8\"," +
-                "}," +
-            "}," +
-            "[\"fuel\"] = \"88450\"," +
-            "[\"flare\"] = 30," +
-            "[\"chaff\"] = 60," +
-            "[\"gun\"] = 100," +
-        "}," +
-    "},";
+export async function b1bTemplate( unitObj: any ): Promise<string> {
+    const spawnTemplate = await ddcsControllers.templateRead({_id: "b1bUnit"});
+    const compiled = _.template(spawnTemplate[0].template);
+    return compiled({unitObj});
 }
 
-export function su24mTemplate( unitObj: typing.IUnit ): string {
-    return "{" +
-        "[\"x\"] = coord.LLtoLO(" + unitObj.lonLatLoc[1] + ", " +  unitObj.lonLatLoc[0] + ").x, " +
-        "[\"y\"] = coord.LLtoLO(" + unitObj.lonLatLoc[1] + ", " +  unitObj.lonLatLoc[0] + ").z, " +
-        "[\"type\"] = \"Su-24M\"," +
-        "[\"name\"] = \"" + unitObj.name + "\"," +
-        // "[\"unitId\"] = " + _.get(unitObj, "unitId") + "," +
-        "[\"heading\"] = " + unitObj.heading || 0 + "," +
-        "[\"skill\"] = \"" + unitObj.skill || "Excellent" + "\"," +
-        "[\"hardpoint_racks\"] = true," +
-        "[\"payload\"]={" +
-            "[\"pylons\"]={" +
-                "[1] = {" +
-                    "[\"CLSID\"] = \"{3C612111-C7AD-476E-8A8E-2485812F4E5C}\"," +
-                "}," +
-                "[2] = {" +
-                    "[\"CLSID\"] = \"{KAB_1500Kr_LOADOUT}\"," +
-                "}," +
-                "[3] = {" +
-                    "[\"CLSID\"] = \"{E2C426E3-8B10-4E09-B733-9CDC26520F48}\"," +
-                "}," +
-                "[4] = {" +
-                    "[\"CLSID\"] = \"{KAB_1500Kr_LOADOUT}\"," +
-                "}," +
-                "[5] = {" +
-                    "[\"CLSID\"] = \"{3C612111-C7AD-476E-8A8E-2485812F4E5C}\"," +
-                "}," +
-                "[6] = {" +
-                    "[\"CLSID\"] = \"{E2C426E3-8B10-4E09-B733-9CDC26520F48}\"," +
-                "}," +
-                "[7] = {" +
-                    "[\"CLSID\"] = \"{KAB_1500Kr_LOADOUT}\"," +
-                "}," +
-                "[8] = {" +
-                    "[\"CLSID\"] = \"{3C612111-C7AD-476E-8A8E-2485812F4E5C}\"," +
-                "}," +
-            "}," +
-            "[\"fuel\"] = \"11700\"," +
-            "[\"flare\"] = 96," +
-            "[\"chaff\"] = 96," +
-            "[\"gun\"] = 100," +
-        "}," +
-    "},";
+export async function su24mTemplate( unitObj: any ): Promise<string> {
+    const spawnTemplate = await ddcsControllers.templateRead({_id: "su24mUnit"});
+    const compiled = _.template(spawnTemplate[0].template);
+    return compiled({unitObj});
 }
 
-export function capPlaneDefenseTemplate( unitObj: any ): string {
-    return "{" +
-        "[\"x\"] = coord.LLtoLO(" + unitObj.routeLocs[1] + ", " +  unitObj.routeLocs[0] + ").x, " +
-        "[\"y\"] = coord.LLtoLO(" + unitObj.routeLocs[1] + ", " +  unitObj.routeLocs[0] + ").z, " +
-        "[\"type\"] = \"" + unitObj.type + "\"," +
-        "[\"name\"] = \"" + unitObj.name + "\"," +
-        "[\"parking_id\"] = \"" + unitObj.parking_id + "\"," +
-        "[\"parking\"] = \"" + unitObj.parking + "\"," +
-        // "[\"unitId\"] = " + _.get(unitObj, "unitId") + "," +
-        "[\"skill\"] = \"" + unitObj.skill || "Excellent" + "\"," +
-        "[\"hardpoint_racks\"] = true," +
-        "[\"payload\"]={" +
-        unitObj.payload || "" +
-        "}," +
-    "},";
+export async function capPlaneDefenseTemplate( unitObj: any ): Promise<string> {
+    const spawnTemplate = await ddcsControllers.templateRead({_id: "capPlaneDefenseUnit"});
+    const compiled = _.template(spawnTemplate[0].template);
+    return compiled({unitObj});
 }
 
-export function capHeliDefenseTemplate( unitObj: any ): string {
-    return "{" +
-        "[\"x\"] = coord.LLtoLO(" + unitObj.routeLocs[1] + ", " +  unitObj.routeLocs[0] + ").x, " +
-        "[\"y\"] = coord.LLtoLO(" + unitObj.routeLocs[1] + ", " +  unitObj.routeLocs[0] + ").z, " +
-        "[\"type\"] = \"" + unitObj.type + "\"," +
-        "[\"name\"] = \"" + unitObj.name + "\"," +
-        "[\"parking_id\"] = \"" + unitObj.parking_id + "\"," +
-        "[\"parking\"] = \"" + unitObj.parking + "\"," +
-        // "[\"unitId\"] = " + _.get(unitObj, "unitId") + "," +
-        "[\"skill\"] = \"" + unitObj.skill || "Excellent" + "\"," +
-        "[\"hardpoint_racks\"] = true," +
-        "[\"payload\"]={" +
-        unitObj.payload || "" +
-        "}," +
-        "},";
+export async function capHeliDefenseTemplate( unitObj: any ): Promise<string> {
+    const spawnTemplate = await ddcsControllers.templateRead({_id: "capHeliDefenseUnit"});
+    const compiled = _.template(spawnTemplate[0].template);
+    return compiled({unitObj});
 }
 
-export function airUnitTemplate( unitObj: typing.IUnit ): string {
-    let curAirTemplate = "{" +
-        "[\"x\"] = coord.LLtoLO(" + unitObj.lonLatLoc[1] + ", " +  unitObj.lonLatLoc[0] + ").x, " +
-        "[\"y\"] = coord.LLtoLO(" + unitObj.lonLatLoc[1] + ", " +  unitObj.lonLatLoc[0] + ").z, " +
-        "[\"type\"] = \"" + unitObj.type + "\"," +
-        "[\"name\"] = \"" + unitObj.name + "\"," +
-        // "[\"unitId\"] = " + _.get(unitObj, "unitId") + "," +
-        "[\"heading\"] = " + unitObj.heading || 0 + "," +
-        "[\"skill\"] = \"" + unitObj.skill || "Excellent" + "\"," +
-        "[\"payload\"]={" +
-            "[\"pylons\"]={}," +
-            "[\"fuel\"] = \"100000\"," +
-            "[\"flare\"] = 200," +
-            "[\"chaff\"] = 200," +
-            "[\"gun\"] = 200," +
-        "},";
-
+export async function airUnitTemplate( unitObj: any ): Promise<string> {
     if (ddcsControllers.countryId[unitObj.country] === "USA" || ddcsControllers.countryId[unitObj.country] === "AGGRESSORS") {
-            // console.log("cs: ", unitObj);
-            curAirTemplate = curAirTemplate + "[\"callsign\"] = {" +
-            "[1] = " + unitObj.callsign[1] + "," +
-            "[2] = " + unitObj.callsign[2] + "," +
-            "[3] = " + unitObj.callsign[3] + "," +
-            "[\"name\"] = \"" + unitObj.callsign.name + "\"," +
-            "}," +
-            "[\"onboard_num\"] = \"" + unitObj.onboard_num + "\",";
-        } else {
-            curAirTemplate = curAirTemplate + "[\"callsign\"] = \"" + unitObj.callsign + "\"," +
-            "[\"onboard_num\"] = \"" + unitObj.onboard_num + "\",";
-        }
-    return curAirTemplate + "}";
+        const spawnTemplateCallsign = await ddcsControllers.templateRead({_id: "airUnitFragmentCallsign"});
+        const compiledCallsign = _.template(spawnTemplateCallsign[0].template);
+        unitObj.callsign = compiledCallsign({unitObj});
+    }
+
+    const spawnTemplate = await ddcsControllers.templateRead({_id: "airUnit"});
+    const compiled = _.template(spawnTemplate[0].template);
+    return compiled({unitObj});
 }
 
-export function staticTemplate(staticObj: typing.IStaticUnitTemp): string {
-    let retObj = "{" +
-        "[\"x\"] = coord.LLtoLO(" + staticObj.lonLatLoc[1] + ", " +  staticObj.lonLatLoc[0] + ").x, " +
-        "[\"y\"] = coord.LLtoLO(" + staticObj.lonLatLoc[1] + ", " +  staticObj.lonLatLoc[0] + ").z, " +
-        "[\"category\"] = \"" + staticObj.unitCategory + "\"," +
-        "[\"country\"] = \"" + staticObj.country + "\"," +
-        "[\"type\"] = \"" + staticObj.type + "\"," +
-        "[\"name\"] = \"" + staticObj.name + "\"," +
-        "[\"shape_name\"] = \"" + staticObj.shape_name + "\"," +
-        "[\"heading\"] = " + (staticObj.hdg || 0) + "," +
-        "[\"canCargo\"] = " + (staticObj.canCargo || "false") + ",";
-    if (staticObj.canCargo) {
-        retObj += "[\"mass\"] = \"" + staticObj.mass + "\",";
-    }
-    return retObj + "}";
+export async function staticTemplate(staticObj: any): Promise<string> {
+    const spawnTemplate = await ddcsControllers.templateRead({_id: "staticUnit"});
+    const compiled = _.template(spawnTemplate[0].template);
+    return compiled({staticObj});
 }
 
 export function getRndFromSpawnCat(
@@ -922,7 +728,7 @@ export async function spawnConvoy(
             lonLatLoc: defaultStartLonLat,
             playerCanDrive: false
         };
-        groupArray += grndUnitTemplate(curSpwnUnit) + ",";
+        groupArray += await grndUnitTemplate(curSpwnUnit) + ",";
         unitNum = unitNum + 1;
     }
     curGroupSpawn = _.replace(curGroupSpawn, "#UNITS", groupArray);
@@ -977,12 +783,12 @@ export async function spawnCAPDefense(
             };
             if (curCapTemp.type === "F-15C") {
                 curUnit.routeLocs = curCapTemp.lonLat;
-                curUnitSpawn += capPlaneDefenseTemplate(curUnit);
+                curUnitSpawn += await capPlaneDefenseTemplate(curUnit);
             }
             if (curCapTemp.type === "AH-1W") {
                 curUnit.routeLocs = ddcsControllers.getLonLatFromDistanceDirection(curCapTemp.lonLat, curAngle, 0.15);
                 curAngle += 180;
-                curUnitSpawn += capHeliDefenseTemplate(curUnit);
+                curUnitSpawn += await capHeliDefenseTemplate(curUnit);
             }
         }
         if (curCapTemp.type === "F-15C") {
@@ -1055,12 +861,12 @@ export async function spawnDefenseChopper(playerUnitObj: typing.IUnit, unitObj: 
 
     if (unitObj.name === "RussianDefHeli") {
         for (let x = 0; x < 2; x++) {
-            curUnitSpawn += mi24vTemplate(curSpwnUnit);
+            curUnitSpawn += await mi24vTemplate(curSpwnUnit);
         }
     }
     if (unitObj.name === "USADefHeli") {
         for (let x = 0; x < 2; x++) {
-            curUnitSpawn += ah1wTemplate(curSpwnUnit);
+            curUnitSpawn += await ah1wTemplate(curSpwnUnit);
         }
     }
 
@@ -1135,12 +941,12 @@ export async function spawnAtkChopper(playerUnitObj: typing.IUnit, unitObj: typi
 
     if (unitObj.name === "RussianAtkHeli") {
         for (let x = 0; x < 2; x++) {
-            curUnitSpawn += mi28nTemplate(curSpwnUnit);
+            curUnitSpawn += await mi28nTemplate(curSpwnUnit);
         }
     }
     if (unitObj.name === "USAAtkHeli") {
         for (let x = 0; x < 2; x++) {
-            curUnitSpawn += ah64dTemplate(curSpwnUnit);
+            curUnitSpawn += await ah64dTemplate(curSpwnUnit);
         }
     }
 
@@ -1208,7 +1014,7 @@ export async function spawnBomberPlane(playerUnitObj: typing.IUnit, bomberObj: a
         }
     }
     if (bomberObj.name === "USABomber") {
-        curUnitSpawn = b1bTemplate(curSpwnUnit);
+        curUnitSpawn = await b1bTemplate(curSpwnUnit);
     }
 
     curGroupSpawn = _.replace(curGroupSpawn, "#UNITS", curUnitSpawn);
@@ -1267,7 +1073,7 @@ export async function spawnAWACSPlane(playerUnitObj: typing.IUnit, awacsObj: any
         hidden: false
     };
 
-    curUnitSpawn = airUnitTemplate(curSpwnUnit);
+    curUnitSpawn = await airUnitTemplate(curSpwnUnit);
 
     curGroupSpawn = _.replace(curGroupSpawn, "#UNITS", curUnitSpawn);
     const curCMD = await spawnGrp(curGroupSpawn, curCountry, curCategory);
@@ -1323,7 +1129,7 @@ export async function spawnTankerPlane(
         hidden: false
     };
 
-    curUnitSpawn = airUnitTemplate(curSpwnUnit);
+    curUnitSpawn = await airUnitTemplate(curSpwnUnit);
 
     curGroupSpawn = _.replace(curGroupSpawn, "#UNITS", curUnitSpawn);
     const curCMD = await spawnGrp(curGroupSpawn, curCountry, curCategory);
@@ -1395,7 +1201,7 @@ export async function spawnSupportPlane(baseObj: typing.IBase, side: number): Pr
         hidden: false
     };
 
-    curUnitSpawn = airUnitTemplate(curSpwnUnit);
+    curUnitSpawn = await airUnitTemplate(curSpwnUnit);
 
     curGroupSpawn = _.replace(curGroupSpawn, "#UNITS", curUnitSpawn);
     // console.log('spawnSupportPlane: ', curGroupSpawn, curSide, curGrpObj.category);
@@ -1508,7 +1314,7 @@ export async function spawnStaticBuilding(
         }
     } else {
         const curCMD = await spawnStatic(
-            staticTemplate(staticObj as typing.IStaticUnitTemp),
+            await staticTemplate(staticObj as typing.IStaticUnitTemp),
             staticObj.country
         );
         await ddcsControllers.sendUDPPacket("frontEnd", {actionObj: {action: "CMD", cmd: curCMD, reqID: 0}});
@@ -1544,7 +1350,7 @@ export async function spawnUnitGroup(spawnArray: typing.IUnitSpawnMin[], init: b
                 await ddcsControllers.unitActionSave(unitObj);
             }
 
-            unitTemplate += ((unitNum !== groupNum) ? "," : "") + grndUnitTemplate(unitObj as IGroundUnitTemp);
+            unitTemplate += ((unitNum !== groupNum) ? "," : "") + await grndUnitTemplate(unitObj as IGroundUnitTemp);
             unitNum++;
         }
 
@@ -1683,10 +1489,16 @@ export async function replenishUnits( baseName: string, side: number, init: bool
     await spawnBaseReinforcementGroup(side, baseName, init);
 }
 
-export async function destroyUnit( unitName: string ): Promise<void> {
+export async function destroyUnit( unitName: string, type: string ): Promise<void> {
     // DONT USE ON CLIENT AIRCRAFT
-    const sendClient = {action: "REMOVEOBJECT", removeObject: unitName, reqID: 0};
-    const actionObj = {actionObj: sendClient, queName: "clientArray"};
+    let cmd: string = "";
+    if (type === "static") {
+        cmd = "StaticObject.getByName(\"" + unitName + "\"):destroy()";
+    } else {
+        cmd = "Unit.getByName(\"" + unitName + "\"):destroy()";
+    }
+
+    const actionObj = {actionObj: {action: "CMD", cmd, reqID: 0}};
     await ddcsControllers.sendUDPPacket("frontEnd", actionObj);
 }
 

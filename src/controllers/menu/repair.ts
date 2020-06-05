@@ -69,7 +69,7 @@ export async function repairBaseSAMRadars(): Promise<void> {
                 );
                 console.log("TRUCKHERE? ", unitsMissing);
                 for (const removeElement of groups[group]) {
-                    await ddcsControllers.destroyUnit(removeElement.name);
+                    await ddcsControllers.destroyUnit(removeElement.name, "unit");
                 }
             }
         }
