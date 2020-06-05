@@ -552,6 +552,8 @@ export interface IUnitSpawnMin {
     unitCategory: number;
     objectCategory: number;
     type: string;
+    countryName?: string;
+    skill?: string;
     lonLatLoc?: number[];
     groupName?: string;
     name?: string;

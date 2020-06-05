@@ -276,9 +276,9 @@ function runRequest(request)
         end
 
         if request.action == "CMD" then
-            -- env.info("cmd: "..request.cmd)
             local success, retVal = pcall(commandExecute, request.cmd)
             if not success then
+                env.info("cmd: "..request.cmd)
                 env.info("Error: " .. retVal)
             end
             if request.reqID > 0 then

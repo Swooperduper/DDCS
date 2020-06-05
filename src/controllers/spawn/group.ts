@@ -121,34 +121,23 @@ export async function landHeliRouteTemplate(routes: any) {
 }
 
 export async function grndUnitGroup( groupObj: any, task?: string, routes?: string ): Promise<string> {
-    let curRoute: string;
-    const curTask = (task) ? task : "Ground Nothing";
-    const uncontrollable = !_.get(groupObj, "playerCanDrive", false);
+    groupObj.uncontrollable = !groupObj.playerCanDrive || false;
 
     if (routes) {
-        curRoute = routes;
+        groupObj.curRoute = routes;
     } else if (groupObj.type === "1L13 EWR" || groupObj.type === "55G6 EWR" ) {
-        curRoute = await turnOnEWRAuto(groupObj);
+        groupObj.curRoute = await turnOnEWRAuto(groupObj);
     } else {
-        curRoute = await getRouteTemplate({} as typing.IConvoyRouteTemplate, "turnOffDisperseUnderFireRoute");
+        groupObj.curRoute = await getRouteTemplate({} as typing.IConvoyRouteTemplate, "turnOffDisperseUnderFireRoute");
     }
 
-    const visible = (groupObj.visible) ? groupObj.visible : "false";
-    const hidden = (groupObj.hidden) ? groupObj.hidden : "false";
-    const curTmpTask = (groupObj.task) ? groupObj.task : curTask;
-
+    groupObj.visible = groupObj.visible || "false";
+    groupObj.hidden = groupObj.hidden || "false";
+    groupObj.task = groupObj.task || ((task) ? task : "Ground Nothing");
+    groupObj.countryName = ddcsControllers.countryId[groupObj.country];
     const spawnTemplate = await ddcsControllers.templateRead({_id: "groundGroup"});
     const compiled = _.template(spawnTemplate[0].template);
-    return compiled({
-        groupName: groupObj.groupName,
-        visible,
-        hidden,
-        uncontrollable,
-        curTmpTask,
-        category: groupObj.category,
-        country: groupObj.country,
-        curRoute
-    });
+    return compiled({groupObj});
 }
 
 export async function grndUnitTemplate( unitObj: any ): Promise<string> {
@@ -1343,6 +1332,8 @@ export async function spawnUnitGroup(spawnArray: typing.IUnitSpawnMin[], init: b
             unitObj.name = (curUnit.name) ? curUnit.name : baseName + " #" + unitNum;
             unitObj._id = unitObj.name;
             unitObj.country = grpObj.country;
+            unitObj.countryName = ddcsControllers.countryId[grpObj.country];
+            unitObj.skill = grpObj.skill || "Excellent";
             unitObj.groupName = curGroupName;
             unitObj.type = curUnit.type;
 
@@ -1351,7 +1342,7 @@ export async function spawnUnitGroup(spawnArray: typing.IUnitSpawnMin[], init: b
                 await ddcsControllers.unitActionSave(unitObj);
             }
 
-            unitTemplate += ((unitNum !== groupNum) ? "," : "") + await grndUnitTemplate(unitObj as IGroundUnitTemp);
+            unitTemplate += await grndUnitTemplate(unitObj as IGroundUnitTemp);
             unitNum++;
         }
 
