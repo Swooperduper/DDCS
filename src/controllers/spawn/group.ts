@@ -1298,7 +1298,7 @@ export async function spawnStaticBuilding(
                 coalition: side,
                 type: staticLookupLogiBuilding[0].type,
                 shape_name: staticLookupLogiBuilding[0].shape_name,
-                canCargo: staticLookupLogiBuilding[0].canCargo,
+                canCargo: staticLookupLogiBuilding[0].canCargo || "false",
                 unitCategory: staticLookupLogiBuilding[0].unitCategory,
                 objectCategory: staticLookupLogiBuilding[0].objectCategory,
                 name: baseObj.name + " " + staticType,
@@ -1313,6 +1313,7 @@ export async function spawnStaticBuilding(
             console.log("country not found: ", side, staticType);
         }
     } else {
+        staticObj.canCargo = staticObj.canCargo || false;
         const curCMD = await spawnStatic(
             await staticTemplate(staticObj as typing.IStaticUnitTemp),
             staticObj.country
