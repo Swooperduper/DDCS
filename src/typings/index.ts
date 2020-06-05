@@ -325,6 +325,7 @@ export interface IUnit {
     samType: string;
     shape_name: string;
     canCargo: boolean;
+    lateActivation?: boolean;
 }
 
 export interface IWebPush {
@@ -552,6 +553,8 @@ export interface IUnitSpawnMin {
     unitCategory: number;
     objectCategory: number;
     type: string;
+    isActive?: boolean;
+    lateActivation?: boolean;
     countryName?: string;
     skill?: string;
     lonLatLoc?: number[];

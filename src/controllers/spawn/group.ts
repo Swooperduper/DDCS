@@ -135,6 +135,7 @@ export async function grndUnitGroup( groupObj: any, task?: string, routes?: stri
     groupObj.hidden = groupObj.hidden || "false";
     groupObj.task = groupObj.task || ((task) ? task : "Ground Nothing");
     groupObj.countryName = ddcsControllers.countryId[groupObj.country];
+    groupObj.lateActivation = groupObj.lateActivation || false;
     const spawnTemplate = await ddcsControllers.templateRead({_id: "groundGroup"});
     const compiled = _.template(spawnTemplate[0].template);
     return compiled({groupObj});

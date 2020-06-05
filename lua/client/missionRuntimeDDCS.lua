@@ -131,11 +131,13 @@ function addGroups(groups, coalition)
             local lat, lon, alt = coord.LOtoLL(unitPosition.p)
             table.insert(tempNames, curUnitName)
             if Unit.isActive(unit) then
+                --env.info("ISACTIVE " .. curUnitName)
                 if objCache[curUnitName] ~= nil then
-                    if objCache[curUnitName].lat ~= lat or objCache[curUnitName].lon ~= lon then
+                    if objCache[curUnitName].lat ~= lat or objCache[curUnitName].lon ~= lon or objCache[curUnitName].isActive ~= true then
                         objCache[curUnitName] = {
                             ["lat"] = lat,
-                            ["lon"] = lon
+                            ["lon"] = lon,
+                            ["isActive"] = true
                         }
                         local curUnitObj = generateInitialUnitObj(group, unit, true, curUnitName, coalition, lon, lat, alt, unitPosition)
                         curUnitObj.action = "U"
@@ -144,17 +146,20 @@ function addGroups(groups, coalition)
                 else
                     objCache[curUnitName] = {
                         ["lat"] = lat,
-                        ["lon"] = lon
+                        ["lon"] = lon,
+                        ["isActive"] = true
                     }
                     local curUnitObj = generateInitialUnitObj(group, unit, true, curUnitName, coalition, lon, lat, alt, unitPosition)
                     curUnitObj.action = "C"
                     sendUDPPacket(curUnitObj)
                 end
             else
-                if objCache[curUnitName] == nil then
+                --env.info("NOTACTIVE " .. curUnitName)
+                if objCache[curUnitName] == nil or objCache[curUnitName].isActive ~= false then
                     objCache[curUnitName] = {
                         ["lat"] = lat,
-                        ["lon"] = lon
+                        ["lon"] = lon,
+                        ["isActive"] = false
                     }
                     local curUnitObj = generateInitialUnitObj(group, unit, false, curUnitName, coalition, lon, lat, alt, unitPosition)
                     curUnitObj.action = "C"
@@ -276,9 +281,9 @@ function runRequest(request)
         end
 
         if request.action == "CMD" then
+            --env.info("cmd: "..request.cmd)
             local success, retVal = pcall(commandExecute, request.cmd)
             if not success then
-                env.info("cmd: "..request.cmd)
                 env.info("Error: " .. retVal)
             end
             if request.reqID > 0 then

@@ -70,6 +70,7 @@ export async function reSyncAllUnitsFromDbToServer(): Promise<void> {
     if (unitObjs.length > 0) {
         const remappedObjs: any = {};
         for (const unitObj of unitObjs) {
+            unitObj.lateActivation = true;
             if (ddcsControllers.UNIT_CATEGORY[unitObj.unitCategory] === "GROUND_UNIT" && !unitObj.isTroop) {
                 const curName = unitObj.groupName;
                 remappedObjs[curName] = remappedObjs[curName] || [];
@@ -88,8 +89,7 @@ export async function reSyncAllUnitsFromDbToServer(): Promise<void> {
             await ddcsControllers.spawnUnitGroup(value as any[], false);
         }
     } else {
-        console.log("ReSync Finished");
-        setMissionStartupReSync(false);
+        console.log("ReSync Que Complete");
     }
 }
 
@@ -166,6 +166,34 @@ export async function reSyncServerObjs(serverCount: number, dbCount: number) {
     });
 }
 
+export async function activateInitSpawn() {
+    await ddcsControllers.unitActionChkResync();
+    // loop through and activate all non ~
+    const unitObjs = await ddcsControllers.unitActionReadStd({
+        dead: false,
+        isActive: false,
+        _id: {$not: /~/},
+        isResync: false
+    });
+
+    const unitGroups = _.groupBy(unitObjs, (u) => u.groupName);
+
+    if (Object.keys(unitGroups).length > 0) {
+        console.log("Start Activating all units");
+        for (const unitKeys of Object.keys(unitGroups)) {
+            await ddcsControllers.sendUDPPacket("frontEnd", {
+                actionObj: {
+                    action: "CMD",
+                    cmd: "Group.getByName(\"" + unitKeys + "\"):activate()",
+                    reqID: 0,
+                    time: new Date()
+                }
+            });
+        }
+        console.log("Finished Activating all units");
+    }
+}
+
 export async function syncCheck(serverCount: number): Promise<void> {
     if (getSessionName()) {
         const servers = await ddcsControllers.serverActionsRead({_id: process.env.SERVER_NAME});
@@ -175,10 +203,9 @@ export async function syncCheck(serverCount: number): Promise<void> {
                 dead: false,
                 $or: [{isActive: false}, {_id: /~/}]
             });
-            const isServerVirgin = (serverCount - preBakedNames.length) === 0;
-
-            if (isServerVirgin || getMissionStartupReSync()) {
-                if (isServerVirgin) {
+            const isServerVirgin = serverCount <= preBakedNames.length; // keep an eye on this one....
+            if (isServerVirgin || getMissionStartupReSync() || getResetFullCampaign()) {
+                if (isServerVirgin || getResetFullCampaign()) {
                     setServerSynced(false);
                     console.log("Server is VIRGIN");
                     const getConfig = await ddcsControllers.serverActionsRead({_id: process.env.SERVER_NAME});
@@ -188,20 +215,23 @@ export async function syncCheck(serverCount: number): Promise<void> {
                     await ddcsControllers.unitActionChkResync();
                     console.log("ResetCampaign: ", getResetFullCampaign(), "MissionReSync: ", missionStartupReSync);
                     if (getResetFullCampaign()) {
+                        await setResetFullCampaign(false); // UNDO
                         console.log("Server is new campaign");
                         // new campaign spawn
                         await populateNewCampaignUnits();
-                        await setResetFullCampaign(false); // UNDO
                     }
                 }
                 const dbCount = await ddcsControllers.actionCount({dead: false});
                 console.log("NORM SYNC: ", serverCount, dbCount);
-                if (serverCount !== dbCount) {
+                if (serverCount < dbCount) {
                     await reSyncAllUnitsFromDbToServer();
+                } else if (serverCount > dbCount) {
+                    await reSyncServerObjs(serverCount, dbCount);
                 } else {
-                    setMissionStartupReSync(false);
                     // unlock server port
                     // send message to discord
+                    await activateInitSpawn();
+                    setMissionStartupReSync(false);
                     setServerSynced(true);
                     console.log("Server Is Synchronized");
                 }

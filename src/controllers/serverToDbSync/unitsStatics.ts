@@ -88,6 +88,8 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
                     isResync: true
                 }
             };
+            iCurObj.data.isActive = curData.isActive;
+
             if (curData.type) {
                 iCurObj.data.type = curData.type;
             }
