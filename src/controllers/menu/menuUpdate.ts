@@ -6,51 +6,6 @@ import * as _ from "lodash";
 import * as typings from "../../typings";
 import * as ddcsControllers from "../";
 
-const enableAction = false;
-const allowedHelisForTroops = [
-    "UH-1H",
-    "Mi-8MT",
-    "SA342M",
-    "SA342L",
-    "SA342Minigun"
-];
-const allowedPlanesForTroops = [
-    "TF-51D",
-    "Bf-109K-4",
-    "P-51D",
-    "F-86F Sabre",
-    "MiG-15bis",
-    "L-39ZA",
-    "Hawk",
-    "SA342Mistral",
-    "C-101CC",
-    "Yak-52"
-];
-const allowedTypesForCratesLight = [
-    "UH-1H",
-    "Mi-8MT",
-    "Ka-50"
-];
-
-const allowedTypesForCratesHeavy = [
-    "Mi-8MT",
-    "Ka-50"
-];
-
-const allowedHelisForInternalCrates = [
-    "UH-1H",
-    "Mi-8MT",
-    "TF-51D",
-    "Bf-109K-4",
-    "P-51D",
-    "L-39ZA",
-    "Hawk",
-    "C-101CC",
-    "Yak-52",
-    "F-86F Sabre",
-    "MiG-15bis"
-];
-
 export async function menuTest(playerUnit: any): Promise<void> {
     const curMenuCommands = ddcsControllers.getEngineCache().menuCommands.filter((menuCommand: typings.IMenuCommand) => {
         return (menuCommand.allowedUnitTypes.length === 0 || _.includes(menuCommand.allowedUnitTypes, "UH-1H") &&
@@ -59,6 +14,34 @@ export async function menuTest(playerUnit: any): Promise<void> {
 
     console.log("MENUTEST RUNNING: ", curMenuCommands.map((cmd: any) => cmd.itemTitle));
     // {$or: [{allowedUnitTypes: "TF-51D"}, {allowedUnitTypes: null}]}
+
+    await ddcsControllers.sendUDPPacket("frontEnd", {
+        actionObj: {
+            action: "CMD",
+            cmd: ["trigger.action.outTextForGroup(2, [[TEST TEST TEST]], 2)"],
+            reqID: 0
+        }
+    });
+}
+
+export function menuCallback(incomingObj: any, curReqJobIndex: number): void {
+    console.log("MENUCALLBACK: ", incomingObj, curReqJobIndex);
+}
+
+
+export async function actionMenu(unitId: number): Promise<void> {
+    const curUnit = await ddcsControllers.unitActionRead({unitId});
+    const menuArray = [
+        `missionCommands.addSubMenuForGroup("${curUnit[0].groupId}", "ActionMenu")`,
+        `missionCommands.addCommandForGroup("${curUnit[0].groupId}", "Is Troop Onboard", {"ActionMenu"}, sendCmd, {["action"] = "f10Menu", ["cmd"] = "isTroopOnboard", ["unitId"] = ${unitId}})`
+    ];
+
+
+
+}
+
+
+/* tslint:disable */
 /*
     const menuTestCommand1 = 'missionCommands.removeItemForGroup(2, "Lives", nil)';
     const menuTestCommand2 = 'missionCommands.addSubMenuForGroup(2, "Lives")';
@@ -88,59 +71,9 @@ export async function menuTest(playerUnit: any): Promise<void> {
         }
     });
 */
-    await ddcsControllers.sendUDPPacket("frontEnd", {
-        actionObj: {
-            action: "CMD",
-            cmd: ["trigger.action.outTextForGroup(2, [[TEST TEST TEST]], 2)"],
-            reqID: 0
-        }
-    });
-}
 
-export function menuCallback(incomingObj: any, curReqJobIndex: number): void {
-    console.log("MENUCALLBACK: ", incomingObj, curReqJobIndex);
-}
-
-
-export async function actionMenu(unitId: number): Promise<void> {
-    const curUnit = await ddcsControllers.unitActionRead({unitId});
-    const menuArray = [
-        `missionCommands.addSubMenuForGroup("${curUnit[0].groupId}", "ActionMenu")`,
-        `missionCommands.addCommandForGroup("${curUnit[0].groupId}", "Is Troop Onboard", {"ActionMenu"}, sendCmd, {["action"] = "f10Menu", ["cmd"] = "isTroopOnboard", ["unitId"] = ${unitId}})`
-    ];
-
-
-
-}
-
-
-/* tslint:disable */
 
 /*
-export function generateMenuCategory(
-    groupId: number,
-    title: string
-) {
-    return "blah";
-}
-
-export function generateMenuItem(
-    groupId: number,
-    title: string,
-    menuMap: string,
-    cmd: {
-        action: string,
-        cmdString: string,
-        type: string,
-        unitId: number,
-        crates: number,
-        mobile: boolean,
-        mass: number
-    }
-) {
-    return "blah";
-}
-
 export async function logisticsMenu(action: string, unit: any) {
     const aqMenuTitleHeavy: any;
     const aqMenuTitleLite: any;
