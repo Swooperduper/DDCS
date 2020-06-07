@@ -120,7 +120,7 @@ export async function unitActionChkResync(): Promise<void> {
     return new Promise((resolve, reject) => {
         dbModels.unitModel.updateMany(
             {},
-            {$set: {isResync: false}},
+            {$set: {isResync: false, isActive: false}},
             (err: any) => {
                 if (err) { reject(err); }
                 resolve();

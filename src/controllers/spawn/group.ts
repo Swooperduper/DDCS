@@ -1340,6 +1340,7 @@ export async function spawnUnitGroup(spawnArray: typing.IUnitSpawnMin[], init: b
 
 
             if (init) {
+                unitObj.isActive = false;
                 await ddcsControllers.unitActionSave(unitObj);
             }
 

@@ -62,10 +62,11 @@ export async function reSyncAllUnitsFromDbToServer(): Promise<void> {
     // sync up all units on server from database
     const unitObjs = await ddcsControllers.unitActionReadStd({
         dead: false,
-        isActive: true,
         _id: {$not: /~/},
         isResync: false
     });
+
+    console.log("RESYNCU: ", unitObjs.length);
 
     if (unitObjs.length > 0) {
         const remappedObjs: any = {};
@@ -181,14 +182,16 @@ export async function activateInitSpawn() {
     if (Object.keys(unitGroups).length > 0) {
         console.log("Start Activating all units");
         for (const unitKeys of Object.keys(unitGroups)) {
-            await ddcsControllers.sendUDPPacket("frontEnd", {
-                actionObj: {
-                    action: "CMD",
-                    cmd: "Group.getByName(\"" + unitKeys + "\"):activate()",
-                    reqID: 0,
-                    time: new Date()
-                }
-            });
+            if (unitKeys) {
+                await ddcsControllers.sendUDPPacket("frontEnd", {
+                    actionObj: {
+                        action: "CMD",
+                        cmd: "Group.getByName(\"" + unitKeys + "\"):activate()",
+                        reqID: 0,
+                        time: new Date()
+                    }
+                });
+            }
         }
         console.log("Finished Activating all units");
     }
@@ -201,9 +204,10 @@ export async function syncCheck(serverCount: number): Promise<void> {
             // is missing empty, pull all units that are active and dont have ~ in unit/static name
             const preBakedNames = await ddcsControllers.actionAliveNames({
                 dead: false,
-                $or: [{isActive: false}, {_id: /~/}]
+                _id: /~/
             });
             const isServerVirgin = serverCount <= preBakedNames.length; // keep an eye on this one....
+            console.log("Check: ", isServerVirgin, getMissionStartupReSync(), getResetFullCampaign());
             if (isServerVirgin || getMissionStartupReSync() || getResetFullCampaign()) {
                 if (isServerVirgin || getResetFullCampaign()) {
                     setServerSynced(false);
@@ -222,7 +226,9 @@ export async function syncCheck(serverCount: number): Promise<void> {
                     }
                 }
                 const dbCount = await ddcsControllers.actionCount({dead: false});
-                console.log("NORM SYNC: ", serverCount, dbCount);
+                console.log("NORM SYNC: ", serverCount, dbCount, preBakedNames.length);
+
+                // await reSyncServerObjs(serverCount, dbCount);
                 if (serverCount < dbCount) {
                     await reSyncAllUnitsFromDbToServer();
                 } else if (serverCount > dbCount) {

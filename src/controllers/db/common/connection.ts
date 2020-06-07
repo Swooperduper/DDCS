@@ -2,7 +2,6 @@ import * as mongoose from "mongoose";
 import * as localModels from "../local/models";
 import * as remoteModels from "../remote/models";
 import * as ddcsController from "../../";
-import * as ddcsControllers from "../../action/aiConvoys";
 
 export let localConnection: mongoose.Connection;
 export let remoteConnection: mongoose.Connection;
@@ -130,5 +129,7 @@ export async function initV3Engine(): Promise<void> {
     }, ddcsController.time.oneHour);
 
     await ddcsController.testRead();
+
+    // await ddcsController.menuTest();
 
 }
