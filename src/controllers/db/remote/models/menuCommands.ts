@@ -29,6 +29,9 @@ export function menuCommandModel(dbconn: mongoose.Connection): mongoose.Document
             cmdProp: {
                 type: Object,
                 required: true
+            },
+            allowedUnitTypes: {
+                type: Array
             }
         },
         {

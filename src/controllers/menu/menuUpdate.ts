@@ -2,8 +2,8 @@
  * DDCS Licensed under AGPL-3.0 by Andrew "Drex" Finegan https://github.com/afinegan/DynamicDCS
  */
 
-// import * as _ from "lodash";
-// import * as typings from "../../typings";
+import * as _ from "lodash";
+import * as typings from "../../typings";
 import * as ddcsControllers from "../";
 
 const enableAction = false;
@@ -51,10 +51,14 @@ const allowedHelisForInternalCrates = [
     "MiG-15bis"
 ];
 
-export async function menuTest() {
-    const curMenuCommands = ddcsControllers.getEngineCache().menuCommands;
+export async function menuTest(playerUnit: any): Promise<void> {
+    const curMenuCommands = ddcsControllers.getEngineCache().menuCommands.filter((menuCommand: typings.IMenuCommand) => {
+        return (menuCommand.allowedUnitTypes.length === 0 || _.includes(menuCommand.allowedUnitTypes, "UH-1H") &&
+            (menuCommand.side === 0 || menuCommand.side === 2));
+    });
 
-    console.log("MENUTEST RUNNING: ", curMenuCommands);
+    console.log("MENUTEST RUNNING: ", curMenuCommands.map((cmd: any) => cmd.itemTitle));
+    // {$or: [{allowedUnitTypes: "TF-51D"}, {allowedUnitTypes: null}]}
 /*
     const menuTestCommand1 = 'missionCommands.removeItemForGroup(2, "Lives", nil)';
     const menuTestCommand2 = 'missionCommands.addSubMenuForGroup(2, "Lives")';
@@ -97,6 +101,17 @@ export function menuCallback(incomingObj: any, curReqJobIndex: number): void {
     console.log("MENUCALLBACK: ", incomingObj, curReqJobIndex);
 }
 
+
+export async function actionMenu(unitId: number): Promise<void> {
+    const curUnit = await ddcsControllers.unitActionRead({unitId});
+    const menuArray = [
+        `missionCommands.addSubMenuForGroup("${curUnit[0].groupId}", "ActionMenu")`,
+        `missionCommands.addCommandForGroup("${curUnit[0].groupId}", "Is Troop Onboard", {"ActionMenu"}, sendCmd, {["action"] = "f10Menu", ["cmd"] = "isTroopOnboard", ["unitId"] = ${unitId}})`
+    ];
+
+
+
+}
 
 
 /* tslint:disable */

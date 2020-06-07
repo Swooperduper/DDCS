@@ -614,5 +614,10 @@ export interface IMenuCommand {
     cmdProp: {
         cmd: string;
         type: string;
+        unitId: number;
+        crates: number;
+        mobile: boolean;
+        mass: boolean;
     };
+    allowedUnitTypes: string[];
 }
