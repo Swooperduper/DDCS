@@ -5,7 +5,7 @@
 import * as mongoose from "mongoose";
 
 export function menuCommandModel(dbconn: mongoose.Connection): mongoose.Document | {} {
-    return dbconn.model("menuCommand", new mongoose.Schema({
+    return dbconn.model("menucommand", new mongoose.Schema({
             _id: {
                 type: String,
                 required: true

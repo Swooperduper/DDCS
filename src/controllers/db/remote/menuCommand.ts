@@ -9,7 +9,6 @@ export async function menuCommandsRead(filter: any): Promise<typings.IMenuComman
     return new Promise((resolve, reject) => {
         dbModels.menuCommandModel.find(filter, (err: any, menuCommands: typings.IMenuCommand[]) => {
             if (err) { reject(err); }
-            console.log("SHEET: ", menuCommands);
             resolve(menuCommands);
         });
     });
