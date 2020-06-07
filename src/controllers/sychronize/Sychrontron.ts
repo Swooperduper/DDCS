@@ -39,6 +39,10 @@ export function getRequestJob(reqId: number): any {
     return requestJobArray.find((r) => r.reqId === reqId);
 }
 
+export function setRequestJobArray(requestObj: any): any {
+    requestJobArray.push(requestObj);
+}
+
 export function getNextUniqueId(): number {
     const curUniqueId = nextUniqueId;
     nextUniqueId += 1;
@@ -150,7 +154,7 @@ export async function syncByName(incomingObj: any, curReqJobIndex: number): Prom
 
 export async function reSyncServerObjs(serverCount: number, dbCount: number) {
     const curNextUniqueId = getNextUniqueId();
-    requestJobArray.push({
+    setRequestJobArray({
         reqId: curNextUniqueId,
         callBack: "syncByName",
         reqArgs: {
@@ -182,11 +186,11 @@ export async function activateInitSpawn() {
     if (Object.keys(unitGroups).length > 0) {
         console.log("Start Activating all units");
         for (const unitKeys of Object.keys(unitGroups)) {
-            if (unitKeys) {
+            if (unitKeys !== "undefined") {
                 await ddcsControllers.sendUDPPacket("frontEnd", {
                     actionObj: {
                         action: "CMD",
-                        cmd: "Group.getByName(\"" + unitKeys + "\"):activate()",
+                        cmd: ["Group.getByName(\"" + unitKeys + "\"):activate()"],
                         reqID: 0,
                         time: new Date()
                     }

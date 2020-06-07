@@ -518,7 +518,7 @@ export async function spawnSAMNet(side: number, baseName: string, init: boolean)
                 console.log("3+ missle batterys in place");
             }
         } else {
-            console.log("");
+            console.log("Sam type doesnt exist");
         }
     } else {
         if (init) {
@@ -1308,7 +1308,7 @@ export async function spawnStaticBuilding(
             await staticTemplate(staticObj as typing.IStaticUnitTemp),
             staticObj.country
         );
-        await ddcsControllers.sendUDPPacket("frontEnd", {actionObj: {action: "CMD", cmd: curCMD, reqID: 0}});
+        await ddcsControllers.sendUDPPacket("frontEnd", {actionObj: {action: "CMD", cmd: [curCMD], reqID: 0}});
     }
 }
 
@@ -1354,7 +1354,7 @@ export async function spawnUnitGroup(spawnArray: typing.IUnitSpawnMin[], init: b
                 grpObj.country,
                 grpObj.unitCategory
             );
-            const sendClient = {actionObj: {action: "CMD", cmd: curCMD, reqID: 0}};
+            const sendClient = {actionObj: {action: "CMD", cmd: [curCMD], reqID: 0}};
             await ddcsControllers.sendUDPPacket("frontEnd", sendClient);
         }
     }
@@ -1381,7 +1381,7 @@ export async function spawnNewMapObjs(): Promise<void> {
                 let totalUnitNum = 0;
                 while (totalUnitNum < ddcsControllers.getEngineCache().config.replenThresholdBase) {
                     totalUnitNum += await spawnBaseReinforcementGroup(baseStartSide, base._id, true, true);
-                    console.log("TOTLOG: ", totalUnitNum, ddcsControllers.getEngineCache().config.replenThresholdBase);
+                    console.log(base._id, " spawned ", totalUnitNum, " units, threshold: ", ddcsControllers.getEngineCache().config.replenThresholdBase);
                 }
 
             }
@@ -1439,7 +1439,7 @@ export async function spawnRadioTower(staticObj: any, init: boolean, baseObj?: t
     };
 
     const curCMD = spawnStatic(exports.staticTemplate(curGrpObj), curGrpObj.country);
-    const sendClient = {action: "CMD", cmd: curCMD, reqID: 0};
+    const sendClient = {action: "CMD", cmd: [curCMD], reqID: 0};
     const actionObj = {actionObj: sendClient, queName: "clientArray"};
     await ddcsControllers.sendUDPPacket("frontEnd", actionObj);
     await ddcsControllers.unitActionUpdateByName({
@@ -1492,7 +1492,7 @@ export async function destroyUnit( unitName: string, type: string ): Promise<voi
         cmd = "Unit.getByName(\"" + unitName + "\"):destroy()";
     }
 
-    const actionObj = {actionObj: {action: "CMD", cmd, reqID: 0}};
+    const actionObj = {actionObj: {action: "CMD", cmd: [cmd], reqID: 0}};
     await ddcsControllers.sendUDPPacket("frontEnd", actionObj);
 }
 

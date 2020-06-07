@@ -82,6 +82,7 @@ export async function initV3Engine(): Promise<void> {
 
     setInterval( async () => {
         await ddcsController.processFiveSecActions(ddcsController.getServerSynced());
+        await ddcsController.menuTest();
     }, ddcsController.time.fiveSecs);
 
     setInterval( async () => {
@@ -129,7 +130,5 @@ export async function initV3Engine(): Promise<void> {
     }, ddcsController.time.oneHour);
 
     await ddcsController.testRead();
-
-    // await ddcsController.menuTest();
 
 }

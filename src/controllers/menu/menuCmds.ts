@@ -309,6 +309,7 @@ export async function loadTroops(unitId: string, troopType: string) {
 }
 
 export async function menuCmdProcess(pObj: any) {
+    console.log("MENU COMMAND: ", pObj);
     const engineCache = ddcsControllers.getEngineCache();
     const defCrate = "iso_container_small";
 

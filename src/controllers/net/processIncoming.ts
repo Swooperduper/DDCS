@@ -88,6 +88,7 @@ export async function processingIncomingData(incomingObj: any) {
             // await ddcsController.processDisconnect(incomingObj);
             break;
         case "processReq":
+            console.log("INC: ", incomingObj);
             const curReqJobIndex = ddcsController.getRequestIndex(incomingObj.reqId);
             const curReqJobObj = ddcsController.getRequestJob(incomingObj.reqId);
             if (curReqJobObj && curReqJobIndex) {

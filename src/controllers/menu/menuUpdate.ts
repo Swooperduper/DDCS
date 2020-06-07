@@ -52,19 +52,42 @@ const allowedHelisForInternalCrates = [
 ];
 
 export async function menuTest() {
-    const menuTestCommand = `
-        [
-        'missionCommands.addSubMenuForGroup("' + unit.groupId + '", "ActionMenu")',
-        'missionCommands.addCommandForGroup("' + unit.groupId + '", "Is Troop Onboard", {"ActionMenu"}, sendCmd, {["action"] = "f10Menu", ["cmd"] = "isTroopOnboard", ["unitId"] = ' + unit.unitId + '})'
-        ]
-    `;
+    console.log("MENUTEST RUNNING");
+/*
+    const menuTestCommand1 = 'missionCommands.removeItemForGroup(2, "Lives", nil)';
+    const menuTestCommand2 = 'missionCommands.addSubMenuForGroup(2, "Lives")';
+    const menuTestCommand3 = 'missionCommands.addCommandForGroup(
+        2,
+        "Time Until Restart",
+        {"Lives"},
+        sendRequest,
+        {["action"] = "f10Menu", ["cmd"] = "serverTimeLeft", ["type"] = "Server Time Left", ["unitId"] = 2}
+    )';
 
-    await ddcsControllers.sendUDPPacket("frontEnd", {
-        action: "CMD",
-        cmd: menuTestCommand,
+    const curNextUniqueId = ddcsControllers.getNextUniqueId();
+    ddcsControllers.setRequestJobArray({
+        reqId: curNextUniqueId,
         callBack: "menuCallback",
-        reqArgs: {},
-        reqId: ddcsControllers.getNextUniqueId()
+        reqArgs: {}
+    });
+    await ddcsControllers.sendUDPPacket("frontEnd", {
+        actionObj: {
+            action: "CMD",
+            cmd: [
+                menuTestCommand1,
+                menuTestCommand2,
+                menuTestCommand3
+            ],
+            reqID: curNextUniqueId
+        }
+    });
+*/
+    await ddcsControllers.sendUDPPacket("frontEnd", {
+        actionObj: {
+            action: "CMD",
+            cmd: ["trigger.action.outTextForGroup(2, [[TEST TEST TEST]], 2)"],
+            reqID: 0
+        }
     });
 }
 

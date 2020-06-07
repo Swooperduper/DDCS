@@ -9,7 +9,7 @@ export async function forcePlayerSpectator(playerId: string, mesg: string): Prom
     await ddcsController.sendUDPPacket("backEnd", {
         actionObj: {
             action: "CMD",
-            cmd: "net.force_player_slot(" + playerId + ", 0, \"\")",
+            cmd: ["net.force_player_slot(" + playerId + ", 0, \"\")"],
             reqID: 0
         },
         queName: "gameGuiArray"
@@ -18,7 +18,7 @@ export async function forcePlayerSpectator(playerId: string, mesg: string): Prom
     await ddcsController.sendUDPPacket("backEnd", {
         actionObj: {
             action: "CMD",
-            cmd: "net.send_chat([[" + mesg + "]], all)",
+            cmd: ["net.send_chat([[" + mesg + "]], all)"],
             reqID: 0
         },
         queName: "gameGuiArray"
@@ -29,7 +29,7 @@ export async function kickPlayer(playerId: number, mesg: string): Promise<void> 
     await ddcsController.sendUDPPacket("backEnd", {
         actionObj: {
             action: "CMD",
-            cmd: "net.kick(" + playerId + ", [[" + mesg + "]])",
+            cmd: ["net.kick(" + playerId + ", [[" + mesg + "]])"],
             reqID: 0
         },
         queName: "gameGuiArray"
@@ -40,7 +40,7 @@ export async function loadMission(missionName: string): Promise<void> {
     await ddcsController.sendUDPPacket("backEnd", {
         actionObj: {
             action: "CMD",
-            cmd: "net.load_mission([[" + missionName + "]])",
+            cmd: ["net.load_mission([[" + missionName + "]])"],
             reqID: 0
         },
         queName: "gameGuiArray"
@@ -51,7 +51,7 @@ export async function sendMesgChatWindow(mesg: string): Promise<void> {
     await ddcsController.sendUDPPacket("backEnd", {
         actionObj: {
             action: "CMD",
-            cmd: "net.send_chat([[" + mesg + "]], true)",
+            cmd: ["net.send_chat([[" + mesg + "]], true)"],
             reqID: 0
         },
         queName: "gameGuiArray"

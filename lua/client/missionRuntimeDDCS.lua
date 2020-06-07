@@ -260,6 +260,11 @@ function updateObjsByName(unitNames, objType)
     end
 end
 
+function sendRequest(outObj)
+    if outObj.action ~= nil then
+        sendUDPPacket(outObj)
+    end
+end
 function commandExecute(s)
     return loadstring("return " ..s)()
 end
@@ -281,14 +286,20 @@ function runRequest(request)
         end
 
         if request.action == "CMD" then
-            --env.info("cmd: "..request.cmd)
-            local success, retVal = pcall(commandExecute, request.cmd)
-            if not success then
-                env.info("Error: " .. retVal)
-            end
-            if request.reqID > 0 then
-                outObj.returnObj = retVal
-                sendUDPPacket(outObj)
+            if type(request.cmd) == 'table' then
+                cmdResponses = {}
+                for rIndex = 1, #request.cmd do
+                    env.info("cmd: ".. request.cmd[rIndex])
+                    local success, retVal = pcall(commandExecute, request.cmd[rIndex])
+                    if not success then
+                        env.info("Error: " .. retVal)
+                    end
+                    table.insert(cmdResponses, retVal)
+                end
+                if request.reqID > 0 then
+                    outObj.returnObj = cmdResponses
+                    sendUDPPacket(outObj)
+                end
             end
         end
     end
