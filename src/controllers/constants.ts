@@ -4,14 +4,14 @@
 
 // setup defaults to satisfy config object
 import * as typings from "../typings";
-import {IWeaponDictionary} from "../typings";
 
 export const engineCache = {
     config: {},
     staticDictionary: [],
     unitDictionary: [],
     weaponsDictionary: [],
-    bases: []
+    bases: [],
+    menuCommands: []
 };
 
 export const OBJECT_CATEGORY: string[] = [
@@ -319,4 +319,8 @@ export function setWeaponDictionary(curWeaponDictionary: any): void {
 
 export function setBases(curBases: any): void {
     engineCache.bases = curBases;
+}
+
+export function setMenuCommands(menuCommands: any): void {
+    engineCache.menuCommands = menuCommands;
 }

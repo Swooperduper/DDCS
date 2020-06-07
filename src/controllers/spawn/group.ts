@@ -1295,7 +1295,8 @@ export async function spawnStaticBuilding(
                 _id: baseObj.name + " " + staticType,
                 hdg: _.random(0, 359),
                 alt: 0,
-                lonLatLoc: ddcsControllers.getRandomLatLonFromBase(baseObj.name, "buildingPoly")
+                lonLatLoc: ddcsControllers.getRandomLatLonFromBase(baseObj.name, "buildingPoly"),
+                isActive: true
             };
             // initial spawn, spawn in DB and sync over
             await ddcsControllers.unitActionSave(curStaticObj);
@@ -1304,6 +1305,7 @@ export async function spawnStaticBuilding(
         }
     } else {
         staticObj.canCargo = staticObj.canCargo || false;
+        staticObj.isActive = true;
         const curCMD = await spawnStatic(
             await staticTemplate(staticObj as typing.IStaticUnitTemp),
             staticObj.country
@@ -1381,7 +1383,8 @@ export async function spawnNewMapObjs(): Promise<void> {
                 let totalUnitNum = 0;
                 while (totalUnitNum < ddcsControllers.getEngineCache().config.replenThresholdBase) {
                     totalUnitNum += await spawnBaseReinforcementGroup(baseStartSide, base._id, true, true);
-                    console.log(base._id, " spawned ", totalUnitNum, " units, threshold: ", ddcsControllers.getEngineCache().config.replenThresholdBase);
+                    console.log(base._id, " spawned ", totalUnitNum, " units, threshold: ",
+                        ddcsControllers.getEngineCache().config.replenThresholdBase);
                 }
 
             }

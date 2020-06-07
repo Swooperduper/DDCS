@@ -7,3 +7,4 @@ export * from "./unitDictionary";
 export * from "./userAccount";
 export * from "./weaponScore";
 export * from "./template";
+export * from "./menuCommands";

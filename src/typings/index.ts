@@ -575,6 +575,7 @@ export interface IStaticSpawnMin {
     hdg: number;
     alt: number;
     lonLatLoc: number[];
+    isActive: boolean;
 }
 
 export interface IGroundUnitTemp {
@@ -602,4 +603,16 @@ export interface IStaticUnitTemp {
 export interface ITemplate {
     _id: string;
     template: string;
+}
+
+export interface IMenuCommand {
+    _id: string;
+    sort: number;
+    menuPath: string[];
+    side: number;
+    itemTitle: string;
+    cmdProp: {
+        cmd: string;
+        type: string;
+    };
 }

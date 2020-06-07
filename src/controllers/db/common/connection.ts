@@ -51,6 +51,10 @@ export async function updateWeaponDictionary(): Promise<void> {
     ddcsController.setWeaponDictionary(await ddcsController.weaponScoreActionsRead({}));
 }
 
+export async function updateMenuCommands(): Promise<void> {
+    ddcsController.setMenuCommands(await ddcsController.menuCommandsRead({}));
+}
+
 export async function initV3Engine(): Promise<void> {
 
     localConnection = await getDbConnection("localConnection");
@@ -69,6 +73,7 @@ export async function initV3Engine(): Promise<void> {
     await updateUnitDictionary(ddcsController.getEngineCache().config.timePeriod);
     await updateWeaponDictionary();
     await updateBases();
+    await updateMenuCommands();
 
     await ddcsController.setResetFullCampaign(ddcsController.getEngineCache().config.resetFullCampaign);
 

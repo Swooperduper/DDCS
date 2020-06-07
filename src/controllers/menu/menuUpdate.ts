@@ -52,7 +52,9 @@ const allowedHelisForInternalCrates = [
 ];
 
 export async function menuTest() {
-    console.log("MENUTEST RUNNING");
+    const curMenuCommands = ddcsControllers.getEngineCache().menuCommands;
+
+    console.log("MENUTEST RUNNING: ", curMenuCommands);
 /*
     const menuTestCommand1 = 'missionCommands.removeItemForGroup(2, "Lives", nil)';
     const menuTestCommand2 = 'missionCommands.addSubMenuForGroup(2, "Lives")';
