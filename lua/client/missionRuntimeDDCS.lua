@@ -289,7 +289,7 @@ function runRequest(request)
             if type(request.cmd) == 'table' then
                 cmdResponses = {}
                 for rIndex = 1, #request.cmd do
-                    env.info("cmd: ".. request.cmd[rIndex])
+                    --env.info("cmd: ".. request.cmd[rIndex])
                     local success, retVal = pcall(commandExecute, request.cmd[rIndex])
                     if not success then
                         env.info("Error: " .. retVal)
@@ -330,5 +330,137 @@ timer.scheduleFunction(sendServerInfo, {}, timer.getTime() + SEND_SERVER_INFO_SE
 timer.scheduleFunction(runPerFrame, {}, timer.getTime() + DATA_TIMEOUT_SEC)
 timer.scheduleFunction(updateObjs, {}, timer.getTime() + DATA_TIMEOUT_SEC)
 
--- world.addEventHandler(ddcs)
+--Send Mission Events Back
+eventTypes = {
+    --[0] = "S_EVENT_INVALID",
+    [1] = "S_EVENT_SHOT",
+    [2] = "S_EVENT_HIT",
+    [3] = "S_EVENT_TAKEOFF",
+    [4] = "S_EVENT_LAND",
+    [5] = "S_EVENT_CRASH",
+    [6] = "S_EVENT_EJECTION",
+    [7] = "S_EVENT_REFUELING",
+    [8] = "S_EVENT_DEAD",
+    [9] = "S_EVENT_PILOT_DEAD",
+    [10] = "S_EVENT_BASE_CAPTURED",
+    [11] = "S_EVENT_MISSION_START",
+    [12] = "S_EVENT_MISSION_END",
+    [13] = "S_EVENT_TOOK_CONTROL",
+    [14] = "S_EVENT_REFUELING_STOP",
+    [15] = "S_EVENT_BIRTH",
+    [16] = "S_EVENT_HUMAN_FAILURE",
+    [17] = "S_EVENT_DETAILED_FAILURE",
+    [18] = "S_EVENT_ENGINE_STARTUP",
+    [19] = "S_EVENT_ENGINE_SHUTDOWN",
+    [20] = "S_EVENT_PLAYER_ENTER_UNIT",
+    [21] = "S_EVENT_PLAYER_LEAVE_UNIT",
+    [22] = "S_EVENT_PLAYER_COMMENT",
+    [23] = "S_EVENT_SHOOTING_START",
+    [24] = "S_EVENT_SHOOTING_END",
+    [25] = "S_EVENT_MARK_ADDED",
+    [26] = "S_EVENT_MARK_CHANGE",
+    [27] = "S_EVENT_MARK_REMOVED",
+    [28] = "S_EVENT_KILL",
+    [29] = "S_EVENT_SCORE",
+    [30] = "S_EVENT_UNIT_LOST",
+    [31] = "S_EVENT_LANDING_AFTER_EJECTION",
+    -- Redacted for now.
+    [33] = "S_EVENT_MAX"
+}
+birthTypes = {
+    "wsBirthPlace_Air",
+    "wsBirthPlace_RunWay",
+    "wsBirthPlace_Park",
+    "wsBirthPlace_Heliport_Hot",
+    "wsBirthPlace_Heliport_Cold"
+}
+
+weaponCategory = {
+    "SHELL",
+    "MISSILE",
+    "ROCKET",
+    "BOMB"
+}
+
+clientEventHandler = {}
+function clientEventHandler:onEvent(_event)
+    local status, err = pcall(function(_event)
+        --env.info("EVENT: "..eventTypes[_event.id])
+        if _event == nil or eventTypes[_event.id] == nil then
+            return false
+        else
+            local curEvent = {}
+            if _event.id ~= nil then
+                curEvent.name = eventTypes[_event.id]
+                curEvent.id = _event.id
+            end
+            if _event.idx ~= nil then
+                curEvent.idx = _event.idx
+            end
+            if _event.time ~= nil then
+                curEvent.time = _event.time
+            end
+            if _event.initiator ~= nil then
+                local getIId = _event.initiator:getID()
+                if getIId ~= nil then
+                    curEvent.initiatorId = tonumber(getIId)
+                end
+            end
+            if _event.target ~= nil then
+                local getTId = _event.target:getID()
+                if getTId ~= nil then
+                    curEvent.targetId = tonumber(getTId)
+                else
+                    local targetObject = _event.target:getDesc()
+                    curEvent.targetId = {
+                        ["typeName"] = targetObject.typeName,
+                        ["displayName"] = targetObject.displayName,
+                        ["category"] = targetObject.category
+                    }
+                end
+            end
+            if _event.place ~= nil then
+                curEvent.place = _event.place:getName()
+            end
+            if _event.subPlace ~= nil then
+                curEvent.subPlace = birthTypes[_event.subPlace]
+            end
+            if _event.weapon ~= nil then
+                local curWeapon = _event.weapon:getDesc()
+                curEvent.weapon = {
+                    ["typeName"] = curWeapon.typeName,
+                    ["displayName"] = curWeapon.displayName,
+                    ["category"] = weaponCategory[curWeapon.category + 1]
+                }
+            end
+            if _event.weapon_name ~= nil then
+                curEvent.weapon_name = _event.weapon_name
+            end
+            if _event.coalition ~= nil then
+                curEvent.coalition = _event.coalition
+            end
+            if _event.groupID ~= nil then
+                curEvent.groupID = _event.groupID
+            end
+            if _event.text ~= nil then
+                curEvent.text = _event.text
+            end
+            if _event.pos ~= nil then
+                curEvent.pos = _event.pos
+            end
+            sendUDPPacket({
+                ["action"] = eventTypes[_event.id],
+                ["data"] = curEvent,
+                ["type"] = "event"
+            })
+            return true
+        end
+    end, _event)
+    if (not status) then
+        env.info("failEvent: ".. err)
+    end
+end
+
+
+world.addEventHandler(clientEventHandler)
 env.info("missionRuntimeDDCS loaded")

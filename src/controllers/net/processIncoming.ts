@@ -1,6 +1,10 @@
 import * as ddcsController from "../";
 
 export async function processingIncomingData(incomingObj: any) {
+    if (incomingObj.action === "S_EVENT_KILL") {
+        // switch scoring to this new kill event
+        console.log("INC2: ", incomingObj);
+    }
     switch (incomingObj.action) {
         case "serverInfo":
             await ddcsController.getLatestSession(incomingObj);

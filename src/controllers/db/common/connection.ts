@@ -87,12 +87,6 @@ export async function initV3Engine(): Promise<void> {
 
     setInterval( async () => {
         await ddcsController.processFiveSecActions(ddcsController.getServerSynced());
-        await ddcsController.initializeMenu({
-            side: 2,
-            groupId: 2,
-            unitId: 5,
-            type: "UH-1H"
-        });
     }, ddcsController.time.fiveSecs);
 
     setInterval( async () => {
@@ -111,6 +105,12 @@ export async function initV3Engine(): Promise<void> {
                 name: ddcsController.getSessionName(),
                 startAbsTime: ddcsController.getStartAbsTime(),
                 curAbsTime: ddcsController.getCurAbsTime()
+            });
+            await ddcsController.initializeMenu({
+                side: 2,
+                groupId: 2,
+                unitId: 5,
+                type: "UH-1H"
             });
         }
     }, ddcsController.time.oneMin);
