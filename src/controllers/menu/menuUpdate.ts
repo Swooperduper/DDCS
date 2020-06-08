@@ -35,6 +35,25 @@ export async function spawnNewMenuCategory(
 
     // draw subPayload items
     for (const curSubMenu of curMenu) {
+        let curUnitDictionary = ddcsControllers.getEngineCache().unitDictionary.filter(
+            (unit: any) => unit.type === curSubMenu.cmdProp.type
+        );
+        let spawnAmount = 1;
+        if (curUnitDictionary.length === 1) {
+            spawnAmount = curUnitDictionary[0].config[ddcsControllers.getEngineCache().config.timePeriod].spawnCount;
+        } else {
+            curUnitDictionary = ddcsControllers.getEngineCache().unitDictionary.filter(
+                (unit: any) => {
+                    return _.includes(unit.comboName, curSubMenu.cmdProp.type);
+                }
+            );
+            if (curUnitDictionary.length > 1) {
+
+                const launcher = curUnitDictionary.find((rec: any) => rec.launcher);
+                spawnAmount = launcher.config[ddcsControllers.getEngineCache().config.timePeriod].spawnCount;
+            }
+        }
+
         let cmdProps = `{["action"] = "f10Menu", `;
         for (const [keyProp, valueProp] of Object.entries(curSubMenu.cmdProp)) {
             if (keyProp === "mass" && curWeight) {
@@ -49,10 +68,13 @@ export async function spawnNewMenuCategory(
         if (curSubMenu.cmdProp.mass) {
             curMenuArray[0] += massTypeString;
         }
+        const curCrates = (curSubMenu.cmdProp.crates) ? "(" + spawnAmount + "Q-" + curSubMenu.cmdProp.crates + "C)" : "";
+
         menuSpawnArray.push(
-            `missionCommands.addCommandForGroup(${playerUnit.groupId}, "${curSubMenu.itemTitle}", {"${curMenuArray.join('","')}"}, sendRequest, ${cmdProps})`
+            `missionCommands.addCommandForGroup(${playerUnit.groupId}, "${curSubMenu.itemTitle}${curCrates}", {"${curMenuArray.join('","')}"}, sendRequest, ${cmdProps})`
         );
     }
+    // console.log("MENUS: ", menuSpawnArray);
     await ddcsControllers.sendUDPPacket("frontEnd", {
         actionObj: {
             action: "CMD",
