@@ -221,6 +221,7 @@ export async function isCrateOnboard(unit: any, verbose: boolean) {
 }
 
 export async function isTroopOnboard(unit: any, verbose: boolean) {
+    console.log("isTroopHere: ", unit, verbose);
     if (!_.isEmpty(unit.troopType)) {
         if (verbose) {
             await ddcsControllers.sendMesgToGroup(
@@ -314,11 +315,11 @@ export async function menuCmdProcess(pObj: any) {
     const defCrate = "iso_container_small";
 
     const units = await ddcsControllers.unitActionRead({unitId: pObj.unitId});
-    const curUnit = _.get(units, 0);
-    if (curUnit) {
+    if (units.length > 0) {
+        const curUnit = units[0];
         const player = await ddcsControllers.srvPlayerActionsRead({name: curUnit.playername});
-        const curPlayer = _.get(player, [0]);
-        if (curPlayer) {
+        if (player.length > 0) {
+            const curPlayer = player[0];
             let spawnArray;
             let curSpawnUnit;
             // action menu

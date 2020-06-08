@@ -9,9 +9,9 @@ export let rtPlayerArray: any;
 
 export async function processPlayerEvent(playerArray: any): Promise<void> {
     const engineCache = ddcsControllers.getEngineCache();
-    if (playerArray.data > 0) {
-        rtPlayerArray = playerArray.data;
-        for (const player of playerArray.data) {
+    if (playerArray.players.length > 0) {
+        rtPlayerArray = playerArray.players;
+        for (const player of playerArray.players) {
             if (player) {
                 const curPlyrUcid = player.ucid;
                 const curPlyrSide = player.side;
@@ -36,9 +36,9 @@ export async function processPlayerEvent(playerArray: any): Promise<void> {
                     }
 
                     const unit = await ddcsControllers.unitActionRead({playername: curPlyrName, dead: false});
-                    const curUnit = unit[0];
-                    const curUnitSide = curUnit.coalition;
-                    if (curUnit) {
+                    if (unit.length > 0) {
+                        const curUnit = unit[0];
+                        const curUnitSide = curUnit.coalition;
                         // switching to spectator gets around this, fix this in future please
                         if ((curUnitSide !== curPlyrSide) && curPlyrSide !== 0 && curPlyrSide) {
                             if (curUnitSide) {
@@ -73,15 +73,13 @@ export async function processPlayerEvent(playerArray: any): Promise<void> {
             }
         }
 
-        for (const data of playerArray.data) {
-            const curData = _.cloneDeep(data);
+        for (const player of playerArray.players) {
+            const curData = _.cloneDeep(player);
+            curData._id = curData.ucid;
+            curData.playerId = curData.id;
+            curData.sessionName = ddcsControllers.getSessionName();
             if (curData.ucid) {
-                await ddcsControllers.srvPlayerActionsUpdateFromServer({
-                    ...curData,
-                    _id: curData.ucid,
-                    playerId: curData.id,
-                    sessionName: ddcsControllers.getSessionName()
-                });
+                await ddcsControllers.srvPlayerActionsUpdateFromServer(curData);
             }
         }
     }

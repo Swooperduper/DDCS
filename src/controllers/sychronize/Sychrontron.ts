@@ -8,7 +8,7 @@ import { getSessionName } from "../";
 
 const requestJobArray: any[] = [];
 
-let missionStartupReSync = true;
+let missionStartupReSync = false;
 let isServerSynced = false;
 let isInitSyncMode = false; // Init Sync Units To Server Mode
 let nextUniqueId = 1;
