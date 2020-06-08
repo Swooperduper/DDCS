@@ -106,12 +106,6 @@ export async function initV3Engine(): Promise<void> {
                 startAbsTime: ddcsController.getStartAbsTime(),
                 curAbsTime: ddcsController.getCurAbsTime()
             });
-            await ddcsController.initializeMenu({
-                side: 2,
-                groupId: 2,
-                unitId: 5,
-                type: "UH-1H"
-            });
         }
     }, ddcsController.time.oneMin);
 

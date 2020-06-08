@@ -18,54 +18,45 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
     const unit = await ddcsControllers.unitActionRead({_id: unitObj.data.name});
     let stParse;
     let iCurObj: any;
-    let curData = unitObj.data;
+    const curData = unitObj.data;
     if (unit.length > 0) {
         const curUnit = unit[0];
         const curUnitName = curUnit.name;
         if (_.includes(curData.name, "AI|")) {
             stParse = _.split(curData.name, "|");
-            curData = {
-                ...curData,
-                playerOwnerId: stParse[1],
-                isAI: true,
-                hidden: true
-            };
+            curData.playerOwnerId = stParse[1];
+            curData.isAI = true;
+            curData.hidden = true;
         }
         if (_.includes(curData.name, "TU|")) {
             stParse = _.split(curData.name, "|");
-            curData = {
-                ...curData,
-                playerOwnerId: stParse[1],
-                playerCanDrive: false,
-                isTroop: true,
-                spawnCat: stParse[2]
-            };
+            curData.playerOwnerId = stParse[1];
+            curData.playerCanDrive = false;
+            curData.isTroop = true;
+            curData.spawnCat = stParse[2];
         }
         if (_.includes(curData.name, "CU|")) {
             stParse = _.split(curData.name, "|");
-            curData = {
-                ...curData,
-                playerOwnerId: stParse[1],
-                isCombo: _.isBoolean(stParse[5]),
-                playerCanDrive: false,
-                isCrate: true,
-                hidden: false
-            };
+            curData.playerOwnerId = stParse[1];
+            curData. isCombo = _.isBoolean(stParse[5]);
+            curData.playerCanDrive = false;
+            curData.isCrate = true;
+            curData.hidden = false;
         }
         if (_.includes(curData.name, "DU|")) {
             stParse = _.split(curData.name, "|");
             const isAllowedToDrive = (stParse[5] === "true");
-            curData = {
-                ...curData,
-                playerOwnerId: stParse[1],
-                proxChkGrp: stParse[3],
-                playerCanDrive: isAllowedToDrive
-            };
+            curData.playerOwnerId = stParse[1];
+            curData.proxChkGrp = stParse[3];
+            curData.playerCanDrive = isAllowedToDrive;
         }
 
         // update location of carrier in aircraft DB
         if (_.includes(curData.name, "Carrier")) {
             await ddcsControllers.baseActionUpdate({_id: curUnitName, centerLoc: curData.lonLatLoc, isResync: true});
+        }
+        if (curData.playername && unitObj.action === "C") {
+            await ddcsControllers.initializeMenu(unitObj.data);
         }
 
         if (unitObj.action !== "D") {
