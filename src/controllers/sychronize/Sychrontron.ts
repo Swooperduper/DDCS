@@ -171,7 +171,7 @@ export async function reSyncServerObjs(serverCount: number, dbCount: number) {
     });
 }
 
-export async function activateInitSpawn() {
+export async function activateInactiveSpawn() {
     await ddcsControllers.unitActionChkResync();
     // loop through and activate all non ~
     const unitObjs = await ddcsControllers.unitActionReadStd({
@@ -180,6 +180,8 @@ export async function activateInitSpawn() {
         _id: {$not: /~/},
         isResync: false
     });
+
+    console.log("inactive: ", unitObjs.length);
 
     const unitGroups = _.groupBy(unitObjs, (u) => u.groupName);
 
@@ -240,7 +242,7 @@ export async function syncCheck(serverCount: number): Promise<void> {
                 } else {
                     // unlock server port
                     // send message to discord
-                    await activateInitSpawn();
+                    await activateInactiveSpawn();
                     setMissionStartupReSync(false);
                     setServerSynced(true);
                     console.log("Server Is Synchronized");
@@ -253,6 +255,7 @@ export async function syncCheck(serverCount: number): Promise<void> {
                     await reSyncServerObjs(serverCount, dbCount);
                 } else {
                     // normal synced operation
+                    await activateInactiveSpawn();
                     console.log("NORMAL SYNC CHECK LOOP");
                 }
             }
