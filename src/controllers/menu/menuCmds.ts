@@ -326,7 +326,6 @@ export async function menuCmdProcess(pObj: any) {
             switch (pObj.cmd) {
                 case "serverTimeLeft":
                     await ddcsControllers.timeLeft(curUnit);
-                    await ddcsControllers.setSideLockFlags();
                     break;
                 case "lookupAircraftCosts":
                     await ddcsControllers.lookupAircraftCosts(curPlayer.ucid);

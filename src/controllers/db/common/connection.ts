@@ -2,6 +2,7 @@ import * as mongoose from "mongoose";
 import * as localModels from "../local/models";
 import * as remoteModels from "../remote/models";
 import * as ddcsController from "../../";
+import {getCurAbsTime} from "../../";
 
 export let localConnection: mongoose.Connection;
 export let remoteConnection: mongoose.Connection;
@@ -87,14 +88,13 @@ export async function initV3Engine(): Promise<void> {
 
     setInterval( async () => {
         await ddcsController.processFiveSecActions(ddcsController.getServerSynced());
+        await ddcsController.processTimer(ddcsController.getCurAbsTime());
     }, ddcsController.time.fiveSecs);
 
     setInterval( async () => {
         if (ddcsController.getServerSynced()) {
             await ddcsController.processThirtySecActions(ddcsController.getServerSynced());
             await ddcsController.processTimer(ddcsController.getCurServerEpoc());
-        } else {
-            ddcsController.resetTimerObj();
         }
     }, ddcsController.time.thirtySecs);
 

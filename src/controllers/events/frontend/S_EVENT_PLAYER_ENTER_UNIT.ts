@@ -10,7 +10,6 @@ export async function processEventPlayerEnterUnit(eventObj: any): Promise<void> 
     const playerArray = await ddcsControllers.srvPlayerActionsRead({sessionName: ddcsControllers.getSessionName()});
     const curIUnit = iUnit[0];
     if (curIUnit) {
-
         const iPlayer = _.find(playerArray, {name: curIUnit.playername});
         if (iPlayer) {
             const iCurObj = {
@@ -26,6 +25,8 @@ export async function processEventPlayerEnterUnit(eventObj: any): Promise<void> 
                 await ddcsControllers.sendToCoalition({payload: {action: eventObj.action, data: _.cloneDeep(iCurObj)}});
                 await ddcsControllers.simpleStatEventActionsSave(iCurObj);
             }
+            // give them a menu
+            await ddcsControllers.initializeMenu(eventObj.data);
         }
     }
 }

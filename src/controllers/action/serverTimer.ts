@@ -6,81 +6,108 @@ import * as _ from "lodash";
 import * as typings from "../../typings";
 import * as ddcsControllers from "../";
 
-let curSecs = 0;
+let currentSeconds = 0;
 let curTime = new Date().getTime();
 let lastSentLoader = _.cloneDeep(curTime);
 let maxTime = 0;
 let mesg;
 
-export let timerObj = {};
+export let timerObj = {
+    fourHours: false,
+    threeHours: false,
+    twoHours: false,
+    oneHour: false,
+    thirtyMinutes: false,
+    twentyMinutes: false,
+    tenMinutes: false,
+    fiveMinutes: false,
+    fourMinutes: false,
+    threeMinutes: false,
+    twoMinutes: false,
+    oneMinute: false
+};
+
+export function getMaxTime(): number {
+    return maxTime;
+}
+
+export function getCurSeconds(): number {
+    return currentSeconds;
+}
+
+export function setMaxTime(curMaxTime: number): void {
+    maxTime = curMaxTime;
+}
+
+
+export function setCurSeconds(curSeconds: number): void {
+    currentSeconds = curSeconds;
+}
 
 export async function processTimer(serverSecs: number): Promise<void> {
-    const engineCache = ddcsControllers.getEngineCache();
-    maxTime = engineCache.config.restartTimer;
+    setMaxTime((ddcsControllers.getStartAbsTime() + ddcsControllers.getEngineCache().config.restartTime) * 1000);
     mesg = null;
-    curSecs = serverSecs;
+    setCurSeconds(serverSecs * 1000);
 
-    if (maxTime > 0) {
-        if (serverSecs > (maxTime - (ddcsControllers.time.oneHour * 4)) && !exports.timerObj.fourHours) {
-            mesg = "Server is restarting in 4 hours!";
-            exports.timerObj.fourHours = true;
+    if (getMaxTime() > 0) {
+        if (getCurSeconds() > (getMaxTime() - (ddcsControllers.time.oneHour * 4)) && !timerObj.fourHours) {
+            mesg = "Server is restarting in less than 4 hours!";
+            timerObj.fourHours = true;
         }
         // 3 hours
-        if (serverSecs > (maxTime - (ddcsControllers.time.oneHour * 3)) && !exports.timerObj.threeHours) {
-            mesg = "Server is restarting in 3 hours!";
-            exports.timerObj.threeHours = true;
+        if (getCurSeconds() > (getMaxTime() - (ddcsControllers.time.oneHour * 3)) && !timerObj.threeHours) {
+            mesg = "Server is restarting in less than 3 hours!";
+            timerObj.threeHours = true;
         }
         // 2 hours
-        if (serverSecs > (maxTime - (ddcsControllers.time.oneHour * 2)) && !exports.timerObj.twoHours) {
-            mesg = "Server is restarting in 2 hours!";
-            exports.timerObj.twoHours = true;
+        if (getCurSeconds() > (getMaxTime() - (ddcsControllers.time.oneHour * 2)) && !timerObj.twoHours) {
+            mesg = "Server is restarting in less than 2 hours!";
+            timerObj.twoHours = true;
         }
         // 1 hour
-        if (serverSecs > (maxTime - ddcsControllers.time.oneHour) && !exports.timerObj.oneHour) {
-            mesg = "Server is restarting in 1 hour!";
-            exports.timerObj.oneHour = true;
+        if (getCurSeconds() > (getMaxTime() - ddcsControllers.time.oneHour) && !timerObj.oneHour) {
+            mesg = "Server is restarting in less than 1 hour!";
+            timerObj.oneHour = true;
         }
         // 30 mins
-        if (serverSecs > (maxTime - 1800) && !exports.timerObj.thirtyMinutes) {
-            mesg = "Server is restarting in 30 minutes!";
-            exports.timerObj.thirtyMinutes = true;
+        if (getCurSeconds() > (getMaxTime() - 1800) && !timerObj.thirtyMinutes) {
+            mesg = "Server is restarting in less than 30 minutes!";
+            timerObj.thirtyMinutes = true;
         }
         // 20 mins
-        if (serverSecs > (maxTime - 1440) && !exports.timerObj.twentyMinutes) {
-            mesg = "Server is restarting in 20 mins!";
-            exports.timerObj.twentyMinutes = true;
+        if (getCurSeconds() > (getMaxTime() - 1440) && !timerObj.twentyMinutes) {
+            mesg = "Server is restarting in less than 20 mins!";
+            timerObj.twentyMinutes = true;
         }
         // 10 mins
-        if (serverSecs > (maxTime - 720) && !exports.timerObj.tenMinutes) {
-            mesg = "Server is restarting in 10 mins!";
-            exports.timerObj.tenMinutes = true;
+        if (getCurSeconds() > (getMaxTime() - 720) && !timerObj.tenMinutes) {
+            mesg = "Server is restarting in less than 10 mins!";
+            timerObj.tenMinutes = true;
         }
         // 5 mins
-        if (serverSecs > (maxTime - 360) && !exports.timerObj.fiveMinutes) {
-            mesg = "Server is restarting in 5 minutes!";
-            exports.timerObj.fiveMinutes = true;
+        if (getCurSeconds() > (getMaxTime() - 360) && !timerObj.fiveMinutes) {
+            mesg = "Server is restarting in less than 5 minutes!";
+            timerObj.fiveMinutes = true;
         }
         // 4 mins
-        if (serverSecs > (maxTime - 240) && !exports.timerObj.fourMinutes) {
-            mesg = "Server is restarting in 4 minutes!";
-            exports.timerObj.fourMinutes = true;
+        if (getCurSeconds() > (getMaxTime() - 240) && !timerObj.fourMinutes) {
+            mesg = "Server is restarting in less than 4 minutes!";
+            timerObj.fourMinutes = true;
         }
         // 3 mins
-        if (serverSecs > (maxTime - 180) && !exports.timerObj.threeMinutes) {
-            mesg = "Server is restarting in 3 minutes!";
-            exports.timerObj.threeMinutes = true;
+        if (getCurSeconds() > (getMaxTime() - 180) && !timerObj.threeMinutes) {
+            mesg = "Server is restarting in less than 3 minutes!";
+            timerObj.threeMinutes = true;
         }
         // 2 mins
-        if (serverSecs > (maxTime - 120) && !exports.timerObj.twoMinutes) {
-            mesg = "Server is restarting in 2 minutes, Locking Server Down!";
-            exports.timerObj.twoMinutes = true;
-            await ddcsControllers.setIsOpenSlotFlag(0);
+        if (getCurSeconds() > (getMaxTime() - 120) && !timerObj.twoMinutes) {
+            mesg = "Server is restarting in less than 2 minutes, Locking Server Down!";
+            timerObj.twoMinutes = true;
         }
         // 1 min
-        if (serverSecs > (maxTime - 60) && !exports.timerObj.oneMinute) {
-            mesg = "Server is restarting in 1 minute, Server Is Locked!";
-            exports.timerObj.oneMinute = true;
-            await ddcsControllers.setIsOpenSlotFlag(0);
+        if (getCurSeconds() > (getMaxTime() - 60) && !timerObj.oneMinute) {
+            mesg = "Server is restarting in less than 1 minute, Server Is Locked!";
+            timerObj.oneMinute = true;
             const latestSession = await ddcsControllers.sessionsActionsReadLatest();
             if (latestSession.name) {
                 const playerArray = await ddcsControllers.srvPlayerActionsRead({ sessionName: latestSession.name });
@@ -90,7 +117,7 @@ export async function processTimer(serverSecs: number): Promise<void> {
             }
         }
         // restart server
-        if (serverSecs > maxTime) {
+        if (getCurSeconds() > getMaxTime()) {
             // restart server on next or same map depending on rotation
             curTime = new Date().getTime();
             if (curTime > lastSentLoader + ddcsControllers.time.oneMin) {
@@ -114,7 +141,20 @@ export async function processTimer(serverSecs: number): Promise<void> {
 }
 
 export function resetTimerObj(): void {
-    timerObj = {};
+    timerObj = {
+        fourHours: false,
+        threeHours: false,
+        twoHours: false,
+        oneHour: false,
+        thirtyMinutes: false,
+        twentyMinutes: false,
+        tenMinutes: false,
+        fiveMinutes: false,
+        fourMinutes: false,
+        threeMinutes: false,
+        twoMinutes: false,
+        oneMinute: false
+    };
 }
 
 export async function restartServer(): Promise<void> {
@@ -126,8 +166,9 @@ export async function restartServer(): Promise<void> {
 }
 
 export function secondsToHms(d: number): string {
-    const h = Math.floor(d / 3600);
-    const m = Math.floor(d % 3600 / 60);
+    const hLeft = d / 3600000;
+    const h = Math.floor(hLeft);
+    const m = Math.floor(60 * (hLeft - h));
     // const s = Math.floor(d % 3600 % 60);
 
     const hDisplay = h > 0 ? h + (h === 1 ? " hour, " : " hours, ") : "";
@@ -137,7 +178,8 @@ export function secondsToHms(d: number): string {
 }
 
 export async function timeLeft(curUnit: typings.IUnit): Promise<void> {
-    const formatTime = secondsToHms(maxTime - curSecs);
+    const formatTime = secondsToHms(getMaxTime() - getCurSeconds());
+    console.log("G: Server has " + formatTime + " left till restart!");
     await ddcsControllers.sendMesgToGroup(
         curUnit.groupId,
         "G: Server has " + formatTime + " left till restart!",

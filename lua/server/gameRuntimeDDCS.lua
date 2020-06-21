@@ -62,7 +62,7 @@ end
 function buildPlayers()
 	playerTable = {}
 	for k, v in pairs(net.get_player_list()) do
-		if v > 1 then
+		if v ~= nil then
 			table.insert(playerTable, net.get_player_info(v))
 		end
 	end

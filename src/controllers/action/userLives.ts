@@ -84,10 +84,10 @@ export async function updateServerLifePoints(): Promise<void> {
 
 export async function lookupLifeResource(playerUcid: string): Promise<void> {
     const srvPlayer = await ddcsControllers.srvPlayerActionsRead({_id: playerUcid});
-    const curPlayer = _.get(srvPlayer, [0]);
+    const curPlayer = srvPlayer[0];
     if (curPlayer) {
         if (curPlayer.name) {
-            const cUnit = await ddcsControllers.unitActionRead({playername: curPlayer.name});
+            const cUnit = await ddcsControllers.unitActionRead({dead: false, playername: curPlayer.name});
             const curUnit = cUnit[0];
             await ddcsControllers.sendMesgToGroup(
                 curUnit.groupId,
@@ -105,7 +105,7 @@ export async function lookupAircraftCosts(playerUcid: string): Promise<void> {
         const curPlayer = srvPlayer[0];
         if (curPlayer) {
             if (curPlayer.name) {
-                const cUnit = await ddcsControllers.unitActionRead({playername: curPlayer.name});
+                const cUnit = await ddcsControllers.unitActionRead({dead: false, playername: curPlayer.name});
                 if (cUnit.length > 0) {
                     const curUnit = cUnit[0];
                     const curUnitDictionary = _.find(engineCache.unitDictionary, {_id: curUnit.type});
