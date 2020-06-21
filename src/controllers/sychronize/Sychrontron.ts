@@ -94,6 +94,8 @@ export async function reSyncAllUnitsFromDbToServer(): Promise<void> {
             await ddcsControllers.spawnUnitGroup(value as any[], false);
         }
     } else {
+        setServerSynced(true);
+        setMissionStartupReSync(false);
         console.log("ReSync Que Complete");
     }
 }
@@ -172,7 +174,7 @@ export async function reSyncServerObjs(serverCount: number, dbCount: number) {
 }
 
 export async function activateInactiveSpawn() {
-    await ddcsControllers.unitActionChkResync();
+    await ddcsControllers.unitActionChkResyncActive();
     // loop through and activate all non ~
     const unitObjs = await ddcsControllers.unitActionReadStd({
         dead: false,

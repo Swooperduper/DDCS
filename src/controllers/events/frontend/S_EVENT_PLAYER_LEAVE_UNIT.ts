@@ -27,6 +27,7 @@ export async function processEventPlayerLeaveUnit(eventObj: any): Promise<void> 
                 await ddcsControllers.sendToCoalition({payload: {action: eventObj.action, data: _.cloneDeep(iCurObj)}});
                 await ddcsControllers.simpleStatEventActionsSave(iCurObj);
             }
+            console.log("PLAYER EXIT UNIT: ", iUnit[0].playername);
         }
     }
 }

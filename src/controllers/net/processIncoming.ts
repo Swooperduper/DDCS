@@ -55,12 +55,15 @@ export async function processingIncomingData(incomingObj: any) {
             await ddcsController.processEventRefuelingStop(incomingObj);
             break;
         case "S_EVENT_BIRTH":
+            console.log("player unit birth: ", incomingObj);
             await ddcsController.processEventBirth(incomingObj);
             break;
         case "S_EVENT_PLAYER_ENTER_UNIT":
+            console.log("player enter unit1");
             await ddcsController.processEventPlayerEnterUnit(incomingObj);
             break;
         case "S_EVENT_PLAYER_LEAVE_UNIT":
+            console.log("player EXIT unit1");
             await ddcsController.processEventPlayerLeaveUnit(incomingObj);
             break;
         case "LOSVISIBLEUNITS":
@@ -92,7 +95,7 @@ export async function processingIncomingData(incomingObj: any) {
             // await ddcsController.processDisconnect(incomingObj);
             break;
         case "processReq":
-            console.log("INC: ", incomingObj);
+            console.log("INC: ", incomingObj.returnObj.length);
             const curReqJobIndex = ddcsController.getRequestIndex(incomingObj.reqId);
             const curReqJobObj = ddcsController.getRequestJob(incomingObj.reqId);
             if (curReqJobObj && curReqJobIndex) {

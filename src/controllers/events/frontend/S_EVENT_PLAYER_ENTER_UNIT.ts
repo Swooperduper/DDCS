@@ -25,8 +25,6 @@ export async function processEventPlayerEnterUnit(eventObj: any): Promise<void> 
                 await ddcsControllers.sendToCoalition({payload: {action: eventObj.action, data: _.cloneDeep(iCurObj)}});
                 await ddcsControllers.simpleStatEventActionsSave(iCurObj);
             }
-            // give them a menu
-            await ddcsControllers.initializeMenu(eventObj.data);
         }
     }
 }

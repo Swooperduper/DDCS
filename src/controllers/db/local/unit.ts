@@ -119,6 +119,19 @@ export async function unitActionUpdateByUnitId(obj: any): Promise<void> {
 export async function unitActionChkResync(): Promise<void> {
     return new Promise((resolve, reject) => {
         dbModels.unitModel.updateMany(
+            {},
+            {$set: {isResync: false}},
+            (err: any) => {
+                if (err) { reject(err); }
+                resolve();
+            }
+        );
+    });
+}
+
+export async function unitActionChkResyncActive(): Promise<void> {
+    return new Promise((resolve, reject) => {
+        dbModels.unitModel.updateMany(
             {isActive: false, _id: {$not: /~/}},
             {$set: {isResync: false}},
             (err: any) => {

@@ -389,7 +389,9 @@ function clientEventHandler:onEvent(_event)
         if _event == nil or eventTypes[_event.id] == nil then
             return false
         else
-            local curEvent = {}
+            local curEvent = {
+
+            }
             if _event.id ~= nil then
                 curEvent.name = eventTypes[_event.id]
                 curEvent.id = _event.id
@@ -404,12 +406,24 @@ function clientEventHandler:onEvent(_event)
                 local getIId = _event.initiator:getID()
                 if getIId ~= nil then
                     curEvent.initiatorId = tonumber(getIId)
+                    curEvent.initiator = {
+                        ["type"] = _event.initiator:getTypeName(),
+                        ["side"] = tonumber(_event.initiator:getCoalition()),
+                        ["unitId"] = tonumber(getIId),
+                        ["groupId"] = tonumber(_event.initiator:getGroup():getID())
+                    }
                 end
             end
             if _event.target ~= nil then
                 local getTId = _event.target:getID()
                 if getTId ~= nil then
                     curEvent.targetId = tonumber(getTId)
+                    curEvent.target = {
+                        ["type"] = _event.target:getTypeName(),
+                        ["side"] = tonumber(_event.target:getCoalition()),
+                        ["unitId"] = tonumber(getTId),
+                        ["groupId"] = tonumber(_event.target:getGroup():getID())
+                    }
                 else
                     local targetObject = _event.target:getDesc()
                     curEvent.targetId = {

@@ -55,10 +55,13 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
         if (_.includes(curData.name, "Carrier")) {
             await ddcsControllers.baseActionUpdate({_id: curUnitName, centerLoc: curData.lonLatLoc, isResync: true});
         }
+
+        /*
         if (curData.playername && unitObj.action === "C") {
             console.log("ADD MENU: ", curData.playername, unitObj.action === "C");
             await ddcsControllers.initializeMenu(unitObj.data);
         }
+         */
 
         if (unitObj.action !== "D") {
             iCurObj = {
