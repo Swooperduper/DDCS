@@ -220,9 +220,9 @@ export async function isCrateOnboard(unit: any, verbose: boolean) {
     return false;
 }
 
-export async function isTroopOnboard(unit: any, verbose: boolean) {
+export async function isTroopOnboard(unit: any, verbose?: boolean) {
     console.log("isTroopHere: ", unit, verbose);
-    if (!_.isEmpty(unit.troopType)) {
+    if (unit.troopType) {
         if (verbose) {
             await ddcsControllers.sendMesgToGroup(
                 unit.groupId,
@@ -344,7 +344,7 @@ export async function menuCmdProcess(pObj: any) {
                             5
                         );
                     } else {
-                        if (exports.isTroopOnboard(curUnit)) {
+                        if (await isTroopOnboard(curUnit)) {
                             const playerProx: any[] = [];
                             const bases = await ddcsControllers.baseActionRead({baseType: "MOB", side: curUnit.coalition});
                             for (const base of bases) {
@@ -477,28 +477,18 @@ export async function menuCmdProcess(pObj: any) {
                                 5
                             );
                         } else {
-                            // real sling loading
-                            if (curUnit.inAir) {
-                                await ddcsControllers.sendMesgToGroup(
-                                    curUnit.groupId,
-                                    "G: Please Land Before Attempting Logistic Commands!",
-                                    5
-                                );
-                            } else {
-                                const chkPlayer = await ddcsControllers.srvPlayerActionsRead({name: curUnit.playername});
-                                const curChkPlayer = chkPlayer[0];
-                                if (curChkPlayer) {
-
-                                    const crateUpdate = await ddcsControllers.staticCrateActionRead({});
-                                    const sendClient = {
-                                        action: "CRATEUPDATE",
-                                        crateNames: _.map(crateUpdate, "_id"),
-                                        callback: "unpackCrate",
-                                        unitId: pObj.unitId
-                                    };
-                                    const actionObj = {actionObj: sendClient, queName: "clientArray"};
-                                    await ddcsControllers.sendUDPPacket("frontEnd", actionObj);
-                                }
+                            const chkPlayer = await ddcsControllers.srvPlayerActionsRead({name: curUnit.playername});
+                            const curChkPlayer = chkPlayer[0];
+                            if (curChkPlayer) {
+                                const crateUpdate = await ddcsControllers.staticCrateActionRead({});
+                                const sendClient = {
+                                    action: "CRATEUPDATE",
+                                    crateNames: _.map(crateUpdate, "_id"),
+                                    callback: "unpackCrate",
+                                    unitId: pObj.unitId
+                                };
+                                const actionObj = {actionObj: sendClient, queName: "clientArray"};
+                                await ddcsControllers.sendUDPPacket("frontEnd", actionObj);
                             }
                         }
                     }

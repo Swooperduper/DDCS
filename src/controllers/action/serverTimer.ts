@@ -158,11 +158,14 @@ export function resetTimerObj(): void {
 }
 
 export async function restartServer(): Promise<void> {
+    console.log("restart server");
+    /*
     const server = await ddcsControllers.serverActionsRead({});
     const newMap = server[0].curFilePath + "_" + server[0].curSeason + "_" +
         _.random(1, (server[0].mapCount || 1)) + ".miz";
     console.log("Loading Map: ", newMap);
     await ddcsControllers.loadMission(newMap);
+     */
 }
 
 export function secondsToHms(d: number): string {
