@@ -19,37 +19,40 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
     let stParse;
     let iCurObj: any;
     const curData = unitObj.data;
+    if (_.includes(curData.name, "AI|")) {
+        stParse = _.split(curData.name, "|");
+        curData.playerOwnerId = stParse[1];
+        curData.isAI = true;
+        curData.hidden = true;
+    }
+    if (_.includes(curData.name, "TU|")) {
+        stParse = _.split(curData.name, "|");
+        curData.playerOwnerId = stParse[1];
+        curData.playerCanDrive = false;
+        curData.isTroop = true;
+        curData.spawnCat = stParse[2];
+    }
+    if (_.includes(curData.name, "CU|")) {
+        stParse = _.split(curData.name, "|");
+        curData.playerOwnerId = stParse[1];
+        curData.crateAmt = Number(stParse[2]);
+        curData.isCombo = stParse[3];
+        curData.templateName = stParse[4];
+        curData.playerCanDrive = false;
+        curData.isCrate = true;
+        curData.hidden = false;
+    }
+    if (_.includes(curData.name, "DU|")) {
+        stParse = _.split(curData.name, "|");
+        const isAllowedToDrive = (stParse[5] === "true");
+        curData.playerOwnerId = stParse[1];
+        curData.proxChkGrp = stParse[3];
+        curData.playerCanDrive = isAllowedToDrive;
+    }
+
     if (unit.length > 0) {
         const curUnit = unit[0];
         const curUnitName = curUnit.name;
-        if (_.includes(curData.name, "AI|")) {
-            stParse = _.split(curData.name, "|");
-            curData.playerOwnerId = stParse[1];
-            curData.isAI = true;
-            curData.hidden = true;
-        }
-        if (_.includes(curData.name, "TU|")) {
-            stParse = _.split(curData.name, "|");
-            curData.playerOwnerId = stParse[1];
-            curData.playerCanDrive = false;
-            curData.isTroop = true;
-            curData.spawnCat = stParse[2];
-        }
-        if (_.includes(curData.name, "CU|")) {
-            stParse = _.split(curData.name, "|");
-            curData.playerOwnerId = stParse[1];
-            curData. isCombo = _.isBoolean(stParse[5]);
-            curData.playerCanDrive = false;
-            curData.isCrate = true;
-            curData.hidden = false;
-        }
-        if (_.includes(curData.name, "DU|")) {
-            stParse = _.split(curData.name, "|");
-            const isAllowedToDrive = (stParse[5] === "true");
-            curData.playerOwnerId = stParse[1];
-            curData.proxChkGrp = stParse[3];
-            curData.playerCanDrive = isAllowedToDrive;
-        }
 
         // update location of carrier in aircraft DB
         if (_.includes(curData.name, "Carrier")) {
@@ -80,6 +83,13 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
                     playername: curData.playername,
                     speed: curData.speed,
                     unitId: curData.unitId,
+                    isCrate: (curData.isCrate || false),
+                    isCombo: (curData.isCombo || false),
+                    crateAmt: (curData.crateAmt || 0),
+                    playerCanDrive: (curData.playerCanDrive || false),
+                    hidden: (curData.hidden || false),
+                    playerOwnerId: (curData.playerOwnerId || ""),
+                    templateName: (curData.templateName || ""),
                     isResync: true
                 }
             };
@@ -176,6 +186,12 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
                             type: iCurObj.data.type,
                             playername: iCurObj.data.playername,
                             playerOwnerId: iCurObj.data.playerOwnerId,
+                            isCrate: (iCurObj.data.isCrate || false),
+                            isCombo: (iCurObj.data.isCombo || false),
+                            playerCanDrive: (iCurObj.data.playerCanDrive || false),
+                            hidden: (iCurObj.data.hidden || false),
+                            crateAmt: (iCurObj.data.crateAmt || 0),
+                            templateName: (iCurObj.data.templateName || ""),
                             isResync: true
                         }
                     }

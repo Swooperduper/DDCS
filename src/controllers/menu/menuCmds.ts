@@ -146,7 +146,7 @@ export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: 
             if (_.some(playerProx)) {
                 curBaseName = _.split(_.get(curBaseObj, "name"), " #")[0];
                 console.log("intCurBaseAt: ", curBaseName);
-                const aliveLogistics = await ddcsControllers.unitActionRead({name: curBaseName + " Logistics", dead: false});
+                const aliveLogistics = await ddcsControllers.unitActionRead({name: curBaseName + " Shelter", dead: false});
                 if (aliveLogistics.length > 0 || _.includes(curBaseName, "Carrier")) {
                     if (intCargoType === "loadJTAC") {
                         await ddcsControllers.unitActionUpdateByUnitId({
@@ -463,6 +463,7 @@ export async function menuCmdProcess(pObj: any) {
                     break;
                 case "unpackCrate":
                     const logiProx = await ddcsControllers.getLogiTowersProximity(curUnit.lonLatLoc, 0.8, curUnit.coalition);
+                    console.log("UNPACK: ", logiProx);
                     if (logiProx.length) {
                         await ddcsControllers.sendMesgToGroup(
                             curUnit.groupId,
@@ -478,17 +479,10 @@ export async function menuCmdProcess(pObj: any) {
                             );
                         } else {
                             const chkPlayer = await ddcsControllers.srvPlayerActionsRead({name: curUnit.playername});
+                            console.log("unpack check player: ", chkPlayer);
                             const curChkPlayer = chkPlayer[0];
                             if (curChkPlayer) {
-                                const crateUpdate = await ddcsControllers.staticCrateActionRead({});
-                                const sendClient = {
-                                    action: "CRATEUPDATE",
-                                    crateNames: _.map(crateUpdate, "_id"),
-                                    callback: "unpackCrate",
-                                    unitId: pObj.unitId
-                                };
-                                const actionObj = {actionObj: sendClient, queName: "clientArray"};
-                                await ddcsControllers.sendUDPPacket("frontEnd", actionObj);
+                                await ddcsControllers.unpackStaticCrate(curUnit);
                             }
                         }
                     }
@@ -526,55 +520,63 @@ export async function menuCmdProcess(pObj: any) {
                     );
                     break;
                 case "EWR":
-                    await spawnCrateFromLogi(curUnit, pObj.type, pObj.crates, "", "", pObj.mobile, pObj.mass, defCrate);
+                    await spawnCrateFromLogi(curUnit, pObj.type, pObj.crates, "", pObj.mobile, pObj.mass, defCrate);
                     break;
                 case "JTAC":
-                    await spawnCrateFromLogi(curUnit, pObj.type, pObj.crates, "", "jtac", pObj.mobile, pObj.mass, defCrate);
+                    await spawnCrateFromLogi(curUnit, pObj.type, pObj.crates, "jtac", pObj.mobile, pObj.mass, defCrate);
                     break;
                 case "reloadGroup":
-                    await spawnCrateFromLogi(curUnit, pObj.type, pObj.crates, "", "reloadGroup", pObj.mobile, pObj.mass, "container_cargo");
+                    await spawnCrateFromLogi(curUnit, pObj.type, pObj.crates, "reloadGroup", pObj.mobile, pObj.mass, "container_cargo");
                     break;
                 case "repairBase":
-                    await spawnCrateFromLogi(curUnit, pObj.type, pObj.crates, "", "repairBase", pObj.mobile, pObj.mass, "container_cargo");
+                    await spawnCrateFromLogi(
+                        curUnit,
+                        pObj.type,
+                        pObj.crates,
+                        "repairBase",
+                        pObj.mobile,
+                        pObj.mass,
+                        "container_cargo"
+                    );
                     break;
                 case "unarmedFuel":
-                    await spawnCrateFromLogi(curUnit, pObj.type, pObj.crates, "", "", pObj.mobile, pObj.mass, defCrate);
+                    await spawnCrateFromLogi(curUnit, pObj.type, pObj.crates, "", pObj.mobile, pObj.mass, defCrate);
                     break;
                 case "unarmedAmmo":
-                    await spawnCrateFromLogi(curUnit, pObj.type, pObj.crates, "", "", pObj.mobile, pObj.mass, defCrate);
+                    await spawnCrateFromLogi(curUnit, pObj.type, pObj.crates, "", pObj.mobile, pObj.mass, defCrate);
                     break;
                 case "armoredCar":
-                    await spawnCrateFromLogi(curUnit, pObj.type, pObj.crates, "", "", pObj.mobile, pObj.mass, defCrate);
+                    await spawnCrateFromLogi(curUnit, pObj.type, pObj.crates, "", pObj.mobile, pObj.mass, defCrate);
                     break;
                 case "APC":
-                    await spawnCrateFromLogi(curUnit, pObj.type, pObj.crates, "", "", pObj.mobile, pObj.mass, defCrate);
+                    await spawnCrateFromLogi(curUnit, pObj.type, pObj.crates, "", pObj.mobile, pObj.mass, defCrate);
                     break;
                 case "tank":
-                    await spawnCrateFromLogi(curUnit, pObj.type, pObj.crates, "", "", pObj.mobile, pObj.mass, defCrate);
+                    await spawnCrateFromLogi(curUnit, pObj.type, pObj.crates, "", pObj.mobile, pObj.mass, defCrate);
                     break;
                 case "artillary":
-                    await spawnCrateFromLogi(curUnit, pObj.type, pObj.crates, "", "", pObj.mobile, pObj.mass, defCrate);
+                    await spawnCrateFromLogi(curUnit, pObj.type, pObj.crates, "", pObj.mobile, pObj.mass, defCrate);
                     break;
                 case "mlrs":
-                    await spawnCrateFromLogi(curUnit, pObj.type, pObj.crates, "", "", pObj.mobile, pObj.mass, defCrate);
+                    await spawnCrateFromLogi(curUnit, pObj.type, pObj.crates, "", pObj.mobile, pObj.mass, defCrate);
                     break;
                 case "stationaryAntiAir":
-                    await spawnCrateFromLogi(curUnit, pObj.type, pObj.crates, "", "", pObj.mobile, pObj.mass, defCrate);
+                    await spawnCrateFromLogi(curUnit, pObj.type, pObj.crates, "", pObj.mobile, pObj.mass, defCrate);
                     break;
                 case "mobileAntiAir":
-                    await spawnCrateFromLogi(curUnit, pObj.type, pObj.crates, "", "", pObj.mobile, pObj.mass, defCrate);
+                    await spawnCrateFromLogi(curUnit, pObj.type, pObj.crates, "", pObj.mobile, pObj.mass, defCrate);
                     break;
                 case "samIR":
-                    await spawnCrateFromLogi(curUnit, pObj.type, pObj.crates, "", "", pObj.mobile, pObj.mass, defCrate);
+                    await spawnCrateFromLogi(curUnit, pObj.type, pObj.crates, "", pObj.mobile, pObj.mass, defCrate);
                     break;
                 case "mobileSAM":
-                    await spawnCrateFromLogi(curUnit, pObj.type, pObj.crates, "", "", pObj.mobile, pObj.mass, defCrate);
+                    await spawnCrateFromLogi(curUnit, pObj.type, pObj.crates, "", pObj.mobile, pObj.mass, defCrate);
                     break;
                 case "MRSAM":
-                    await spawnCrateFromLogi(curUnit, pObj.type, pObj.crates, "", "", pObj.mobile, pObj.mass, defCrate);
+                    await spawnCrateFromLogi(curUnit, pObj.type, pObj.crates, "", pObj.mobile, pObj.mass, defCrate);
                     break;
                 case "LRSAM":
-                    await spawnCrateFromLogi(curUnit, pObj.type, pObj.crates, "", "", pObj.mobile, pObj.mass, defCrate);
+                    await spawnCrateFromLogi(curUnit, pObj.type, pObj.crates, "", pObj.mobile, pObj.mass, defCrate);
                     break;
                 case "spawnBomber":
                     await spawnBomber(curUnit, curPlayer, pObj.type, pObj.rsCost);
@@ -733,16 +735,18 @@ export async function spawnCrateFromLogi(
     unit: any,
     type: string,
     crates: string,
-    combo: string,
     special: string,
     mobile: boolean,
     mass: number,
     crateType: string
 ) {
     const engineCache = ddcsControllers.getEngineCache();
+    const curUnitDict = _.find(engineCache.unitDictionary, (uD) => _.includes(uD.comboName, type) );
+    const isCombo = !!curUnitDict;
+    console.log(unit, type, crates, isCombo, special, mobile, mass, crateType);
     let spc: string;
     let crateObj;
-    let crateCount = 0;
+    const crateCount = 0;
     if (special) {
         spc = special;
     } else {
@@ -762,9 +766,9 @@ export async function spawnCrateFromLogi(
         const normalCrateBases = await ddcsControllers.baseActionRead({});
         const checkAllBase: any[] = [];
         let curLogistic;
-        const aliveBases = await ddcsControllers.unitActionRead({_id:  /Logistics/, dead: false, coalition: unit.coalition});
+        const aliveBases = await ddcsControllers.unitActionRead({_id:  /Shelter/, dead: false, coalition: unit.coalition});
         for (const base of normalCrateBases) {
-            curLogistic = _.find(aliveBases, {name: base.name + " Logistics"});
+            curLogistic = _.find(aliveBases, {name: base.name + " Shelter"});
             closeLogi = _.get(base, "name");
             if (!!curLogistic) {
                 checkAllBase.push(await ddcsControllers.isPlayerInProximity(
@@ -774,8 +778,10 @@ export async function spawnCrateFromLogi(
                 ));
             }
         }
-        if (_.some(checkAllBase)) {
+        if (!_.some(checkAllBase)) { // UNDO SET BACK BEFORE CHECKIN!!!
             const delCrates = await ddcsControllers.staticCrateActionRead({playerOwnerId: curPlayer.ucid});
+
+            /*
             for (const crate of delCrates) {
                 if (crateCount > engineCache.config.maxCrates - 2) {
                     await ddcsControllers.staticCrateActionDelete({
@@ -785,6 +791,7 @@ export async function spawnCrateFromLogi(
                 }
                 crateCount++;
             }
+             */
             let curShapeName: string;
             const curCrate = _.find(engineCache.staticDictionary, {_id: crateType});
             if (curCrate) {
@@ -792,13 +799,17 @@ export async function spawnCrateFromLogi(
             } else {
                 curShapeName = "iso_container_small_cargo";
             }
+            const curName = "CU|" + curPlayer.ucid + "|" + crates + "|" + isCombo + "|" +
+                ((spc) ? spc : type + "|" + closeLogi) + "|#" + _.random(1000000, 9999999);
+
             crateObj = {
-                name: (spc) ? spc + "|#" + _.random(1000000, 9999999) : type +
-                    "|" + closeLogi + "|#" + _.random(1000000, 9999999),
+                _id: curName,
+                name: curName,
                 unitLonLatLoc: unit.lonLatLoc,
                 shape_name: curShapeName,
-                category: "Cargo",
+                unitCategory: "Cargos",
                 type: crateType,
+                hdg: unit.hdg,
                 heading: unit.hdg,
                 canCargo: true,
                 mass,
@@ -806,13 +817,16 @@ export async function spawnCrateFromLogi(
                 templateName: type,
                 special: spc,
                 crateAmt: crates,
-                isCombo: combo,
+                isCombo,
                 playerCanDrive: mobile,
                 country: ddcsControllers.defCountrys[unit.coalition],
                 side: unit.coalition,
-                coalition: unit.coalition
+                coalition: unit.coalition,
+                lonLatLoc: ddcsControllers.getLonLatFromDistanceDirection(unit.lonLatLoc, unit.hdg, 0.05)
             };
-            await ddcsControllers.spawnLogiCrate(crateObj, true);
+
+            await ddcsControllers.spawnStaticBuilding(crateObj, false);
+            // await ddcsControllers.spawnLogiCrate(crateObj, true);
 
             await ddcsControllers.sendMesgToGroup(
                 unit.groupId,
@@ -1056,6 +1070,7 @@ export async function spawnTanker(curUnit: any, curPlayer: any, tankerType: stri
 }
 
 export async function unpackCrate(playerUnit: any, country: string, type: string, special: string, combo: boolean, mobile: boolean) {
+    console.log("UNPACK CRATE: ", playerUnit, country, type, special, combo, mobile);
     const engineCache = ddcsControllers.getEngineCache();
     const curTimePeriod = engineCache.config.timePeriod || "modern";
     if (playerUnit.inAir) {
@@ -1101,18 +1116,16 @@ export async function unpackCrate(playerUnit: any, country: string, type: string
                     if (curUnitHdg > 359) {
                         curUnitHdg = 30;
                     }
-                    const unitStart = {
-                        ...cbUnit,
-                        spwnName: "DU|" + curPlayer.ucid + "|" + cbUnit.type + "|" + special + "|true|" + mobile + "|" +
-                            curPlayer.name + "|" + _.random(10000, 99999),
-                        lonLatLoc: playerUnit.lonLatLoc,
-                        heading: curUnitHdg,
-                        country,
-                        playerCanDrive: mobile,
-                        coalition: playerUnit.coalition
-                    };
+                    const curUnitStart = _.cloneDeep(cbUnit) as any;
+                    curUnitStart.spwnName = "DU|" + curPlayer.ucid + "|" + cbUnit.type + "|" + special + "|true|" + mobile + "|" +
+                        curPlayer.name + "|" + _.random(10000, 99999);
+                    curUnitStart.lonLatLoc = playerUnit.lonLatLoc;
+                    curUnitStart.hdg = curUnitHdg;
+                    curUnitStart.country = ddcsControllers.countryId.indexOf(country);
+                    curUnitStart.playerCanDrive = mobile;
+                    curUnitStart.coalition = playerUnit.coalition;
 
-                    newSpawnArray.push(unitStart);
+                    newSpawnArray.push(curUnitStart);
                     curUnitHdg = curUnitHdg + addHdg;
                 }
             }
@@ -1145,15 +1158,12 @@ export async function unpackCrate(playerUnit: any, country: string, type: string
                             "|true|" + mobile + "|" + curPlayer.name + "|" + _.random(10000, 99999));
                     }
 
-                    unitStart = {
-                        ...unitStart,
-                        lonLatLoc: playerUnit.lonLatLoc,
-                        heading: curUnitHdg,
-                        country: pCountry,
-                        playerCanDrive: mobile,
-                        special,
-                        coalition: playerUnit.coalition
-                    };
+                    unitStart.lonLatLoc = playerUnit.lonLatLoc;
+                    unitStart.hdg = curUnitHdg;
+                    unitStart.country = ddcsControllers.countryId.indexOf(pCountry);
+                    unitStart.playerCanDrive = mobile;
+                    unitStart.special = special;
+                    unitStart.coalition = playerUnit.coalition;
 
                     newSpawnArray.push(unitStart);
                     curUnitHdg = curUnitHdg + addHdg;

@@ -1269,7 +1269,7 @@ export async function spawnLogiGroup(spawnArray: typing.IUnit[], side: number): 
 */
 
 export async function spawnStaticBuilding(
-    staticObj: typing.IStaticSpawnMin,
+    staticObj: any,
     init: boolean,
     baseObj?: any,
     side?: number,
@@ -1289,7 +1289,8 @@ export async function spawnStaticBuilding(
                 type: staticLookupLogiBuilding[0].type,
                 shape_name: staticLookupLogiBuilding[0].shape_name,
                 canCargo: staticLookupLogiBuilding[0].canCargo || "false",
-                unitCategory: staticLookupLogiBuilding[0].unitCategory,
+                unitCategory: (staticLookupLogiBuilding[0].unitCategory === 6) ?
+                    ddcsControllers.OBJECT_CATEGORY[staticLookupLogiBuilding[0].unitCategory] : staticLookupLogiBuilding[0].unitCategory,
                 objectCategory: staticLookupLogiBuilding[0].objectCategory,
                 name: baseObj.name + " " + staticType,
                 _id: baseObj.name + " " + staticType,
@@ -1315,6 +1316,7 @@ export async function spawnStaticBuilding(
 }
 
 export async function spawnUnitGroup(spawnArray: typing.IUnitSpawnMin[], init: boolean, baseName?: string, side?: number): Promise<void> {
+    // console.log("SPAWUNITGROUP: ", spawnArray[0]);
     if (spawnArray.length > 0) {
         let groupTemplate: string = "";
         const groupNum = _.random(1000000, 9999999);
@@ -1356,6 +1358,7 @@ export async function spawnUnitGroup(spawnArray: typing.IUnitSpawnMin[], init: b
                 grpObj.country,
                 grpObj.unitCategory
             );
+            // console.log("CMDCMD: ", curCMD);
             const sendClient = {actionObj: {action: "CMD", cmd: [curCMD], reqID: 0}};
             await ddcsControllers.sendUDPPacket("frontEnd", sendClient);
         }

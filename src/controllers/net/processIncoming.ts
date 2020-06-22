@@ -69,9 +69,6 @@ export async function processingIncomingData(incomingObj: any) {
         case "LOSVISIBLEUNITS":
             await ddcsController.processLOSEnemy(incomingObj);
             break;
-        case "CRATEOBJUPDATE":
-            await ddcsController.processStaticCrate(incomingObj);
-            break;
         case "unitsAlive":
             await ddcsController.sendMissingUnits(incomingObj.data);
             break;

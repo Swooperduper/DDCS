@@ -2,30 +2,29 @@
  * DDCS Licensed under AGPL-3.0 by Andrew "Drex" Finegan https://github.com/afinegan/DynamicDCS
  */
 
+import * as _ from "lodash";
 import * as ddcsControllers from "../";
 
 export async function spawnLogiCrate(crateObj: any, init?: boolean) {
     if (init) {
-        const curCrateObj = {
-            ...crateObj,
-            _id: crateObj.name,
-            lonLatLoc: ddcsControllers.getLonLatFromDistanceDirection(crateObj.unitLonLatLoc, crateObj.heading, 0.05)
-        };
+        const curCrateObj = _.cloneDeep(crateObj);
+        curCrateObj._id = crateObj.name;
+        curCrateObj.lonLatLoc = ddcsControllers.getLonLatFromDistanceDirection(crateObj.unitLonLatLoc, crateObj.heading, 0.05);
 
         await ddcsControllers.staticCrateActionSave(curCrateObj);
-        await ddcsControllers.cmdQueActionsSave({
+
+        await ddcsControllers.sendUDPPacket("frontEnd", {
             actionObj: {
                 action: "CMD",
-                cmd: await ddcsControllers.spawnStatic(
+                cmd: [await ddcsControllers.spawnStatic(
                     await ddcsControllers.staticTemplate(curCrateObj),
                     crateObj.country
-                ),
+                )],
                 reqID: 0
-            },
-            queName: "clientArray"
+            }
         });
     } else {
-        await ddcsControllers.cmdQueActionsSave({
+        await ddcsControllers.sendUDPPacket("frontEnd", {
             actionObj: {
                 action: "CMD",
                 cmd: await ddcsControllers.spawnStatic(
@@ -33,8 +32,7 @@ export async function spawnLogiCrate(crateObj: any, init?: boolean) {
                     crateObj.country
                 ),
                 reqID: 0
-            },
-            queName: "clientArray"
+            }
         });
     }
 }

@@ -231,8 +231,8 @@ export async function getStaticCratesInProximity(
     lonLat: number[],
     kmDistance: number,
     coalition: number
-): Promise<typing.ICrate[]> {
-    return await ddcsControllers.staticCrateActionReadStd({
+) {
+    return await ddcsControllers.unitActionReadStd({
             lonLatLoc: {
                 $near: {
                     $geometry: {
@@ -242,6 +242,7 @@ export async function getStaticCratesInProximity(
                     $maxDistance: kmDistance * 1000
                 }
             },
+            objectCategory: 6,
             coalition
         });
 }

@@ -150,6 +150,13 @@ export function unitModel(dbconn: mongoose.Connection): mongoose.Document | {} {
             },
             shape_name: {
                 type: String
+            },
+            crateAmt: {
+                type: Number,
+                default: 1
+            },
+            templateName: {
+                type: String
             }
         },
         {

@@ -55,7 +55,7 @@ export function staticCratesModel(dbconn: mongoose.Connection): mongoose.Documen
                 type: String
             },
             crateAmt: {
-                type: Number,
+                type: Number
             },
             isCombo: {
                 type: Boolean,

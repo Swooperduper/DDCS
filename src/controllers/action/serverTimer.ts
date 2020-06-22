@@ -105,6 +105,7 @@ export async function processTimer(serverSecs: number): Promise<void> {
             timerObj.twoMinutes = true;
         }
         // 1 min
+        /*
         if (getCurSeconds() > (getMaxTime() - 60) && !timerObj.oneMinute) {
             mesg = "Server is restarting in less than 1 minute, Server Is Locked!";
             timerObj.oneMinute = true;
@@ -137,6 +138,7 @@ export async function processTimer(serverSecs: number): Promise<void> {
                 await ddcsControllers.sendMesgToAll(mesg, 20);
             }
         }
+         */
     }
 }
 

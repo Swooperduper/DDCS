@@ -21,7 +21,7 @@ export const OBJECT_CATEGORY: string[] = [
     "STATIC",
     "BASE",
     "SCENERY",
-    "CARGO"
+    "Cargo"
 ];
 
 export const SURFACE_TYPE_CATEGORY: string[] = [
