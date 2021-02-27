@@ -28,13 +28,11 @@ export async function destroyCrates(
 
 export async function unpackStaticCrate(curPlayerUnit: any): Promise<void> {
     const crates = await ddcsControllers.getStaticCratesInProximity(curPlayerUnit.lonLatLoc, 0.2, curPlayerUnit.coalition);
-    console.log("crates: ", crates, curPlayerUnit.lonLatLoc, curPlayerUnit.coalition);
     let localCrateNum: number;
     let msg: string;
     const curCrate: any = crates[0];
     const crateInfo = _.find(ddcsControllers.getEngineCache().unitDictionary, {_id: curCrate.type.split("|")[2]});
 
-    console.log("SELECTED CRATE: ", curCrate);
     const numCrate: number = curCrate.crateAmt;
     const curCrateSpecial: string = curCrate.special || "";
     const curCrateType: string = curCrate.templateName;

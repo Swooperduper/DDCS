@@ -265,7 +265,7 @@ export function getRndFromSpawnCat(
     curUnit = cPUnits[randomIndex];
 
     if (curUnit) {
-        if (curUnit.comboName.length > 0) {
+        if (curUnit.comboName && curUnit.comboName.length > 0) {
             curUnits = _.filter(cPUnits, (curPUnit) => {
                 return _.includes(curPUnit.comboName, _.sample(curUnit.comboName));
             });
@@ -417,7 +417,7 @@ export async function spawnBaseReinforcementGroup(side: number, baseName: string
                             lonLatLoc: ddcsControllers.getLonLatFromDistanceDirection(
                                 randLatLonInBase,
                                 curAngle,
-                                curRndSpawn[j].spokeDistance / 2
+                                infoSpwn.spokeDistance / 2
                             )
                         });
                     }
@@ -435,7 +435,7 @@ export async function spawnBaseReinforcementGroup(side: number, baseName: string
                             lonLatLoc: ddcsControllers.getLonLatFromDistanceDirection(
                                 randLatLonInBase,
                                 curAngle,
-                                curRndSpawn[k].spokeDistance
+                                infoSpwn.spokeDistance
                             )
                         });
                     }
@@ -1316,7 +1316,6 @@ export async function spawnStaticBuilding(
 }
 
 export async function spawnUnitGroup(spawnArray: typing.IUnitSpawnMin[], init: boolean, baseName?: string, side?: number): Promise<void> {
-    // console.log("SPAWUNITGROUP: ", spawnArray[0]);
     if (spawnArray.length > 0) {
         let groupTemplate: string = "";
         const groupNum = _.random(1000000, 9999999);

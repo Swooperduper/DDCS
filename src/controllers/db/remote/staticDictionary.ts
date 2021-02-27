@@ -10,6 +10,6 @@ export async function staticDictionaryActionsRead(obj: any): Promise<typings.ISt
         dbModels.staticDictionaryModel.find(obj, (err: any, staticDictionary: typings.IStaticDictionary[]) => {
             if (err) { reject(err); }
             resolve(staticDictionary);
-        });
+        }).lean();
     });
 }

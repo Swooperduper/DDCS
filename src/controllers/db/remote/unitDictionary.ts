@@ -10,6 +10,6 @@ export async function unitDictionaryActionsRead(obj: any): Promise<typings.IUnit
         dbModels.unitDictionaryModel.find(obj, (err: any, unitDictionary: typings.IUnitDictionary[]) => {
             if (err) { reject(err); }
             resolve(unitDictionary);
-        });
+        }).lean();
     });
 }

@@ -463,7 +463,6 @@ export async function menuCmdProcess(pObj: any) {
                     break;
                 case "unpackCrate":
                     const logiProx = await ddcsControllers.getLogiTowersProximity(curUnit.lonLatLoc, 0.8, curUnit.coalition);
-                    console.log("UNPACK: ", logiProx);
                     if (logiProx.length) {
                         await ddcsControllers.sendMesgToGroup(
                             curUnit.groupId,
@@ -479,7 +478,6 @@ export async function menuCmdProcess(pObj: any) {
                             );
                         } else {
                             const chkPlayer = await ddcsControllers.srvPlayerActionsRead({name: curUnit.playername});
-                            console.log("unpack check player: ", chkPlayer);
                             const curChkPlayer = chkPlayer[0];
                             if (curChkPlayer) {
                                 await ddcsControllers.unpackStaticCrate(curUnit);
@@ -1069,8 +1067,14 @@ export async function spawnTanker(curUnit: any, curPlayer: any, tankerType: stri
     }
 }
 
-export async function unpackCrate(playerUnit: any, country: number, type: string, special: string, combo: boolean, mobile: boolean) {
-    console.log("UNPACK CRATE: ", playerUnit, country, type, special, combo, mobile);
+export async function unpackCrate(
+    playerUnit: any,
+    country: number,
+    type: string,
+    special: string,
+    combo: boolean,
+    mobile: boolean
+) {
     const engineCache = ddcsControllers.getEngineCache();
     const curTimePeriod = engineCache.config.timePeriod || "modern";
     if (playerUnit.inAir) {
@@ -1119,7 +1123,7 @@ export async function unpackCrate(playerUnit: any, country: number, type: string
                     const curUnitStart = _.cloneDeep(cbUnit) as any;
                     curUnitStart.spwnName = "DU|" + curPlayer.ucid + "|" + cbUnit.type + "|" + special + "|true|" + mobile + "|" +
                         curPlayer.name + "|" + _.random(10000, 99999);
-                    curUnitStart.lonLatLoc = playerUnit.lonLatLoc;
+                    curUnitStart.lonLatLoc = ddcsControllers.getLonLatFromDistanceDirection(playerUnit.lonLatLoc, curUnitHdg, 0.05);
                     curUnitStart.hdg = curUnitHdg;
                     curUnitStart.country = country;
                     curUnitStart.playerCanDrive = mobile;
@@ -1134,32 +1138,24 @@ export async function unpackCrate(playerUnit: any, country: number, type: string
         } else {
             const addHdg = 30;
             let curUnitHdg = playerUnit.hdg;
-            let unitStart;
             let pCountry = country;
             const findUnit = _.find(engineCache.unitDictionary, {_id: type});
-
-            console.log("SA ", country);
             if (findUnit) {
                 const spawnUnitCount = findUnit.config[curTimePeriod].spawnCount;
-                if ((type === "1L13 EWR" || type === "55G6 EWR" || type === "Dog Ear radar") && _.get(playerUnit, "coalition") === 2) {
+                if ((type === "1L13 EWR" || type === "55G6 EWR" || type === "Dog Ear radar") && playerUnit.coalition === 2) {
                     console.log("EWR: UKRAINE");
                     pCountry = 1;
                 }
 
                 for (let x = 0; x < spawnUnitCount; x++) {
-                    unitStart = _.cloneDeep(findUnit);
+                    const unitStart = _.cloneDeep(findUnit);
+                    unitStart.spwnName = ("DU|" + curPlayer.ucid + "|" + type + "|" + special +
+                    "|true|" + mobile + "|" + curPlayer.name + "|" + ((special !== "jtac") ? _.random(10000, 99999) : "")) as string;
                     if (curUnitHdg > 359) {
                         curUnitHdg = 30;
                     }
-                    if (special === "jtac") {
-                        _.set(unitStart, "spwnName", "DU|" + curPlayer.ucid + "|" + type + "|" + special +
-                            "|true|" + mobile + "|" + curPlayer.name + "|");
-                    } else {
-                        _.set(unitStart, "spwnName", "DU|" + curPlayer.ucid + "|" + type + "|" + special +
-                            "|true|" + mobile + "|" + curPlayer.name + "|" + _.random(10000, 99999));
-                    }
 
-                    unitStart.lonLatLoc = playerUnit.lonLatLoc;
+                    unitStart.lonLatLoc = ddcsControllers.getLonLatFromDistanceDirection(playerUnit.lonLatLoc, curUnitHdg, 0.05);
                     unitStart.hdg = curUnitHdg;
                     unitStart.country = pCountry;
                     unitStart.playerCanDrive = mobile;
