@@ -16,7 +16,7 @@ export function getWeaponCost(typeName: string, count: number): number {
         const foxAllowance = (mantraCHK > 2) ? 0 : (count > 2) ? 0 : curWeaponLookup.fox2ModUnder2 || 0;
         return curWeaponLookup.tier || 0 + foxAllowance;
     }
-    console.log("cant find weapon: line17");
+    console.log("cant find weapon: line17 ", typeName);
     return 0;
 }
 

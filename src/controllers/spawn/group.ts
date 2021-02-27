@@ -1491,14 +1491,9 @@ export async function replenishUnits( baseName: string, side: number, init: bool
 
 export async function destroyUnit( unitName: string, type: string ): Promise<void> {
     // DONT USE ON CLIENT AIRCRAFT
-    let cmd: string = "";
-    if (type === "static") {
-        cmd = "StaticObject.getByName(\"" + unitName + "\"):destroy()";
-    } else {
-        cmd = "Unit.getByName(\"" + unitName + "\"):destroy()";
-    }
+    console.log("TT: ", unitName);
 
-    const actionObj = {actionObj: {action: "CMD", cmd: [cmd], reqID: 0}};
+    const actionObj = {actionObj: {action: "destroyObj", unitName, type, reqID: ""}};
     await ddcsControllers.sendUDPPacket("frontEnd", actionObj);
 }
 

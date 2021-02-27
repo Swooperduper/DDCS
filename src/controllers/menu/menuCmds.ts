@@ -1069,7 +1069,7 @@ export async function spawnTanker(curUnit: any, curPlayer: any, tankerType: stri
     }
 }
 
-export async function unpackCrate(playerUnit: any, country: string, type: string, special: string, combo: boolean, mobile: boolean) {
+export async function unpackCrate(playerUnit: any, country: number, type: string, special: string, combo: boolean, mobile: boolean) {
     console.log("UNPACK CRATE: ", playerUnit, country, type, special, combo, mobile);
     const engineCache = ddcsControllers.getEngineCache();
     const curTimePeriod = engineCache.config.timePeriod || "modern";
@@ -1121,7 +1121,7 @@ export async function unpackCrate(playerUnit: any, country: string, type: string
                         curPlayer.name + "|" + _.random(10000, 99999);
                     curUnitStart.lonLatLoc = playerUnit.lonLatLoc;
                     curUnitStart.hdg = curUnitHdg;
-                    curUnitStart.country = ddcsControllers.countryId.indexOf(country);
+                    curUnitStart.country = country;
                     curUnitStart.playerCanDrive = mobile;
                     curUnitStart.coalition = playerUnit.coalition;
 
@@ -1138,11 +1138,12 @@ export async function unpackCrate(playerUnit: any, country: string, type: string
             let pCountry = country;
             const findUnit = _.find(engineCache.unitDictionary, {_id: type});
 
+            console.log("SA ", country);
             if (findUnit) {
                 const spawnUnitCount = findUnit.config[curTimePeriod].spawnCount;
                 if ((type === "1L13 EWR" || type === "55G6 EWR" || type === "Dog Ear radar") && _.get(playerUnit, "coalition") === 2) {
                     console.log("EWR: UKRAINE");
-                    pCountry = "UKRAINE";
+                    pCountry = 1;
                 }
 
                 for (let x = 0; x < spawnUnitCount; x++) {
@@ -1160,11 +1161,10 @@ export async function unpackCrate(playerUnit: any, country: string, type: string
 
                     unitStart.lonLatLoc = playerUnit.lonLatLoc;
                     unitStart.hdg = curUnitHdg;
-                    unitStart.country = ddcsControllers.countryId.indexOf(pCountry);
+                    unitStart.country = pCountry;
                     unitStart.playerCanDrive = mobile;
                     unitStart.special = special;
                     unitStart.coalition = playerUnit.coalition;
-
                     newSpawnArray.push(unitStart);
                     curUnitHdg = curUnitHdg + addHdg;
                 }

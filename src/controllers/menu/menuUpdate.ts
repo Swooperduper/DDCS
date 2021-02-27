@@ -86,6 +86,7 @@ export async function spawnNewMenuCategory(
 }
 
 export async function initializeMenu(playerUnit: any): Promise<void> {
+    console.log("PU: ", playerUnit);
     let lightCrateWeight = _.cloneDeep(startLightCrateWeight);
     let heavyCrateWeight = _.cloneDeep(startHeavyCrateWeight);
 

@@ -36,7 +36,9 @@ export async function processEventBirth(eventObj: any): Promise<void> {
             }
         }
         // give them a menu
-        console.log("UNIT BIRTH: ", eventObj.data.initiator);
-        await ddcsControllers.initializeMenu(eventObj.data.initiator);
+        if (eventObj.data.initiator) {
+            console.log("UNIT BIRTH: ", eventObj.data.initiator);
+            await ddcsControllers.initializeMenu(eventObj.data.initiator);
+        }
     }
 }

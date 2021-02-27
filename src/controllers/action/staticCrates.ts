@@ -63,6 +63,9 @@ export async function unpackStaticCrate(curPlayerUnit: any): Promise<void> {
                 }
             } else {
                 msg = "G: Unpacking " + _.toUpper(curCrateSpecial) + " " + curCrateType + "!";
+                // console.log("del crate obj: ", grpTypes, curCrateType, numCrate);
+                // exports.destroyCrates(grpTypes, curCrateType, numCrate);
+
                 await ddcsControllers.unpackCrate(
                     curPlayerUnit,
                     curCrate.country,

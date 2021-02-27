@@ -289,7 +289,7 @@ function runRequest(request)
             if type(request.cmd) == 'table' then
                 cmdResponses = {}
                 for rIndex = 1, #request.cmd do
-                    --env.info("cmd: ".. request.cmd[rIndex])
+                    env.info("cmd: ".. request.cmd[rIndex])
                     local success, retVal = pcall(commandExecute, request.cmd[rIndex])
                     if not success then
                         env.info("Error: " .. retVal)
@@ -300,6 +300,20 @@ function runRequest(request)
                     outObj.returnObj = cmdResponses
                     sendUDPPacket(outObj)
                 end
+            end
+        end
+
+        env.info("static123")
+        if request.action == "destroyObj" then
+            if request.type == "static" then
+                env.info("staticDel: ".. request.unitName.." "..request.type)
+                delObj = StaticObject.getByName(request.unitName)
+            else
+                env.info("unitDel: ".. request.unitName.." "..request.type)
+                delObj = Unit.getByName(request.unitName)
+            end
+            if delObj ~= nil then
+                delObj:destroy()
             end
         end
     end
@@ -408,10 +422,14 @@ function clientEventHandler:onEvent(_event)
                     curEvent.initiatorId = tonumber(getIId)
                     curEvent.initiator = {
                         ["type"] = _event.initiator:getTypeName(),
+                        ["category"] = tonumber(_event.initiator:getCategory()),
                         ["side"] = tonumber(_event.initiator:getCoalition()),
-                        ["unitId"] = tonumber(getIId),
-                        ["groupId"] = tonumber(_event.initiator:getGroup():getID())
+                        ["unitId"] = tonumber(getIId)
                     }
+                    -- if object is not a static(3) or container(6) grab its group
+                    if curEvent.initiator.category ~= 3 and curEvent.initiator.category ~= 6 then
+                        curEvent.initiator.groupId = tonumber(_event.initiator:getGroup():getID())
+                    end
                 end
             end
             if _event.target ~= nil then
@@ -420,10 +438,14 @@ function clientEventHandler:onEvent(_event)
                     curEvent.targetId = tonumber(getTId)
                     curEvent.target = {
                         ["type"] = _event.target:getTypeName(),
+                        ["category"] = tonumber(_event.target:getCategory()),
                         ["side"] = tonumber(_event.target:getCoalition()),
-                        ["unitId"] = tonumber(getTId),
-                        ["groupId"] = tonumber(_event.target:getGroup():getID())
+                        ["unitId"] = tonumber(getTId)
                     }
+                    -- if object is not a static(3) or container(6) grab its group
+                    if curEvent.target.category ~= 3 and curEvent.target.category ~= 6 then
+                        curEvent.target.groupId = tonumber(_event.target:getGroup():getID())
+                    end
                 else
                     local targetObject = _event.target:getDesc()
                     curEvent.targetId = {
