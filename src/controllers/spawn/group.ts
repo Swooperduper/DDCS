@@ -23,23 +23,26 @@ export async function spawnStatic(staticSpawn: string, country: number): Promise
 
 // TODO: maybe combine this with the other route templates
 export async function turnOnEWRAuto(groupObj: typing.IUnit): Promise<string> {
-    let setCallSign: any;
+    let setCallsign: number;
     let setFreq: any;
     if (_.includes(ddcsControllers.countryId[groupObj.country], "UKRAINE")) {
-        setCallSign = 254;
+        console.log("UKRAINE: ", groupObj);
+        setCallsign = 254;
         setFreq = 254000000;
     } else if (groupObj.type === "55G6 EWR") {
+        console.log("mig15: ", groupObj);
         // Mig 15 freq
-        setCallSign = 375;
+        setCallsign = 375;
         setFreq = 3750000;
     } else {
-        setCallSign = 124;
+        console.log("other freq: ", groupObj);
+        setCallsign = 124;
         setFreq = 124000000;
     }
 
-    const spawnTemplate = await ddcsControllers.templateRead({_id: "turnOnEWRAutoRoute"});
+    const spawnTemplate = await ddcsControllers.templateRead({_id: "turnOnEWRAutoRouteTest"});
     const compiled = _.template(spawnTemplate[0].template);
-    return compiled({setFreq, setCallSign});
+    return compiled({setFreq, setCallsign});
 }
 
 export function convoyRouteTemplate(routes: typing.IConvoyRouteTemplate) {

@@ -243,6 +243,7 @@ export async function getStaticCratesInProximity(
                 }
             },
             objectCategory: 6,
+            dead: false,
             coalition
         });
 }

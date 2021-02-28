@@ -30,16 +30,15 @@ export async function unpackStaticCrate(curPlayerUnit: any): Promise<void> {
     const crates = await ddcsControllers.getStaticCratesInProximity(curPlayerUnit.lonLatLoc, 0.2, curPlayerUnit.coalition);
     let localCrateNum: number;
     let msg: string;
-    const curCrate: any = crates[0];
-    const crateInfo = _.find(ddcsControllers.getEngineCache().unitDictionary, {_id: curCrate.type.split("|")[2]});
+    if (crates.length > 0) {
+        const curCrate: any = crates[0];
+        // const crateInfo = _.find(ddcsControllers.getEngineCache().unitDictionary, {_id: curCrate.type.split("|")[2]});
 
-    const numCrate: number = curCrate.crateAmt;
-    const curCrateSpecial: string = curCrate.special || "";
-    const curCrateType: string = curCrate.templateName;
-    const isCombo: boolean = curCrate.isCombo;
-    const isMobile: boolean = curCrate.playerCanDrive;
-
-    if (curCrate) {
+        const numCrate: number = curCrate.crateAmt;
+        const curCrateSpecial: string = curCrate.special || "";
+        const curCrateType: string = curCrate.templateName;
+        const isCombo: boolean = curCrate.isCombo;
+        const isMobile: boolean = curCrate.playerCanDrive;
         const grpTypes: any = _.transform(crates, (result: any, value: any) => {
             (result[value.templateName] || (result[value.templateName] = [])).push(value);
         }, {});
@@ -75,7 +74,7 @@ export async function unpackStaticCrate(curPlayerUnit: any): Promise<void> {
                     .then((response: any) => {
                         console.log("unpacking response2: ", response);
                         if (response) {
-                            exports.destroyCrates(grpTypes, curCrateType, numCrate);
+                            destroyCrates(grpTypes, curCrateType, numCrate);
                         }
                     })
                     .catch((err: any) => {

@@ -782,6 +782,7 @@ export async function spawnCrateFromLogi(
             }
         }
         if (_.some(checkAllBase)) { // UNDO SET BACK BEFORE CHECKIN!!!
+        // if (true) {
             const delCrates = await ddcsControllers.staticCrateActionRead({playerOwnerId: curPlayer.ucid});
 
 
