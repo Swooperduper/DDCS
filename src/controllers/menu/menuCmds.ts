@@ -366,6 +366,9 @@ export async function menuCmdProcess(pObj: any) {
                                 );
                             } else {
                                 const curTroops: any[] = [];
+                                const randInc = _.random(1000000, 9999999);
+                                const genName = "TU|" + curPlayer.ucid + "|" + curUnit.troopType + "|" +
+                                    curUnit.playername + "|";
                                 const delUnits = await ddcsControllers.unitActionRead({
                                     playerOwnerId: curPlayer.ucid,
                                     isTroop: true,
@@ -386,8 +389,8 @@ export async function menuCmdProcess(pObj: any) {
                                     true
                                 )[0]);
                                 spawnArray = {
-                                    spwnName: "TU|" + curPlayer.ucid + "|" + curUnit.troopType + "|" +
-                                        curUnit.playername + "|" + _.random(1000000, 9999999),
+                                    name: "",
+                                    groupName: genName + randInc,
                                     type: curSpawnUnit.type,
                                     lonLatLoc: curUnit.lonLatLoc,
                                     heading: curUnit.hdg,
@@ -402,6 +405,7 @@ export async function menuCmdProcess(pObj: any) {
                                     x < curSpawnUnit.config[engineCache.config.timePeriod].spawnCount;
                                     x++
                                 ) {
+                                    spawnArray.name =  genName + (randInc + x);
                                     curTroops.push(spawnArray);
                                 }
                                 await ddcsControllers.unitActionUpdateByUnitId({
@@ -1111,18 +1115,22 @@ export async function unpackCrate(
         if (combo) {
             const addHdg = 30;
             let curUnitHdg = playerUnit.hdg;
+            let randInc = _.random(1000000, 9999999);
             const findUnits = _.filter(engineCache.unitDictionary, (curUnitDict) => {
                 return _.includes(curUnitDict.comboName, type);
             });
             for (const cbUnit of findUnits) {
+                randInc += 1;
+                const genName = "DU|" + curPlayer.ucid + "|" + cbUnit.type + "|" + special + "|true|" + mobile + "|" +
+                    curPlayer.name + "|";
                 const spawnUnitCount = cbUnit.config[curTimePeriod].spawnCount;
                 for (let x = 0; x < spawnUnitCount; x++) {
                     if (curUnitHdg > 359) {
                         curUnitHdg = 30;
                     }
                     const curUnitStart = _.cloneDeep(cbUnit) as any;
-                    curUnitStart.spwnName = "DU|" + curPlayer.ucid + "|" + cbUnit.type + "|" + special + "|true|" + mobile + "|" +
-                        curPlayer.name + "|" + _.random(10000, 99999);
+                    curUnitStart.groupName = genName + randInc;
+                    curUnitStart.name = genName + (randInc + x);
                     curUnitStart.lonLatLoc = ddcsControllers.getLonLatFromDistanceDirection(playerUnit.lonLatLoc, curUnitHdg, 0.05);
                     curUnitStart.hdg = curUnitHdg;
                     curUnitStart.country = country;
@@ -1139,6 +1147,9 @@ export async function unpackCrate(
             const addHdg = 30;
             let curUnitHdg = playerUnit.hdg;
             let pCountry = country;
+            const randInc = _.random(1000000, 9999999);
+            const genName = "DU|" + curPlayer.ucid + "|" + type + "|" + special +
+                "|true|" + mobile + "|" + curPlayer.name + "|";
             const findUnit = _.find(engineCache.unitDictionary, {_id: type});
             if (findUnit) {
                 const spawnUnitCount = findUnit.config[curTimePeriod].spawnCount;
@@ -1146,15 +1157,13 @@ export async function unpackCrate(
                     console.log("EWR: UKRAINE");
                     pCountry = 1;
                 }
-
                 for (let x = 0; x < spawnUnitCount; x++) {
                     const unitStart = _.cloneDeep(findUnit);
-                    unitStart.spwnName = ("DU|" + curPlayer.ucid + "|" + type + "|" + special +
-                    "|true|" + mobile + "|" + curPlayer.name + "|" + ((special !== "jtac") ? _.random(10000, 99999) : "")) as string;
                     if (curUnitHdg > 359) {
                         curUnitHdg = 30;
                     }
-
+                    unitStart.name = genName + (randInc + x);
+                    unitStart.groupName = genName + randInc;
                     unitStart.lonLatLoc = ddcsControllers.getLonLatFromDistanceDirection(playerUnit.lonLatLoc, curUnitHdg, 0.05);
                     unitStart.hdg = curUnitHdg;
                     unitStart.country = pCountry;
