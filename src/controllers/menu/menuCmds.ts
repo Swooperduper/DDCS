@@ -221,7 +221,6 @@ export async function isCrateOnboard(unit: any, verbose: boolean) {
 }
 
 export async function isTroopOnboard(unit: any, verbose?: boolean) {
-    console.log("isTroopHere: ", unit, verbose);
     if (unit.troopType) {
         if (verbose) {
             await ddcsControllers.sendMesgToGroup(
@@ -320,7 +319,6 @@ export async function menuCmdProcess(pObj: any) {
         const player = await ddcsControllers.srvPlayerActionsRead({name: curUnit.playername});
         if (player.length > 0) {
             const curPlayer = player[0];
-            let spawnArray;
             let curSpawnUnit;
             // action menu
             switch (pObj.cmd) {
@@ -388,24 +386,27 @@ export async function menuCmdProcess(pObj: any) {
                                     false,
                                     true
                                 )[0]);
-                                spawnArray = {
-                                    name: "",
-                                    groupName: genName + randInc,
-                                    type: curSpawnUnit.type,
-                                    lonLatLoc: curUnit.lonLatLoc,
-                                    heading: curUnit.hdg,
-                                    country: curUnit.country,
-                                    category: curSpawnUnit.unitCategory,
-                                    playerCanDrive: true,
-                                    coalition: curUnit.coalition
-                                };
 
                                 for (
                                     let x = 0;
                                     x < curSpawnUnit.config[engineCache.config.timePeriod].spawnCount;
                                     x++
                                 ) {
-                                    spawnArray.name =  genName + (randInc + x);
+                                    const spawnArray = {
+                                        name: genName + (randInc + x),
+                                        groupName: genName + randInc,
+                                        type: curSpawnUnit.type,
+                                        lonLatLoc: ddcsControllers.getLonLatFromDistanceDirection(
+                                            curUnit.lonLatLoc,
+                                            curUnit.hdg + (x * 10),
+                                            0.05
+                                        ),
+                                        hdg: curUnit.hdg,
+                                        country: curUnit.country,
+                                        unitCategory: curSpawnUnit.unitCategory,
+                                        playerCanDrive: true,
+                                        coalition: curUnit.coalition
+                                    };
                                     curTroops.push(spawnArray);
                                 }
                                 await ddcsControllers.unitActionUpdateByUnitId({
@@ -748,7 +749,7 @@ export async function spawnCrateFromLogi(
     console.log(unit, type, crates, isCombo, special, mobile, mass, crateType);
     let spc: string;
     let crateObj;
-    const crateCount = 0;
+    let crateCount = 0;
     if (special) {
         spc = special;
     } else {
@@ -780,10 +781,10 @@ export async function spawnCrateFromLogi(
                 ));
             }
         }
-        if (!_.some(checkAllBase)) { // UNDO SET BACK BEFORE CHECKIN!!!
+        if (_.some(checkAllBase)) { // UNDO SET BACK BEFORE CHECKIN!!!
             const delCrates = await ddcsControllers.staticCrateActionRead({playerOwnerId: curPlayer.ucid});
 
-            /*
+
             for (const crate of delCrates) {
                 if (crateCount > engineCache.config.maxCrates - 2) {
                     await ddcsControllers.staticCrateActionDelete({
@@ -793,7 +794,7 @@ export async function spawnCrateFromLogi(
                 }
                 crateCount++;
             }
-             */
+
             let curShapeName: string;
             const curCrate = _.find(engineCache.staticDictionary, {_id: crateType});
             if (curCrate) {
