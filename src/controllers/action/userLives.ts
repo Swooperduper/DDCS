@@ -177,15 +177,16 @@ export async function checkAircraftCosts(): Promise<void> {
 }
 
 export async function addLifePoints(curPlayer: any, curUnit: any, execAction?: string, addLP?: number): Promise<void> {
-    if (!curUnit.groupId) {
+    if (!!curUnit && !curUnit.groupId) {
         console.log("no groupid: ", curUnit);
+    } else {
+        await ddcsControllers.srvPlayerActionsAddLifePoints({
+            _id: curPlayer._id,
+            groupId: curUnit.groupId,
+            addLifePoints: addLP,
+            execAction
+        });
     }
-    await ddcsControllers.srvPlayerActionsAddLifePoints({
-        _id: curPlayer._id,
-        groupId: curUnit.groupId,
-        addLifePoints: addLP,
-        execAction
-    });
 }
 
 export async function removeLifePoints(

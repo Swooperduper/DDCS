@@ -80,6 +80,12 @@ function generateInitialUnitObj(group, unit, isActive, curName, coalition, lon, 
 
         local PlayerName = unit:getPlayerName()
         if PlayerName ~= nil then
+            if type(PlayerName) == 'table' then
+                env.info("playername: "..PlayerName[1].."-"..PlayerName[2])
+            else
+                env.info("playername: "..PlayerName)
+            end
+
             curUnit.data.playername = PlayerName
             local curFullAmmo = unit:getAmmo()
             if curFullAmmo ~= nil then

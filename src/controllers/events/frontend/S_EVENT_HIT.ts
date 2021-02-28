@@ -73,9 +73,10 @@ export async function checkShootingUsers(): Promise<void> {
 }
 
 export async function processEventHit(eventObj: any): Promise<void> {
+    console.log("WeaponHit: ", eventObj);
     const engineCache = ddcsControllers.getEngineCache();
-    const iUnitId = eventObj.data.arg3;
-    const tUnitId = eventObj.data.arg4;
+    const iUnitId = eventObj.data.initiator.unitId;
+    const tUnitId = eventObj.data.initiator.target;
     let iPName: string = "";
     let tPName: string = "";
     let iCurObj: any;
@@ -150,8 +151,8 @@ export async function processEventHit(eventObj: any): Promise<void> {
         }
     }
 
-    if (iUnit[0].coalition !== tUnit[0].coalition) {
-        const curWeapon = _.find(engineCache.weaponsDictionary, {_id: eventObj.data.arg7.typeName});
+    if (iUnit[0].coalition !== tUnit[0].coalition && eventObj.data.weapon) {
+        const curWeapon = _.find(engineCache.weaponsDictionary, {_id: eventObj.data.weapon.typeName});
 
         if (curWeapon) {
             const curWeaponName = ( curWeapon.displayName) ?  curWeapon.displayName :  curWeapon._id;
@@ -231,7 +232,7 @@ export async function processEventHit(eventObj: any): Promise<void> {
             }
         } else {
             // console.log('weapon not here');
-            console.log("Weapon Unknown: ", eventObj.data.arg7.typeName);
+            console.log("Weapon Unknown: ", eventObj.data.weapon.typeName);
             shootingUsers[iUnitId].count = exports.shootingUsers[iUnitId].count + 1;
             shootingUsers[iUnitId].startTime = new Date().getTime();
             // exports.shootingUsers, [iUnitId].serverName = serverName;

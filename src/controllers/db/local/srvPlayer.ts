@@ -136,7 +136,7 @@ export async function srvPlayerActionsAddLifePoints(obj: {
                         if (obj.execAction === "PeriodicAdd") {
                             msg = "+" + _.round(addPoints, 2).toFixed(2) + "LP(T:" + maxLimitedPoints.toFixed(2) + ")";
                         } else {
-                            msg = "You Have Just Gained " +
+                            msg = srvPlayer.name + " Have Just Gained " +
                                 addPoints.toFixed(2) + " Life Points! " +
                                 obj.execAction + "(Total:" + maxLimitedPoints.toFixed(2) + ")";
                         }
@@ -189,7 +189,7 @@ export async function srvPlayerActionsRemoveLifePoints(obj: {
                         { $set: setObj },
                         (updateErr: any) => {
                             if (updateErr) { reject(updateErr); }
-                            ddcsController.sendMesgToGroup( obj.groupId, "You Have Just Used " +
+                            ddcsController.sendMesgToGroup( obj.groupId, serverObj[0].name + " Have Just Used " +
                                 removePoints.toFixed(2) + " Life Points! " + obj.execAction +
                                 "(Total:" + curTotalPoints.toFixed(2) + ")", 5);
                             resolve();

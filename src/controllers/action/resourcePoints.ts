@@ -2,6 +2,7 @@
  * DDCS Licensed under AGPL-3.0 by Andrew "Drex" Finegan https://github.com/afinegan/DynamicDCS
  */
 
+import * as _ from "lodash";
 import * as typings from "../../typings";
 import * as ddcsControllers from "../";
 

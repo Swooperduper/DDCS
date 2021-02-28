@@ -6,17 +6,16 @@ import * as _ from "lodash";
 import * as ddcsControllers from "../../";
 
 export async function processEventTakeoff(eventObj: any): Promise<void> {
+    console.log("TAKEOFF: ", eventObj);
     const engineCache = ddcsControllers.getEngineCache();
     let place: string;
-    if (eventObj.data.arg6) {
-        place = " from " + eventObj.data.arg6;
-    } else if (eventObj.data.arg5) {
-        place = " from " + eventObj.data.arg5;
+    if (eventObj && eventObj.data && eventObj.data.place) {
+        place = eventObj.data.place;
     } else {
         place = "";
     }
 
-    const iUnit = await ddcsControllers.unitActionRead({unitId: eventObj.data.arg3});
+    const iUnit = await ddcsControllers.unitActionRead({unitId: eventObj.data.initiator.unitId});
     const playerArray = await ddcsControllers.srvPlayerActionsRead({sessionName: ddcsControllers.getSessionName()});
     const curIUnit = iUnit[0];
     const curUnitSide = curIUnit.coalition;
@@ -38,18 +37,21 @@ export async function processEventTakeoff(eventObj: any): Promise<void> {
                         roleCode: "I",
                         msg: "C: " + curIUnit.type + "(" + curIUnit.playername + ") has taken off" + place
                     };
-                    if (engineCache.config.lifePointsEnabled) {
+                    if (engineCache.config.lifePointsEnabled && !_.includes(iPlayer.slot, "_")) {
+                        console.log("checkSlotTakeoff: ", iPlayer.slot);
                         await ddcsControllers.removeLifePoints(
                             iPlayer,
                             curIUnit,
                             "Takeoff"
                         );
                     }
+                    /*
                     await ddcsControllers.sendToCoalition({payload: {
                             action: eventObj.action,
                             data: _.cloneDeep(iCurObj)
                         }});
                     await ddcsControllers.simpleStatEventActionsSave(iCurObj);
+                    */
                 }
             }
         }

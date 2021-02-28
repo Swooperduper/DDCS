@@ -6,18 +6,19 @@ import * as _ from "lodash";
 import * as ddcsControllers from "../../";
 
 export async function processEventLand(eventObj: any): Promise<void> {
+    console.log("LAND: ", eventObj);
     const engineCache = ddcsControllers.getEngineCache();
     let place: string = "";
     let baseLand: string = "";
 
     // Occurs when an aircraft lands at an airbase, farp or ship
-    if (eventObj.data.arg6) {
-        baseLand = eventObj.data.arg6;
-    } else if (eventObj.data.arg5) {
-        baseLand = eventObj.data.arg5;
+    if (eventObj && eventObj.data && eventObj.data.initiator.place && eventObj.data.initiator.place) {
+        baseLand = eventObj.data.initiator.place;
+    } else {
+        baseLand = "";
     }
 
-    const iUnit = await ddcsControllers.unitActionRead({unitId: eventObj.data.arg3, isCrate: false});
+    const iUnit = await ddcsControllers.unitActionRead({unitId: eventObj.data.initiator.unitId, isCrate: false});
     const playerArray = await ddcsControllers.srvPlayerActionsRead({sessionName: ddcsControllers.getSessionName()});
 
     if (_.isUndefined(iUnit[0])) {
@@ -59,18 +60,21 @@ export async function processEventLand(eventObj: any): Promise<void> {
                     msg: "C: " + iUnit[0].type + "(" + iUnit[0].playername + ") has landed at friendly " + place
                 };
                 console.log("FriendBaseLand: ", iCurObj.msg);
-                if (iCurObj.iucid && engineCache.config.lifePointsEnabled) {
+                if (engineCache.config.lifePointsEnabled && !_.includes(iPlayer.slot, "_")) {
+                    console.log("checkSlotLanding: ", iPlayer.slot);
                     await ddcsControllers.addLifePoints(
                         iPlayer,
                         iUnit[0],
                         "Land"
                     );
-                    await ddcsControllers.sendToCoalition({payload: {
-                            action: eventObj.action,
-                            data: _.cloneDeep(iCurObj)
-                        }});
-                    await ddcsControllers.simpleStatEventActionsSave(iCurObj);
                 }
+                /*
+                await ddcsControllers.sendToCoalition({payload: {
+                        action: eventObj.action,
+                        data: _.cloneDeep(iCurObj)
+                    }});
+                await ddcsControllers.simpleStatEventActionsSave(iCurObj);
+                 */
             }
         }
     }

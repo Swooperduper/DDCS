@@ -6,9 +6,9 @@ import * as _ from "lodash";
 import * as ddcsControllers from "../../";
 
 export async function processEventBirth(eventObj: any): Promise<void> {
-    const curUnitId = eventObj.data.initiatorId;
+    const curUnitId = eventObj.data.initiator.unitId;
     if (curUnitId) {
-        const iUnit = await ddcsControllers.unitActionRead({unitId: eventObj.data.initiatorId});
+        const iUnit = await ddcsControllers.unitActionRead({unitId: curUnitId});
         const curIUnit = iUnit[0];
         if (curIUnit && curIUnit.playername && curIUnit.playername !== "") {
             const playerArray = await ddcsControllers.srvPlayerActionsRead({sessionName: ddcsControllers.getSessionName()});

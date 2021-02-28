@@ -7,7 +7,7 @@ import * as ddcsControllers from "../../";
 
 export async function processEventRefuelingStop(eventObj: any): Promise<void> {
     // Occurs when an aircraft is finished taking fuel.
-    const iUnit = await ddcsControllers.unitActionRead({unitId: eventObj.data.arg3});
+    const iUnit = await ddcsControllers.unitActionRead({unitId: eventObj.data.initiator.unitId});
     const playerArray = await ddcsControllers.srvPlayerActionsRead({sessionName: ddcsControllers.getSessionName()});
     if (iUnit[0]) {
         const iPlayer = _.find(playerArray, {name: iUnit[0].playername});

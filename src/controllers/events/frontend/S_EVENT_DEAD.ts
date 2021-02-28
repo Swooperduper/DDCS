@@ -8,7 +8,7 @@ import * as ddcsControllers from "../../";
 export async function processEventDead(eventObj: any): Promise<void> {
     const engineCache = ddcsControllers.getEngineCache();
     const nowTime = new Date().getTime();
-    const iUnit = await ddcsControllers.unitActionRead({unitId: eventObj.data.arg3});
+    const iUnit = await ddcsControllers.unitActionRead({unitId: eventObj.data.initiator.unitId});
     const playerArray = await ddcsControllers.srvPlayerActionsRead({sessionName: ddcsControllers.getSessionName()});
     const curIUnit = iUnit[0];
     if (curIUnit) {
