@@ -76,7 +76,6 @@ export async function spawnNewMenuCategory(
         }
     }
 
-    console.log("MSA: ", menuSpawnArray);
     await ddcsControllers.sendUDPPacket("frontEnd", {
         actionObj: {
             action: "CMD",

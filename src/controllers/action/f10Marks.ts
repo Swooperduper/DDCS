@@ -12,13 +12,12 @@ export async function setFarpMarks() {
     for (const base of bases) {
         randomMarkId = _.random(1000, 9999);
         if (base.baseMarkId) {
-            ddcsControllers.sendUDPPacket("frontEnd", {
+            await ddcsControllers.sendUDPPacket("frontEnd", {
                 actionObj: {
                     action: "CMD",
                     cmd: ["trigger.action.removeMark(" + base.baseMarkId + ")"],
                     reqID: 0
-                },
-                queName: "clientArray"
+                }
             });
         }
         ddcsControllers.sendUDPPacket("frontEnd", {
@@ -30,13 +29,8 @@ export async function setFarpMarks() {
                     ", true)"
                 ],
                 reqID: 0
-            },
-            queName: "clientArray"
+            }
         });
-        await ddcsControllers.baseActionUpdate({_id: base.name})
-            .catch((err) => {
-                console.log("44", err);
-            });
     }
 }
 

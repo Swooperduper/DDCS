@@ -75,6 +75,7 @@ export async function initV3Engine(): Promise<void> {
     await updateWeaponDictionary();
     await updateBases();
     await updateMenuCommands();
+    await ddcsController.setFarpMarks();
 
     await ddcsController.setResetFullCampaign(ddcsController.getEngineCache().config.resetFullCampaign);
 
