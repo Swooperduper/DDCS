@@ -80,12 +80,6 @@ function generateInitialUnitObj(group, unit, isActive, curName, coalition, lon, 
 
         local PlayerName = unit:getPlayerName()
         if PlayerName ~= nil then
-            if type(PlayerName) == 'table' then
-                env.info("playername: "..PlayerName[1].."-"..PlayerName[2])
-            else
-                env.info("playername: "..PlayerName)
-            end
-
             curUnit.data.playername = PlayerName
             local curFullAmmo = unit:getAmmo()
             if curFullAmmo ~= nil then
@@ -295,7 +289,9 @@ function runRequest(request)
             if type(request.cmd) == 'table' then
                 cmdResponses = {}
                 for rIndex = 1, #request.cmd do
-                    env.info("cmd: ".. request.cmd[rIndex])
+                    if request.verbose ~= null then
+                        env.info("cmd: ".. request.cmd[rIndex])
+                    end
                     local success, retVal = pcall(commandExecute, request.cmd[rIndex])
                     if not success then
                         env.info("Error: " .. retVal)
@@ -309,13 +305,16 @@ function runRequest(request)
             end
         end
 
-        env.info("static123")
         if request.action == "destroyObj" then
             if request.type == "static" then
-                env.info("staticDel: ".. request.unitName.." "..request.type)
+                if request.verbose ~= null then
+                    env.info("staticDel: ".. request.unitName.." "..request.type)
+                end
                 delObj = StaticObject.getByName(request.unitName)
             else
-                env.info("unitDel: ".. request.unitName.." "..request.type)
+                if request.verbose ~= null then
+                    env.info("unitDel: ".. request.unitName.." "..request.type)
+                end
                 delObj = Unit.getByName(request.unitName)
             end
             if delObj ~= nil then

@@ -163,7 +163,7 @@ export async function unitActionRemoveAllDead(): Promise<void> {
         dbModels.unitModel.deleteOne(
             {
                 dead: true,
-                category: {
+                unitCategory: {
                     $ne: catNum
                 },
                 updatedAt: {

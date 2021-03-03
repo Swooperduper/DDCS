@@ -7,6 +7,7 @@ import * as typing from "../../typings";
 import * as ddcsControllers from "../";
 
 export async function checkUnitsToBaseForCapture(): Promise<void> {
+    console.log("CHECK BASE CAPTURE");
     let sideArray = {};
     const campaignState: any = {
         red: 0,
@@ -21,7 +22,7 @@ export async function checkUnitsToBaseForCapture(): Promise<void> {
             (result[value.coalition] || (result[value.coalition] = [])).push(value);
         });
         if (base.side === 1 && _.get(sideArray, [2], []).length > 0) {
-            // console.log('enemy in range: ', base.name + ': enemy Blue');
+            console.log("enemy in range: ", base.name + ": enemy Blue");
             if (_.get(sideArray, [1], []).length === 0) {
                 console.log("BASE HAS BEEN CAPTURED: ", base.name, " is now ", 2);
                 await ddcsControllers.sendMesgToAll(
@@ -31,19 +32,19 @@ export async function checkUnitsToBaseForCapture(): Promise<void> {
 
                 await ddcsControllers.spawnSupportBaseGrp(base.name, 2, false);
                 await ddcsControllers.baseActionUpdateSide({name: base.name, side: 2});
-                await ddcsControllers.setbaseSides();
-                const aliveLogistics = await ddcsControllers.unitActionRead({name: base.name + " Logistics", dead: false});
+                // await ddcsControllers.setbaseSides();
+                const aliveLogistics = await ddcsControllers.unitActionRead({_id: base.name + " Shelter", dead: false});
                 if (aliveLogistics.length > 0) {
-                    // await ddcsControllers.spawnLogisticCmdCenter({}, false, base, 2);
+                    await ddcsControllers.spawnStaticBuilding({} as typing.IStaticSpawnMin, true, base, 2, "Shelter");
                 }
-                const aliveComms = await ddcsControllers.unitActionRead({name: base.name + " Communications", dead: false});
+                const aliveComms = await ddcsControllers.unitActionRead({_id: base.name + " Comms tower M", dead: false});
                 if (aliveComms.length > 0) {
-                    await ddcsControllers.spawnStaticBuilding({} as typing.IStaticSpawnMin, false, base, 2, "Comms tower M");
+                    await ddcsControllers.spawnStaticBuilding({} as typing.IStaticSpawnMin, true, base, 2, "Comms tower M");
                 }
             }
         }
         if (base.side === 2 && _.get(sideArray, [1], []).length > 0) {
-            // console.log('enemy in range: ', base.name + ': enemy Red');
+            console.log("enemy in range: ", base.name + ": enemy Red");
             if (_.get(sideArray, [2], []).length === 0) {
                 console.log("BASE HAS BEEN CAPTURED: ", base.name, " is now ", 1);
                 await ddcsControllers.sendMesgToAll(
@@ -53,10 +54,14 @@ export async function checkUnitsToBaseForCapture(): Promise<void> {
 
                 await ddcsControllers.spawnSupportBaseGrp(base.name, 1, false);
                 await ddcsControllers.baseActionUpdateSide({name: base.name, side: 1});
-                await ddcsControllers.setbaseSides();
-                const aliveLogistics = await ddcsControllers.unitActionRead({name: base.name + " Logistics", dead: false});
+                // await ddcsControllers.setbaseSides();
+                const aliveLogistics = await ddcsControllers.unitActionRead({name: base.name + " Shelter", dead: false});
                 if (aliveLogistics.length > 0) {
-                    // await ddcsControllers.spawnLogisticCmdCenter({}, false, base, 1);
+                    await ddcsControllers.spawnStaticBuilding({} as typing.IStaticSpawnMin, true, base, 1, "Shelter");
+                }
+                const aliveComms = await ddcsControllers.unitActionRead({name: base.name + " Comms tower M", dead: false});
+                if (aliveComms.length > 0) {
+                    await ddcsControllers.spawnStaticBuilding({} as typing.IStaticSpawnMin, true, base, 1, "Comms tower M");
                 }
             }
         }
@@ -76,14 +81,14 @@ export async function checkUnitsToBaseForCapture(): Promise<void> {
             // console.log('Spawning Support Units', base, unitSide);
             await ddcsControllers.spawnSupportBaseGrp(base.name, unitSide, false);
             await ddcsControllers.baseActionUpdateSide({name: base.name, side: unitSide});
-            await ddcsControllers.setbaseSides();
-            const aliveLogistics = await ddcsControllers.unitActionRead({name: base.name + " Logistics", dead: false});
+            // await ddcsControllers.setbaseSides();
+            const aliveLogistics = await ddcsControllers.unitActionRead({name: base.name + " Shelter", dead: false});
             if (aliveLogistics.length > 0) {
-                // await ddcsControllers.spawnLogisticCmdCenter({}, false, base, unitSide);
+                await ddcsControllers.spawnStaticBuilding({} as typing.IStaticSpawnMin, true, base, unitSide, "Shelter");
             }
-            const aliveComms = await ddcsControllers.unitActionRead({name: base.name + " Communications", dead: false});
+            const aliveComms = await ddcsControllers.unitActionRead({name: base.name + " Comms tower M", dead: false});
             if (aliveComms.length > 0) {
-                await ddcsControllers.spawnStaticBuilding({} as typing.IStaticSpawnMin, false, base, unitSide, "Comms tower M");
+                await ddcsControllers.spawnStaticBuilding({} as typing.IStaticSpawnMin, true, base, unitSide, "Comms tower M");
             }
         }
     }
@@ -125,7 +130,7 @@ export async function getCoalitionGroundUnitsInProximity(
                     ]
                 }
             },
-            category: catNum,
+            unitCategory: catNum,
             coalition: side
         });
 }
@@ -176,7 +181,7 @@ export async function getGroundUnitsInProximity(lonLat: number[], kmDistance: nu
                 $maxDistance: kmDistance * 1000
             }
         },
-        category: catNum,
+        unitCategory: catNum,
         isCrate: false,
         isTroop
     });
@@ -194,7 +199,7 @@ export async function getLogiTowersProximity(lonLat: number[], kmDistance: numbe
                     ]
                 }
             },
-            category: catNum,
+            unitCategory: catNum,
             proxChkGrp: "logisticTowers",
             coalition
         });
@@ -219,7 +224,7 @@ export async function getPlayersInProximity(
             playername: {
                 $ne: ""
             },
-            category: {
+            unitCategory: {
                 $in: ["AIRPLANE", "HELICOPTER"]
             },
             inAir,

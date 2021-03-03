@@ -125,7 +125,7 @@ export async function syncByName(incomingObj: any, curReqJobIndex: number): Prom
             await ddcsControllers.sendUDPPacket("frontEnd", {
                 actionObj: {
                     action: "reSyncInfo",
-                    objType: (ddcsControllers.UNIT_CATEGORY[incomingObj.category] === "STRUCTURE") ? "static" : "unit",
+                    objType: (ddcsControllers.UNIT_CATEGORY[incomingObj.unitCategory] === "STRUCTURE") ? "static" : "unit",
                     missingNames,
                     reqID: 0, // dont run anything with return data
                     time: new Date()
@@ -143,7 +143,7 @@ export async function syncByName(incomingObj: any, curReqJobIndex: number): Prom
             await ddcsControllers.sendUDPPacket("frontEnd", {
                 actionObj: {
                     action: "reSyncInfo",
-                    objType: (ddcsControllers.UNIT_CATEGORY[incomingObj.category] === "STRUCTURE") ? "static" : "unit",
+                    objType: (ddcsControllers.UNIT_CATEGORY[incomingObj.unitCategory] === "STRUCTURE") ? "static" : "unit",
                     missingNames,
                     reqID: 0, // dont run anything with return data
                     time: new Date()
@@ -215,7 +215,7 @@ export async function syncCheck(serverCount: number): Promise<void> {
                 _id: /~/
             });
             const isServerVirgin = serverCount <= preBakedNames.length; // keep an eye on this one....
-            console.log("Check: ", isServerVirgin, getMissionStartupReSync(), getResetFullCampaign());
+            console.log("Check: ", isServerVirgin, getMissionStartupReSync(), getResetFullCampaign(), preBakedNames.length);
             if (isServerVirgin || getMissionStartupReSync() || getResetFullCampaign()) {
                 if (isServerVirgin || getResetFullCampaign()) {
                     setServerSynced(false);
@@ -258,6 +258,7 @@ export async function syncCheck(serverCount: number): Promise<void> {
                 } else {
                     // normal synced operation
                     await activateInactiveSpawn();
+                    setServerSynced(true);
                     console.log("NORMAL SYNC CHECK LOOP");
                 }
             }

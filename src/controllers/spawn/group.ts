@@ -211,6 +211,7 @@ export async function airUnitTemplate( unitObj: any ): Promise<string> {
 }
 
 export async function staticTemplate(staticObj: any): Promise<string> {
+    console.log("staticObj: ", staticObj);
     const spawnTemplate = await ddcsControllers.templateRead({_id: "staticUnit"});
     const compiled = _.template(spawnTemplate[0].template);
     return compiled({staticObj});
@@ -1302,8 +1303,19 @@ export async function spawnStaticBuilding(
                 lonLatLoc: ddcsControllers.getRandomLatLonFromBase(baseObj.name, "buildingPoly"),
                 isActive: true
             };
-            // initial spawn, spawn in DB and sync over
-            await ddcsControllers.unitActionSave(curStaticObj);
+
+
+            await ddcsControllers.sendUDPPacket("frontEnd", {
+                actionObj: {
+                    action: "CMD",
+                    cmd: [await spawnStatic(
+                        await staticTemplate(curStaticObj as typing.IStaticUnitTemp),
+                        curStaticObj.country)],
+                    reqID: 0
+                }
+            });
+            // initial spawn, spawn in DB and sync over - doesnt work as of yet
+            // await ddcsControllers.unitActionSave(curStaticObj);
         } else {
             console.log("country not found: ", side, staticType);
         }
