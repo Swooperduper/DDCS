@@ -546,6 +546,7 @@ export interface ICapTemplate {
 }
 
 export interface IUnitSpawnMin {
+    playerCanDrive: boolean;
     hdg: number;
     alt: number;
     coalition: number;

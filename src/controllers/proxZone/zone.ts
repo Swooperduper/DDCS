@@ -112,3 +112,7 @@ export function getRandomLatLonFromBase(baseName: string, polytype: string, zone
     }
     return [];
 }
+
+export function getOppositeHeading(heading: number) {
+    return (heading + 180) % 360;
+}

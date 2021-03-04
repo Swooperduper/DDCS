@@ -404,6 +404,7 @@ export async function spawnBaseReinforcementGroup(side: number, baseName: string
                             unitCategory: infoSpwn.unitCategory,
                             objectCategory: infoSpwn.objectCategory,
                             type: infoSpwn.type,
+                            playerCanDrive: false,
                             lonLatLoc: ddcsControllers.getRandomLatLonFromBase(baseName, polyCheck)
                         });
                     }
@@ -418,6 +419,7 @@ export async function spawnBaseReinforcementGroup(side: number, baseName: string
                             unitCategory: curRndSpawn[j].unitCategory,
                             objectCategory: curRndSpawn[j].objectCategory,
                             type: curRndSpawn[j].type,
+                            playerCanDrive: false,
                             lonLatLoc: ddcsControllers.getLonLatFromDistanceDirection(
                                 randLatLonInBase,
                                 curAngle,
@@ -436,6 +438,7 @@ export async function spawnBaseReinforcementGroup(side: number, baseName: string
                             unitCategory: curRndSpawn[k].unitCategory,
                             objectCategory: curRndSpawn[k].objectCategory,
                             type: curRndSpawn[k].type,
+                            playerCanDrive: false,
                             lonLatLoc: ddcsControllers.getLonLatFromDistanceDirection(
                                 randLatLonInBase,
                                 curAngle,
@@ -454,6 +457,7 @@ export async function spawnBaseReinforcementGroup(side: number, baseName: string
                             unitCategory: infoSpwn.unitCategory,
                             objectCategory: infoSpwn.objectCategory,
                             type: infoSpwn.type,
+                            playerCanDrive: false,
                             lonLatLoc: ddcsControllers.getRandomLatLonFromBase(baseName, polyCheck)
                         }
                     ]);
@@ -653,6 +657,7 @@ export async function spawnLayer2Reinforcements(
             country: ddcsControllers.countryId.indexOf(curCountry[0]),
             unitCategory: curUnarmedAmmo[0].unitCategory,
             objectCategory: curUnarmedAmmo[0].objectCategory,
+            playerCanDrive: false,
             type: curUnarmedAmmo[0].type,
             lonLatLoc: randLatLonInBase
         });
@@ -666,6 +671,7 @@ export async function spawnLayer2Reinforcements(
                 country: ddcsControllers.countryId.indexOf(curCountry[0]),
                 unitCategory: curRndSpawn[j].unitCategory,
                 objectCategory: curRndSpawn[j].objectCategory,
+                playerCanDrive: false,
                 type: curRndSpawn[j].type,
                 lonLatLoc: ddcsControllers.getLonLatFromDistanceDirection(randLatLonInBase, curAngle, 0.05)
             });
@@ -1156,7 +1162,7 @@ export async function spawnSupportPlane(baseObj: typing.IBase, side: number): Pr
     curSide = ddcsControllers.defCountrys[side];
     curBaseName = "AI|1010101|" + baseObj.name + "|LOGISTICS|";
     baseLoc = baseObj.centerLoc;
-    console.log("BASE: ", baseLoc);
+    console.log("CALL REPLEN BASE: ", baseLoc);
 
     if (_.includes(baseObj._id, "_MOB") || _.includes(baseObj._id, "_FOB")) {
         curSpwnUnit = _.cloneDeep(getRndFromSpawnCat("transportHeli", side, true, true )[0]);
@@ -1192,14 +1198,17 @@ export async function spawnSupportPlane(baseObj: typing.IBase, side: number): Pr
         lonLatLoc: remoteLoc,
         name: curUnitName,
         playerCanDrive: false,
-        hidden: false
+        hidden: false,
+        heading: ddcsControllers.getOppositeHeading(randomDir),
+        skill: "Excellent",
+        callsign: 251
     };
 
     curUnitSpawn = await airUnitTemplate(curSpwnUnit);
 
     curGroupSpawn = _.replace(curGroupSpawn, "#UNITS", curUnitSpawn);
-    // console.log('spawnSupportPlane: ', curGroupSpawn, curSide, curGrpObj.category);
-    const curCMD = await spawnGrp(curGroupSpawn, curSide, curGrpObj.category);
+    const curCMD = await spawnGrp(curGroupSpawn, curSide, curGrpObj.unitCategory);
+    // console.log("spawnSupportPlane: ", curCMD);
     const sendClient = {action: "CMD", cmd: [curCMD], reqID: 0};
     const actionObj = {actionObj: sendClient, queName: "clientArray"};
     await ddcsControllers.sendUDPPacket("frontEnd", actionObj);
@@ -1353,6 +1362,7 @@ export async function spawnUnitGroup(spawnArray: typing.IUnitSpawnMin[], init: b
             unitObj.country = grpObj.country;
             unitObj.countryName = ddcsControllers.countryId[grpObj.country];
             unitObj.skill = grpObj.skill || "Excellent";
+            unitObj.playerCanDrive = false;
             unitObj.groupName = curGroupName;
             unitObj.type = curUnit.type;
 
@@ -1372,8 +1382,8 @@ export async function spawnUnitGroup(spawnArray: typing.IUnitSpawnMin[], init: b
                 grpObj.country,
                 grpObj.unitCategory
             );
-            // console.log("CMDCMD: ", curCMD);
-            const sendClient = {actionObj: {action: "CMD", cmd: [curCMD], reqID: 0}};
+            // console.log("spawnUnitGroup: ", curCMD);
+            const sendClient = {actionObj: {action: "CMD", cmd: [curCMD], reqID: 0, verbose: true}};
             await ddcsControllers.sendUDPPacket("frontEnd", sendClient);
         }
     }

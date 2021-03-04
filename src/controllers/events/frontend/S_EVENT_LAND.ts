@@ -9,13 +9,12 @@ export async function processEventLand(eventObj: any): Promise<void> {
     console.log("LAND: ", eventObj);
     const engineCache = ddcsControllers.getEngineCache();
     let place: string = "";
-    let baseLand: string = "";
 
     // Occurs when an aircraft lands at an airbase, farp or ship
-    if (eventObj && eventObj.data && eventObj.data.initiator.place && eventObj.data.initiator.place) {
-        baseLand = eventObj.data.initiator.place;
+    if (eventObj && eventObj.data && eventObj.data.place) {
+        place = eventObj.data.place;
     } else {
-        baseLand = "";
+        place = "";
     }
 
     const iUnit = await ddcsControllers.unitActionRead({unitId: eventObj.data.initiator.unitId, isCrate: false});
@@ -31,7 +30,7 @@ export async function processEventLand(eventObj: any): Promise<void> {
             const curSide = iUnit[0].coalition;
             const bases = await ddcsControllers.baseActionRead({_id: bName});
             const curBase = bases[0]; // does this work?
-            console.log("LANDINGCARGO: ", curBase.side === curSide, baseLand === bName, baseLand, " = ", bName,
+            console.log("LANDINGCARGO: ", curBase.side === curSide, place === bName, place, " = ", bName,
                 iUnit[0].unitCategory);
             if (curBase.side === curSide) {
                 await ddcsControllers.replenishUnits( bName, curSide, false);
@@ -59,7 +58,7 @@ export async function processEventLand(eventObj: any): Promise<void> {
                     roleCode: "I",
                     msg: "C: " + iUnit[0].type + "(" + iUnit[0].playername + ") has landed at friendly " + place
                 };
-                console.log("FriendBaseLand: ", iCurObj.msg);
+                console.log("FriendlyPlace: ", iCurObj.msg);
                 if (engineCache.config.lifePointsEnabled && !_.includes(iPlayer.slot, "_")) {
                     console.log("checkSlotLanding: ", iPlayer.slot);
                     await ddcsControllers.addLifePoints(

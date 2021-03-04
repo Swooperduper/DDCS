@@ -9,12 +9,12 @@ export async function processFiveSecActions(fullySynced: boolean): Promise<void>
 
     const engineCache = ddcsControllers.getEngineCache();
     const replenThreshold = 1; // percentage under max
-    const replenBase = engineCache.replenThresholdBase * replenThreshold;
-    const replenTimer = _.random(engineCache.replenTimer / 2, engineCache.replenTimer);
+    const replenBase = engineCache.config.replenThresholdBase * replenThreshold;
+    const replenTimer = _.random(engineCache.config.replenTimer / 2, engineCache.config.replenTimer);
 
     await ddcsControllers.syncCheck(ddcsControllers.getCurServerCnt());
 
-    console.log("fullSynced: ", fullySynced);
+
     if (fullySynced) {
         // resetCampaignController.checkTimeToRestart(serverName); //for testing base capture quickly
         // spawn support planes to replenish base units
@@ -24,7 +24,7 @@ export async function processFiveSecActions(fullySynced: boolean): Promise<void>
             const unitCnt = replenBase;
             const units = await ddcsControllers.unitActionRead({name: new RegExp(curRegEx), dead: false});
             const replenEpoc = new Date(base.replenTime).getTime();
-            const aliveComms = await ddcsControllers.unitActionRead({name: base.name + " Communications", dead: false});
+            const aliveComms = await ddcsControllers.unitActionRead({name: base.name + " Comms tower M", dead: false});
             if (aliveComms.length > 0) {
                 if ((units.length < unitCnt) && replenEpoc < new Date().getTime()) {
                     await ddcsControllers.baseActionUpdateReplenTimer({
