@@ -43,6 +43,7 @@ export async function weaponScoreActionsReadWeapon(obj: any): Promise<void> {
 }
 
 export async function weaponScoreActionsCheck(obj: any) {
+    console.log("WCT: ", dbModels.weaponScoreTable);
     dbModels.weaponScoreTable.find({_id: obj.typeName}, (err: any, weaponScore: typings.IWeaponDictionary[]) => {
         if (err) {
             console.log("line:396: ", err);

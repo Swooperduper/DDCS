@@ -6,7 +6,7 @@ import * as _ from "lodash";
 import * as ddcsControllers from "../";
 import { getSessionName } from "../";
 
-const requestJobArray: any[] = [];
+const requestJobObj: any = {};
 
 let missionStartupReSync = false;
 let isServerSynced = false;
@@ -31,16 +31,20 @@ export function setMissionStartupReSync(value: boolean): void {
     missionStartupReSync = value;
 }
 
-export function getRequestIndex(reqId: number): any {
-    return _.findIndex(requestJobArray, ["reqId", reqId]);
+export function getRequestJobSize(): any {
+    return Object.keys(requestJobObj).length;
 }
 
 export function getRequestJob(reqId: number): any {
-    return requestJobArray.find((r) => r.reqId === reqId);
+    return requestJobObj["REQ" + reqId];
 }
 
-export function setRequestJobArray(requestObj: any): any {
-    requestJobArray.push(requestObj);
+export function setRequestJobArray(requestObj: any, reqId: number): any {
+    requestJobObj["REQ" + reqId] = requestObj;
+}
+
+export function cleanRequestJobArray(reqId: number): any {
+    delete requestJobObj["REQ" + reqId];
 }
 
 export function getNextUniqueId(): number {
@@ -111,7 +115,7 @@ export async function populateNewCampaignUnits(): Promise<void> {
 }
 
 export async function syncByName(incomingObj: any, curReqJobIndex: number): Promise<void> {
-    const curReqJob = requestJobArray[curReqJobIndex];
+    const curReqJob = requestJobObj["REQ" + curReqJobIndex];
     console.log("server: ", curReqJob.reqArgs.serverCount, "db: ", curReqJob.reqArgs.dbCount);
 
     const aliveNamesObj =
@@ -151,7 +155,7 @@ export async function syncByName(incomingObj: any, curReqJobIndex: number): Prom
             });
         }
     }
-    requestJobArray.splice(curReqJobIndex, 1);
+    cleanRequestJobArray(curReqJobIndex);
 }
 
 export async function reSyncServerObjs(serverCount: number, dbCount: number) {
@@ -163,7 +167,7 @@ export async function reSyncServerObjs(serverCount: number, dbCount: number) {
             serverCount,
             dbCount
         }
-    });
+    }, curNextUniqueId);
     await ddcsControllers.sendUDPPacket("frontEnd", {
         actionObj: {
             action: "getNames",

@@ -66,9 +66,6 @@ export async function processingIncomingData(incomingObj: any) {
             console.log("player EXIT unit1");
             await ddcsController.processEventPlayerLeaveUnit(incomingObj);
             break;
-        case "LOSVISIBLEUNITS":
-            await ddcsController.processLOSEnemy(incomingObj);
-            break;
         case "unitsAlive":
             await ddcsController.sendMissingUnits(incomingObj.data);
             break;
@@ -92,12 +89,15 @@ export async function processingIncomingData(incomingObj: any) {
             // await ddcsController.processDisconnect(incomingObj);
             break;
         case "processReq":
-            console.log("INC: ", incomingObj.returnObj.length);
-            const curReqJobIndex = ddcsController.getRequestIndex(incomingObj.reqId);
             const curReqJobObj = ddcsController.getRequestJob(incomingObj.reqId);
-            if (curReqJobObj && curReqJobIndex) {
+            if (curReqJobObj) {
                 // @ts-ignore
-                ddcsController[curReqJobObj.callBack](incomingObj, curReqJobIndex);
+                await ddcsController[curReqJobObj.callBack](incomingObj, incomingObj.reqId);
+
+                // cleanup request job array
+                console.log("req array size before: ", ddcsController.getRequestJobSize());
+                ddcsController.cleanRequestJobArray(incomingObj.reqId);
+                console.log("req array size after: ", ddcsController.getRequestJobSize());
             } else {
                 console.log("Cant find req Id: ", incomingObj.reqId);
             }
