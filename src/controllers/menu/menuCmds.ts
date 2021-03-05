@@ -147,7 +147,7 @@ export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: 
                 curBaseName = _.split(_.get(curBaseObj, "name"), " #")[0];
                 console.log("intCurBaseAt: ", curBaseName);
                 const aliveLogistics = await ddcsControllers.unitActionRead({name: curBaseName + " Shelter", dead: false});
-                if (aliveLogistics.length > 0 || _.includes(curBaseName, "Carrier")) {
+                if (aliveLogistics.length >= 0 || _.includes(curBaseName, "Carrier")) {
                     if (intCargoType === "loadJTAC") {
                         await ddcsControllers.unitActionUpdateByUnitId({
                             unitId: curUnit.unitId,
@@ -160,6 +160,13 @@ export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: 
                         );
                     }
                     if (intCargoType === "loadBaseRepair") {
+                        const intCargo = _.split(curUnit.intCargoType, "|");
+                        const curIntCrateBaseOrigin = intCargo[2];
+                        curBaseName = _.split(curBaseObj.name, " #")[0];
+                        console.log("intCurUnpackBaseAt: ", curBaseName);
+                        if (curIntCrateBaseOrigin !== curBaseName) {
+                            await ddcsControllers.repairBase(curBaseObj, curUnit);
+                        }
                         await ddcsControllers.unitActionUpdateByUnitId({
                             unitId: curUnit.unitId,
                             intCargoType: "|BaseRepair|" + curBaseName + "|"

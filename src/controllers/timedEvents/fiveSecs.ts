@@ -14,7 +14,7 @@ export async function processFiveSecActions(fullySynced: boolean): Promise<void>
 
     await ddcsControllers.syncCheck(ddcsControllers.getCurServerCnt());
 
-
+    console.log("SYNCED: ", fullySynced);
     if (fullySynced) {
         // resetCampaignController.checkTimeToRestart(serverName); //for testing base capture quickly
         // spawn support planes to replenish base units
