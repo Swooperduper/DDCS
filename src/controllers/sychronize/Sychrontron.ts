@@ -13,6 +13,7 @@ let isServerSynced = false;
 let isInitSyncMode = false; // Init Sync Units To Server Mode
 let nextUniqueId = 1;
 let resetFullCampaign = false;
+const fiveMins = 5 * 60 * 1000;
 
 export function getResetFullCampaign(): boolean {
     return resetFullCampaign;
@@ -40,11 +41,20 @@ export function getRequestJob(reqId: number): any {
 }
 
 export function setRequestJobArray(requestObj: any, reqId: number): any {
+    requestObj.createTime = new Date().getTime();
     requestJobObj["REQ" + reqId] = requestObj;
 }
 
 export function cleanRequestJobArray(reqId: number): any {
     delete requestJobObj["REQ" + reqId];
+}
+
+export function jobArrayCleanup(): any {
+    for (const property in requestJobObj) {
+        if ( new Date().getTime() > requestJobObj[property].createTime + fiveMins ) {
+            delete requestJobObj[property];
+        }
+    }
 }
 
 export function getNextUniqueId(): number {
@@ -190,11 +200,13 @@ export async function activateInactiveSpawn() {
     console.log("inactive: ", unitObjs.length);
 
     const unitGroups = _.groupBy(unitObjs, (u) => u.groupName);
-
     if (Object.keys(unitGroups).length > 0) {
         console.log("Start Activating all units");
         for (const unitKeys of Object.keys(unitGroups)) {
             if (unitKeys !== "undefined") {
+                if (_.includes(unitKeys, "DU")) {
+                    console.log("activate: ", unitKeys);
+                }
                 await ddcsControllers.sendUDPPacket("frontEnd", {
                     actionObj: {
                         action: "CMD",

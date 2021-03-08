@@ -43,6 +43,7 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
         curData.hidden = false;
     }
     if (_.includes(curData.name, "DU|")) {
+        // console.log("spawn: ", unitObj, unit);
         stParse = _.split(curData.name, "|");
         const isAllowedToDrive = (stParse[5] === "true");
         curData.playerOwnerId = stParse[1];
@@ -53,6 +54,7 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
     if (unit.length > 0) {
         const curUnit = unit[0];
         const curUnitName = curUnit.name;
+        // console.log("CU: ", curUnit);
 
         // update location of carrier in aircraft DB
         if (_.includes(curData.name, "Carrier")) {
@@ -98,6 +100,9 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
             if (curData.type) {
                 iCurObj.data.type = curData.type;
             }
+            if (curData.groupName) {
+                iCurObj.data.groupName = curData.groupName;
+            }
             if (curData.ammo) {
                 iCurObj.data.ammo = curData.ammo;
             }
@@ -109,6 +114,7 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
             if (curData.country) {
                 iCurObj.data.country = curData.country;
             }
+
             await ddcsControllers.unitActionUpdate(iCurObj.data);
             await ddcsControllers.sendToCoalition({payload: {
                     action: "U",

@@ -16,6 +16,8 @@ end
 env.info("startMissionRuntimeDDCS")
 
 ddcs = {}
+laserSpots = {}
+IRSpots = {}
 local ddcsHost = "localhost"
 local ddcsPort = 3001
 local missionRuntimeHost = "localhost"
@@ -51,6 +53,7 @@ function generateInitialUnitObj(group, unit, isActive, curName, coalition, lon, 
     local curUnit = {
         ["uType"] = "unit",
         ["data"] = {
+            ["groupName"] = group:getName(),
             ["name"] = curName,
             ["isActive"] = isActive,
             ["unitPosition"] = unitPosition,
@@ -75,7 +78,7 @@ function generateInitialUnitObj(group, unit, isActive, curName, coalition, lon, 
         curUnit.data.surfType = land.getSurfaceType(unitPosition.p)
         curUnit.data.inAir = unit:inAir()
         curUnit.data.velocity = unit:getVelocity()
-        curUnit.data.groupName = group:getName()
+        --curUnit.data.groupName = group:getName()
         curUnit.data.coalition = coalition
 
         local PlayerName = unit:getPlayerName()
@@ -330,6 +333,89 @@ function runRequest(request)
                         end
                     end
                 end
+            end
+        end
+
+        if request.action == "setLaserSmoke" then
+            local curJtacUnit = Unit.getByName(request.jtacUnitName)
+            local curEnemyUnit = Unit.getByName(request.enemyUnitName)
+
+            if curJtacUnit ~= nil and curEnemyUnit ~= nil then
+                local _enemyVector = curEnemyUnit:getPoint()
+                local _enemyVectorUpdated = { x = _enemyVector.x, y = _enemyVector.y + 2.0, z = _enemyVector.z }
+                local _oldLase = laserSpots[curJtacUnit]
+                local _oldIR = IRSpots[curJtacUnit]
+
+                if _oldLase == nil then
+                    local _status, _result = pcall(function()
+                        return Spot.createLaser(curJtacUnit, { x = 0, y = 2.0, z = 0 }, _enemyVectorUpdated, request.laserCode)
+                    end)
+                    if not _status then
+                        env.error('ERROR: ' .. _result, false)
+                    else
+                        if _result then
+                            laserSpots[curJtacUnit] = _result
+                        end
+                    end
+                else
+                    _oldLase:setPoint(_enemyVectorUpdated)
+                end
+
+                if _oldIR == nil then
+                    local _status, _result = pcall(function()
+                        return Spot.createInfraRed(curJtacUnit, { x = 0, y = 2.0, z = 0 }, _enemyVectorUpdated)
+                    end)
+                    if not _status then
+                        env.error('ERROR: ' .. _result, false)
+                    else
+                        if _result then
+                            IRSpots[curJtacUnit] = _result
+                        end
+                    end
+                else
+                    _oldIR:setPoint(_enemyVectorUpdated)
+                end
+
+                local elat, elon, ealt = coord.LOtoLL(_enemyVectorUpdated)
+                local MGRS = coord.LLtoMGRS(coord.LOtoLL(_enemyVectorUpdated))
+                local enemyType = curEnemyUnit:getTypeName()
+                --local mesg = "JTAC Has Placed Smoke And Is Now Lasing a "..enemyType.." on "..request.laserCode.." Lat:"..elat.." Lon:"..elon.." MGRS:"..MGRS.UTMZone..MGRS.MGRSDigraph.." "..MGRS.Easting.." "..MGRS.Northing
+                --trigger.action.outTextForCoalition(request.coalition, mesg, 15)
+                if request.coalition == 1 then
+                    trigger.action.smoke(_enemyVectorUpdated, 4 )
+                end
+                if request.coalition == 2 then
+                    trigger.action.smoke(_enemyVectorUpdated, 1 )
+                end
+                if request.reqID > 0 then
+                    outObj.jtacUnit = request.jtacUnitName
+                    outObj.returnObj = {
+                        mgrs = MGRS,
+                        lonLat = {
+                            lon = elon,
+                            lat = elat
+                        },
+                        alt = ealt,
+                        type = enemyType
+                    }
+                    sendUDPPacket(outObj)
+                end
+            end
+        end
+
+        if request.action == "removeLaserIR" then
+            local _tempLase = laserSpots[request.jtacUnitName]
+            if _tempLase ~= nil then
+                Spot.destroy(_tempLase)
+                laserSpots[request.jtacUnitName] = nil
+                _tempLase = nil
+            end
+
+            local _tempIR = IRSpots[request.jtacUnitName]
+            if _tempIR ~= nil then
+                Spot.destroy(_tempIR)
+            	IRSpots[request.jtacUnitName] = nil
+            	_tempIR = nil
             end
         end
 

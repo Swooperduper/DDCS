@@ -49,9 +49,7 @@ export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: 
                         curBaseObj = base;
                     }
                 }
-                curBaseName = _.split(curBaseObj.name, " #")[0];
-                console.log("intCurUnpackBaseAt: ", curBaseName);
-                if (curIntCrateBaseOrigin === curBaseName) {
+                if (curBaseObj && curIntCrateBaseOrigin === _.split(curBaseObj.name, " #")[0]) {
                     await ddcsControllers.sendMesgToGroup(
                         curUnit.groupId,
                         "G: You can't unpack this internal crate from same base it is acquired!",

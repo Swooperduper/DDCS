@@ -12,6 +12,7 @@ export async function processPlayerEvent(playerArray: any): Promise<void> {
     if (playerArray.players.length > 0) {
         rtPlayerArray = playerArray.players;
         for (const player of playerArray.players) {
+            /* player check sides, lock etc
             if (player) {
                 const curPlyrUcid = player.ucid;
                 const curPlyrSide = player.side;
@@ -71,6 +72,7 @@ export async function processPlayerEvent(playerArray: any): Promise<void> {
                     }
                 }
             }
+            */
         }
 
         for (const player of playerArray.players) {

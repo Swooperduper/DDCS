@@ -38,7 +38,7 @@ export async function processEventBirth(eventObj: any): Promise<void> {
         // give them a menu
         if (eventObj.data.initiator.groupId) {
             // Only players can get a menu
-            console.log("spawning player menu");
+            // console.log("spawning player menu");
             await ddcsControllers.initializeMenu(eventObj.data.initiator);
         }
     }

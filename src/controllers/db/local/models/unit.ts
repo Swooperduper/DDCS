@@ -157,6 +157,9 @@ export function unitModel(dbconn: mongoose.Connection): mongoose.Document | {} {
             },
             templateName: {
                 type: String
+            },
+            jtacEnemyLocation: {
+                type: Object
             }
         },
         {

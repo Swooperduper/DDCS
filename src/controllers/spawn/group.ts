@@ -211,7 +211,7 @@ export async function airUnitTemplate( unitObj: any ): Promise<string> {
 }
 
 export async function staticTemplate(staticObj: any): Promise<string> {
-    console.log("staticObj: ", staticObj);
+    // console.log("staticObj: ", staticObj);
     const spawnTemplate = await ddcsControllers.templateRead({_id: "staticUnit"});
     const compiled = _.template(spawnTemplate[0].template);
     return compiled({staticObj});
