@@ -40,6 +40,40 @@ export function findBearing(lat1: number, lng1: number, lat2: number, lng2: numb
     return (curDeg === 360) ? 0 : curDeg;
 }
 
+export function calcDirectDistanceInKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
+    const R = 6371; // km
+    const dLat = toRad(lat2 - lat1);
+    const dLon = toRad(lon2 - lon1);
+    const latRad1 = toRad(lat1);
+    const latRad2 = toRad(lat2);
+
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(latRad1) * Math.cos(latRad2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const d = R * c;
+    return d;
+}
+
+export function toDegreesMinutesAndSeconds(coordinate: number) {
+    const absolute = Math.abs(coordinate);
+    const degrees = Math.floor(absolute);
+    const minutesNotTruncated = (absolute - degrees) * 60;
+    const minutes = Math.floor(minutesNotTruncated);
+    const seconds = Math.floor((minutesNotTruncated - minutes) * 60);
+
+    return degrees + " " + minutes + " " + seconds;
+}
+
+export function convertDMS(lat: number, lng: number) {
+    const latitude = toDegreesMinutesAndSeconds(lat);
+    const latitudeCardinal = lat >= 0 ? "N" : "S";
+
+    const longitude = toDegreesMinutesAndSeconds(lng);
+    const longitudeCardinal = lng >= 0 ? "E" : "W";
+
+    return latitude + " " + latitudeCardinal + "    " + longitude + " " + longitudeCardinal;
+}
+
 export function getLonLatFromDistanceDirection(lonLatLoc: number[], direction: number, distance: number): number[] {
     return geo_destination(lonLatLoc, distance, direction);
 }

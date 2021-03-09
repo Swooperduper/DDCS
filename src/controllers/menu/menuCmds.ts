@@ -313,6 +313,62 @@ export async function loadTroops(unitId: string, troopType: string) {
     }
 }
 
+export async function getActiveJTACTargets(unit: any, player: any, target: number) {
+    const closestJTAC = await ddcsControllers.getFirst5CoalitionJTACInProximity(unit.lonLatLoc, 10000, unit.coalition);
+    let mesg = "";
+    if (target) {
+        if (closestJTAC[(target - 1)]) {
+            const curJtacEnemy = closestJTAC[(target - 1)].jtacEnemyLocation;
+            const closestBase = await ddcsControllers.getAnyBasesInProximity([curJtacEnemy.lonLat.lon, curJtacEnemy.lonLat.lat], 100);
+            // console.log("target: ", target, closestJTAC[target - 1]);
+            mesg += "Target: " + target + " Type: " + curJtacEnemy.type;
+            if (closestBase[0] && closestBase[0]._id) {
+                mesg += " near " + closestBase[0]._id + "\n";
+            }
+            mesg += "Lat: " + curJtacEnemy.lonLat.lat + " Lon: " + curJtacEnemy.lonLat.lon + "\n";
+            mesg += "DMS: " + ddcsControllers.convertDMS(curJtacEnemy.lonLat.lat, curJtacEnemy.lonLat.lon) + "\n";
+            mesg += "MGRS: " + curJtacEnemy.mgrs.UTMZone + curJtacEnemy.mgrs.MGRSDigraph +
+                curJtacEnemy.mgrs.Easting + curJtacEnemy.mgrs.Northing + "\n";
+            mesg += "Shot IR and Laser, Laser Code: " + curJtacEnemy.laserCode;
+
+            await ddcsControllers.sendMesgToGroup(
+                unit.groupId,
+                mesg,
+                60
+            );
+        } else {
+            await ddcsControllers.sendMesgToGroup(
+                unit.groupId,
+                "There is no JTAC target: " + target,
+                10
+            );
+        }
+    } else {
+        for (let x = 0; x < closestJTAC.length; x++) {
+            if (x !== 0) {
+                mesg += "\n";
+            }
+
+            const curJtacEnemy = closestJTAC[x].jtacEnemyLocation;
+            const enemyBRA = ddcsControllers.findBearing(unit.lonLatLoc[1], unit.lonLatLoc[0],
+                curJtacEnemy.lonLat.lat, curJtacEnemy.lonLat.lon).toFixed(0);
+            const enemyDist = ddcsControllers.calcDirectDistanceInKm(unit.lonLatLoc[1], unit.lonLatLoc[0],
+                curJtacEnemy.lonLat.lat, curJtacEnemy.lonLat.lon).toFixed(2);
+            const closestBase = await ddcsControllers.getAnyBasesInProximity([curJtacEnemy.lonLat.lon, curJtacEnemy.lonLat.lat], 100);
+            console.log("BRA", enemyBRA, enemyDist, curJtacEnemy);
+            mesg += (x + 1) + ". " + curJtacEnemy.type + " at BRA " + enemyBRA + " for " + enemyDist + "KM";
+            if (closestBase[0] && closestBase[0]._id) {
+                mesg += " near " + closestBase[0]._id;
+            }
+        }
+        await ddcsControllers.sendMesgToGroup(
+            unit.groupId,
+            mesg,
+            20
+        );
+    }
+}
+
 export async function menuCmdProcess(pObj: any) {
     console.log("MENU COMMAND: ", pObj);
     const engineCache = ddcsControllers.getEngineCache();
@@ -335,6 +391,9 @@ export async function menuCmdProcess(pObj: any) {
                     break;
                 case "lookupLifeResource":
                     await ddcsControllers.lookupLifeResource(curPlayer.ucid);
+                    break;
+                case "getTargetCoords":
+                    await getActiveJTACTargets(curUnit, player, pObj.target);
                     break;
                 case "resourcePoints":
                     await ddcsControllers.checkResourcePoints(curPlayer);

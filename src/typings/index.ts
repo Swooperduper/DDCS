@@ -265,6 +265,21 @@ export interface IAmmo {
 }
 
 export interface IUnit {
+    jtacEnemyLocation: {
+        laserCode: string;
+        alt: number,
+        type: string,
+        lonLat: {
+            lat: number,
+            lon: number
+        },
+        mgrs: {
+            Easting: string
+            MGRSDigraph: string,
+            Northing: string,
+            UTMZone: string
+        }
+    };
     threatLvl: number;
     jtacReplenTime: number;
     jtacTarget: any;

@@ -9,7 +9,9 @@ export async function menuCommandsRead(filter: any): Promise<typings.IMenuComman
     return new Promise((resolve, reject) => {
         dbModels.menuCommandModel.find(filter, (err: any, menuCommands: typings.IMenuCommand[]) => {
             if (err) { reject(err); }
-            resolve(menuCommands);
+            const sortedMenu = menuCommands.sort((a, b) => (a.sort > b.sort) ? 1 : -1);
+            // console.log("SM: ", sortedMenu);
+            resolve(sortedMenu);
         });
     });
 }

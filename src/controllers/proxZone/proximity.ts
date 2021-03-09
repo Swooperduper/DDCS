@@ -168,6 +168,21 @@ export async function getBasesInProximity(lonLat: number[], kmDistance: number, 
         });
 }
 
+export async function getAnyBasesInProximity(lonLat: number[], kmDistance: number): Promise<typing.IBase[]> {
+    return await ddcsControllers.baseActionRead({
+        centerLoc: {
+            $near: {
+                $geometry: {
+                    type: "Point",
+                    coordinates: lonLat
+                },
+                $maxDistance: kmDistance * 1000
+            }
+        },
+        enabled: true
+    });
+}
+
 export async function getGroundUnitsInProximity(lonLat: number[], kmDistance: number, isTroop: boolean): Promise<typing.IUnit[]> {
     const catNum = ddcsControllers.UNIT_CATEGORY.indexOf("GROUND_UNIT");
     return await ddcsControllers.unitActionReadStd({
@@ -251,6 +266,27 @@ export async function getStaticCratesInProximity(
             dead: false,
             coalition
         });
+}
+
+export async function getFirst5CoalitionJTACInProximity(
+    lonLat: number[],
+    kmDistance: number,
+    side: number
+): Promise<typing.IUnit[]> {
+    return await ddcsControllers.unitActionReadFirst5({
+        dead: false,
+        lonLatLoc: {
+            $geoWithin: {
+                $centerSphere: [
+                    lonLat,
+                    kmDistance / 6378.1
+                ]
+            }
+        },
+        proxChkGrp: "jtac",
+        coalition: side,
+        jtacEnemyLocation: {$ne: null}
+    });
 }
 
 export async function getTroopsInProximity(lonLat: number[], kmDistance: number, coalition: number): Promise<typing.IUnit[]> {

@@ -396,7 +396,8 @@ function runRequest(request)
                             lat = elat
                         },
                         alt = ealt,
-                        type = enemyType
+                        type = enemyType,
+                        laserCode = request.laserCode
                     }
                     sendUDPPacket(outObj)
                 end
