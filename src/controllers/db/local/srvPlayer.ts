@@ -6,6 +6,7 @@ import * as _ from "lodash";
 import * as typings from "../../../typings";
 import { dbModels } from "../common";
 import * as ddcsController from "../../";
+import {IBase, ISrvPlayers} from "../../../typings";
 
 export async function srvPlayerActionsRead(obj: any): Promise<typings.ISrvPlayers[]> {
     return new Promise((resolve, reject) => {
@@ -43,10 +44,14 @@ export async function srvPlayerActionsUnsetGicTimeLeft(obj: any): Promise<void> 
 }
 
 export async function srvPlayerActionsUpdateFromServer(obj: {
+    redRSPoints: number;
+    blueRSPoints: number;
+    tmpRSPoints: number;
     _id: string,
     sessionName: string,
     side: number,
     sideLockTime: number,
+    playerId: string,
     curLifePoints?: number,
     currentSessionMinutesPlayed_blue?: number,
     currentSessionMinutesPlayed_red?: number,
@@ -55,16 +60,13 @@ export async function srvPlayerActionsUpdateFromServer(obj: {
 }): Promise<void> {
     const engineCache = ddcsController.getEngineCache();
     return new Promise((resolve, reject) => {
-        dbModels.srvPlayerModel.find({_id: obj._id}, (err: any, serverObj: typings.ISrvPlayers[]) => {
+        dbModels.srvPlayerModel.find({_id: obj._id}, async (err: any, serverObj: typings.ISrvPlayers[]) => {
             if (err) { reject(err); }
             if (serverObj.length === 0) {
+                // new player detected
 
                 if (obj.ipaddr === ":10308") {
                     obj.ipaddr = "127.0.0.1";
-                }
-
-                if (obj.side === 0) { // keep the user on the last side
-                    delete obj.side;
                 }
                 obj.curLifePoints = engineCache.config.startLifePoints;
 
@@ -74,32 +76,36 @@ export async function srvPlayerActionsUpdateFromServer(obj: {
                     resolve();
                 });
             } else {
+                // existing player record exist
                 const curPly = serverObj[0];
-                if ((curPly.sessionName !== obj.sessionName) && curPly.sessionName && obj.sessionName) {
-                    const curTime =  new Date().getTime();
-                    obj.curLifePoints = engineCache.config.startLifePoints;
-                    obj.currentSessionMinutesPlayed_blue = 0;
-                    obj.currentSessionMinutesPlayed_red = 0;
-                    if (curPly.sideLockTime < curTime) {
-                        obj.sideLockTime = curTime + ddcsController.time.oneHour;
-                        obj.sideLock = 0;
-                    }
-                }
-                if (obj.ipaddr === ":10308") {
-                    obj.ipaddr = "127.0.0.1";
-                }
-                if (obj.side === 0) { // keep the user on the last side
-                    delete obj.side;
-                }
 
-                dbModels.srvPlayerModel.updateOne(
-                    {_id: obj._id},
-                    {$set: obj},
-                    (updateErr: any) => {
-                        if (updateErr) { reject(updateErr); }
-                        resolve();
+                // keep an eye on this check....
+                await ddcsController.protectSlots(curPly.sideLock, obj.side, obj.playerId);
+
+                const iUnit = await ddcsController.unitActionRead({playername: curPly.name});
+                // console.log("unit: ", curPly.name, iUnit);
+                if (iUnit.length > 0) {
+                    if (curPly.sessionName && obj.sessionName && (curPly.sessionName !== obj.sessionName)) {
+                        obj.curLifePoints = engineCache.config.startLifePoints;
+                        obj.currentSessionMinutesPlayed_blue = 0;
+                        obj.currentSessionMinutesPlayed_red = 0;
+                        obj.redRSPoints = 0;
+                        obj.blueRSPoints = 0;
+                        obj.tmpRSPoints = 0;
                     }
-                );
+                    if (obj.ipaddr === ":10308") {
+                        obj.ipaddr = "127.0.0.1";
+                    }
+
+                    dbModels.srvPlayerModel.updateOne(
+                        {_id: obj._id},
+                        {$set: obj},
+                        (updateErr: any) => {
+                            if (updateErr) { reject(updateErr); }
+                            resolve();
+                        }
+                    );
+                }
             }
         });
     });
@@ -134,11 +140,11 @@ export async function srvPlayerActionsAddLifePoints(obj: {
                     (updateErr: any, srvPlayer: typings.ISrvPlayers) => {
                         if (updateErr) { reject(updateErr); }
                         if (obj.execAction === "PeriodicAdd") {
-                            msg = "+" + _.round(addPoints, 2).toFixed(2) + "LP(T:" + maxLimitedPoints.toFixed(2) + ")";
+                            msg = "+" + _.round(addPoints, 2).toFixed(2) || "" + "LP(T:" + maxLimitedPoints.toFixed(2) || "" + ")";
                         } else {
                             msg = srvPlayer.name + " Have Just Gained " +
-                                addPoints.toFixed(2) + " Life Points! " +
-                                obj.execAction + "(Total:" + maxLimitedPoints.toFixed(2) + ")";
+                                addPoints.toFixed(2) || "" + " Life Points! " +
+                                obj.execAction + "(Total:" + maxLimitedPoints.toFixed(2) || "" + ")";
                         }
                         if (obj.groupId) {
                             ddcsController.sendMesgToGroup( obj.groupId, msg, 5);
@@ -174,7 +180,7 @@ export async function srvPlayerActionsRemoveLifePoints(obj: {
                     ddcsController.forcePlayerSpectator(
                         serverObj[0].playerId,
                         "You Do Not Have Enough Points To Fly This Vehicle" +
-                        "{" + removePoints.toFixed(2) + "/" + curPlayerLifePoints.toFixed(2) + ")"
+                        "{" + removePoints.toFixed(2) || "" + "/" + curPlayerLifePoints.toFixed(2) || "" + ")"
                     );
                     resolve();
                 } else {
@@ -190,8 +196,8 @@ export async function srvPlayerActionsRemoveLifePoints(obj: {
                         (updateErr: any) => {
                             if (updateErr) { reject(updateErr); }
                             ddcsController.sendMesgToGroup( obj.groupId, serverObj[0].name + " Have Just Used " +
-                                removePoints.toFixed(2) + " Life Points! " + obj.execAction +
-                                "(Total:" + curTotalPoints.toFixed(2) + ")", 5);
+                                removePoints.toFixed(2) || "" + " Life Points! " + obj.execAction +
+                                "(Total:" + curTotalPoints.toFixed(2) || "" + ")", 5);
                             resolve();
                         }
                     );
@@ -294,7 +300,7 @@ export async function srvPlayerActionsApplyTempToRealScore(obj: {
                     {$set: rsTotals},
                     (updateErr: any) => {
                         if (updateErr) { reject(updateErr); }
-                        console.log("aplyT2R: ", curPly.name, mesg);
+                        // console.log("aplyT2R: ", curPly.name, mesg);
                         ddcsController.sendMesgToGroup(obj.groupId, mesg, 15);
                         resolve();
                     }

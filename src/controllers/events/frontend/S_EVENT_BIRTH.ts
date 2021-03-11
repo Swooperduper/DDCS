@@ -12,7 +12,7 @@ export async function processEventBirth(eventObj: any): Promise<void> {
         const curIUnit = iUnit[0];
         if (curIUnit && curIUnit.playername && curIUnit.playername !== "") {
             const playerArray = await ddcsControllers.srvPlayerActionsRead({sessionName: ddcsControllers.getSessionName()});
-            console.log("PA: ", playerArray);
+            // console.log("PA: ", playerArray);
             if (curIUnit) {
                 const iPlayer = _.find(playerArray, {name: curIUnit.playername});
                 console.log("playerarray: ", iPlayer);

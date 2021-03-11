@@ -7,54 +7,43 @@ import * as ddcsController from "../";
 export async function forcePlayerSpectator(playerId: string, mesg: string): Promise<void> {
 
     await ddcsController.sendUDPPacket("backEnd", {
-        actionObj: {
-            action: "CMD",
-            cmd: ["net.force_player_slot(" + playerId + ", 0, \"\")"],
-            reqID: 0
-        },
-        queName: "gameGuiArray"
+        action: "CMD",
+        cmd: `net.force_player_slot('${playerId}', 0, "")`,
+        reqID: 0
     });
 
-    await ddcsController.sendUDPPacket("backEnd", {
-        actionObj: {
-            action: "CMD",
-            cmd: ["net.send_chat([[" + mesg + "]], all)"],
-            reqID: 0
-        },
-        queName: "gameGuiArray"
-    });
+    await sendMesgToPlayerChatWindow(mesg, playerId);
 }
 
 export async function kickPlayer(playerId: number, mesg: string): Promise<void> {
     await ddcsController.sendUDPPacket("backEnd", {
-        actionObj: {
-            action: "CMD",
-            cmd: ["net.kick(" + playerId + ", [[" + mesg + "]])"],
-            reqID: 0
-        },
-        queName: "gameGuiArray"
+        action: "CMD",
+        cmd: "net.kick(" + playerId + ", [[" + mesg + "]])",
+        reqID: 0
     });
 }
 
 export async function loadMission(missionName: string): Promise<void> {
     await ddcsController.sendUDPPacket("backEnd", {
-        actionObj: {
-            action: "CMD",
-            cmd: ["net.load_mission([[" + missionName + "]])"],
-            reqID: 0
-        },
-        queName: "gameGuiArray"
+        action: "CMD",
+        cmd: "net.load_mission([[" + missionName + "]])",
+        reqID: 0
     });
 }
 
 export async function sendMesgChatWindow(mesg: string): Promise<void> {
     await ddcsController.sendUDPPacket("backEnd", {
-        actionObj: {
-            action: "CMD",
-            cmd: ["net.send_chat([[" + mesg + "]], true)"],
-            reqID: 0
-        },
-        queName: "gameGuiArray"
+        action: "CMD",
+        cmd: `net.send_chat([[${mesg}]], true)`,
+        reqID: 0
+    });
+}
+
+export async function sendMesgToPlayerChatWindow(mesg: string, playerId: string): Promise<void> {
+    await ddcsController.sendUDPPacket("backEnd", {
+        action: "CMD",
+        cmd: `net.send_chat_to([[${mesg}]], ${playerId})`,
+        reqID: 0
     });
 }
 
@@ -62,10 +51,9 @@ export async function sendMesgToAll(mesg: string, time: number, delayTime?: numb
     await ddcsController.sendUDPPacket("frontEnd", {
         actionObj: {
             action: "CMD",
-            cmd: ["trigger.action.outText([[" + mesg + "]], " + time + ")"],
+            cmd: "trigger.action.outText([[" + mesg + "]], " + time + ")",
             reqID: 0
         },
-        queName: "clientArray",
         timeToExecute: delayTime
     });
 }
@@ -74,10 +62,9 @@ export async function sendMesgToCoalition(coalition: number, mesg: string, time:
     await ddcsController.sendUDPPacket("frontEnd", {
         actionObj: {
             action: "CMD",
-            cmd: ["trigger.action.outTextForCoalition(" + coalition + ", [[" + mesg + "]], " + time + ")"],
+            cmd: "trigger.action.outTextForCoalition(" + coalition + ", [[" + mesg + "]], " + time + ")",
             reqID: 0
         },
-        queName: "clientArray",
         timeToExecute: delayTime
     });
 }
@@ -86,10 +73,9 @@ export async function sendMesgToGroup(groupId: number, mesg: string, time: numbe
     await ddcsController.sendUDPPacket("frontEnd", {
         actionObj: {
             action: "CMD",
-            cmd: ["trigger.action.outTextForGroup(" + groupId + ", [[" + mesg + "]], " + time + ")"],
+            cmd: "trigger.action.outTextForGroup(" + groupId + ", [[" + mesg + "]], " + time + ")",
             reqID: 0
         },
-        queName: "clientArray",
         timeToExecute: delayTime
     });
 }
@@ -99,7 +85,6 @@ export async function setIsOpenSlotFlag(lockFlag: number): Promise<void> {
         actionObj: {
             action: "SETISOPENSLOT",
             val: lockFlag
-        },
-        queName: "clientArray"
+        }
     });
 }

@@ -12,8 +12,9 @@ export async function processPlayerEvent(playerArray: any): Promise<void> {
     if (playerArray.players.length > 0) {
         rtPlayerArray = playerArray.players;
         for (const player of playerArray.players) {
-            /* player check sides, lock etc
             if (player) {
+                // console.log("player: ", player);
+                /* player check sides, lock etc
                 const curPlyrUcid = player.ucid;
                 const curPlyrSide = player.side;
                 const curPlyrName = player.name;
@@ -71,8 +72,8 @@ export async function processPlayerEvent(playerArray: any): Promise<void> {
                         }
                     }
                 }
+                */
             }
-            */
         }
 
         for (const player of playerArray.players) {
@@ -80,6 +81,7 @@ export async function processPlayerEvent(playerArray: any): Promise<void> {
             curData._id = curData.ucid;
             curData.playerId = curData.id;
             curData.sessionName = ddcsControllers.getSessionName();
+            // console.log("updateP: ", curData);
             if (curData.ucid) {
                 await ddcsControllers.srvPlayerActionsUpdateFromServer(curData);
             }

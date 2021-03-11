@@ -4,6 +4,30 @@
 
 import * as _ from "lodash";
 import * as ddcsControllers from "../";
+import { dbModels } from "../db/common";
+import * as typings from "../../typings";
+
+export async function lockUserToSide(incomingObj: any, lockToSide: number): Promise<void> {
+    return new Promise((resolve, reject) => {
+        dbModels.srvPlayerModel.find({_id: incomingObj.from}, (err: any, serverObj: typings.ISrvPlayers[]) => {
+            if (err) { reject(err); }
+            const curPly = serverObj[0];
+            if (curPly && curPly.sideLock === 0) {
+                console.log("lockToSide: ", lockToSide, curPly.name);
+                dbModels.srvPlayerModel.updateOne(
+                    {_id: incomingObj.from},
+                    {$set: {sideLock: lockToSide}},
+                    (updateErr: any) => {
+                        if (updateErr) { reject(updateErr); }
+                        resolve();
+                    }
+                );
+            } else {
+                console.log("Already locked", curPly.name);
+            }
+        });
+    });
+}
 
 export async function setSideLockFlags(): Promise<void> {
     const playerSideLockTable: any[] = [];

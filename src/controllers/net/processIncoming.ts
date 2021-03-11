@@ -1,6 +1,13 @@
+import * as _ from "lodash";
 import * as ddcsController from "../";
+import { dbModels } from "../db/common";
+import * as typings from "../../typings";
+import {IBase, ISrvPlayers} from "../../typings";
 
 export async function processingIncomingData(incomingObj: any) {
+    if (incomingObj.reqId === 1) {
+        console.log("iobj: ", incomingObj);
+    }
     if (incomingObj.action === "S_EVENT_KILL") {
         // switch scoring to this new kill event
         console.log("INC2: ", incomingObj);
@@ -102,5 +109,76 @@ export async function processingIncomingData(incomingObj: any) {
                 console.log("Cant find req Id: ", incomingObj.reqId);
             }
             break;
+        case "incomingMessage":
+            if (incomingObj.message === "-red") {
+                await ddcsController.lockUserToSide(incomingObj, 1);
+            }
+            if (incomingObj.message === "-blue") {
+                await ddcsController.lockUserToSide(incomingObj, 2);
+            }
+            /*
+            if (incomingObj.message === "-reload") {
+                await ddcsController.sendUDPPacket("backEnd", {
+                    action: "refreshPlayerSlots"
+                });
+            }
+             */
+            break;
+        case "playerChangeSlot":
+            if (incomingObj && incomingObj.occupiedUnitSide && incomingObj.playerInfo && (incomingObj.occupiedUnitSide === 0 ||
+                (incomingObj.occupiedUnitSide.groupName && incomingObj.occupiedUnitSide.countryName))) {
+                const curBaseName = incomingObj.occupiedUnitSide.groupName.split(" @")[0];
+                const curSlotSide = _.includes(ddcsController.COUNTRY[2], _.toUpper(incomingObj.occupiedUnitSide.countryName)) ? 2 : 1;
+
+                const bases = await ddcsController.baseActionRead({_id: curBaseName});
+                // console.log("1: ", bases[0], incomingObj.playerInfo.ucid);
+                if (bases.length > 0) {
+                    dbModels.srvPlayerModel.find({_id: incomingObj.playerInfo.ucid}, async (err: any, serverObj: typings.ISrvPlayers[]) => {
+                        if (err) { console.log("ERROR: " + err); }
+                        // console.log("2: ", serverObj);
+                        if (serverObj.length > 0) {
+                            const curPlayer = serverObj[0];
+                            const curSlotBase = bases[0];
+                            await processSlotLock(curPlayer.sideLock, curSlotBase.side, curSlotSide, incomingObj.playerInfo.id);
+                        }
+                    });
+                }
+            }
+            break;
     }
 }
+
+export async function processSlotLock(sideLock: number, baseSide: number, curSlotSide: number, playerId: string) {
+    let mesg;
+
+    if (sideLock === 0) {
+        mesg = "You are not locked to a side yet, Please type in chat to join: -red or -blue";
+        await ddcsController.forcePlayerSpectator(playerId, mesg);
+    }
+
+    if (sideLock !== curSlotSide) {
+        mesg = "Your are locked to " + ddcsController.side[sideLock];
+        await ddcsController.forcePlayerSpectator(playerId, mesg);
+    }
+
+    if (baseSide !== curSlotSide) {
+        mesg = "You must capture this base before you can occupy slot";
+        await ddcsController.forcePlayerSpectator(playerId, mesg);
+    }
+}
+
+export async function protectSlots(sideLock: number, playerSide: number, playerId: string) {
+    let mesg;
+
+    if (sideLock === 0 && playerSide !== 0) {
+        mesg = "You are not locked to a side yet, Please type in chat to join: -red or -blue";
+        await ddcsController.forcePlayerSpectator(playerId, mesg);
+    }
+
+    if (playerSide !== 0 && sideLock !== playerSide) {
+        mesg = "Your are locked to " + ddcsController.side[sideLock];
+        await ddcsController.forcePlayerSpectator(playerId, mesg);
+    }
+}
+
+
