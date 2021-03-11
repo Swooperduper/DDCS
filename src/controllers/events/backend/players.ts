@@ -14,12 +14,17 @@ export async function processPlayerEvent(playerArray: any): Promise<void> {
         for (const player of playerArray.players) {
             if (player) {
                 // console.log("player: ", player);
-                /* player check sides, lock etc
+                // player check sides, lock etc
                 const curPlyrUcid = player.ucid;
-                const curPlyrSide = player.side;
                 const curPlyrName = player.name;
+                const gamemaster = _.includes(player.slot, "instructor");
                 const isArtilleryCmdr = _.includes(player.slot, "artillery_commander");
-                const isForwardObserver = _.includes(player.slot, "forward_observer");
+                // const isForwardObserver = _.includes(player.slot, "forward_observer");
+                // console.log("player slot: ", player.slot);
+
+                if (gamemaster) {
+                    await ddcsControllers.forcePlayerSpectator(player.id, "You are not allowed to use Game Master slot.");
+                }
 
                 const banUser = await ddcsControllers.srvPlayerActionsRead({_id: curPlyrUcid, banned: true});
                 if (!_.isEmpty(banUser)) {
@@ -37,42 +42,11 @@ export async function processPlayerEvent(playerArray: any): Promise<void> {
                         );
                     }
 
-                    const unit = await ddcsControllers.unitActionRead({playername: curPlyrName, dead: false});
-                    if (unit.length > 0) {
-                        const curUnit = unit[0];
-                        const curUnitSide = curUnit.coalition;
-                        // switching to spectator gets around this, fix this in future please
-                        if ((curUnitSide !== curPlyrSide) && curPlyrSide !== 0 && curPlyrSide) {
-                            if (curUnitSide) {
-                                await ddcsControllers.sendMesgToAll(
-                                    curPlyrName + " Has Switch To " + ddcsControllers.side[curPlyrSide],
-                                    15
-                                );
-                            }
-                        }
-                        if (isArtilleryCmdr || isForwardObserver) {
-                            const srvPlayer = await ddcsControllers.srvPlayerActionsRead({ _id: player.ucid });
-                            const curPlayer = srvPlayer[0];
-                            if (curPlayer.gciAllowed || isForwardObserver) {
-                                if (curPlayer.sideLock === 0) {
-                                    await ddcsControllers.srvPlayerActionsUpdate({
-                                        _id: player.ucid,
-                                        sideLock: player.side,
-                                        sideLockTime: new Date().getTime() + (60 * 60 * 1000)
-                                    });
-                                    await ddcsControllers.setSideLockFlags();
-                                    console.log(player.name + " is now locked to " + player.side);
-                                }
-                            } else {
-                                if (engineCache.config.isJtacLocked) {
-                                    await ddcsControllers.forcePlayerSpectator(player.id, "You are not allowed to use " +
-                                        "GCI/Tac Commander slot. Please contact a Mod for more information.");
-                                }
-                            }
-                        }
+                    if (isArtilleryCmdr && engineCache.config.isJtacLocked) {
+                        await ddcsControllers.forcePlayerSpectator(player.id, "You are not allowed to use " +
+                            "GCI/Tac Commander slot. Please contact a Mod for more information.");
                     }
                 }
-                */
             }
         }
 
