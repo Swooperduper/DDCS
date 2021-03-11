@@ -51,7 +51,7 @@ export async function sendMesgToAll(mesg: string, time: number, delayTime?: numb
     await ddcsController.sendUDPPacket("frontEnd", {
         actionObj: {
             action: "CMD",
-            cmd: "trigger.action.outText([[" + mesg + "]], " + time + ")",
+            cmd: ["trigger.action.outText([[" + mesg + "]], " + time + ")"],
             reqID: 0
         },
         timeToExecute: delayTime
@@ -62,7 +62,7 @@ export async function sendMesgToCoalition(coalition: number, mesg: string, time:
     await ddcsController.sendUDPPacket("frontEnd", {
         actionObj: {
             action: "CMD",
-            cmd: "trigger.action.outTextForCoalition(" + coalition + ", [[" + mesg + "]], " + time + ")",
+            cmd: ["trigger.action.outTextForCoalition(" + coalition + ", [[" + mesg + "]], " + time + ")"],
             reqID: 0
         },
         timeToExecute: delayTime
@@ -73,7 +73,7 @@ export async function sendMesgToGroup(groupId: number, mesg: string, time: numbe
     await ddcsController.sendUDPPacket("frontEnd", {
         actionObj: {
             action: "CMD",
-            cmd: "trigger.action.outTextForGroup(" + groupId + ", [[" + mesg + "]], " + time + ")",
+            cmd: ["trigger.action.outTextForGroup(" + groupId + ", [[" + mesg + "]], " + time + ")"],
             reqID: 0
         },
         timeToExecute: delayTime

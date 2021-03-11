@@ -5,9 +5,6 @@ import * as typings from "../../typings";
 import {IBase, ISrvPlayers} from "../../typings";
 
 export async function processingIncomingData(incomingObj: any) {
-    if (incomingObj.reqId === 1) {
-        console.log("iobj: ", incomingObj);
-    }
     if (incomingObj.action === "S_EVENT_KILL") {
         // switch scoring to this new kill event
         console.log("INC2: ", incomingObj);

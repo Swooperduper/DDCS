@@ -344,28 +344,36 @@ export async function getActiveJTACTargets(unit: any, player: any, target: numbe
             );
         }
     } else {
-        for (let x = 0; x < closestJTAC.length; x++) {
-            if (x !== 0) {
-                mesg += "\n";
-            }
+        if (closestJTAC.length > 0) {
+            for (let x = 0; x < closestJTAC.length; x++) {
+                if (x !== 0) {
+                    mesg += "\n";
+                }
 
-            const curJtacEnemy = closestJTAC[x].jtacEnemyLocation;
-            const enemyBRA = ddcsControllers.findBearing(unit.lonLatLoc[1], unit.lonLatLoc[0],
-                curJtacEnemy.lonLat.lat, curJtacEnemy.lonLat.lon).toFixed(0);
-            const enemyDist = ddcsControllers.calcDirectDistanceInKm(unit.lonLatLoc[1], unit.lonLatLoc[0],
-                curJtacEnemy.lonLat.lat, curJtacEnemy.lonLat.lon).toFixed(2);
-            const closestBase = await ddcsControllers.getAnyBasesInProximity([curJtacEnemy.lonLat.lon, curJtacEnemy.lonLat.lat], 100);
-            console.log("BRA", enemyBRA, enemyDist, curJtacEnemy);
-            mesg += (x + 1) + ". " + curJtacEnemy.type + " at BRA " + enemyBRA + " for " + enemyDist + "KM";
-            if (closestBase[0] && closestBase[0]._id) {
-                mesg += " near " + closestBase[0]._id;
+                const curJtacEnemy = closestJTAC[x].jtacEnemyLocation;
+                const enemyBRA = ddcsControllers.findBearing(unit.lonLatLoc[1], unit.lonLatLoc[0],
+                    curJtacEnemy.lonLat.lat, curJtacEnemy.lonLat.lon).toFixed(0);
+                const enemyDist = ddcsControllers.calcDirectDistanceInKm(unit.lonLatLoc[1], unit.lonLatLoc[0],
+                    curJtacEnemy.lonLat.lat, curJtacEnemy.lonLat.lon).toFixed(2);
+                const closestBase = await ddcsControllers.getAnyBasesInProximity([curJtacEnemy.lonLat.lon, curJtacEnemy.lonLat.lat], 100);
+                console.log("BRA", enemyBRA, enemyDist, curJtacEnemy);
+                mesg += (x + 1) + ". " + curJtacEnemy.type + " at BRA " + enemyBRA + " for " + enemyDist + "KM";
+                if (closestBase[0] && closestBase[0]._id) {
+                    mesg += " near " + closestBase[0]._id;
+                }
             }
+            await ddcsControllers.sendMesgToGroup(
+                unit.groupId,
+                mesg,
+                20
+            );
+        } else {
+            await ddcsControllers.sendMesgToGroup(
+                unit.groupId,
+                "There is no JTAC targets",
+                10
+            );
         }
-        await ddcsControllers.sendMesgToGroup(
-            unit.groupId,
-            mesg,
-            20
-        );
     }
 }
 
