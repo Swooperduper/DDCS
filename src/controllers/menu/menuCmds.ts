@@ -162,8 +162,8 @@ export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: 
                         const intCargo = _.split(curUnit.intCargoType, "|");
                         const curIntCrateBaseOrigin = intCargo[2];
                         curBaseName = _.split(curBaseObj.name, " #")[0];
-                        console.log("intCurUnpackBaseAt: ", curBaseName);
-                        if (curIntCrateBaseOrigin !== curBaseName) {
+                        console.log("intCurUnpackBaseAt: ", intCargo, curBaseName);
+                        if (curIntCrateBaseOrigin && curBaseName && curIntCrateBaseOrigin !== curBaseName) {
                             await ddcsControllers.repairBase(curBaseObj, curUnit);
                         }
                         await ddcsControllers.unitActionUpdateByUnitId({
@@ -276,12 +276,12 @@ export async function loadTroops(unitId: string, troopType: string) {
             const checkAllSecondBase: any[] = [];
             let curLogistic: any;
             const aliveBases = await ddcsControllers.unitActionRead({
-                _id:  /Logistics/,
+                _id:  /Shelter/,
                 dead: false,
                 coalition: curUnit.coalition
             });
             for (const base of secondBases) {
-                curLogistic = _.find(aliveBases, {name: base.name + " Logistics"});
+                curLogistic = _.find(aliveBases, {name: base.name + " Shelter"});
                 if (!!curLogistic) {
                     checkAllSecondBase.push( await ddcsControllers.isPlayerInProximity(
                         curLogistic.lonLatLoc,

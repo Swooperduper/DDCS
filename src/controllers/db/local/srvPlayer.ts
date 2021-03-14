@@ -64,6 +64,7 @@ export async function srvPlayerActionsUpdateFromServer(obj: {
             if (err) { reject(err); }
             if (serverObj.length === 0) {
                 // new player detected
+                console.log("player: ", obj);
 
                 if (obj.ipaddr === ":10308") {
                     obj.ipaddr = "127.0.0.1";

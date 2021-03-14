@@ -75,7 +75,7 @@ export function setSyncLockdownMode(flag: boolean): void {
     isInitSyncMode = flag;
 }
 
-export async function reSyncAllUnitsFromDbToServer(): Promise<void> {
+export async function reSyncAllUnitsFromDbToServer(serverCount: number, dbCount: number): Promise<void> {
     console.log("Respawn Current Units From Db ", missionStartupReSync);
     // sync up all units on server from database
     const unitObjs = await ddcsControllers.unitActionReadStd({
@@ -101,6 +101,8 @@ export async function reSyncAllUnitsFromDbToServer(): Promise<void> {
                     _id: unitObj.name,
                     dead: true
                 });
+                console.log("Resync Server Objects, in Db to Server: ", serverCount, dbCount);
+                await reSyncServerObjs(serverCount, dbCount);
             }
         }
 
@@ -231,7 +233,7 @@ export async function syncCheck(serverCount: number): Promise<void> {
                 _id: /~/
             });
             const isServerVirgin = serverCount <= preBakedNames.length; // keep an eye on this one....
-            console.log("Check: ", isServerVirgin, getMissionStartupReSync(), getResetFullCampaign(), preBakedNames.length);
+            console.log("Check: ", isServerVirgin, getMissionStartupReSync(), getResetFullCampaign(), serverCount, preBakedNames.length);
             if (isServerVirgin || getMissionStartupReSync() || getResetFullCampaign()) {
                 if (isServerVirgin || getResetFullCampaign()) {
                     setServerSynced(false);
@@ -254,7 +256,7 @@ export async function syncCheck(serverCount: number): Promise<void> {
 
                 // await reSyncServerObjs(serverCount, dbCount);
                 if (serverCount < dbCount) {
-                    await reSyncAllUnitsFromDbToServer();
+                    await reSyncAllUnitsFromDbToServer(serverCount, dbCount);
                 } else if (serverCount > dbCount) {
                     await reSyncServerObjs(serverCount, dbCount);
                 } else {

@@ -11,7 +11,7 @@ export async function checkCmdCenters(): Promise<void> {
     let curSide;
     const bases = await ddcsControllers.baseActionRead({baseType: "FOB", enabled: true});
     for (const base of bases) {
-        const isCCExist = await ddcsControllers.unitActionRead({_id: base.name + " Logistics", dead: false});
+        const isCCExist = await ddcsControllers.unitActionRead({_id: base.name + " Shelter", dead: false});
         if (isCCExist.length > 0) {
             curSide = isCCExist[0].coalition;
             if (_.get(base, "side") !== curSide) {
@@ -46,7 +46,7 @@ export async function spawnCCAtNeutralBase(curPlayerUnit: typings.IUnit): Promis
     for ( const base of mainNeutralBases) {
         const unitsInProx = await ddcsControllers.getPlayersInProximity(base.centerLoc, 3.4, false, curPlayerUnit.coalition);
         if (_.find(unitsInProx, {playername: curPlayerUnit.playername})) {
-            const cmdCenters = await ddcsControllers.unitActionRead({_id: base.name + " Logistics", dead: false});
+            const cmdCenters = await ddcsControllers.unitActionRead({_id: base.name + " Shelter", dead: false});
             if (cmdCenters.length > 0) {
                 console.log("player own CC??: " + (cmdCenters[0].coalition === curPlayerUnit.coalition));
                 if (cmdCenters[0].coalition === curPlayerUnit.coalition) {

@@ -198,7 +198,7 @@ export async function getGroundUnitsInProximity(lonLat: number[], kmDistance: nu
         },
         unitCategory: catNum,
         isCrate: false,
-        isTroop
+        $or: [{isTroop}, {proxChkGrp: "jtac"}]
     });
 }
 

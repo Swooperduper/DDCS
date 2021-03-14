@@ -172,7 +172,7 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
                     data: curData
                 };
                 if (ddcsControllers.UNIT_CATEGORY[curData.unitCategory] === "STRUCTURE") {
-                    if (_.includes(curData.name, " Logistics")) {
+                    if (_.includes(curData.name, " Shelter")) {
                         curData.proxChkGrp = "logisticTowers";
                     }
                 }

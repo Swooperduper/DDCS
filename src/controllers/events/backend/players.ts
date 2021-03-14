@@ -7,11 +7,21 @@ import * as ddcsControllers from "../../";
 
 export let rtPlayerArray: any;
 
+export async function playerUpdateRecord(player: any): Promise<void> {
+    const curData = _.cloneDeep(player);
+    curData._id = curData.ucid;
+    curData.playerId = curData.id;
+    curData.sessionName = ddcsControllers.getSessionName();
+    if (curData.ucid) {
+        await ddcsControllers.srvPlayerActionsUpdateFromServer(curData);
+    }
+}
+
 export async function processPlayerEvent(playerArray: any): Promise<void> {
     const engineCache = ddcsControllers.getEngineCache();
     if (playerArray.players.length > 0) {
-        rtPlayerArray = playerArray.players;
-        for (const player of playerArray.players) {
+        rtPlayerArray = _.cloneDeep(playerArray.players);
+        for (const player of rtPlayerArray) {
             if (player) {
                 // console.log("player: ", player);
                 // player check sides, lock etc
@@ -38,7 +48,8 @@ export async function processPlayerEvent(playerArray: any): Promise<void> {
                         await ddcsControllers.forcePlayerSpectator(player.id, "You are not allowed to use Game Master slot.");
                     }
 
-                    if (engineCache.config.isJtacLocked && isArtilleryCmdr && !localPlayer.gciAllowed) {
+                    if (engineCache.config.isJtacLocked && isArtilleryCmdr &&
+                        !localPlayer.gciAllowed && localPlayer.sideLock !== player.side) {
                         await ddcsControllers.forcePlayerSpectator(player.id, "You are not allowed to use " +
                             "GCI/Tac Commander slot. Please contact a Mod for more information.");
                     }
@@ -51,20 +62,13 @@ export async function processPlayerEvent(playerArray: any): Promise<void> {
                         );
                     }
                 } else {
-                    console.log("New Player");
+                    await playerUpdateRecord(player);
                 }
             }
         }
 
-        for (const player of playerArray.players) {
-            const curData = _.cloneDeep(player);
-            curData._id = curData.ucid;
-            curData.playerId = curData.id;
-            curData.sessionName = ddcsControllers.getSessionName();
-            // console.log("updateP: ", curData);
-            if (curData.ucid) {
-                await ddcsControllers.srvPlayerActionsUpdateFromServer(curData);
-            }
+        for (const player of rtPlayerArray) {
+            await playerUpdateRecord(player);
         }
     }
 }
