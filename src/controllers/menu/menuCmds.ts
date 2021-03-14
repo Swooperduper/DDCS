@@ -5,6 +5,7 @@
 import * as _ from "lodash";
 import * as typing from "../../typings";
 import * as ddcsControllers from "../";
+import {getNextUniqueId, processLOSEnemy, setRequestJobArray} from "../";
 
 export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: string) {
     const engineCache = ddcsControllers.getEngineCache();
@@ -377,6 +378,39 @@ export async function getActiveJTACTargets(unit: any, player: any, target: numbe
     }
 }
 
+export async function processReceiveRoadPath(incomingObj: any): Promise<void> {
+    // console.log("return road path object: ", incomingObj, incomingObj.returnObj[0]);
+    const baseConvoyGroupName = "AI|convoyLarge|Sochi-Adler_Sukhumi-Babushara|";
+
+    await ddcsControllers.spawnConvoy(
+        baseConvoyGroupName,
+        2,
+        incomingObj.returnObj,
+        {
+            name: "convoyLarge",
+            AIType: "groundConvoy",
+            functionCall: "fullCampaignStackStats",
+            stackTrigger: "1.25",
+            makeup: [
+                {
+                    template: "tank",
+                    count: 2
+                },
+                {
+                    template: "mobileAntiAir",
+                    count: 2
+                },
+                {
+                    template: "samIR",
+                    count: 2
+                }
+            ]
+        },
+        "Test Spawn Convoy"
+    );
+
+}
+
 export async function menuCmdProcess(pObj: any) {
     console.log("MENU COMMAND: ", pObj);
     const engineCache = ddcsControllers.getEngineCache();
@@ -593,6 +627,28 @@ export async function menuCmdProcess(pObj: any) {
                         "G: You Have " + _.size(grpGroups) + "/" + engineCache.config.maxUnitsMoving + " Unit Acquisitions In Play!",
                         10
                     );
+                    break;
+                case "testSpawnConvoy":
+                    // console.log("Test Spawn Convoy");
+                    const curNextUniqueId = getNextUniqueId();
+                    setRequestJobArray({
+                        reqId: curNextUniqueId,
+                        callBack: "processReceiveRoadPath",
+                        reqArgs: {}
+                    }, curNextUniqueId);
+                    await ddcsControllers.sendUDPPacket("frontEnd", {
+                        actionObj: {
+                            action: "getGroundRoute",
+                            type: "roads",
+                            lat1: 43.439378434051,
+                            lon1: 39.924231880466,
+                            lat2: 42.852741071635,
+                            lon2: 41.142447588488,
+                            reqID: curNextUniqueId,
+                            time: new Date()
+                        }
+                    });
+
                     break;
                 case "EWR":
                     await spawnCrateFromLogi(curUnit, pObj.type, pObj.crates, "", pObj.mobile, pObj.mass, defCrate);

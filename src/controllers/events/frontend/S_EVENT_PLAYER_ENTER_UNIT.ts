@@ -21,10 +21,12 @@ export async function processEventPlayerEnterUnit(eventObj: any): Promise<void> 
                 roleCode: "I",
                 msg: "C: " + curIUnit.playername + " enters a brand new " + curIUnit.type
             };
+            /*
             if (iCurObj.iucid) {
                 await ddcsControllers.sendToCoalition({payload: {action: eventObj.action, data: _.cloneDeep(iCurObj)}});
                 await ddcsControllers.simpleStatEventActionsSave(iCurObj);
             }
+             */
         }
     }
 }

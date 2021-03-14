@@ -27,7 +27,7 @@ export async function setEWRTask(unitName: string): Promise<void> {
 export async function setMissionTask(groupName: string, route: string): Promise<void> {
 
     const sendClient = {
-        action: "ADDTASK",
+        action: "addTask",
         taskType: "Mission",
         groupName,
         route

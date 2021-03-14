@@ -16,12 +16,12 @@ export async function weaponScoreActionsRead(obj: any): Promise<typings.IWeaponD
 
 export async function weaponScoreActionsReadWeapon(obj: any): Promise<void> {
     return new Promise((resolve, reject) => {
-        dbModels.weaponScoreTable.find({_id: obj.typeName}, (err: any, weaponscore: typings.IWeaponDictionary[]) => {
+        dbModels.weaponScoreModel.find({_id: obj.typeName}, (err: any, weaponscore: typings.IWeaponDictionary[]) => {
             if (err) { reject(err); }
 
             const firstWeaponScore = weaponscore[0];
             if (firstWeaponScore) {
-                const curWeaponScore = new dbModels.weaponScoreTable({
+                const curWeaponScore = new dbModels.weaponScoreModel({
                     _id: obj.typeName,
                     name: obj.typeName,
                     displayName: obj.displayName,
@@ -43,13 +43,12 @@ export async function weaponScoreActionsReadWeapon(obj: any): Promise<void> {
 }
 
 export async function weaponScoreActionsCheck(obj: any) {
-    console.log("WCT: ", dbModels.weaponScoreTable);
-    dbModels.weaponScoreTable.find({_id: obj.typeName}, (err: any, weaponScore: typings.IWeaponDictionary[]) => {
+    dbModels.weaponScoreModel.find({_id: obj.typeName}, (err: any, weaponScore: typings.IWeaponDictionary[]) => {
         if (err) {
             console.log("line:396: ", err);
         }
         if (weaponScore.length === 0) {
-            const curWeaponScore = new dbModels.weaponScoreTable({
+            const curWeaponScore = new dbModels.weaponScoreModel({
                 _id: obj.typeName,
                 name: obj.typeName,
                 unitType: obj.unitType

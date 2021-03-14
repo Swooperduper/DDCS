@@ -8,7 +8,7 @@ import * as ddcsControllers from "../../";
 export async function processEventPlayerLeaveUnit(eventObj: any): Promise<void> {
     const iUnit = await ddcsControllers.unitActionRead({unitId: eventObj.data.initiator.unitId});
     const playerArray = await ddcsControllers.srvPlayerActionsRead({sessionName: ddcsControllers.getSessionName()});
-    if (iUnit[0]) {
+    if (iUnit && iUnit.length > 0) {
 
         await ddcsControllers.processUnitUpdates({action: "D", data: {name: iUnit[0].name}});
 
@@ -23,10 +23,12 @@ export async function processEventPlayerLeaveUnit(eventObj: any): Promise<void> 
                 roleCode: "I",
                 msg: "C: " + iUnit[0].playername + " leaves his " + iUnit[0].type
             };
+            /*
             if (iCurObj.iucid) {
                 await ddcsControllers.sendToCoalition({payload: {action: eventObj.action, data: _.cloneDeep(iCurObj)}});
                 await ddcsControllers.simpleStatEventActionsSave(iCurObj);
             }
+             */
             console.log("PLAYER EXIT UNIT: ", iUnit[0].playername);
         }
     }

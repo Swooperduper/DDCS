@@ -6,11 +6,10 @@ import * as _ from "lodash";
 import * as ddcsControllers from "../";
 
 export async function processUnitUpdates(unitObj: any): Promise<void> {
-    /*
-    if (unitObj.uType !== "unit") {
-        console.log("U: ", unitObj);
+    if (unitObj.data.name === "~TRAIN-3-1") {
+        console.log("unitUp: ", unitObj);
     }
-
+/*
     if (unitObj.data.unitCategory === ddcsControllers.UNIT_CATEGORY("STRUCTURE")) {
         console.log("STRUCT: ", unitObj);
     }

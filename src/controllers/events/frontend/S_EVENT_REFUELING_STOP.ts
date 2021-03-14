@@ -22,10 +22,12 @@ export async function processEventRefuelingStop(eventObj: any): Promise<void> {
                 msg: "C: " + iUnit[0].type + "(" + iUnit[0].playername + ") ended refueling",
                 showInChart: true
             };
+            /*
             if (iCurObj.iucid) {
                 await ddcsControllers.sendToCoalition({payload: {action: eventObj.action, data: _.cloneDeep(iCurObj)}});
                 await ddcsControllers.simpleStatEventActionsSave(iCurObj);
             }
+             */
         }
     }
 }

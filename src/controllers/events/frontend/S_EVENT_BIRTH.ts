@@ -27,10 +27,12 @@ export async function processEventBirth(eventObj: any): Promise<void> {
                         msg: "C: " + curIUnit.playername + " enters a brand new " + curIUnit.type,
                         groupId: curIUnit.groupId
                     };
+                    /*
                     if (iCurObj.iucid) {
                         await ddcsControllers.sendToCoalition({payload: {action: eventObj.action, data: _.cloneDeep(iCurObj)}});
                         // await ddcsControllers.simpleStatEventActionsSave(iCurObj);
                     }
+                     */
                     await ddcsControllers.srvPlayerActionsClearTempScore({_id: iCurObj.iucid, groupId: iCurObj.groupId});
                 }
             }

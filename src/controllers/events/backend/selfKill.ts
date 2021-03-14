@@ -20,9 +20,11 @@ export async function processSelfKill(eventObj: any): Promise<void> {
             roleCode: "I",
             msg: "A: " + ddcsControllers.side[iPlayer.side] + " " + iPlayer.name + " has killed himself"
         };
+        /*
         if (iCurObj.iucid) {
             await ddcsControllers.sendToAll({payload: {action: eventObj.action, data: _.cloneDeep(iCurObj)}});
             await ddcsControllers.simpleStatEventActionsSave(iCurObj);
         }
+         */
     }
 }

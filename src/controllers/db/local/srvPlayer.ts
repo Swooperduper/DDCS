@@ -140,11 +140,11 @@ export async function srvPlayerActionsAddLifePoints(obj: {
                     (updateErr: any, srvPlayer: typings.ISrvPlayers) => {
                         if (updateErr) { reject(updateErr); }
                         if (obj.execAction === "PeriodicAdd") {
-                            msg = "+" + _.round(addPoints, 2).toFixed(2) || "" + "LP(T:" + maxLimitedPoints.toFixed(2) || "" + ")";
+                            msg = "+" + _.round(addPoints, 2) || "" + "LP(T:" + maxLimitedPoints || "" + ")";
                         } else {
                             msg = srvPlayer.name + " Have Just Gained " +
-                                addPoints.toFixed(2) || "" + " Life Points! " +
-                                obj.execAction + "(Total:" + maxLimitedPoints.toFixed(2) || "" + ")";
+                                addPoints || "" + " Life Points! " +
+                                obj.execAction + "(Total:" + maxLimitedPoints || "" + ")";
                         }
                         if (obj.groupId) {
                             ddcsController.sendMesgToGroup( obj.groupId, msg, 5);
@@ -180,7 +180,7 @@ export async function srvPlayerActionsRemoveLifePoints(obj: {
                     ddcsController.forcePlayerSpectator(
                         serverObj[0].playerId,
                         "You Do Not Have Enough Points To Fly This Vehicle" +
-                        "{" + removePoints.toFixed(2) || "" + "/" + curPlayerLifePoints.toFixed(2) || "" + ")"
+                        "{" + removePoints || "" + "/" + curPlayerLifePoints || "" + ")"
                     );
                     resolve();
                 } else {
@@ -196,8 +196,8 @@ export async function srvPlayerActionsRemoveLifePoints(obj: {
                         (updateErr: any) => {
                             if (updateErr) { reject(updateErr); }
                             ddcsController.sendMesgToGroup( obj.groupId, serverObj[0].name + " Have Just Used " +
-                                removePoints.toFixed(2) || "" + " Life Points! " + obj.execAction +
-                                "(Total:" + curTotalPoints.toFixed(2) || "" + ")", 5);
+                                removePoints || "" + " Life Points! " + obj.execAction +
+                                "(Total:" + curTotalPoints || "" + ")", 5);
                             resolve();
                         }
                     );

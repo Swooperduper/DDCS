@@ -91,7 +91,7 @@ export async function lookupLifeResource(playerUcid: string): Promise<void> {
             const curUnit = cUnit[0];
             await ddcsControllers.sendMesgToGroup(
                 curUnit.groupId,
-                "G: You Have " + curPlayer.curLifePoints.toFixed(2) + " Life Resource Points.",
+                "G: You Have " + curPlayer.curLifePoints + " Life Resource Points.",
                 5
             );
         }
@@ -125,7 +125,7 @@ export async function lookupAircraftCosts(playerUcid: string): Promise<void> {
                         totalTakeoffCosts = curUnitLPCost + curTopWeaponCost;
                         await ddcsControllers.sendMesgToGroup(
                             curUnit.groupId,
-                            "G: You aircraft costs " + totalTakeoffCosts.toFixed(2) + "( " + curUnitLPCost + "(" +
+                            "G: You aircraft costs " + totalTakeoffCosts + "( " + curUnitLPCost + "(" +
                             curUnit.type + ")+" + curTopWeaponCost + "(" + curTopAmmo + ") ) Life Points.",
                             5
                         );
@@ -161,8 +161,8 @@ export async function checkAircraftCosts(): Promise<void> {
                     totalTakeoffCosts = curUnitLPCost + curTopWeaponCost;
                     if ((curPlayer.curLifePoints || 0) < totalTakeoffCosts && !curUnit.inAir) {
                         mesg = "G: You Do Not Have Enough Points To Takeoff In " + curUnit.type + " + Loadout(" +
-                            totalTakeoffCosts.toFixed(2) + "/" +
-                            curPlayer.curLifePoints.toFixed(2) + "}";
+                            totalTakeoffCosts + "/" +
+                            curPlayer.curLifePoints + "}";
                         console.log(curPlayer.name + " " + mesg);
                         await ddcsControllers.sendMesgToGroup(
                             curUnit.groupId,

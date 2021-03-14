@@ -64,6 +64,7 @@ function generateInitialUnitObj(group, unit, isActive, curName, coalition, lon, 
             },
             ["alt"] = alt,
             ["unitCategory"] = unit:getDesc().category,
+            ["groupCategory"] = group:getCategory(),
             ["objectCategory"] = unit:getCategory(),
             ["country"] = unit:getCountry(),
             ["coalition"] = coalition,
@@ -133,7 +134,12 @@ function addGroups(groups, coalition)
             local unitPosition = unit:getPosition()
             local lat, lon, alt = coord.LOtoLL(unitPosition.p)
             table.insert(tempNames, curUnitName)
-            if Unit.isActive(unit) then
+
+            if curStaticName == "~TRAIN-3-1" then
+                tprint(unit, 1)
+            end
+
+            if Unit.isActive(unit) or unit:getTypeName() == "Locomotive" then
                 --env.info("ISACTIVE " .. curUnitName)
                 if objCache[curUnitName] ~= nil then
                     if objCache[curUnitName].lat ~= lat or objCache[curUnitName].lon ~= lon or objCache[curUnitName].isActive ~= true then
@@ -180,6 +186,10 @@ function addStatics(statics, coalition)
         local lat, lon, alt = coord.LOtoLL(staticPosition.p)
         local curStaticName = static:getName()
         table.insert(tempNames, curStaticName)
+
+        if curStaticName == "~TRAIN-3-1" then
+            tprint(objCache[curStaticName], 1)
+        end
 
         if objCache[curStaticName] ~= nil then
             if objCache[curStaticName].lat ~= lat or objCache[curStaticName].lon ~= lon then
@@ -278,6 +288,64 @@ function runRequest(request)
             ["action"] = "processReq",
             ["reqId"] = request.reqID
         }
+
+        if request.action == "addTask" then
+            env.info('ADD TASK')
+            tprint(request, 1)
+            if request.taskType == 'Mission' then
+                local taskGroup = Group.getByName(request.groupName)
+                if taskGroup ~= nil then
+                    tprint(taskGroup:getUnits(), 1)
+                    local _controller = taskGroup:getController()
+                    local routeTable = JSON:decode(request.route)
+                    tprint(routeTable, 1)
+                    local _Mission = {
+                        id = 'Mission',
+                        params = routeTable
+                    }
+                    tprint(_Mission, 1)
+                    _controller:pushTask(_Mission)
+                    local hasTask = _controller:hasTask()
+                    if hasTask ~= nil then
+                        env.info(request.groupName..' HAS A TASK ')
+                    else
+                        env.info(request.groupName..' NO TASK')
+                    end
+                end
+            end
+            if request.taskType == 'EWR' then
+                local taskUnit = Unit.getByName(request.unitName)
+                if taskUnit ~= nil then
+                    local _controller = taskUnit:getController();
+                    local _EWR = {
+                        id = 'EWR',
+                        auto = true,
+                        params = {
+                        }
+                    }
+                    _controller:setTask(_EWR)
+                end
+            end
+        end
+
+        if request.action == "getGroundRoute" then
+            if request.lat1 ~= nil and request.lon1 ~= nil and request.lat2 ~= nil and request.lon2 ~= nil and request.type ~= nil then
+                local curStart = coord.LLtoLO(request.lat1, request.lon1)
+                local curEnd = coord.LLtoLO(request.lat2, request.lon2)
+
+                local x1, y1 = land.getClosestPointOnRoads(request.type, curStart.x, curStart.z)
+                local x2, y2 = land.getClosestPointOnRoads(request.type, curEnd.x, curEnd.z)
+                env.info("getRoute: "..request.type.." "..x1.." "..y1.." "..x2.." "..y2)
+                --tprint(land.findPathOnRoads(request.type, x1, y1, x2, y2), 1)
+                if request.reqID > 0 then
+                    outObj.returnObj ={
+                        {["x"] = x1, ["y"] = y1},
+                        {["x"] = x2, ["y"] = y2}
+                    }
+                    sendUDPPacket(outObj)
+                end
+            end
+        end
 
         if request.action == "getNames" then
             outObj.returnObj = completeNames

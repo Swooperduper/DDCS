@@ -24,10 +24,12 @@ export async function processEventPilotDead(eventObj: any): Promise<void> {
                     ") pilot is dead",
                 groupId: iUnit[0].groupId
             };
+            /*
             if (iCurObj.iucid) {
                 await ddcsControllers.sendToAll({payload: {action: eventObj.action, data: _.cloneDeep(iCurObj)}});
                 await ddcsControllers.simpleStatEventActionsSave(iCurObj);
             }
+             */
             await ddcsControllers.srvPlayerActionsClearTempScore({_id: iCurObj.iucid, groupId: iCurObj.groupId});
 
             if (engineCache.config.inGameHitMessages) {

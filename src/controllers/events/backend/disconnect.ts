@@ -19,10 +19,12 @@ export async function processDisconnect(eventObj: any): Promise<void> {
             roleCode: "I",
             msg: "A: " + iPlayer.name + " has disconnected - Ping:" + iPlayer.ping + " Lang:" + iPlayer.lang
         };
+        /*
         if (iCurObj.iucid) {
             await ddcsControllers.sendToAll({payload: {action: eventObj.action, data: _.cloneDeep(iCurObj)}});
             await ddcsControllers.simpleStatEventActionsSave(iCurObj);
         }
+         */
         await ddcsControllers.sendMesgToCoalition(
             eventObj.data.arg3,
             iCurObj.msg,

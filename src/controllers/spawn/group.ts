@@ -45,40 +45,30 @@ export async function turnOnEWRAuto(groupObj: typing.IUnit): Promise<string> {
     return compiled({setFreq, setCallsign});
 }
 
-export function convoyRouteTemplate(routes: typing.IConvoyRouteTemplate) {
-    const buildTemplate: any = {
-        route: {
-            points: []
-        },
-        routeLocs: [],
-        alt: 0,
-        speed: 0,
-        baseId: 0,
-        eplrs: 0,
-        radioFreq: 0,
-        tacan: {
-            channel: 0,
-            enabled: false,
-            modeChannel: 0,
-            frequency: 0
-        }
-    };
-    let cNum = 1;
-    for (const route of routes.routeLocs) {
-        const routePayload: typing.IPointsTemplate = {
-            type: "Turning Point",
-            action: route.action,
-            x: "coord.LLtoLO(" + route.lonLat[1] + ", " + route.lonLat[0] + ").x",
-            y: "coord.LLtoLO(" + route.lonLat[1] + ", " + route.lonLat[0] + ").z",
-            speed: 20,
-            name: "route" + cNum,
-            radioFreq: 0
-        };
+export async function convoyRouteTemplate(routes: any) {
+    const groundRouteTemplate = await ddcsControllers.templateRead({_id: "groundRoute"});
+    const compiledGroundRouteTemplate = _.template(groundRouteTemplate[0].template);
+    const groundRoutePointTemplate = await ddcsControllers.templateRead({_id: "groundRoutePoint"});
+    const compiledGroundRoutePointTemplate = _.template(groundRoutePointTemplate[0].template);
 
-        buildTemplate.route.points.push(routePayload);
+    let cNum = 1;
+    let routeTemplate = "";
+    for (const route of routes.routeLocs) {
+        const routePayload = {
+            x: route.x,
+            y: route.y,
+            routeNum: "route" + cNum
+        };
+        const routeCompiled = compiledGroundRoutePointTemplate(routePayload);
+        routeTemplate += `
+            [${cNum}] = {
+                ${routeCompiled}
+            },
+        `;
         cNum = cNum + 1;
     }
-    return buildTemplate;
+    const curRouteGroundTemplate = compiledGroundRouteTemplate();
+    return _.replace(curRouteGroundTemplate, "#POINTS", routeTemplate);
 }
 
 export async function getRouteTemplate(routes: any, templateName: string): Promise<string> {
@@ -144,8 +134,13 @@ export async function grndUnitGroup( groupObj: any, task?: string, routes?: stri
     return compiled({groupObj});
 }
 
-export async function grndUnitTemplate( unitObj: any ): Promise<string> {
-    const spawnTemplate = await ddcsControllers.templateRead({_id: "groundUnit"});
+export async function grndUnitTemplate( unitObj: any, isLatLon: boolean = true): Promise<string> {
+    let spawnTemplate;
+    if (isLatLon) {
+        spawnTemplate = await ddcsControllers.templateRead({_id: "groundUnitLatLon"});
+    } else {
+        spawnTemplate = await ddcsControllers.templateRead({_id: "groundUnit"});
+    }
     const compiled = _.template(spawnTemplate[0].template);
     return compiled({unitObj});
 }
@@ -686,7 +681,7 @@ export async function spawnLayer2Reinforcements(
 export async function spawnConvoy(
     groupName: string,
     convoySide: number,
-    baseTemplate: typing.IConvoyTemplate,
+    baseTemplate: any,
     aIConfig: typing.IAIConfig,
     mesg: string
 ): Promise<void> {
@@ -694,7 +689,7 @@ export async function spawnConvoy(
     let curUnit;
     for (const units of aIConfig.makeup) {
         curUnit = {
-            ...exports.getRndFromSpawnCat(units.template, convoySide, false, true)[0],
+            ...getRndFromSpawnCat(units.template, convoySide, false, true)[0],
             country: ddcsControllers.defCountrys[convoySide],
             speed: "55",
             hidden: false,
@@ -709,16 +704,19 @@ export async function spawnConvoy(
     const curConvoyMakeup = convoyMakeup;
     let groupArray: string = "";
     let curGroupSpawn;
-    const defaultStartLonLat = baseTemplate.route[0].lonLat;
+    const defaultStartLonLat = baseTemplate[0];
 
     const curGrpObj = {
         groupName,
         country: curConvoyMakeup[0].country,
-        routeLocs: baseTemplate.route,
-        category: ddcsControllers.UNIT_CATEGORY.indexOf("GROUND_UNIT")
+        countryName: ddcsControllers.COUNTRY[curConvoyMakeup[0].country],
+        routeLocs: baseTemplate,
+        unitCategory: ddcsControllers.UNIT_CATEGORY.indexOf("GROUND_UNIT")
     };
 
-    curGroupSpawn = await grndUnitGroup(curGrpObj);
+    // console.log("GROUNDGROUP: ", curConvoyMakeup, curGrpObj);
+    curGroupSpawn = await grndUnitGroup(curGrpObj, "Ground Nothing", await convoyRouteTemplate(curGrpObj));
+    // console.log("CGS: ", curGroupSpawn);
     let unitNum = 1;
     for (const convUnit of curConvoyMakeup) {
         const curSpwnUnit = {
@@ -726,17 +724,24 @@ export async function spawnConvoy(
             hidden: false,
             name: groupName + unitNum + "|",
             lonLatLoc: defaultStartLonLat,
-            playerCanDrive: false
+            playerCanDrive: false,
+            x: baseTemplate[0].x,
+            y: baseTemplate[0].y,
+            hdg: _.random(0, 359),
+            skill: "Excellent",
+            countryName: curGrpObj.countryName
         };
-        groupArray += await grndUnitTemplate(curSpwnUnit) + ",";
+        groupArray += await grndUnitTemplate(curSpwnUnit, false) + ",";
         unitNum = unitNum + 1;
     }
     curGroupSpawn = _.replace(curGroupSpawn, "#UNITS", groupArray);
-    const curCMD = exports.spawnGrp(curGroupSpawn, _.get(curGrpObj, "country"), _.get(curGrpObj, "category"));
+    const curCMD = await spawnGrp(curGroupSpawn, _.get(curGrpObj, "country"), _.get(curGrpObj, "unitCategory"));
+    console.log("groundSpawn: ", curCMD);
     const sendClient = {action: "CMD", cmd: [curCMD], reqID: 0};
-    const actionObj = {actionObj: sendClient, queName: "clientArray"};
+    const actionObj = {actionObj: sendClient};
     await ddcsControllers.sendUDPPacket("frontEnd", actionObj);
-    await ddcsControllers.setMissionTask(groupName, JSON.stringify(exports.convoyRouteTemplate(curGrpObj)));
+    // console.log("TASKING ROUTE: ", JSON.stringify(convoyRouteTemplate(curGrpObj)));
+    // await ddcsControllers.setMissionTask(groupName, JSON.stringify(convoyRouteTemplate(curGrpObj)));
     await ddcsControllers.sendMesgToCoalition(
         convoySide,
         mesg,

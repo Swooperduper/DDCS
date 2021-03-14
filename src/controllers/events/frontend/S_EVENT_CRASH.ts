@@ -27,10 +27,12 @@ export async function processEventCrash(eventObj: any): Promise<void> {
                 msg: "A: " + ddcsControllers.side[curIUnit.coalition] + " " + curIUnit.type + "(" + curIUnit.playername + ") has crashed",
                 groupId: curIUnit.groupId
             };
+            /*
             if (iCurObj.iucid) {
                 await ddcsControllers.sendToAll({payload: {action: eventObj.action, data: _.cloneDeep(iCurObj)}});
                 await ddcsControllers.simpleStatEventActionsSave(iCurObj);
             }
+             */
             await ddcsControllers.srvPlayerActionsClearTempScore({_id: iCurObj.iucid, groupId: iCurObj.groupId});
 
             if (engineCache.config.inGameHitMessages) {
