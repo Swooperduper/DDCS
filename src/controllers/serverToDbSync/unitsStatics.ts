@@ -37,7 +37,7 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
         curData.crateAmt = Number(stParse[2]);
         curData.isCombo = stParse[3];
         curData.templateName = stParse[4];
-        curData.playerCanDrive = stParse[5];
+        curData.playerCanDrive = stParse[5] || false;
         curData.isCrate = true;
         curData.hidden = false;
     }
@@ -47,7 +47,7 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
         const isAllowedToDrive = (stParse[5] === "true");
         curData.playerOwnerId = stParse[1];
         curData.proxChkGrp = stParse[3];
-        curData.playerCanDrive = isAllowedToDrive;
+        curData.playerCanDrive = isAllowedToDrive || false;
     }
 
     if (unit.length > 0) {
@@ -164,7 +164,7 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
     } else {
         if (unitObj.action !== "D") {
             if (curData.name) {
-                console.log("NAME: ", curData.name, curData);
+                // console.log("NAME: ", curData.name, curData);
                 curData._id = curData.name;
                 curData.isResync = true;
                 iCurObj = {

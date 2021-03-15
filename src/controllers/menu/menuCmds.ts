@@ -932,7 +932,7 @@ export async function spawnCrateFromLogi(
                 curShapeName = "iso_container_small_cargo";
             }
             const curName = "CU|" + curPlayer.ucid + "|" + crates + "|" + isCombo + "|" +
-                ((spc) ? spc : type + "|" + mobile + "|" + closeLogi) + "|#" + _.random(1000000, 9999999);
+                (spc) ? spc : type + "|" + mobile + "|" + closeLogi + "|#" + _.random(1000000, 9999999);
 
             crateObj = {
                 _id: curName,
@@ -950,7 +950,7 @@ export async function spawnCrateFromLogi(
                 special: spc,
                 crateAmt: crates,
                 isCombo,
-                playerCanDrive: mobile,
+                playerCanDrive: mobile || false,
                 country: ddcsControllers.defCountrys[unit.coalition],
                 side: unit.coalition,
                 coalition: unit.coalition,
@@ -1223,7 +1223,7 @@ export async function unpackCrate(
         const curPlayer = player[0];
         const delUnits = await ddcsControllers.unitActionReadStd({
             playerOwnerId: curPlayer.ucid,
-            playerCanDrive: mobile,
+            playerCanDrive: mobile ||false,
             isCrate: false,
             dead: false
         });
@@ -1264,7 +1264,7 @@ export async function unpackCrate(
                     curUnitStart.lonLatLoc = ddcsControllers.getLonLatFromDistanceDirection(playerUnit.lonLatLoc, curUnitHdg, 0.05);
                     curUnitStart.hdg = curUnitHdg;
                     curUnitStart.country = country;
-                    curUnitStart.playerCanDrive = mobile;
+                    curUnitStart.playerCanDrive = mobile || false;
                     curUnitStart.coalition = playerUnit.coalition;
 
                     newSpawnArray.push(curUnitStart);
@@ -1297,7 +1297,7 @@ export async function unpackCrate(
                     unitStart.lonLatLoc = ddcsControllers.getLonLatFromDistanceDirection(playerUnit.lonLatLoc, curUnitHdg, 0.05);
                     unitStart.hdg = curUnitHdg;
                     unitStart.country = pCountry;
-                    unitStart.playerCanDrive = mobile;
+                    unitStart.playerCanDrive = mobile || false;
                     unitStart.special = special;
                     unitStart.coalition = playerUnit.coalition;
                     newSpawnArray.push(unitStart);

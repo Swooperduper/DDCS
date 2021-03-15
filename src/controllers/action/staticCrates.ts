@@ -38,7 +38,7 @@ export async function unpackStaticCrate(curPlayerUnit: any): Promise<void> {
         const curCrateSpecial: string = curCrate.special || "";
         const curCrateType: string = curCrate.templateName;
         const isCombo: boolean = curCrate.isCombo;
-        const isMobile: boolean = curCrate.playerCanDrive;
+        const isMobile: boolean = curCrate.playerCanDrive || false;
         const grpTypes: any = _.transform(crates, (result: any, value: any) => {
             (result[value.templateName] || (result[value.templateName] = [])).push(value);
         }, {});

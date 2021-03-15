@@ -348,6 +348,9 @@ export async function spawnSupportBaseGrp( baseName: string, side: number, init:
         return ((_.includes(baseObj._id, "_MOB") && baseObj.initSide === side) ||
             _.includes(baseObj._id, "_FOB")) && _.split(baseObj.name, " #")[0] === baseName;
     });
+
+    // console.log("SSB: ", farpBases, baseName, side, init);
+
     for (const farp of farpBases) {
         await spawnUnitGroup(spawnSupportVehiclesOnFarp( farp.name, side ), init, baseName, side);
     }
@@ -1367,7 +1370,7 @@ export async function spawnUnitGroup(spawnArray: typing.IUnitSpawnMin[], init: b
             unitObj.country = grpObj.country;
             unitObj.countryName = ddcsControllers.countryId[grpObj.country];
             unitObj.skill = grpObj.skill || "Excellent";
-            unitObj.playerCanDrive = curUnit.playerCanDrive;
+            unitObj.playerCanDrive = curUnit.playerCanDrive || false;
             unitObj.groupName = curGroupName;
             unitObj.type = curUnit.type;
 
@@ -1387,7 +1390,7 @@ export async function spawnUnitGroup(spawnArray: typing.IUnitSpawnMin[], init: b
                 grpObj.country,
                 grpObj.unitCategory
             );
-            console.log("spawnUnitGroup: ", curCMD);
+            // console.log("spawnUnitGroup: ", curCMD);
             const sendClient = {actionObj: {action: "CMD", cmd: [curCMD], reqID: 0, verbose: true}};
             await ddcsControllers.sendUDPPacket("frontEnd", sendClient);
         }
