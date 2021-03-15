@@ -203,7 +203,6 @@ export async function getGroundUnitsInProximity(lonLat: number[], kmDistance: nu
 }
 
 export async function getLogiTowersProximity(lonLat: number[], kmDistance: number, coalition: number): Promise<typing.IUnit[]> {
-    const catNum = ddcsControllers.UNIT_CATEGORY.indexOf("STRUCTURE");
     return await ddcsControllers.unitActionRead({
             dead: false,
             lonLatLoc: {
@@ -214,8 +213,7 @@ export async function getLogiTowersProximity(lonLat: number[], kmDistance: numbe
                     ]
                 }
             },
-            unitCategory: catNum,
-            proxChkGrp: "logisticTowers",
+            _id: /Shelter/,
             coalition
         });
 }

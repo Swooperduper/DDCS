@@ -898,7 +898,7 @@ export async function spawnCrateFromLogi(
         const checkAllBase: any[] = [];
         let curLogistic;
         const aliveBases = await ddcsControllers.unitActionRead({_id:  /Shelter/, dead: false, coalition: unit.coalition});
-        console.log("AB: ", aliveBases);
+        // console.log("AB: ", aliveBases);
         for (const base of normalCrateBases) {
             curLogistic = _.find(aliveBases, {name: base.name + " Shelter"});
             if (!!curLogistic) {
