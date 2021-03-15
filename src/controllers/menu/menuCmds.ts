@@ -898,27 +898,27 @@ export async function spawnCrateFromLogi(
         const checkAllBase: any[] = [];
         let curLogistic;
         const aliveBases = await ddcsControllers.unitActionRead({_id:  /Shelter/, dead: false, coalition: unit.coalition});
+        console.log("AB: ", aliveBases);
         for (const base of normalCrateBases) {
             curLogistic = _.find(aliveBases, {name: base.name + " Shelter"});
-            closeLogi = _.get(base, "name");
             if (!!curLogistic) {
-                checkAllBase.push(await ddcsControllers.isPlayerInProximity(
+                const isPlayerInProximity = await ddcsControllers.isPlayerInProximity(
                     curLogistic.lonLatLoc,
                     0.2,
                     unit.playername
-                ));
+                );
+
+                if (isPlayerInProximity) {
+                    closeLogi = base.name;
+                }
             }
         }
-        if (_.some(checkAllBase)) { // UNDO SET BACK BEFORE CHECKIN!!!
-        // if (true) {
-            const delCrates = await ddcsControllers.staticCrateActionRead({playerOwnerId: curPlayer.ucid});
-
+        if (closeLogi !== "") {
+            const delCrates = await ddcsControllers.unitActionRead({isCrate: true, dead: false, playerOwnerId: curPlayer.ucid});
+            // console.log("CRATES: ", curPlayer, checkAllBase, delCrates, crateCount, engineCache.config.maxCrates, closeLogi);
 
             for (const crate of delCrates) {
-                if (crateCount > engineCache.config.maxCrates - 2) {
-                    await ddcsControllers.staticCrateActionDelete({
-                        _id: crate._id
-                    });
+                if (crateCount > (engineCache.config.maxCrates - 2)) {
                     await ddcsControllers.destroyUnit(crate._id, "static");
                 }
                 crateCount++;

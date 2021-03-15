@@ -3,6 +3,7 @@ import * as ddcsController from "../";
 import { dbModels } from "../db/common";
 import * as typings from "../../typings";
 import {IBase, ISrvPlayers} from "../../typings";
+import * as ddcsControllers from "../action/aiConvoys";
 
 export async function processingIncomingData(incomingObj: any) {
     if (incomingObj.action === "S_EVENT_KILL") {
@@ -120,6 +121,17 @@ export async function processingIncomingData(incomingObj: any) {
                 });
             }
              */
+            if (incomingObj.message === "-se") {
+                const carrierGroupName = "~Carrier|East|Lincoln|Red|";
+                await ddcsController.sendUDPPacket("frontEnd", {
+                    actionObj: {
+                        action: "CMD",
+                        cmd: ["Group.getByName(\"" + carrierGroupName + "\"):activate()"],
+                        reqID: 0,
+                        time: new Date()
+                    }
+                });
+            }
             break;
         case "playerChangeSlot":
             if (incomingObj && incomingObj.occupiedUnitSide && incomingObj.playerInfo && (incomingObj.occupiedUnitSide === 0 ||
