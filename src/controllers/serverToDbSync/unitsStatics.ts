@@ -57,6 +57,7 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
 
         // update location of carrier in aircraft DB
         if (_.includes(curData.name, "Carrier")) {
+            // console.log("carrier update location: ", curUnitName, curData.lonLatLoc);
             await ddcsControllers.baseActionUpdate({_id: curUnitName, centerLoc: curData.lonLatLoc, isResync: true});
         }
 

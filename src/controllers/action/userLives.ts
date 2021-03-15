@@ -69,7 +69,6 @@ export async function updateServerLifePoints(): Promise<void> {
                     } else {
                         addFracPoint = playerBalance.modifier;
                     }
-
                     await addLifePoints(
                         cPlayer,
                         curUnit || null,
@@ -177,16 +176,14 @@ export async function checkAircraftCosts(): Promise<void> {
 }
 
 export async function addLifePoints(curPlayer: any, curUnit: any, execAction?: string, addLP?: number): Promise<void> {
-    if (!curUnit || !curUnit.groupId) {
-        console.log("no groupid: ", curUnit);
-    } else {
-        await ddcsControllers.srvPlayerActionsAddLifePoints({
-            _id: curPlayer._id,
-            groupId: curUnit.groupId,
-            addLifePoints: addLP,
-            execAction
-        });
-    }
+    const groupId = (curUnit && curUnit.groupId) ? curUnit.groupId : null;
+
+    await ddcsControllers.srvPlayerActionsAddLifePoints({
+        _id: curPlayer._id,
+        groupId,
+        addLifePoints: addLP,
+        execAction
+    });
 }
 
 export async function removeLifePoints(

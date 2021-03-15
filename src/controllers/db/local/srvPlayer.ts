@@ -128,6 +128,7 @@ export async function srvPlayerActionsAddLifePoints(obj: {
             const maxLimitedPoints: number = (curTotalPoints > ddcsController.maxLifePoints) ?
                 ddcsController.maxLifePoints : curTotalPoints;
             let msg;
+            // console.log("OBJ: ", obj, addPoints, maxLimitedPoints);
             if (serverObj.length > 0) {
                 const setObj = {
                     cachedRemovedLPPoints: (!obj.addLifePoints) ?  0 : undefined,
@@ -141,12 +142,13 @@ export async function srvPlayerActionsAddLifePoints(obj: {
                     (updateErr: any, srvPlayer: typings.ISrvPlayers) => {
                         if (updateErr) { reject(updateErr); }
                         if (obj.execAction === "PeriodicAdd") {
-                            msg = "+" + _.round(addPoints, 2) || "" + "LP(T:" + maxLimitedPoints || "" + ")";
+                            msg = "+" + _.round(addPoints, 2) + " Life Point (Total: " + maxLimitedPoints + ")";
                         } else {
                             msg = srvPlayer.name + " Have Just Gained " +
-                                addPoints || "" + " Life Points! " +
-                                obj.execAction + "(Total:" + maxLimitedPoints || "" + ")";
+                                addPoints + " Life Points! " +
+                                obj.execAction + "(Total:" + maxLimitedPoints + ")";
                         }
+                        // console.log("MESG: ", msg);
                         if (obj.groupId) {
                             ddcsController.sendMesgToGroup( obj.groupId, msg, 5);
                         }
@@ -400,6 +402,19 @@ export async function srvPlayerActionsResetMinutesPlayed(obj: {
         dbModels.srvPlayerModel.updateOne(
             {_id: obj._id},
             {$set: {[sessionMinutesVar]: 0}},
+            (err: any) => {
+                if (err) { reject(err); }
+                resolve();
+            }
+        );
+    });
+}
+
+export async function srvPlayerActionsUnsetCampaignLock(): Promise<void> {
+    return new Promise((resolve, reject) => {
+        dbModels.srvPlayerModel.updateMany(
+            {},
+            {$set: {sideLock: 0}},
             (err: any) => {
                 if (err) { reject(err); }
                 resolve();
