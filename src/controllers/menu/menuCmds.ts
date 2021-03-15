@@ -932,7 +932,7 @@ export async function spawnCrateFromLogi(
                 curShapeName = "iso_container_small_cargo";
             }
             const curName = "CU|" + curPlayer.ucid + "|" + crates + "|" + isCombo + "|" +
-                ((spc) ? spc : type + "|" + closeLogi) + "|#" + _.random(1000000, 9999999);
+                ((spc) ? spc : type + "|" + mobile + "|" + closeLogi) + "|#" + _.random(1000000, 9999999);
 
             crateObj = {
                 _id: curName,

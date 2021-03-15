@@ -37,7 +37,7 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
         curData.crateAmt = Number(stParse[2]);
         curData.isCombo = stParse[3];
         curData.templateName = stParse[4];
-        curData.playerCanDrive = false;
+        curData.playerCanDrive = stParse[5];
         curData.isCrate = true;
         curData.hidden = false;
     }
