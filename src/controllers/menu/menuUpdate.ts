@@ -92,7 +92,7 @@ export async function initializeMenu(playerUnit: any): Promise<void> {
 
     const curMenuCommands = ddcsControllers.getEngineCache().menuCommands.filter((menuCommand: typings.IMenuCommand) => {
         return (menuCommand.allowedUnitTypes.length === 0 || _.includes(menuCommand.allowedUnitTypes, playerUnit.type)) &&
-            (menuCommand.side === 0 || menuCommand.side === playerUnit.side);
+            (menuCommand.side === 0 || menuCommand.side === playerUnit.coalition);
     });
 
     // build master menu levels, every first lvl, clear menu line out

@@ -83,30 +83,28 @@ export async function srvPlayerActionsUpdateFromServer(obj: {
                 // keep an eye on this check....
                 await ddcsController.protectSlots(curPly.sideLock, obj.side, obj.playerId);
 
-                const iUnit = await ddcsController.unitActionRead({playername: curPly.name});
-                // console.log("unit: ", curPly.name, iUnit);
-                if (iUnit.length > 0) {
-                    if (curPly.sessionName && obj.sessionName && (curPly.sessionName !== obj.sessionName)) {
-                        obj.curLifePoints = engineCache.config.startLifePoints;
-                        obj.currentSessionMinutesPlayed_blue = 0;
-                        obj.currentSessionMinutesPlayed_red = 0;
-                        obj.redRSPoints = 0;
-                        obj.blueRSPoints = 0;
-                        obj.tmpRSPoints = 0;
-                    }
-                    if (obj.ipaddr === ":10308") {
-                        obj.ipaddr = "127.0.0.1";
-                    }
+                // const iUnit = await ddcsController.unitActionRead({playername: curPly.name});
 
-                    dbModels.srvPlayerModel.updateOne(
-                        {_id: obj._id},
-                        {$set: obj},
-                        (updateErr: any) => {
-                            if (updateErr) { reject(updateErr); }
-                            resolve();
-                        }
-                    );
+                if (curPly.sessionName && obj.sessionName && (curPly.sessionName !== obj.sessionName)) {
+                    obj.curLifePoints = engineCache.config.startLifePoints;
+                    obj.currentSessionMinutesPlayed_blue = 0;
+                    obj.currentSessionMinutesPlayed_red = 0;
+                    obj.redRSPoints = 0;
+                    obj.blueRSPoints = 0;
+                    obj.tmpRSPoints = 0;
                 }
+                if (obj.ipaddr === ":10308") {
+                    obj.ipaddr = "127.0.0.1";
+                }
+
+                dbModels.srvPlayerModel.updateOne(
+                    {_id: obj._id},
+                    {$set: obj},
+                    (updateErr: any) => {
+                        if (updateErr) { reject(updateErr); }
+                        resolve();
+                    }
+                );
             }
         });
     });

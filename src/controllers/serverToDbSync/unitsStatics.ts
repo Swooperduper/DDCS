@@ -164,7 +164,7 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
     } else {
         if (unitObj.action !== "D") {
             if (curData.name) {
-                console.log("NAME: ", curData.name);
+                console.log("NAME: ", curData.name, curData);
                 curData._id = curData.name;
                 curData.isResync = true;
                 iCurObj = {
@@ -205,6 +205,11 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
                 if (ddcsControllers.UNIT_CATEGORY[curData.unitCategory] === "STRUCTURE") {
                     // console.log('SUM: ', curData);
                     await ddcsControllers.setUnitMark(curData);
+                }
+                if (curData.playername !== "" && curData.groupId) {
+                    // Only players can get a menu
+                    // console.log("spawning player menu");
+                    await ddcsControllers.initializeMenu(curData);
                 }
             }
         }

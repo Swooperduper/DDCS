@@ -15,7 +15,7 @@ export async function processEventBirth(eventObj: any): Promise<void> {
             // console.log("PA: ", playerArray);
             if (curIUnit) {
                 const iPlayer = _.find(playerArray, {name: curIUnit.playername});
-                console.log("playerarray: ", iPlayer);
+                console.log("playerarray: ", iPlayer, curIUnit);
                 if (iPlayer) {
                     const iCurObj = {
                         sessionName: ddcsControllers.getSessionName(),
@@ -37,11 +37,14 @@ export async function processEventBirth(eventObj: any): Promise<void> {
                 }
             }
         }
+
+        /*
         // give them a menu
         if (eventObj.data.initiator.groupId) {
             // Only players can get a menu
             // console.log("spawning player menu");
             await ddcsControllers.initializeMenu(eventObj.data.initiator);
         }
+         */
     }
 }
