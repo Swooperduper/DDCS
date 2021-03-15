@@ -22,6 +22,11 @@ export async function processPlayerEvent(playerArray: any): Promise<void> {
     if (curPlayerArray.length > 0) {
         rtPlayerArray = curPlayerArray;
         for (const player of curPlayerArray) {
+            // lockout if server is not synced
+            if (ddcsControllers.getMissionStartupReSync() && player.side !== 0) {
+                await ddcsControllers.forcePlayerSpectator(player.id, "Server is not Synced!");
+            }
+
             // console.log("player: ", player);
             // player check sides, lock etc
             const curPlyrUcid = player.ucid;
