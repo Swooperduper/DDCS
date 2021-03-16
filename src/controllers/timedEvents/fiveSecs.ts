@@ -27,6 +27,7 @@ export async function processFiveSecActions(fullySynced: boolean): Promise<void>
             const aliveComms = await ddcsControllers.unitActionRead({name: base.name + " Comms tower M", dead: false});
             if (aliveComms.length > 0) {
                 if ((units.length < unitCnt) && replenEpoc < new Date().getTime()) {
+                    //  if (( (base._id === "Tuapse_MOB") || units.length < unitCnt) && replenEpoc < new Date().getTime()) {
                     await ddcsControllers.baseActionUpdateReplenTimer({
                         name: base._id,
                         replenTime: new Date().getTime() + (replenTimer * 1000)

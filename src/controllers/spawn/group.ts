@@ -519,6 +519,7 @@ export async function spawnSAMNet(side: number, baseName: string, init: boolean)
                 } else {
                     openSAM = _.sample(_.sample(spawnArray)) || spawnArray[0][0];
                 }
+                console.log("spawnstar: ", side, baseName, openSAM, init);
                 await spawnStarSam(side, baseName, openSAM, init);
             } else {
                 console.log("3+ missle batterys in place");
@@ -553,6 +554,7 @@ export async function spawnStarSam(
     let randLatLonInBase;
     let infoSpwn;
     let groupedUnits: any[];
+    console.log("STAR: ", lastLonLat, baseName, openStarSAM, ddcsControllers.getRandomLatLonFromBase(baseName, "layer2Poly", openStarSAM));
     randLatLonInBase = (lastLonLat) ? lastLonLat : ddcsControllers.getRandomLatLonFromBase(baseName, "layer2Poly", openStarSAM);
     groupedUnits = [];
     curRndSpawn = _.sortBy(getRndFromSpawnCat("samRadar", side, false, true, launchers, useUnitType ), "sort");
