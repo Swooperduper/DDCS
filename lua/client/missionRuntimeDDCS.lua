@@ -13,6 +13,21 @@ function tprint(tbl, indent)
     end
 end
 
+function TableComp(a,b) --algorithm is O(n log n), due to table growth.
+    if #a ~= #b then return false end -- early out
+    local t1,t2 = {}, {} -- temp tables
+    for k,v in pairs(a) do -- copy all values into keys for constant time lookups
+        t1[k] = (t1[k] or 0) + 1 -- make sure we track how many times we see each value.
+    end
+    for k,v in pairs(b) do
+        t2[k] = (t2[k] or 0) + 1
+    end
+    for k,v in pairs(t1) do -- go over every element
+        if v ~= t2[k] then return false end -- if the number of times that element was seen don't match...
+    end
+    return true
+end
+
 env.info("startMissionRuntimeDDCS")
 
 ddcs = {}
@@ -49,7 +64,7 @@ tempNames = {}
 objCache = {}
 checkDead = {}
 
-function generateInitialUnitObj(group, unit, isActive, curName, coalition, lon, lat, alt, unitPosition)
+function generateInitialUnitObj(group, unit, isActive, curName, coalition, lon, lat, alt, unitPosition, playername, ammo)
     local curUnit = {
         ["uType"] = "unit",
         ["data"] = {
@@ -69,6 +84,8 @@ function generateInitialUnitObj(group, unit, isActive, curName, coalition, lon, 
             ["country"] = unit:getCountry(),
             ["coalition"] = coalition,
             ["type"] = unit:getTypeName(),
+            ["playername"] = playername,
+            ["ammo"] = ammo
         }
     }
 
@@ -81,23 +98,6 @@ function generateInitialUnitObj(group, unit, isActive, curName, coalition, lon, 
         curUnit.data.velocity = unit:getVelocity()
         --curUnit.data.groupName = group:getName()
         curUnit.data.coalition = coalition
-
-        local PlayerName = unit:getPlayerName()
-        if PlayerName ~= nil then
-            curUnit.data.playername = PlayerName
-            local curFullAmmo = unit:getAmmo()
-            if curFullAmmo ~= nil then
-                curUnit.data.ammo = {}
-                for ammoIndex = 1, #curFullAmmo do
-                    table.insert(curUnit.data.ammo, {
-                        ["typeName"] = curFullAmmo[ammoIndex].desc.typeName,
-                        ["count"] = curFullAmmo[ammoIndex].count
-                    })
-                end
-            end
-        else
-            curUnit.data.playername = ""
-        end
     end
     return curUnit
 end
@@ -135,20 +135,34 @@ function addGroups(groups, coalition)
             local lat, lon, alt = coord.LOtoLL(unitPosition.p)
             table.insert(tempNames, curUnitName)
 
-            if curStaticName == "~TRAIN-3-1" then
-                tprint(unit, 1)
+            local playername = unit:getPlayerName()
+            local ammo = {}
+            if playername ~= nil and playername ~= "" then
+                local curFullAmmo = unit:getAmmo()
+                if curFullAmmo ~= nil then
+                    for ammoIndex = 1, #curFullAmmo do
+                        table.insert(ammo, {
+                            ["typeName"] = curFullAmmo[ammoIndex].desc.typeName,
+                            ["count"] = curFullAmmo[ammoIndex].count
+                        })
+                    end
+                end
+            else
+                playername = ""
             end
 
-            if Unit.isActive(unit) or unit:getTypeName() == "Locomotive" then
+            --if Unit.isActive(unit) or unit:getTypeName() == "Locomotive" then
+            if Unit.isActive(unit) then
                 --env.info("ISACTIVE " .. curUnitName)
                 if objCache[curUnitName] ~= nil then
-                    if objCache[curUnitName].lat ~= lat or objCache[curUnitName].lon ~= lon or objCache[curUnitName].isActive ~= true then
+                    if objCache[curUnitName].lat ~= lat or objCache[curUnitName].lon ~= lon or objCache[curUnitName].isActive ~= true or not TableComp(objCache[curUnitName].ammo, ammo) then
                         objCache[curUnitName] = {
                             ["lat"] = lat,
                             ["lon"] = lon,
-                            ["isActive"] = true
+                            ["isActive"] = true,
+                            ["ammo"] = ammo
                         }
-                        local curUnitObj = generateInitialUnitObj(group, unit, true, curUnitName, coalition, lon, lat, alt, unitPosition)
+                        local curUnitObj = generateInitialUnitObj(group, unit, true, curUnitName, coalition, lon, lat, alt, unitPosition, playername, ammo)
                         curUnitObj.action = "U"
                         sendUDPPacket(curUnitObj)
                     end
@@ -156,9 +170,10 @@ function addGroups(groups, coalition)
                     objCache[curUnitName] = {
                         ["lat"] = lat,
                         ["lon"] = lon,
-                        ["isActive"] = true
+                        ["isActive"] = true,
+                        ["ammo"] = ammo
                     }
-                    local curUnitObj = generateInitialUnitObj(group, unit, true, curUnitName, coalition, lon, lat, alt, unitPosition)
+                    local curUnitObj = generateInitialUnitObj(group, unit, true, curUnitName, coalition, lon, lat, alt, unitPosition, playername, ammo)
                     curUnitObj.action = "C"
                     sendUDPPacket(curUnitObj)
                 end
@@ -168,9 +183,10 @@ function addGroups(groups, coalition)
                     objCache[curUnitName] = {
                         ["lat"] = lat,
                         ["lon"] = lon,
-                        ["isActive"] = false
+                        ["isActive"] = false,
+                        ["ammo"] = ammo
                     }
-                    local curUnitObj = generateInitialUnitObj(group, unit, false, curUnitName, coalition, lon, lat, alt, unitPosition)
+                    local curUnitObj = generateInitialUnitObj(group, unit, false, curUnitName, coalition, lon, lat, alt, unitPosition, playername, ammo)
                     curUnitObj.action = "C"
                     sendUDPPacket(curUnitObj)
                 end
@@ -186,10 +202,6 @@ function addStatics(statics, coalition)
         local lat, lon, alt = coord.LOtoLL(staticPosition.p)
         local curStaticName = static:getName()
         table.insert(tempNames, curStaticName)
-
-        if curStaticName == "~TRAIN-3-1" then
-            tprint(objCache[curStaticName], 1)
-        end
 
         if objCache[curStaticName] ~= nil then
             if objCache[curStaticName].lat ~= lat or objCache[curStaticName].lon ~= lon then

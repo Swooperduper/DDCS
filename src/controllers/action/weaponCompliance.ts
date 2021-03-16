@@ -17,6 +17,7 @@ export async function checkWeaponComplianceOnTakeoff(iPlayer: any, curIUnit: any
                 maxLimitedWeaponCount = maxLimitedWeaponCount + value.count;
             }
         }
+        // console.log("weaponRestrictions: ", maxLimitedWeaponCount, " > ", weaponRule.maxTotalAllowed) ;
         if (maxLimitedWeaponCount > weaponRule.maxTotalAllowed) {
             const msg = "Removed from aircraft not complying with weapon restrictions, (" +
                 maxLimitedWeaponCount + " of " + _.join(limitedWeapons) + ")";
@@ -41,6 +42,7 @@ export async function checkAircraftWeaponCompliance(): Promise<void> {
             const cUnit = await ddcsControllers.unitActionRead({dead: false, playername: curPlayer.name});
             if (cUnit.length > 0) {
                 const curUnit = cUnit[0];
+                // console.log("CU:", curUnit);
                 for (const weaponRule of engineCache.config.weaponRules || []) {
                     const limitedWeapons: any[] = [];
                     let maxLimitedWeaponCount = 0;
