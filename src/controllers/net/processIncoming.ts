@@ -4,6 +4,7 @@ import { dbModels } from "../db/common";
 import * as typings from "../../typings";
 import {IBase, ISrvPlayers} from "../../typings";
 import * as ddcsControllers from "../action/aiConvoys";
+import {sendMesgToPlayerChatWindow} from "../";
 
 export async function processingIncomingData(incomingObj: any) {
     if (incomingObj.action === "S_EVENT_KILL") {
@@ -121,8 +122,9 @@ export async function processingIncomingData(incomingObj: any) {
                 });
             }
              */
+            /*
             if (incomingObj.message === "-se") {
-                const carrierGroupName = "~Carrier|East|Lincoln|Red|";
+                const carrierGroupName = "~Carrier|West|Lincoln|Red|";
                 await ddcsController.sendUDPPacket("frontEnd", {
                     actionObj: {
                         action: "CMD",
@@ -134,7 +136,7 @@ export async function processingIncomingData(incomingObj: any) {
             }
 
             if (incomingObj.message === "-sr") {
-                const carrierGroupName = "~Carrier|West|Roosevelt|Blue|";
+                const carrierGroupName = "~Carrier|East|Roosevelt|Blue|";
                 await ddcsController.sendUDPPacket("frontEnd", {
                     actionObj: {
                         action: "CMD",
@@ -144,6 +146,7 @@ export async function processingIncomingData(incomingObj: any) {
                     }
                 });
             }
+             */
 
             break;
         case "playerChangeSlot":
@@ -176,16 +179,16 @@ export async function processSlotLock(sideLock: number, baseSide: number, curSlo
     if (sideLock === 0) {
         mesg = "You are not locked to a side yet, Please type in chat to join: -red or -blue";
         await ddcsController.forcePlayerSpectator(playerId, mesg);
-    }
+    } else {
+        if (sideLock !== curSlotSide) {
+            mesg = "Your are locked to " + ddcsController.side[sideLock];
+            await ddcsController.forcePlayerSpectator(playerId, mesg);
+        }
 
-    if (sideLock !== curSlotSide) {
-        mesg = "Your are locked to " + ddcsController.side[sideLock];
-        await ddcsController.forcePlayerSpectator(playerId, mesg);
-    }
-
-    if (baseSide !== curSlotSide) {
-        mesg = "You must capture this base before you can occupy slot";
-        await ddcsController.forcePlayerSpectator(playerId, mesg);
+        if (baseSide !== curSlotSide) {
+            mesg = "You must capture this base before you can occupy slot";
+            await ddcsController.forcePlayerSpectator(playerId, mesg);
+        }
     }
 }
 
@@ -197,7 +200,7 @@ export async function protectSlots(sideLock: number, playerSide: number, playerI
         await ddcsController.forcePlayerSpectator(playerId, mesg);
     }
 
-    if (playerSide !== 0 && sideLock !== playerSide) {
+    if (sideLock !== 0 && playerSide !== 0 && sideLock !== playerSide) {
         mesg = "Your are locked to " + ddcsController.side[sideLock];
         await ddcsController.forcePlayerSpectator(playerId, mesg);
     }

@@ -6,14 +6,21 @@ import * as _ from "lodash";
 import * as ddcsControllers from "../";
 import { dbModels } from "../db/common";
 import * as typings from "../../typings";
+import {sendMesgToPlayerChatWindow} from "../";
 
 export async function lockUserToSide(incomingObj: any, lockToSide: number): Promise<void> {
     return new Promise((resolve, reject) => {
-        dbModels.srvPlayerModel.find({_id: incomingObj.from}, (err: any, serverObj: typings.ISrvPlayers[]) => {
+        dbModels.srvPlayerModel.find({_id: incomingObj.from}, async (err: any, serverObj: typings.ISrvPlayers[]) => {
             if (err) { reject(err); }
             const curPly = serverObj[0];
-            if (curPly && curPly.sideLock === 0) {
-                console.log("lockToSide: ", lockToSide, curPly.name);
+            // console.log("current player: ", curPly, incomingObj);
+            if (curPly && curPly.sideLock !== 0) {
+                await sendMesgToPlayerChatWindow("Player ALREADY Locked to side " +
+                    ddcsControllers.side[curPly.sideLock].toUpperCase(), curPly.playerId);
+            } else {
+                // console.log("lockToSide: ", lockToSide, curPly.name);
+                await sendMesgToPlayerChatWindow("Player is now Locked to side " +
+                    ddcsControllers.side[lockToSide].toUpperCase(), curPly.playerId);
                 dbModels.srvPlayerModel.updateOne(
                     {_id: incomingObj.from},
                     {$set: {sideLock: lockToSide}},
@@ -22,8 +29,6 @@ export async function lockUserToSide(incomingObj: any, lockToSide: number): Prom
                         resolve();
                     }
                 );
-            } else {
-                console.log("Already locked", curPly.name);
             }
         });
     });
