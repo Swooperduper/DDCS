@@ -22,21 +22,16 @@ export async function processEventTakeoff(eventObj: any): Promise<void> {
     if (_.isUndefined(curIUnit)) {
         console.log("isUndef: ", eventObj);
     }
+    // console.log("curIunit: ", curIUnit);
     if (curIUnit) {
         const iPlayer = _.find(playerArray, {name: curIUnit.playername});
+        // console.log("iPlayer: ", iPlayer);
         if (iPlayer && iPlayer.ucid) {
             if (await ddcsControllers.checkWeaponComplianceOnTakeoff(iPlayer, curIUnit)) {
                 const friendlyBases = await ddcsControllers.getBasesInProximity(curIUnit.lonLatLoc, 5, curUnitSide);
+                // console.log("getBASE: ", curIUnit, curUnitSide, friendlyBases);
                 if (friendlyBases.length > 0) {
-                    const iCurObj = {
-                        sessionName: ddcsControllers.getSessionName(),
-                        eventCode: ddcsControllers.shortNames[eventObj.action],
-                        iucid: iPlayer.ucid,
-                        iName: curIUnit.playername,
-                        displaySide: curIUnit.coalition,
-                        roleCode: "I",
-                        msg: "C: " + curIUnit.type + "(" + curIUnit.playername + ") has taken off" + place
-                    };
+                    console.log("LPE: ", engineCache.config.lifePointsEnabled, !_.includes(iPlayer.slot, "_"));
                     if (engineCache.config.lifePointsEnabled && !_.includes(iPlayer.slot, "_")) {
                         console.log("checkSlotTakeoff: ", iPlayer.slot);
                         await ddcsControllers.removeLifePoints(

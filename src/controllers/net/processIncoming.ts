@@ -132,6 +132,19 @@ export async function processingIncomingData(incomingObj: any) {
                     }
                 });
             }
+
+            if (incomingObj.message === "-sr") {
+                const carrierGroupName = "~Carrier|West|Roosevelt|Blue|";
+                await ddcsController.sendUDPPacket("frontEnd", {
+                    actionObj: {
+                        action: "CMD",
+                        cmd: ["Group.getByName(\"" + carrierGroupName + "\"):activate()"],
+                        reqID: 0,
+                        time: new Date()
+                    }
+                });
+            }
+
             break;
         case "playerChangeSlot":
             if (incomingObj && incomingObj.occupiedUnitSide && incomingObj.playerInfo && (incomingObj.occupiedUnitSide === 0 ||
