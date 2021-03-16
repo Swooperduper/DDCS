@@ -1533,27 +1533,38 @@ export async function healBase( baseName: string, curPlayerUnit: any, init: bool
     const baseUnit = await ddcsControllers.baseActionRead({name: baseName});
     if (baseUnit.length > 0) {
         const curBase = baseUnit[0];
+
         if (curBase.baseType !== "MOB") {
             await exports.spawnSupportBaseGrp( curBase.name, curPlayerUnit.coalition); // return resp
         } else {
-            const shelterUnit = await ddcsControllers.unitActionRead({name: curBase.name + " Shelter", dead: false});
-            const curShelterUnit = shelterUnit[0];
-            if (curShelterUnit) {
-                curShelterUnit.coalition = curBase.side;
-                await ddcsControllers.spawnStaticBuilding(curShelterUnit, false, curBase, curPlayerUnit.coalition, "Shelter");
+            if (curBase.side !== curPlayerUnit.coalition) {
+                await ddcsControllers.sendMesgToGroup(
+                    curPlayerUnit.groupId,
+                    "G: Enemy " + curBase._id + " could not be repaired!",
+                    5
+                );
+                return false;
             } else {
-                await ddcsControllers.spawnStaticBuilding({} as IStaticSpawnMin, true, curBase, curPlayerUnit.coalition, "Shelter");
-            }
+                const shelterUnit = await ddcsControllers.unitActionRead({name: curBase.name + " Shelter", dead: false});
+                const curShelterUnit = shelterUnit[0];
+                if (curShelterUnit) {
+                    curShelterUnit.coalition = curBase.side;
+                    await ddcsControllers.spawnStaticBuilding(curShelterUnit, false, curBase, curPlayerUnit.coalition, "Shelter");
+                } else {
+                    await ddcsControllers.spawnStaticBuilding({} as IStaticSpawnMin, true, curBase, curPlayerUnit.coalition, "Shelter");
+                }
 
-            const commUnit = await ddcsControllers.unitActionRead({name: curBase.name + " Comms tower M", dead: false});
-            const curCommUnit = commUnit[0];
-            if (curCommUnit) {
-                curCommUnit.coalition = curBase.side;
-                await ddcsControllers.spawnStaticBuilding(curCommUnit, false, curBase, curPlayerUnit.coalition, "Comms tower M");
-            } else {
-                await ddcsControllers.spawnStaticBuilding({} as IStaticSpawnMin, true, curBase, curPlayerUnit.coalition, "Comms tower M");
+                const commUnit = await ddcsControllers.unitActionRead({name: curBase.name + " Comms tower M", dead: false});
+                const curCommUnit = commUnit[0];
+                if (curCommUnit) {
+                    curCommUnit.coalition = curBase.side;
+                    await ddcsControllers.spawnStaticBuilding(curCommUnit, false, curBase, curPlayerUnit.coalition, "Comms tower M");
+                } else {
+                    await ddcsControllers.spawnStaticBuilding({} as IStaticSpawnMin,
+                        true, curBase, curPlayerUnit.coalition, "Comms tower M");
+                }
+                await spawnSupportBaseGrp( curBase.name, curPlayerUnit.coalition, init );
             }
-            await spawnSupportBaseGrp( curBase.name, curPlayerUnit.coalition, init );
         }
         return true;
     }
