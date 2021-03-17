@@ -1533,35 +1533,16 @@ export async function destroyUnit( unitName: string, type: string ): Promise<voi
 
 export async function healBase( baseName: string, curPlayerUnit: any, init: boolean): Promise<boolean> {
     const baseUnit = await ddcsControllers.baseActionRead({name: baseName});
-	// console.log("healBase: ", baseName, baseUnit);
+
+    // console.log("healBase: ", baseName, baseName);
     if (baseUnit.length > 0) {
         const curBase = baseUnit[0];
-		// console.log("CB: ", curBase);
+
         if (curBase.baseType !== "MOB") {
-			if (curBase.side !== 0 && curBase.side !== curPlayerUnit.coalition) {
-				await ddcsControllers.sendMesgToGroup(
-                    curPlayerUnit.groupId,
-                    "G: Enemy " + curBase._id + " could not be repaired!",
-                    5
-                );
-                return false;
-			} else {
-				await exports.spawnSupportBaseGrp( curBase.name, curPlayerUnit.coalition); // return resp
-				
-				const shelterUnit = await ddcsControllers.unitActionRead({name: curBase.name + " Shelter", dead: false});
-                const curShelterUnit = shelterUnit[0];
-                if (curShelterUnit) {
-                    curShelterUnit.coalition = curBase.side;
-                    await ddcsControllers.spawnStaticBuilding(curShelterUnit, false, curBase, curPlayerUnit.coalition, "Shelter");
-                } else {
-                    await ddcsControllers.spawnStaticBuilding({} as IStaticSpawnMin, true, curBase, curPlayerUnit.coalition, "Shelter");
-					await exports.spawnSupportBaseGrp( curBase.name, curPlayerUnit.coalition); // return resp
-                }
-			}
+            await exports.spawnSupportBaseGrp( curBase.name, curPlayerUnit.coalition); // return resp
         } else {
-			// console.log("BU: ", curBase, curPlayerUnit);
-            if (curBase.side !== 0 && curBase.side !== curPlayerUnit.coalition) {
-				console.log("enemy base");
+            if (curBase.side !== curPlayerUnit.coalition) {
+                console.log("");
                 await ddcsControllers.sendMesgToGroup(
                     curPlayerUnit.groupId,
                     "G: Enemy " + curBase._id + " could not be repaired!",
