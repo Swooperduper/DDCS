@@ -113,12 +113,12 @@ export async function landHeliRouteTemplate(routes: any) {
     return await getRouteTemplate(routes, "landHeliRoute");
 }
 
-export async function grndUnitGroup( groupObj: any, task?: string, routes?: string ): Promise<string> {
+export async function grndUnitGroup(groupObj: any, task?: string, routes?: string): Promise<string> {
     groupObj.uncontrollable = !groupObj.playerCanDrive || false;
 
     if (routes) {
         groupObj.curRoute = routes;
-    } else if (groupObj.type === "1L13 EWR" || groupObj.type === "55G6 EWR" ) {
+    } else if (groupObj.type === "1L13 EWR" || groupObj.type === "55G6 EWR") {
         groupObj.curRoute = await turnOnEWRAuto(groupObj);
     } else {
         groupObj.curRoute = await getRouteTemplate({} as typing.IConvoyRouteTemplate, "turnOffDisperseUnderFireRoute");
@@ -134,7 +134,7 @@ export async function grndUnitGroup( groupObj: any, task?: string, routes?: stri
     return compiled({groupObj});
 }
 
-export async function grndUnitTemplate( unitObj: any, isLatLon: boolean = true): Promise<string> {
+export async function grndUnitTemplate(unitObj: any, isLatLon: boolean = true): Promise<string> {
     let spawnTemplate;
     if (isLatLon) {
         spawnTemplate = await ddcsControllers.templateRead({_id: "groundUnitLatLon"});
@@ -145,55 +145,55 @@ export async function grndUnitTemplate( unitObj: any, isLatLon: boolean = true):
     return compiled({unitObj});
 }
 
-export async function mi24vTemplate( unitObj: any ): Promise<string> {
+export async function mi24vTemplate(unitObj: any): Promise<string> {
     const spawnTemplate = await ddcsControllers.templateRead({_id: "mi24vUnit"});
     const compiled = _.template(spawnTemplate[0].template);
     return compiled({unitObj});
 }
 
-export async function ah1wTemplate( unitObj: any ): Promise<string> {
+export async function ah1wTemplate(unitObj: any): Promise<string> {
     const spawnTemplate = await ddcsControllers.templateRead({_id: "ah1wUnit"});
     const compiled = _.template(spawnTemplate[0].template);
     return compiled({unitObj});
 }
 
-export async function mi28nTemplate( unitObj: any ): Promise<string> {
+export async function mi28nTemplate(unitObj: any): Promise<string> {
     const spawnTemplate = await ddcsControllers.templateRead({_id: "mi28nUnit"});
     const compiled = _.template(spawnTemplate[0].template);
     return compiled({unitObj});
 }
 
-export async function ah64dTemplate( unitObj: any ): Promise<string> {
+export async function ah64dTemplate(unitObj: any): Promise<string> {
     const spawnTemplate = await ddcsControllers.templateRead({_id: "ah64dUnit"});
     const compiled = _.template(spawnTemplate[0].template);
     return compiled({unitObj});
 }
 
-export async function b1bTemplate( unitObj: any ): Promise<string> {
+export async function b1bTemplate(unitObj: any): Promise<string> {
     const spawnTemplate = await ddcsControllers.templateRead({_id: "b1bUnit"});
     const compiled = _.template(spawnTemplate[0].template);
     return compiled({unitObj});
 }
 
-export async function su24mTemplate( unitObj: any ): Promise<string> {
+export async function su24mTemplate(unitObj: any): Promise<string> {
     const spawnTemplate = await ddcsControllers.templateRead({_id: "su24mUnit"});
     const compiled = _.template(spawnTemplate[0].template);
     return compiled({unitObj});
 }
 
-export async function capPlaneDefenseTemplate( unitObj: any ): Promise<string> {
+export async function capPlaneDefenseTemplate(unitObj: any): Promise<string> {
     const spawnTemplate = await ddcsControllers.templateRead({_id: "capPlaneDefenseUnit"});
     const compiled = _.template(spawnTemplate[0].template);
     return compiled({unitObj});
 }
 
-export async function capHeliDefenseTemplate( unitObj: any ): Promise<string> {
+export async function capHeliDefenseTemplate(unitObj: any): Promise<string> {
     const spawnTemplate = await ddcsControllers.templateRead({_id: "capHeliDefenseUnit"});
     const compiled = _.template(spawnTemplate[0].template);
     return compiled({unitObj});
 }
 
-export async function airUnitTemplate( unitObj: any ): Promise<string> {
+export async function airUnitTemplate(unitObj: any): Promise<string> {
     if (ddcsControllers.countryId[unitObj.country] === "USA" || ddcsControllers.countryId[unitObj.country] === "AGGRESSORS") {
         const spawnTemplateCallsign = await ddcsControllers.templateRead({_id: "airUnitFragmentCallsign"});
         const compiledCallsign = _.template(spawnTemplateCallsign[0].template);
@@ -296,7 +296,7 @@ export function getRndFromSpawnCat(
     }
 }
 
-export function spawnSupportVehiclesOnFarp( baseName: string, side: number ): typing.IUnitSpawnMin[] {
+export function spawnSupportVehiclesOnFarp(baseName: string, side: number): typing.IUnitSpawnMin[] {
     const engineCache = ddcsControllers.getEngineCache();
     const curBase = _.find(engineCache.bases, {name: baseName});
 
@@ -312,7 +312,7 @@ export function spawnSupportVehiclesOnFarp( baseName: string, side: number ): ty
         } else {
             curAng = curAng + 270;
         }
-        for ( const val of sptArray) {
+        for (const val of sptArray) {
             const curSpawnTemplate = getRndFromSpawnCat(val, side, false, true)[0];
             const curCountry = _.intersection(
                 curSpawnTemplate.config[ddcsControllers.getEngineCache().config.timePeriod].country,
@@ -343,7 +343,7 @@ export function spawnSupportVehiclesOnFarp( baseName: string, side: number ): ty
     }
 }
 
-export async function spawnSupportBaseGrp( baseName: string, side: number, init: boolean ): Promise<void> {
+export async function spawnSupportBaseGrp(baseName: string, side: number, init: boolean): Promise<void> {
     const farpBases = _.filter(ddcsControllers.getEngineCache().bases, (baseObj) => {
         return ((_.includes(baseObj._id, "_MOB") && baseObj.initSide === side) ||
             _.includes(baseObj._id, "_FOB")) && _.split(baseObj.name, " #")[0] === baseName;
@@ -352,7 +352,7 @@ export async function spawnSupportBaseGrp( baseName: string, side: number, init:
     // console.log("SSB: ", farpBases, baseName, side, init);
 
     for (const farp of farpBases) {
-        await spawnUnitGroup(spawnSupportVehiclesOnFarp( farp.name, side ), init, baseName, side);
+        await spawnUnitGroup(spawnSupportVehiclesOnFarp(farp.name, side), init, baseName, side);
     }
 }
 
@@ -513,9 +513,9 @@ export async function spawnSAMNet(side: number, baseName: string, init: boolean)
             }
             if (realSAMArray.length < 3) {
                 if (_.intersection(spawnArray[0], realSAMArray).length > 0) {
-                    openSAM =  _.sample(_.difference(spawnArray[0], realSAMArray));
+                    openSAM = _.sample(_.difference(spawnArray[0], realSAMArray));
                 } else if (_.intersection(spawnArray[1], realSAMArray).length > 0) {
-                    openSAM =  _.sample(_.difference(spawnArray[1], realSAMArray));
+                    openSAM = _.sample(_.difference(spawnArray[1], realSAMArray));
                 } else {
                     openSAM = _.sample(_.sample(spawnArray)) || spawnArray[0][0];
                 }
@@ -557,7 +557,7 @@ export async function spawnStarSam(
     console.log("STAR: ", lastLonLat, baseName, openStarSAM, ddcsControllers.getRandomLatLonFromBase(baseName, "layer2Poly", openStarSAM));
     randLatLonInBase = (lastLonLat) ? lastLonLat : ddcsControllers.getRandomLatLonFromBase(baseName, "layer2Poly", openStarSAM);
     groupedUnits = [];
-    curRndSpawn = _.sortBy(getRndFromSpawnCat("samRadar", side, false, true, launchers, useUnitType ), "sort");
+    curRndSpawn = _.sortBy(getRndFromSpawnCat("samRadar", side, false, true, launchers, useUnitType), "sort");
     infoSpwn = curRndSpawn[0];
     centerRadar = infoSpwn.centerRadar ? 1 : 0;
     curSpokeNum = curRndSpawn.length - centerRadar;
@@ -859,7 +859,7 @@ export async function spawnDefenseChopper(playerUnitObj: typing.IUnit, unitObj: 
         ]
     };
 
-    curGroupSpawn = await grndUnitGroup( curGrpObj, "CAS", await getRouteTemplate(curGrpObj, "defenseHeliRoute"));
+    curGroupSpawn = await grndUnitGroup(curGrpObj, "CAS", await getRouteTemplate(curGrpObj, "defenseHeliRoute"));
 
     curSpwnUnit = {
         ...curSpwnUnit,
@@ -939,7 +939,7 @@ export async function spawnAtkChopper(playerUnitObj: typing.IUnit, unitObj: typi
         ]
     };
 
-    curGroupSpawn = await grndUnitGroup( curGrpObj, "CAS", await getRouteTemplate(curGrpObj, "atkHeliRoute"));
+    curGroupSpawn = await grndUnitGroup(curGrpObj, "CAS", await getRouteTemplate(curGrpObj, "atkHeliRoute"));
 
     curSpwnUnit = {
         ...curSpwnUnit,
@@ -1008,7 +1008,7 @@ export async function spawnBomberPlane(playerUnitObj: typing.IUnit, bomberObj: a
         ]
     };
 
-    curGroupSpawn = await grndUnitGroup( curGrpObj, "CAS", await getRouteTemplate(curGrpObj, "bombersPlaneRoute"));
+    curGroupSpawn = await grndUnitGroup(curGrpObj, "CAS", await getRouteTemplate(curGrpObj, "bombersPlaneRoute"));
 
     curSpwnUnit = {
         ...curSpwnUnit,
@@ -1055,7 +1055,7 @@ export async function spawnAWACSPlane(playerUnitObj: typing.IUnit, awacsObj: any
     curTkrName = "AI|" + awacsObj.name + "|";
     curSpwnUnit = _.cloneDeep(awacsObj);
 
-    const closeBase = await ddcsControllers.baseActionGetClosestBase({ unitLonLatLoc: playerUnitObj.lonLatLoc});
+    const closeBase = await ddcsControllers.baseActionGetClosestBase({unitLonLatLoc: playerUnitObj.lonLatLoc});
     remoteLoc = ddcsControllers.getLonLatFromDistanceDirection(
         playerUnitObj.lonLatLoc,
         playerUnitObj.hdg,
@@ -1073,7 +1073,7 @@ export async function spawnAWACSPlane(playerUnitObj: typing.IUnit, awacsObj: any
         ]
     };
 
-    curGroupSpawn = await grndUnitGroup( curGrpObj, "AWACS", await awacsPlaneRouteTemplate(curGrpObj));
+    curGroupSpawn = await grndUnitGroup(curGrpObj, "AWACS", await awacsPlaneRouteTemplate(curGrpObj));
 
     curSpwnUnit = {
         ...curSpwnUnit,
@@ -1117,7 +1117,7 @@ export async function spawnTankerPlane(
     curTkrName = "AI|" + tankerObj.name + "|";
     curSpwnUnit = _.cloneDeep(tankerObj);
 
-    const closeBase = await ddcsControllers.baseActionGetClosestBase({ unitLonLatLoc: playerLoc});
+    const closeBase = await ddcsControllers.baseActionGetClosestBase({unitLonLatLoc: playerLoc});
     curGrpObj = {
         ..._.cloneDeep(curSpwnUnit),
         groupName: curTkrName + "#" + _.random(1000000, 9999999),
@@ -1129,7 +1129,7 @@ export async function spawnTankerPlane(
         ]
     };
 
-    curGroupSpawn = await grndUnitGroup( curGrpObj, "Refueling", await tankerPlaneRouteTemplate(curGrpObj));
+    curGroupSpawn = await grndUnitGroup(curGrpObj, "Refueling", await tankerPlaneRouteTemplate(curGrpObj));
 
     curSpwnUnit = {
         ...curSpwnUnit,
@@ -1175,10 +1175,10 @@ export async function spawnSupportPlane(baseObj: typing.IBase, side: number): Pr
     console.log("CALL REPLEN BASE: ", baseLoc);
 
     if (_.includes(baseObj._id, "_MOB") || _.includes(baseObj._id, "_FOB")) {
-        curSpwnUnit = _.cloneDeep(getRndFromSpawnCat("transportHeli", side, true, true )[0]);
+        curSpwnUnit = _.cloneDeep(getRndFromSpawnCat("transportHeli", side, true, true)[0]);
         remoteLoc = ddcsControllers.getLonLatFromDistanceDirection(baseLoc, randomDir, 40);
     } else {
-        curSpwnUnit = _.cloneDeep(getRndFromSpawnCat("transportAircraft", side, true, true )[0]);
+        curSpwnUnit = _.cloneDeep(getRndFromSpawnCat("transportAircraft", side, true, true)[0]);
         remoteLoc = ddcsControllers.getLonLatFromDistanceDirection(baseLoc, randomDir, 70);
     }
     curGrpObj = {
@@ -1196,9 +1196,9 @@ export async function spawnSupportPlane(baseObj: typing.IBase, side: number): Pr
         ]
     };
     if (_.includes(baseObj._id, "_MOB") || _.includes(baseObj._id, "_FOB")) {
-        curGroupSpawn = await grndUnitGroup( curGrpObj, "Transport", await landHeliRouteTemplate(curRoutes));
+        curGroupSpawn = await grndUnitGroup(curGrpObj, "Transport", await landHeliRouteTemplate(curRoutes));
     } else {
-        curGroupSpawn = await grndUnitGroup( curGrpObj, "Transport", await landPlaneRouteTemplate(curRoutes));
+        curGroupSpawn = await grndUnitGroup(curGrpObj, "Transport", await landPlaneRouteTemplate(curRoutes));
     }
 
     curUnitName = "AI|1010101|" + _.get(baseObj, "name") + "|LOGISTICS|";
@@ -1427,9 +1427,6 @@ export async function spawnNewMapObjs(): Promise<void> {
             }
 
 
-
-
-
             // spawn support base units
 
 
@@ -1460,6 +1457,7 @@ export async function spawnNewMapObjs(): Promise<void> {
         }
     }
 }
+
 /*
 export async function spawnRadioTower(staticObj: any, init: boolean, baseObj?: typing.IBase, side?: number): Promise<void> {
     let curGrpObj = _.cloneDeep(staticObj);
@@ -1490,6 +1488,7 @@ export async function spawnRadioTower(staticObj: any, init: boolean, baseObj?: t
     });
 }
 */
+
 /*
 export async function spawnBaseEWR(serverName: string, type: string, baseName: string, side: number): Promise<void> {
     const engineCache = ddcsControllers.getEngineCache();
@@ -1519,11 +1518,11 @@ export async function spawnBaseEWR(serverName: string, type: string, baseName: s
 }
  */
 
-export async function replenishUnits( baseName: string, side: number, init: boolean ): Promise<void> {
+export async function replenishUnits(baseName: string, side: number, init: boolean): Promise<void> {
     await spawnBaseReinforcementGroup(side, baseName, init);
 }
 
-export async function destroyUnit( unitName: string, type: string ): Promise<void> {
+export async function destroyUnit(unitName: string, type: string): Promise<void> {
     // DONT USE ON CLIENT AIRCRAFT
     console.log("TT: ", unitName);
 
@@ -1531,37 +1530,37 @@ export async function destroyUnit( unitName: string, type: string ): Promise<voi
     await ddcsControllers.sendUDPPacket("frontEnd", actionObj);
 }
 
-export async function healBase( baseName: string, curPlayerUnit: any, init: boolean): Promise<boolean> {
+export async function healBase(baseName: string, curPlayerUnit: any, init: boolean): Promise<boolean> {
     const baseUnit = await ddcsControllers.baseActionRead({name: baseName});
-	// console.log("healBase: ", baseName, baseUnit);
+    // console.log("healBase: ", baseName, baseUnit);
     if (baseUnit.length > 0) {
         const curBase = baseUnit[0];
-		// console.log("CB: ", curBase);
+        // console.log("CB: ", curBase);
         if (curBase.baseType !== "MOB") {
-			if (curBase.side !== 0 && curBase.side !== curPlayerUnit.coalition) {
-				await ddcsControllers.sendMesgToGroup(
+            if (curBase.side !== 0 && curBase.side !== curPlayerUnit.coalition) {
+                await ddcsControllers.sendMesgToGroup(
                     curPlayerUnit.groupId,
                     "G: Enemy " + curBase._id + " could not be repaired!",
                     5
                 );
                 return false;
-			} else {
-				await exports.spawnSupportBaseGrp( curBase.name, curPlayerUnit.coalition); // return resp
-				
-				const shelterUnit = await ddcsControllers.unitActionRead({name: curBase.name + " Shelter", dead: false});
+            } else {
+                await exports.spawnSupportBaseGrp(curBase.name, curPlayerUnit.coalition); // return resp
+
+                const shelterUnit = await ddcsControllers.unitActionRead({name: curBase.name + " Shelter", dead: false});
                 const curShelterUnit = shelterUnit[0];
                 if (curShelterUnit) {
                     curShelterUnit.coalition = curBase.side;
                     await ddcsControllers.spawnStaticBuilding(curShelterUnit, false, curBase, curPlayerUnit.coalition, "Shelter");
                 } else {
                     await ddcsControllers.spawnStaticBuilding({} as IStaticSpawnMin, true, curBase, curPlayerUnit.coalition, "Shelter");
-					await exports.spawnSupportBaseGrp( curBase.name, curPlayerUnit.coalition); // return resp
+                    await exports.spawnSupportBaseGrp(curBase.name, curPlayerUnit.coalition); // return resp
                 }
-			}
+            }
         } else {
-			// console.log("BU: ", curBase, curPlayerUnit);
+            // console.log("BU: ", curBase, curPlayerUnit);
             if (curBase.side !== 0 && curBase.side !== curPlayerUnit.coalition) {
-				console.log("enemy base");
+                console.log("enemy base");
                 await ddcsControllers.sendMesgToGroup(
                     curPlayerUnit.groupId,
                     "G: Enemy " + curBase._id + " could not be repaired!",
@@ -1587,7 +1586,7 @@ export async function healBase( baseName: string, curPlayerUnit: any, init: bool
                     await ddcsControllers.spawnStaticBuilding({} as IStaticSpawnMin,
                         true, curBase, curPlayerUnit.coalition, "Comms tower M");
                 }
-                await spawnSupportBaseGrp( curBase.name, curPlayerUnit.coalition, init );
+                await spawnSupportBaseGrp(curBase.name, curPlayerUnit.coalition, init);
             }
         }
         return true;
