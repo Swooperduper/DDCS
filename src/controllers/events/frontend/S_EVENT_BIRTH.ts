@@ -15,7 +15,7 @@ export async function processEventBirth(eventObj: any): Promise<void> {
             // console.log("PA: ", playerArray);
             if (curIUnit) {
                 const iPlayer = _.find(playerArray, {name: curIUnit.playername});
-                console.log("playerarray: ", iPlayer, curIUnit);
+                // console.log("playerarray: ", iPlayer, curIUnit);
                 if (iPlayer) {
                     const iCurObj = {
                         sessionName: ddcsControllers.getSessionName(),
