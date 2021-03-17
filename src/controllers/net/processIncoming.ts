@@ -181,7 +181,7 @@ export async function processSlotLock(sideLock: number, baseSide: number, curSlo
         await ddcsController.forcePlayerSpectator(playerId, mesg);
     } else {
         if (sideLock !== curSlotSide) {
-            mesg = "Your are locked to " + ddcsController.side[sideLock];
+            mesg = "You are locked to " + ddcsController.side[sideLock];
             await ddcsController.forcePlayerSpectator(playerId, mesg);
         }
 
@@ -200,8 +200,8 @@ export async function protectSlots(sideLock: number, playerSide: number, playerI
         await ddcsController.forcePlayerSpectator(playerId, mesg);
     }
 
-    if (sideLock !== 0 && playerSide !== 0 && sideLock !== playerSide) {
-        mesg = "Your are locked to " + ddcsController.side[sideLock];
+    if (playerSide !== 0 && sideLock !== playerSide) {
+        mesg = "You are locked to " + ddcsController.side[sideLock];
         await ddcsController.forcePlayerSpectator(playerId, mesg);
     }
 }

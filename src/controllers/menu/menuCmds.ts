@@ -874,7 +874,7 @@ export async function spawnCrateFromLogi(
     const engineCache = ddcsControllers.getEngineCache();
     const curUnitDict = _.find(engineCache.unitDictionary, (uD) => _.includes(uD.comboName, type) );
     const isCombo = !!curUnitDict;
-    console.log(unit, type, crates, isCombo, special, mobile, mass, crateType);
+    // console.log(unit, type, crates, isCombo, special, mobile, mass, crateType);
     let spc: string;
     let crateObj;
     let crateCount = 0;
@@ -1223,7 +1223,7 @@ export async function unpackCrate(
         const curPlayer = player[0];
         const delUnits = await ddcsControllers.unitActionReadStd({
             playerOwnerId: curPlayer.ucid,
-            playerCanDrive: mobile ||false,
+            playerCanDrive: mobile || false,
             isCrate: false,
             dead: false
         });

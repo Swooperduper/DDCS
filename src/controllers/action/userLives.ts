@@ -130,6 +130,7 @@ export async function lookupAircraftCosts(playerUcid: string): Promise<void> {
                         );
                     } else {
                         console.log("cant find unit in dictionary: line 129");
+                        console.log("lookup unit: ", curUnit);
                     }
                 }
             }
