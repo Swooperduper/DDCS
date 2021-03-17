@@ -42,7 +42,7 @@ export async function spawnCCAtNeutralBase(curPlayerUnit: typings.IUnit): Promis
     const mainNeutralBases = _.remove(bases, (base) => {
         return !_.includes(base.name, "#");
     });
-
+	console.log("bases: ", bases, curPlayerUnit);
     for ( const base of mainNeutralBases) {
         const unitsInProx = await ddcsControllers.getPlayersInProximity(base.centerLoc, 3.4, false, curPlayerUnit.coalition);
         if (_.find(unitsInProx, {playername: curPlayerUnit.playername})) {
