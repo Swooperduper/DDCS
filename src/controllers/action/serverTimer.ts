@@ -105,7 +105,7 @@ export async function processTimer(serverSecs: number): Promise<void> {
             timerObj.twoMinutes = true;
         }
         // 1 min
-        /*
+        
         if (getCurSeconds() > (getMaxTime() - 60) && !timerObj.oneMinute) {
             mesg = "Server is restarting in less than 1 minute, Server Is Locked!";
             timerObj.oneMinute = true;
@@ -119,7 +119,7 @@ export async function processTimer(serverSecs: number): Promise<void> {
         }
         // restart server
         if (getCurSeconds() > getMaxTime()) {
-            // restart server on next or same map depending on rotation
+           /* restart server on next or same map depending on rotation
             curTime = new Date().getTime();
             if (curTime > lastSentLoader + ddcsControllers.time.oneMin) {
                 const latestSession = await ddcsControllers.sessionsActionsReadLatest();
@@ -131,14 +131,14 @@ export async function processTimer(serverSecs: number): Promise<void> {
                     exports.restartServer();
                 }
                 lastSentLoader = curTime;
-            }
+            }*/
+            exports.restartServer();
         } else {
             if (mesg) {
                 console.log("serverMesg: ", mesg);
                 await ddcsControllers.sendMesgToAll(mesg, 20);
             }
         }
-         */
     }
 }
 
@@ -161,6 +161,7 @@ export function resetTimerObj(): void {
 
 export async function restartServer(): Promise<void> {
     console.log("restart server");
+    ddcsControllers.shutdown();
     /*
     const server = await ddcsControllers.serverActionsRead({});
     const newMap = server[0].curFilePath + "_" + server[0].curSeason + "_" +
@@ -184,6 +185,7 @@ export function secondsToHms(d: number): string {
 
 export async function timeLeft(curUnit: typings.IUnit): Promise<void> {
     const formatTime = secondsToHms(getMaxTime() - getCurSeconds());
+
     console.log("G: Server has " + formatTime + " left till restart!");
     await ddcsControllers.sendMesgToGroup(
         curUnit.groupId,
