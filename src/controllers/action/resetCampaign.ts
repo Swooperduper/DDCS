@@ -36,9 +36,7 @@ export async function restartCampaign(): Promise<void> {
     const engineCache = ddcsControllers.getEngineCache();
     console.log("ALL TABLES CLEARED OFF, restart");
     if (engineCache.config.fullServerRestartOnCampaignWin) {
-        await shutdown((output: any) => {
-            console.log(output);
-        });
+        await shutdown(); // reboot entire computer
     } else {
         await ddcsControllers.restartServer();
     }
