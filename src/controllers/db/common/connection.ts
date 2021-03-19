@@ -97,8 +97,7 @@ export async function initV3Engine(): Promise<void> {
             await ddcsController.processThirtySecActions(ddcsController.getServerSynced());
             await ddcsController.processTimer(ddcsController.getCurServerEpoc());
         }
-    // }, ddcsController.time.thirtySecs);
-    }, 5 * 1000);
+    }, ddcsController.time.thirtySecs);
 
     setInterval( async () => {
         if (ddcsController.getSessionName() !== "") {
@@ -108,6 +107,9 @@ export async function initV3Engine(): Promise<void> {
                 startAbsTime: ddcsController.getStartAbsTime(),
                 curAbsTime: ddcsController.getCurAbsTime()
             });
+        }
+        if (ddcsController.getServerSynced()) {
+            await ddcsController.getAllDetectedUnitsByNameArray();
         }
     }, ddcsController.time.oneMin);
 

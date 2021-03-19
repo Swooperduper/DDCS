@@ -162,6 +162,11 @@ export function serverModel(dbconn: mongoose.Connection): mongoose.Document | {}
             lifePointsEnabled: {
                 type: Boolean,
                 default: true
+            },
+            GCIDetectTypes: {
+                type: Array,
+                required: true,
+                default: []
             }
         },
         {

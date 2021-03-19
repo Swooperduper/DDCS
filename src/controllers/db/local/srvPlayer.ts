@@ -129,7 +129,7 @@ export async function srvPlayerActionsAddLifePoints(obj: {
             // console.log("OBJ: ", obj, addPoints, maxLimitedPoints);
             if (serverObj.length > 0) {
                 const setObj = {
-                    cachedRemovedLPPoints: (!obj.addLifePoints) ?  0 : undefined,
+                    cachedRemovedLPPoints: (!obj.addLifePoints) ?  0 : serverObj[0].cachedRemovedLPPoints,
                     curLifePoints: maxLimitedPoints,
                     lastLifeAction: curAction,
                     safeLifeActionTime: new Date().getTime() + ddcsController.time.fifteenSecs

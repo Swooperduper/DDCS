@@ -27,7 +27,7 @@ export async function actionCount(obj: any): Promise<number> {
 
 export async function unitActionRead(obj: any): Promise<typings.IUnit[]> {
     return new Promise((resolve, reject) => {
-        dbModels.unitModel.find(obj).sort( { createdAt: -1 } ).exec((err: any, dbUnits: typings.IUnit[]) => {
+        dbModels.unitModel.find(obj).sort( { createdAt: -1 } ).lean().exec((err: any, dbUnits: typings.IUnit[]) => {
             if (err) { reject(err); }
             resolve(dbUnits);
         });

@@ -2,9 +2,6 @@ import * as _ from "lodash";
 import * as ddcsController from "../";
 import { dbModels } from "../db/common";
 import * as typings from "../../typings";
-import {IBase, ISrvPlayers} from "../../typings";
-import * as ddcsControllers from "../action/aiConvoys";
-import {sendMesgToPlayerChatWindow} from "../";
 
 export async function processingIncomingData(incomingObj: any) {
     if (incomingObj.action === "S_EVENT_KILL") {
@@ -146,8 +143,20 @@ export async function processingIncomingData(incomingObj: any) {
                     }
                 });
             }
-             */
 
+            if (incomingObj.message === "-getdetect") {
+                console.log("getdetect");
+                await ddcsController.getAllDetectedUnitsByNameArray();
+                await ddcsController.sendUDPPacket("frontEnd", {
+                    actionObj: {
+                        action: "processGCIDetectionByName",
+                        ewrNames: ["~Aerial-1"],
+                        verbose: true,
+                        reqID: 0
+                    }
+                });
+            }
+            */
             break;
         case "playerChangeSlot":
             if (incomingObj && incomingObj.occupiedUnitSide && incomingObj.playerInfo && (incomingObj.occupiedUnitSide === 0 ||

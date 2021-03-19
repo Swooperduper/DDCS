@@ -265,6 +265,9 @@ export interface IAmmo {
 }
 
 export interface IUnit {
+    curEnemyAspect: string;
+    distanceTo: number;
+    bearingTo: number;
     jtacEnemyLocation: {
         laserCode: string;
         alt: number,

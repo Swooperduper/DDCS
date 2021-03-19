@@ -41,6 +41,7 @@ export function unitDictionaryModel(dbconn: mongoose.Connection): mongoose.Docum
             },
             threatLvl: {
                 type: Number,
+                required: true,
                 default: 0
             },
             reloadReqArray: {
