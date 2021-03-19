@@ -22,6 +22,7 @@ export async function processThirtySecActions(fullySynced: boolean) {
         await ddcsControllers.checkAircraftWeaponCompliance();
 
         await ddcsControllers.aliveJtac30SecCheck();
+        await ddcsControllers.getAllDetectedUnitsByNameArray();
 
         await ddcsControllers.checkCmdCenters();
 

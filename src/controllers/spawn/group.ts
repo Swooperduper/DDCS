@@ -1462,7 +1462,7 @@ export async function spawnNewMapObjs(): Promise<void> {
 export async function spawnRadioTower(staticObj: any, init: boolean, baseObj?: typing.IBase, side?: number): Promise<void> {
     let curGrpObj = _.cloneDeep(staticObj);
     const curBaseName = baseObj ? baseObj.name : "";
-    curGrpObj.name = (curGrpObj.name || curBaseName) + " Communications";
+    curGrpObj.name = (curGrpObj.name || curBaseName) + " Comms tower M";
     curGrpObj.coalition = curGrpObj.coalition || side;
     curGrpObj.country = ddcsControllers.defCountrys[curGrpObj.coalition];
     if (_.isUndefined(curGrpObj.lonLatLoc)) {

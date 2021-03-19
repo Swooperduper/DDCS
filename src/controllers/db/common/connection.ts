@@ -108,9 +108,6 @@ export async function initV3Engine(): Promise<void> {
                 curAbsTime: ddcsController.getCurAbsTime()
             });
         }
-        if (ddcsController.getServerSynced()) {
-            await ddcsController.getAllDetectedUnitsByNameArray();
-        }
     }, ddcsController.time.oneMin);
 
     setInterval( async () => {

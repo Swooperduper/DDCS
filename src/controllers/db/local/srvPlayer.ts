@@ -371,22 +371,17 @@ export async function srvPlayerActionsAddMinutesPlayed(obj: {
 }): Promise<void> {
     return new Promise((resolve, reject) => {
         const sessionMinutesVar = "currentSessionMinutesPlayed_" + ddcsController.side[obj.side];
-        dbModels.srvPlayerModel.find({ _id: obj._id }, (err: any, serverObj: any) => {
+        dbModels.srvPlayerModel.findOne({ _id: obj._id }, (err: any, curPlayer: any) => {
                 if (err) { reject(err); }
-                if (serverObj.length > 0) {
-                    const curPlayer = serverObj;
-                    console.log("Name: ", curPlayer.name, (curPlayer.sessionMinutesVar || 0) + (obj.minutesPlayed || 0));
-                    dbModels.srvPlayerModel.updateOne(
-                        { _id: obj._id },
-                        { $set: { [sessionMinutesVar]: (curPlayer.sessionMinutesVar || 0) + (obj.minutesPlayed || 0) } },
-                        (updateErr: any) => {
-                            if (updateErr) { reject(updateErr); }
-                            resolve();
-                        }
-                    );
-                } else {
-                    resolve();
-                }
+                console.log("Name: ", curPlayer.name, (curPlayer[sessionMinutesVar] || 0) + (obj.minutesPlayed || 0));
+                dbModels.srvPlayerModel.updateOne(
+                    { _id: obj._id },
+                    { $set: { [sessionMinutesVar]: (curPlayer[sessionMinutesVar] || 0) + (obj.minutesPlayed || 0) } },
+                    (updateErr: any) => {
+                        if (updateErr) { reject(updateErr); }
+                        resolve();
+                    }
+                );
             });
     });
 }

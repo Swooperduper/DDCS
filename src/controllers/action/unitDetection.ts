@@ -2,7 +2,6 @@
  * DDCS Licensed under AGPL-3.0 by Andrew "Drex" Finegan https://github.com/afinegan/DynamicDCS
  */
 
-import * as _ from "lodash";
 import * as ddcsController from "../";
 import {IUnit} from "../../typings";
 
@@ -23,12 +22,19 @@ export async function processGCIDetection(incomingObj: any): Promise<void> {
             _id: {$in: incomingObj.detectedUnitNames}
         });
         const sortByThreat = detectedUnits.sort((a, b) => (a.threatLvl > b.threatLvl) ? 1 : -1);
-        const enemyRed = sortByThreat.filter((du) => du.coalition === 1);
-        await gciUpdatePilots(enemyRed, 2);
 
-        const enemyBlue = sortByThreat.filter((du) => du.coalition === 2);
-        await gciUpdatePilots(enemyBlue, 1);
+        const sideStack = await ddcsController.checkCurrentPlayerBalance();
+        // console.log("sidestack: ", sideStack);
 
+        if (sideStack.underdog === 1) {
+            const enemyBlue = sortByThreat.filter((du) => du.coalition === 2);
+            await gciUpdatePilots(enemyBlue, 1);
+        }
+
+        if (sideStack.underdog === 2) {
+            const enemyRed = sortByThreat.filter((du) => du.coalition === 1);
+            await gciUpdatePilots(enemyRed, 2);
+        }
     } else {
         console.log("No detected units");
     }
@@ -91,10 +97,13 @@ export async function gciUpdatePilots(detectedUnits: any, friendlySide: number) 
                     // F15, BRA 217 FOR 60M, AT 14000FT, DRAG
                     if (!!curPlayerDistance[x]) {
                         const curUnit = curPlayerDistance[x];
-                        mesg += `${curUnit.type.toUpperCase()}, BRA ${curUnit.bearingTo.toFixed(0)} FOR ${(curUnit.distanceTo * 0.621371).toFixed(0)}M, at ${(curUnit.alt * 3.28084).toFixed(0)}FT, ${curUnit.curEnemyAspect}\n`;
+                        if (x !== 0) {
+                            mesg += `\n`;
+                        }
+                        mesg += `${curUnit.type.toUpperCase()}, BRAA ${curUnit.bearingTo.toFixed(0)} FOR ${(curUnit.distanceTo * 0.621371).toFixed(0)}M, at ${(curUnit.alt * 3.28084).toFixed(0)}FT, ${curUnit.curEnemyAspect}`;
                     }
                 }
-                await ddcsController.sendMesgToGroup(curPlayerUnit.groupId, mesg, 10);
+                await ddcsController.sendMesgToGroup(curPlayerUnit.groupId, mesg, 15);
             }
         }
     }
