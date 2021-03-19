@@ -15,6 +15,7 @@ export function setTimeToRestart(timestamp: number): void {
 
 // Create shutdown function
 export async function shutdown(): Promise<void> {
+	console.log("trying to shutdown");
     await exec("shutdown.exe /r /t 00");
 }
 
