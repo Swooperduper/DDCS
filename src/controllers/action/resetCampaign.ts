@@ -14,8 +14,8 @@ export function setTimeToRestart(timestamp: number): void {
 }
 
 // Create shutdown function
-async function shutdown(callback: { (output: any): void; (arg0: any): any; }): Promise<void> {
-    await exec("shutdown.exe /r /t 00", (error: any, stdout: any) => callback(stdout) );
+export async function shutdown(): Promise<void> {
+    await exec("shutdown.exe /r /t 00");
 }
 
 export async function checkTimeToRestart(): Promise<void> {
