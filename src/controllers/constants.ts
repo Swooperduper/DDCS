@@ -6,12 +6,12 @@
 import * as typings from "../typings";
 
 export const engineCache = {
-    config: {},
     staticDictionary: [],
     unitDictionary: [],
     weaponsDictionary: [],
     bases: [],
-    menuCommands: []
+    menuCommands: [],
+    config: {} as typings.IServer
 };
 
 export const OBJECT_CATEGORY: string[] = [
@@ -55,6 +55,7 @@ export const UNIT_CATEGORY: string[] = [
     "STRUCTURE"
 ];
 
+/* not used, put in server
 export const COUNTRY: any = [
     [],
     [
@@ -137,6 +138,7 @@ export const COUNTRY: any = [
         "UKRAINE"
     ]
 ];
+*/
 
 export const countryId: string[] = [
     "RUSSIA",
@@ -213,7 +215,15 @@ export const countryId: string[] = [
     "KUWAIT",
     "QATAR",
     "OMAN",
-    "UNITED_ARAB_EMIRATES"
+    "UNITED_ARAB_EMIRATES",
+    "SOUTH_AFRICA",
+    "CUBA",
+    "PORTUGAL",
+    "GDR",
+    "LEBANON",
+    "CJTF_BLUE",
+    "CJTF_RED",
+    "UN_PEACEKEEPERS"
 ];
 
 export const defCountrys: number[] = [

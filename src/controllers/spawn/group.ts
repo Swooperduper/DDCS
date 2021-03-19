@@ -6,6 +6,7 @@ import * as _ from "lodash";
 import * as typing from "../../typings";
 import * as ddcsControllers from "../";
 import {IGroundUnitTemp, IStaticSpawnMin} from "../../typings";
+import * as ddcsController from "../action/unitDetection";
 
 let openSAM: string;
 
@@ -246,7 +247,7 @@ export function getRndFromSpawnCat(
             const curCountry =
                 _.intersection(
                     unit.config[ddcsControllers.getEngineCache().config.timePeriod].country,
-                    ddcsControllers.COUNTRY[(side || 0)]
+                    ddcsControllers.engineCache.config.countrySides[(side || 0)]
                 );
             if (curCountry.length > 0) {
                 unit.country = curCountry[0];
@@ -316,7 +317,7 @@ export function spawnSupportVehiclesOnFarp(baseName: string, side: number): typi
             const curSpawnTemplate = getRndFromSpawnCat(val, side, false, true)[0];
             const curCountry = _.intersection(
                 curSpawnTemplate.config[ddcsControllers.getEngineCache().config.timePeriod].country,
-                ddcsControllers.COUNTRY[(side || 0)]
+                ddcsControllers.engineCache.config.countrySides[(side || 0)]
             );
 
             const newObj = {
@@ -383,7 +384,7 @@ export async function spawnBaseReinforcementGroup(side: number, baseName: string
                 polyCheck = infoSpwn.centerRadar ? "buildingPoly" : "unitPoly";
                 const curCountry = _.intersection(
                     infoSpwn.config[ddcsControllers.getEngineCache().config.timePeriod].country,
-                    ddcsControllers.COUNTRY[(side || 0)]
+                    ddcsControllers.engineCache.config.countrySides[(side || 0)]
                 );
 
                 if (infoSpwn.spoke) {
@@ -564,7 +565,7 @@ export async function spawnStarSam(
     curSpokeDeg = 359 / curSpokeNum;
     const curCountry = _.intersection(
         infoSpwn.config[ddcsControllers.getEngineCache().config.timePeriod].country,
-        ddcsControllers.COUNTRY[(side || 0)]
+        ddcsControllers.engineCache.config.countrySides[(side || 0)]
     );
     if (infoSpwn.centerRadar) {
         groupedUnits.push({
@@ -645,7 +646,7 @@ export async function spawnLayer2Reinforcements(
         const curSpokeDeg = 359 / curSpokeNum;
         const curCountry = _.intersection(
             curRndSpawn[0].config[ddcsControllers.getEngineCache().config.timePeriod].country,
-            ddcsControllers.COUNTRY[(side || 0)]
+            ddcsControllers.engineCache.config.countrySides[(side || 0)]
         );
 
         const randLatLonInBase = _.cloneDeep(ddcsControllers.getRandomLatLonFromBase(baseName, "layer2Poly"));
@@ -714,7 +715,7 @@ export async function spawnConvoy(
     const curGrpObj = {
         groupName,
         country: curConvoyMakeup[0].country,
-        countryName: ddcsControllers.COUNTRY[curConvoyMakeup[0].country],
+        countryName: ddcsControllers.engineCache.config.countrySides[curConvoyMakeup[0].country],
         routeLocs: baseTemplate,
         unitCategory: ddcsControllers.UNIT_CATEGORY.indexOf("GROUND_UNIT")
     };
@@ -1303,7 +1304,7 @@ export async function spawnStaticBuilding(
         const curCountry =
             _.intersection(
                 staticLookupLogiBuilding[0].config[ddcsControllers.getEngineCache().config.timePeriod].country,
-                ddcsControllers.COUNTRY[(side || 0)]
+                ddcsControllers.engineCache.config.countrySides[(side || 0)]
             );
         if (curCountry.length > 0) {
             const curStaticObj = {

@@ -20,6 +20,7 @@ export interface IBase {
 }
 
 export interface IServer {
+    countrySides: string[][];
     _id: string;
     updatedAt: Date;
     createdAt: Date;
