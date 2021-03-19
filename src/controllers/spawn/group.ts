@@ -1393,7 +1393,7 @@ export async function spawnUnitGroup(spawnArray: typing.IUnitSpawnMin[], init: b
                 grpObj.unitCategory
             );
             // console.log("spawnUnitGroup: ", curCMD);
-            const sendClient = {actionObj: {action: "CMD", cmd: [curCMD], reqID: 0, verbose: true}};
+            const sendClient = {actionObj: {action: "CMD", cmd: [curCMD], reqID: 0}};
             await ddcsControllers.sendUDPPacket("frontEnd", sendClient);
         }
     }

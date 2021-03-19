@@ -347,7 +347,7 @@ function runRequest(request)
 
                 local x1, y1 = land.getClosestPointOnRoads(request.type, curStart.x, curStart.z)
                 local x2, y2 = land.getClosestPointOnRoads(request.type, curEnd.x, curEnd.z)
-                env.info("getRoute: "..request.type.." "..x1.." "..y1.." "..x2.." "..y2)
+                --env.info("getRoute: "..request.type.." "..x1.." "..y1.." "..x2.." "..y2)
                 --tprint(land.findPathOnRoads(request.type, x1, y1, x2, y2), 1)
                 if request.reqID > 0 then
                     outObj.returnObj ={
