@@ -23,7 +23,7 @@ export async function processGCIDetection(incomingObj: any): Promise<void> {
         });
         const sortByThreat = detectedUnits.sort((a, b) => (a.threatLvl > b.threatLvl) ? 1 : -1);
 
-        const sideStack = await ddcsController.checkCurrentPlayerBalance();
+        const sideStack = await ddcsController.checkRealtimeSideBalance();
         // console.log("sidestack: ", sideStack);
 
         if (sideStack.underdog === 1) {

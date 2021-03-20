@@ -5,6 +5,42 @@
 import * as _ from "lodash";
 import * as typings from "../../typings";
 import * as ddcsControllers from "../";
+import {IPlayerBalance} from "../../typings";
+
+export function checkRealtimeSideBalance(): IPlayerBalance {
+
+    let sideState: typings.IPlayerBalance = {
+        underdog: 0,
+        ratio: 1
+    };
+
+    const sideArray: string[][] = [
+        [],
+        [],
+        []
+    ];
+
+    for (const player of ddcsControllers.getRTPlayerArray()) {
+        sideArray[player.side].push(player.name);
+    }
+
+    const redUnderdog = sideArray[2].length / sideArray[1].length;
+    const blueUnderdog = sideArray[1].length / sideArray[2].length;
+
+    if (redUnderdog > 1 && isFinite(redUnderdog)) {
+        sideState = {
+            underdog: 1,
+            ratio: redUnderdog
+        };
+    } else if (blueUnderdog > 1 && isFinite(blueUnderdog)) {
+        sideState = {
+            underdog: 2,
+            ratio: blueUnderdog
+        };
+    }
+
+    return sideState;
+}
 
 export async function checkCurrentPlayerBalance(): Promise<typings.IPlayerBalance>  {
     let sideState: typings.IPlayerBalance = {
