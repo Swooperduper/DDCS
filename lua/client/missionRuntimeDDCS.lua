@@ -347,7 +347,7 @@ function runRequest(request)
 
                 local x1, y1 = land.getClosestPointOnRoads(request.type, curStart.x, curStart.z)
                 local x2, y2 = land.getClosestPointOnRoads(request.type, curEnd.x, curEnd.z)
-                env.info("getRoute: "..request.type.." "..x1.." "..y1.." "..x2.." "..y2)
+                --env.info("getRoute: "..request.type.." "..x1.." "..y1.." "..x2.." "..y2)
                 --tprint(land.findPathOnRoads(request.type, x1, y1, x2, y2), 1)
                 if request.reqID > 0 then
                     outObj.returnObj ={
@@ -500,6 +500,29 @@ function runRequest(request)
             end
         end
 
+        if request.action == "processGCIDetectionByName" then
+            local detectedUnitNames = {}
+            if type(request.ewrNames) == 'table' then
+                for nIndex = 1, #request.ewrNames do
+                    local curUnit = Unit.getByName(request.ewrNames[nIndex])
+                    --env.info("DETECT3: "..request.ewrNames[nIndex]);
+                    if curUnit ~= nil then
+                        local ewrController = curUnit:getGroup():getController()
+                        local detectedTargets = ewrController:getDetectedTargets(Controller.Detection.RADAR)
+                        for k,v in pairs (detectedTargets) do
+                            if v["object"]:getCategory() == Object.Category.UNIT then
+                                table.insert(detectedUnitNames, v["object"]:getName())
+                            end
+                        end
+                    end
+                end
+                if request.reqID > 0 then
+                    outObj.detectedUnitNames = detectedUnitNames
+                    sendUDPPacket(outObj)
+                end
+            end
+        end
+
         if request.action == "destroyObj" then
             if request.type == "static" then
                 if request.verbose ~= null then
@@ -521,7 +544,7 @@ end
 function runPerFrame(ourArgument, time)
     local request = udpMissionRuntime:receive()
     if request ~= nil then
-        -- env.info(request)
+        env.info(request)
         requestObj = JSON:decode(request)
         if requestObj.actionObj ~= nil then
             runRequest(requestObj.actionObj)

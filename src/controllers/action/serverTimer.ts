@@ -45,6 +45,7 @@ export function setCurSeconds(curSeconds: number): void {
 }
 
 export async function processTimer(serverSecs: number): Promise<void> {
+	// console.log("ABS TIME: ", ddcsControllers.getStartAbsTime());
     setMaxTime((ddcsControllers.getStartAbsTime() + ddcsControllers.getEngineCache().config.restartTime) * 1000);
     mesg = null;
     setCurSeconds(serverSecs * 1000);
@@ -105,7 +106,7 @@ export async function processTimer(serverSecs: number): Promise<void> {
             timerObj.twoMinutes = true;
         }
         // 1 min
-        
+        // console.log("SECONDS: ", getCurSeconds(), " > ", getMaxTime(), " - ", 60);
         if (getCurSeconds() > (getMaxTime() - 60) && !timerObj.oneMinute) {
             mesg = "Server is restarting in less than 1 minute, Server Is Locked!";
             timerObj.oneMinute = true;

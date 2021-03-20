@@ -16,11 +16,19 @@ export async function playerUpdateRecord(player: any): Promise<void> {
     }
 }
 
+export function setRTPlayerArray(setArray: any) {
+    rtPlayerArray = setArray;
+}
+
+export function getRTPlayerArray() {
+    return rtPlayerArray;
+}
+
 export async function processPlayerEvent(playerArray: any): Promise<void> {
     const curPlayerArray = playerArray.players.filter((pe: any) => pe.id !== 1);
     const engineCache = ddcsControllers.getEngineCache();
     if (curPlayerArray.length > 0) {
-        rtPlayerArray = curPlayerArray;
+        setRTPlayerArray(curPlayerArray);
         for (const player of curPlayerArray) {
             // lockout if server is not synced
             if (ddcsControllers.getMissionStartupReSync() && player.side !== 0) {

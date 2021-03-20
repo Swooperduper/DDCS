@@ -20,6 +20,7 @@ export interface IBase {
 }
 
 export interface IServer {
+    countrySides: string[][];
     _id: string;
     updatedAt: Date;
     createdAt: Date;
@@ -265,6 +266,9 @@ export interface IAmmo {
 }
 
 export interface IUnit {
+    curEnemyAspect: string;
+    distanceTo: number;
+    bearingTo: number;
     jtacEnemyLocation: {
         laserCode: string;
         alt: number,

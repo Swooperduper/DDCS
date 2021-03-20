@@ -728,7 +728,7 @@ export async function menuCmdProcess(pObj: any) {
                     await internalCargo(curUnit, curPlayer, pObj.type);
                     break;
             }
-        }
+        }``
     }
 }
 

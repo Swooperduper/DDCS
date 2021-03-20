@@ -6,6 +6,7 @@ import * as _ from "lodash";
 import * as typing from "../../typings";
 import * as ddcsControllers from "../";
 import {IGroundUnitTemp, IStaticSpawnMin} from "../../typings";
+import * as ddcsController from "../action/unitDetection";
 
 let openSAM: string;
 
@@ -246,7 +247,7 @@ export function getRndFromSpawnCat(
             const curCountry =
                 _.intersection(
                     unit.config[ddcsControllers.getEngineCache().config.timePeriod].country,
-                    ddcsControllers.COUNTRY[(side || 0)]
+                    ddcsControllers.engineCache.config.countrySides[(side || 0)]
                 );
             if (curCountry.length > 0) {
                 unit.country = curCountry[0];
@@ -316,7 +317,7 @@ export function spawnSupportVehiclesOnFarp(baseName: string, side: number): typi
             const curSpawnTemplate = getRndFromSpawnCat(val, side, false, true)[0];
             const curCountry = _.intersection(
                 curSpawnTemplate.config[ddcsControllers.getEngineCache().config.timePeriod].country,
-                ddcsControllers.COUNTRY[(side || 0)]
+                ddcsControllers.engineCache.config.countrySides[(side || 0)]
             );
 
             const newObj = {
@@ -383,7 +384,7 @@ export async function spawnBaseReinforcementGroup(side: number, baseName: string
                 polyCheck = infoSpwn.centerRadar ? "buildingPoly" : "unitPoly";
                 const curCountry = _.intersection(
                     infoSpwn.config[ddcsControllers.getEngineCache().config.timePeriod].country,
-                    ddcsControllers.COUNTRY[(side || 0)]
+                    ddcsControllers.engineCache.config.countrySides[(side || 0)]
                 );
 
                 if (infoSpwn.spoke) {
@@ -564,7 +565,7 @@ export async function spawnStarSam(
     curSpokeDeg = 359 / curSpokeNum;
     const curCountry = _.intersection(
         infoSpwn.config[ddcsControllers.getEngineCache().config.timePeriod].country,
-        ddcsControllers.COUNTRY[(side || 0)]
+        ddcsControllers.engineCache.config.countrySides[(side || 0)]
     );
     if (infoSpwn.centerRadar) {
         groupedUnits.push({
@@ -645,7 +646,7 @@ export async function spawnLayer2Reinforcements(
         const curSpokeDeg = 359 / curSpokeNum;
         const curCountry = _.intersection(
             curRndSpawn[0].config[ddcsControllers.getEngineCache().config.timePeriod].country,
-            ddcsControllers.COUNTRY[(side || 0)]
+            ddcsControllers.engineCache.config.countrySides[(side || 0)]
         );
 
         const randLatLonInBase = _.cloneDeep(ddcsControllers.getRandomLatLonFromBase(baseName, "layer2Poly"));
@@ -714,7 +715,7 @@ export async function spawnConvoy(
     const curGrpObj = {
         groupName,
         country: curConvoyMakeup[0].country,
-        countryName: ddcsControllers.COUNTRY[curConvoyMakeup[0].country],
+        countryName: ddcsControllers.engineCache.config.countrySides[curConvoyMakeup[0].country],
         routeLocs: baseTemplate,
         unitCategory: ddcsControllers.UNIT_CATEGORY.indexOf("GROUND_UNIT")
     };
@@ -1303,7 +1304,7 @@ export async function spawnStaticBuilding(
         const curCountry =
             _.intersection(
                 staticLookupLogiBuilding[0].config[ddcsControllers.getEngineCache().config.timePeriod].country,
-                ddcsControllers.COUNTRY[(side || 0)]
+                ddcsControllers.engineCache.config.countrySides[(side || 0)]
             );
         if (curCountry.length > 0) {
             const curStaticObj = {
@@ -1393,7 +1394,7 @@ export async function spawnUnitGroup(spawnArray: typing.IUnitSpawnMin[], init: b
                 grpObj.unitCategory
             );
             // console.log("spawnUnitGroup: ", curCMD);
-            const sendClient = {actionObj: {action: "CMD", cmd: [curCMD], reqID: 0, verbose: true}};
+            const sendClient = {actionObj: {action: "CMD", cmd: [curCMD], reqID: 0}};
             await ddcsControllers.sendUDPPacket("frontEnd", sendClient);
         }
     }
@@ -1462,7 +1463,7 @@ export async function spawnNewMapObjs(): Promise<void> {
 export async function spawnRadioTower(staticObj: any, init: boolean, baseObj?: typing.IBase, side?: number): Promise<void> {
     let curGrpObj = _.cloneDeep(staticObj);
     const curBaseName = baseObj ? baseObj.name : "";
-    curGrpObj.name = (curGrpObj.name || curBaseName) + " Communications";
+    curGrpObj.name = (curGrpObj.name || curBaseName) + " Comms tower M";
     curGrpObj.coalition = curGrpObj.coalition || side;
     curGrpObj.country = ddcsControllers.defCountrys[curGrpObj.coalition];
     if (_.isUndefined(curGrpObj.lonLatLoc)) {
@@ -1536,37 +1537,30 @@ export async function healBase(baseName: string, curPlayerUnit: any, init: boole
     if (baseUnit.length > 0) {
         const curBase = baseUnit[0];
         // console.log("CB: ", curBase);
-        if (curBase.baseType !== "MOB") {
-            if (curBase.side !== 0 && curBase.side !== curPlayerUnit.coalition) {
-                await ddcsControllers.sendMesgToGroup(
-                    curPlayerUnit.groupId,
-                    "G: Enemy " + curBase._id + " could not be repaired!",
-                    5
-                );
-                return false;
-            } else {
-                await exports.spawnSupportBaseGrp(curBase.name, curPlayerUnit.coalition); // return resp
+        if (curBase.side !== 0 && curBase.side !== curPlayerUnit.coalition) {
+            await ddcsControllers.sendMesgToGroup(
+                curPlayerUnit.groupId,
+                "G: Enemy " + curBase._id + " could not be repaired!",
+                5
+            );
+            return false;
+        } else {
+            if (curBase.baseType !== "MOB") {
+                await spawnSupportBaseGrp(curBase.name, curPlayerUnit.coalition, false); // return resp
 
                 const shelterUnit = await ddcsControllers.unitActionRead({name: curBase.name + " Shelter", dead: false});
-                const curShelterUnit = shelterUnit[0];
-                if (curShelterUnit) {
-                    curShelterUnit.coalition = curBase.side;
-                    await ddcsControllers.spawnStaticBuilding(curShelterUnit, false, curBase, curPlayerUnit.coalition, "Shelter");
+                if (shelterUnit.length > 0) {
+                    await ddcsControllers.sendMesgToGroup(
+                        curPlayerUnit.groupId,
+                        "G: Shelter at " + curBase._id + " already exists!",
+                        5
+                    );
+                    return false;
                 } else {
+                    console.log("NOT A MOB: ", {}, true, curBase, curPlayerUnit.coalition, "Shelter");
+
                     await ddcsControllers.spawnStaticBuilding({} as IStaticSpawnMin, true, curBase, curPlayerUnit.coalition, "Shelter");
-                    await exports.spawnSupportBaseGrp(curBase.name, curPlayerUnit.coalition); // return resp
                 }
-            }
-        } else {
-            // console.log("BU: ", curBase, curPlayerUnit);
-            if (curBase.side !== 0 && curBase.side !== curPlayerUnit.coalition) {
-                console.log("enemy base");
-                await ddcsControllers.sendMesgToGroup(
-                    curPlayerUnit.groupId,
-                    "G: Enemy " + curBase._id + " could not be repaired!",
-                    5
-                );
-                return false;
             } else {
                 const shelterUnit = await ddcsControllers.unitActionRead({name: curBase.name + " Shelter", dead: false});
                 const curShelterUnit = shelterUnit[0];

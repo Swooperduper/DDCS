@@ -31,13 +31,23 @@ function toDeg(rad: number): number {
     return rad * 180 / Math.PI;
 }
 
+export function pad(num: number, size: number) {
+    const s = "000000000" + num;
+    return s.substr(s.length - size);
+}
+
 export function findBearing(lat1: number, lng1: number, lat2: number, lng2: number): number {
-    const dLon = (lng2 - lng1);
-    const y = Math.sin(dLon) * Math.cos(lat2);
-    const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLon);
-    const brng = (Math.atan2(y, x)) * 180 / Math.PI;
-    const curDeg = 360 - ((brng + 360) % 360);
-    return (curDeg === 360) ? 0 : curDeg;
+    const startLat = toRad(lat1);
+    const startLng  = toRad(lng1);
+    const destLat  = toRad(lat2);
+    const destLng  = toRad(lng2);
+
+    const y = Math.sin(destLng - startLng) * Math.cos(destLat);
+    const x = Math.cos(startLat) * Math.sin(destLat) -
+        Math.sin(startLat) * Math.cos(destLat) * Math.cos(destLng - startLng);
+    let brng = Math.atan2(y, x);
+    brng = toDeg(brng);
+    return (brng + 360) % 360;
 }
 
 export function calcDirectDistanceInKm(lat1: number, lon1: number, lat2: number, lon2: number): number {

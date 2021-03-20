@@ -12,7 +12,7 @@ export async function baseUnitUnderAttack(unit: typings.IUnit): Promise<void> {
         const closestBases = await ddcsControllers.getBasesInProximity(unit.lonLatLoc, 18, unit.coalition);
         if (closestBases) {
             const curDBBase = closestBases[0];
-            const aliveComms = await ddcsControllers.unitActionRead({name: curDBBase.name + " Communications", dead: false});
+            const aliveComms = await ddcsControllers.unitActionRead({name: curDBBase.name + " Comms tower M", dead: false});
             if (aliveComms.length > 0) {
                 const curBase = _.find(engineCache.bases, {_id: curDBBase._id});
                 if (curBase) {
