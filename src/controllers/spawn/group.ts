@@ -1546,7 +1546,7 @@ export async function healBase(baseName: string, curPlayerUnit: any, init: boole
             return false;
         } else {
             if (curBase.baseType !== "MOB") {
-                await exports.spawnSupportBaseGrp(curBase.name, curPlayerUnit.coalition); // return resp
+                await spawnSupportBaseGrp(curBase.name, curPlayerUnit.coalition, false); // return resp
 
                 const shelterUnit = await ddcsControllers.unitActionRead({name: curBase.name + " Shelter", dead: false});
                 if (shelterUnit.length > 0) {
