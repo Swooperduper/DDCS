@@ -1537,37 +1537,30 @@ export async function healBase(baseName: string, curPlayerUnit: any, init: boole
     if (baseUnit.length > 0) {
         const curBase = baseUnit[0];
         // console.log("CB: ", curBase);
-        if (curBase.baseType !== "MOB") {
-            if (curBase.side !== 0 && curBase.side !== curPlayerUnit.coalition) {
-                await ddcsControllers.sendMesgToGroup(
-                    curPlayerUnit.groupId,
-                    "G: Enemy " + curBase._id + " could not be repaired!",
-                    5
-                );
-                return false;
-            } else {
+        if (curBase.side !== 0 && curBase.side !== curPlayerUnit.coalition) {
+            await ddcsControllers.sendMesgToGroup(
+                curPlayerUnit.groupId,
+                "G: Enemy " + curBase._id + " could not be repaired!",
+                5
+            );
+            return false;
+        } else {
+            if (curBase.baseType !== "MOB") {
                 await exports.spawnSupportBaseGrp(curBase.name, curPlayerUnit.coalition); // return resp
 
                 const shelterUnit = await ddcsControllers.unitActionRead({name: curBase.name + " Shelter", dead: false});
-                const curShelterUnit = shelterUnit[0];
-                if (curShelterUnit) {
-                    curShelterUnit.coalition = curBase.side;
-                    await ddcsControllers.spawnStaticBuilding(curShelterUnit, false, curBase, curPlayerUnit.coalition, "Shelter");
+                if (shelterUnit.length > 0) {
+                    await ddcsControllers.sendMesgToGroup(
+                        curPlayerUnit.groupId,
+                        "G: Shelter at " + curBase._id + " already exists!",
+                        5
+                    );
+                    return false;
                 } else {
+                    console.log("NOT A MOB: ", {}, true, curBase, curPlayerUnit.coalition, "Shelter");
+
                     await ddcsControllers.spawnStaticBuilding({} as IStaticSpawnMin, true, curBase, curPlayerUnit.coalition, "Shelter");
-                    await exports.spawnSupportBaseGrp(curBase.name, curPlayerUnit.coalition); // return resp
                 }
-            }
-        } else {
-            // console.log("BU: ", curBase, curPlayerUnit);
-            if (curBase.side !== 0 && curBase.side !== curPlayerUnit.coalition) {
-                console.log("enemy base");
-                await ddcsControllers.sendMesgToGroup(
-                    curPlayerUnit.groupId,
-                    "G: Enemy " + curBase._id + " could not be repaired!",
-                    5
-                );
-                return false;
             } else {
                 const shelterUnit = await ddcsControllers.unitActionRead({name: curBase.name + " Shelter", dead: false});
                 const curShelterUnit = shelterUnit[0];

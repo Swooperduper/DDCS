@@ -544,7 +544,7 @@ end
 function runPerFrame(ourArgument, time)
     local request = udpMissionRuntime:receive()
     if request ~= nil then
-        -- env.info(request)
+        env.info(request)
         requestObj = JSON:decode(request)
         if requestObj.actionObj ~= nil then
             runRequest(requestObj.actionObj)
