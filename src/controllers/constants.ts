@@ -232,6 +232,12 @@ export const defCountrys: number[] = [
     2
 ];
 
+export const defCountriesByName: string[] = [
+    "",
+    "RUSSIA",
+    "USA"
+];
+
 export const enemyCountry: number[] = [
     0,
     2,

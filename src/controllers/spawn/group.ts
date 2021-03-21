@@ -1566,6 +1566,13 @@ export async function healBase(baseName: string, curPlayerUnit: any, init: boole
                 const curShelterUnit = shelterUnit[0];
                 if (curShelterUnit) {
                     curShelterUnit.coalition = curBase.side;
+                    curShelterUnit.country =
+                        ddcsControllers.countryId.indexOf(
+                        _.intersection(
+                            ddcsControllers.defCountriesByName,
+                            ddcsControllers.engineCache.config.countrySides[(curBase.side || 0)]
+                        )[0])
+                    ;
                     await ddcsControllers.spawnStaticBuilding(curShelterUnit, false, curBase, curPlayerUnit.coalition, "Shelter");
                 } else {
                     await ddcsControllers.spawnStaticBuilding({} as IStaticSpawnMin, true, curBase, curPlayerUnit.coalition, "Shelter");
@@ -1575,6 +1582,13 @@ export async function healBase(baseName: string, curPlayerUnit: any, init: boole
                 const curCommUnit = commUnit[0];
                 if (curCommUnit) {
                     curCommUnit.coalition = curBase.side;
+                    curShelterUnit.country =
+                        ddcsControllers.countryId.indexOf(
+                            _.intersection(
+                                ddcsControllers.defCountriesByName,
+                                ddcsControllers.engineCache.config.countrySides[(curBase.side || 0)]
+                            )[0])
+                    ;
                     await ddcsControllers.spawnStaticBuilding(curCommUnit, false, curBase, curPlayerUnit.coalition, "Comms tower M");
                 } else {
                     await ddcsControllers.spawnStaticBuilding({} as IStaticSpawnMin,
