@@ -4,10 +4,6 @@ import { dbModels } from "../db/common";
 import * as typings from "../../typings";
 
 export async function processingIncomingData(incomingObj: any) {
-    if (incomingObj.action === "S_EVENT_KILL") {
-        // switch scoring to this new kill event
-        console.log("INC2: ", incomingObj);
-    }
     switch (incomingObj.action) {
         case "serverInfo":
             await ddcsController.getLatestSession(incomingObj);
@@ -33,6 +29,9 @@ export async function processingIncomingData(incomingObj: any) {
         case "S_EVENT_HIT":
             // not using hit anymore for kills
             // await ddcsController.processEventHit(incomingObj);
+            break;
+        case "S_EVENT_KILL":
+            await ddcsController.processEventKill(incomingObj);
             break;
         case "S_EVENT_TAKEOFF":
             await ddcsController.processEventTakeoff(incomingObj);

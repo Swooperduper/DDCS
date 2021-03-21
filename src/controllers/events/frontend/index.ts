@@ -3,6 +3,7 @@ export * from "./S_EVENT_CRASH";
 export * from "./S_EVENT_DEAD";
 export * from "./S_EVENT_EJECTION";
 export * from "./S_EVENT_HIT";
+export * from "./S_EVENT_KILL";
 export * from "./S_EVENT_LAND";
 export * from "./S_EVENT_PILOT_DEAD";
 export * from "./S_EVENT_PLAYER_ENTER_UNIT";

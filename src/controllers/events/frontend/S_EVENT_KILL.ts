@@ -5,75 +5,11 @@
 import * as _ from "lodash";
 import * as ddcsControllers from "../../";
 
-export let shootingUsers: any = {};
+export async function processEventKill(eventObj: any): Promise<void> {
+    console.log("Event Kill: ", eventObj);
 
-export async function checkShootingUsers(): Promise<void> {
-    const engineCache = ddcsControllers.getEngineCache();
-    const nowTime = new Date().getTime();
-    const curKeys = _.keys(shootingUsers);
-    if (curKeys.length > 0) {
-        for (const shootKey of curKeys ) {
-            if (shootingUsers[shootKey].startTime + 3000 < new Date().getTime()) {
-                const shootObj = shootingUsers[shootKey].iCurObj;
-                shootObj.score = 10;
 
-                if (shootObj.iucid || shootObj.tucid) {
-                    await ddcsControllers.sendToAll({payload: {action: "EVENT_HIT", data: _.cloneDeep(shootObj)}});
-                    await ddcsControllers.simpleStatEventActionsSave(shootObj);
-                }
-                if (exports.shootingUsers[shootKey].isOwnedUnit) {
-                    await ddcsControllers.srvPlayerActionsUnitAddToRealScore({
-                        _id: shootObj.iOwnerId,
-                        groupId: shootObj.groupId,
-                        score: shootObj.score,
-                        unitType: shootObj.iType,
-                        unitCoalition: shootObj.iUnitCoalition
-                    });
-                } else {
-                    await ddcsControllers.srvPlayerActionsAddTempScore({
-                        _id: shootObj.iucid,
-                        groupId: shootObj.groupId,
-                        score: shootObj.score
-                    });
-                }
-                if (ddcsControllers.UNIT_CATEGORY[shootObj.tUnit.unitCategory] === "GROUND_UNIT") {
-                    await ddcsControllers.baseUnitUnderAttack(shootObj.tUnit);
-                    if (engineCache.config.inGameHitMessages) {
-                        console.log("shooting1: ", shootObj.msg);
-                        await ddcsControllers.sendMesgToAll(
-                            "A: " + shootObj.msg,
-                            20,
-                            nowTime + ddcsControllers.time.oneMin
-                        );
-                    }
-                } else if (ddcsControllers.UNIT_CATEGORY[shootObj.iUnit.unitCategory] === "GROUND_UNIT") {
-                    await ddcsControllers.baseUnitUnderAttack(shootObj.tUnit);
-                    if (engineCache.config.inGameHitMessages || exports.shootingUsers[shootKey].isOwnedUnit) {
-                        console.log("shooting2: ", shootObj.msg);
-                        await ddcsControllers.sendMesgToAll(
-                            "A: " + shootObj.msg,
-                            20,
-                            nowTime + ddcsControllers.time.oneMin
-                        );
-                    }
-                } else {
-                    if (engineCache.config.inGameHitMessages) {
-                        console.log("shooting3: ", shootObj.msg);
-                        await ddcsControllers.sendMesgToAll(
-                            "A: " + shootObj.msg,
-                            20,
-                            nowTime + ddcsControllers.time.oneMin
-                        );
-                    }
-                }
-                delete exports.shootingUsers[shootKey];
-            }
-        }
-    }
-}
-
-export async function processEventHit(eventObj: any): Promise<void> {
-    console.log("WeaponHit: ", eventObj);
+    /*
     const engineCache = ddcsControllers.getEngineCache();
     const iUnitId = eventObj.data.initiator.unitId;
     const tUnitId = eventObj.data.initiator.target;
@@ -247,4 +183,5 @@ export async function processEventHit(eventObj: any): Promise<void> {
             shootingUsers[iUnitId].iCurObj = _.cloneDeep(iCurObj);
         }
     }
+    */
 }
