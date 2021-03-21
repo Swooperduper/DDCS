@@ -715,7 +715,7 @@ export async function spawnConvoy(
     const curGrpObj = {
         groupName,
         country: curConvoyMakeup[0].country,
-        countryName: ddcsControllers.engineCache.config.countrySides[curConvoyMakeup[0].country],
+        countryName: ddcsControllers.defCountriesByName[curConvoyMakeup[0].country],
         routeLocs: baseTemplate,
         unitCategory: ddcsControllers.UNIT_CATEGORY.indexOf("GROUND_UNIT")
     };
