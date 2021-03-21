@@ -31,7 +31,8 @@ export async function processingIncomingData(incomingObj: any) {
             await ddcsController.menuCmdProcess(incomingObj);
             break;
         case "S_EVENT_HIT":
-            await ddcsController.processEventHit(incomingObj);
+            // not using hit anymore for kills
+            // await ddcsController.processEventHit(incomingObj);
             break;
         case "S_EVENT_TAKEOFF":
             await ddcsController.processEventTakeoff(incomingObj);
