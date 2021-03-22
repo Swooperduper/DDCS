@@ -82,9 +82,9 @@ export async function processEventKill(eventObj: any): Promise<void> {
 
     if (iCurObj.initiator.unit) {
         if (iCurObj.initiator.player) {
-            mesg += iCurObj.initiator.unit.type + "(" + iCurObj.initiator.player.name + ")";
+            mesg += eventObj.data.initiator.type + "(" + iCurObj.initiator.player.name + ")";
         } else {
-            mesg += iCurObj.initiator.unit.type;
+            mesg += eventObj.data.initiator.type;
         }
     } else {
         mesg += "Something";
@@ -94,9 +94,9 @@ export async function processEventKill(eventObj: any): Promise<void> {
 
     if (iCurObj.target.unit) {
         if (iCurObj.target.player) {
-            mesg += iCurObj.target.unit.type + "(" + iCurObj.target.player.name + ")";
+            mesg += eventObj.data.initiator.type + "(" + iCurObj.target.player.name + ")";
         } else {
-            mesg += iCurObj.target.unit.type;
+            mesg += eventObj.data.initiator.type;
         }
     } else {
         mesg += "Something";
