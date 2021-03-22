@@ -58,7 +58,7 @@ export async function processEventKill(eventObj: any): Promise<void> {
 
     const engineCache = ddcsControllers.getEngineCache();
     const iUnitId = eventObj.data.initiator.unitId;
-    const tUnitId = eventObj.data.initiator.target;
+    const tUnitId = eventObj.data.target.unitId;
 
     const iUnit = await ddcsControllers.unitActionRead({unitId: iUnitId});
     const tUnit = await ddcsControllers.unitActionRead({unitId: tUnitId});
@@ -85,9 +85,7 @@ export async function processEventKill(eventObj: any): Promise<void> {
     };
 
     if (iCurObj.initiator.unit) {
-
         mesg +=  capitalizeFirstLetter(ddcsControllers.side[eventObj.data.initiator.side]) + " ";
-
         if (iCurObj.initiator.player) {
             mesg += eventObj.data.initiator.type + "(" + iCurObj.initiator.player.name + ")";
         } else {
@@ -100,9 +98,7 @@ export async function processEventKill(eventObj: any): Promise<void> {
     mesg += " has killed ";
 
     if (iCurObj.target.unit) {
-
         mesg += capitalizeFirstLetter(ddcsControllers.side[eventObj.data.target.side]) + " ";
-
         if (iCurObj.target.player) {
             mesg += eventObj.data.target.type + "(" + iCurObj.target.player.name + ")";
         } else {
@@ -112,7 +108,9 @@ export async function processEventKill(eventObj: any): Promise<void> {
         mesg += "Something";
     }
 
-    mesg += " with " + eventObj.data.weapon_name;
+    if (eventObj.data.weapon_name) {
+        mesg += " with " + eventObj.data.weapon_name;
+    }
 
     console.log("outmesg: ", mesg);
 
