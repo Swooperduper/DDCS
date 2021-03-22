@@ -5,6 +5,10 @@
 import * as _ from "lodash";
 import * as ddcsControllers from "../../";
 
+function capitalizeFirstLetter(string: string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
 export async function processEventKill(eventObj: any): Promise<void> {
     console.log("Event Kill: ", eventObj);
 
@@ -81,6 +85,9 @@ export async function processEventKill(eventObj: any): Promise<void> {
     };
 
     if (iCurObj.initiator.unit) {
+
+        mesg +=  capitalizeFirstLetter(ddcsControllers.side[eventObj.data.initiator.side]) + " ";
+
         if (iCurObj.initiator.player) {
             mesg += eventObj.data.initiator.type + "(" + iCurObj.initiator.player.name + ")";
         } else {
@@ -93,6 +100,9 @@ export async function processEventKill(eventObj: any): Promise<void> {
     mesg += " has killed ";
 
     if (iCurObj.target.unit) {
+
+        mesg += capitalizeFirstLetter(ddcsControllers.side[eventObj.data.target.side]) + " ";
+
         if (iCurObj.target.player) {
             mesg += eventObj.data.initiator.type + "(" + iCurObj.target.player.name + ")";
         } else {
