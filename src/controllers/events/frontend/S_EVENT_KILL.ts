@@ -104,9 +104,9 @@ export async function processEventKill(eventObj: any): Promise<void> {
         mesg += capitalizeFirstLetter(ddcsControllers.side[eventObj.data.target.side]) + " ";
 
         if (iCurObj.target.player) {
-            mesg += eventObj.data.initiator.type + "(" + iCurObj.target.player.name + ")";
+            mesg += eventObj.data.target.type + "(" + iCurObj.target.player.name + ")";
         } else {
-            mesg += eventObj.data.initiator.type;
+            mesg += eventObj.data.target.type;
         }
     } else {
         mesg += "Something";
