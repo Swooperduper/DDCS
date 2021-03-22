@@ -8,6 +8,112 @@ import * as ddcsControllers from "../../";
 export async function processEventKill(eventObj: any): Promise<void> {
     console.log("Event Kill: ", eventObj);
 
+    /*
+    INC2:  { action: 'S_EVENT_KILL',
+  data:
+   { id: 28,
+     initiator:
+      { category: 1,
+        groupId: 4700,
+        side: 1,
+        type: 'Su-25T',
+        unitId: 10022 },
+     initiatorId: 10022,
+     name: 'S_EVENT_KILL',
+     target: { category: 3, side: 2, type: 'Shelter', unitId: 1000092 },
+     targetId: 1000092,
+     time: 47686.898,
+     weapon: { category: 'SHELL', displayName: 'su-25T', typeName: 'Su-25T' },
+     weapon_name: 'Su-25T' },
+  type: 'event' }
+
+    Event Kill:  { action: 'S_EVENT_KILL',
+  data:
+   { id: 28,
+     initiator:
+      { category: 1,
+        groupId: 6564,
+        side: 1,
+        type: 'Ka-50',
+        unitId: 11886 },
+     initiatorId: 11886,
+     name: 'S_EVENT_KILL',
+     target:
+      { category: 1,
+        groupId: 1001052,
+        side: 2,
+        type: 'Hawk ln',
+        unitId: 1001060 },
+     targetId: 1001060,
+     time: 52935.23,
+     weapon_name: 'Vikhr_M' },
+  type: 'event' }
+     */
+
+    const nowTime = new Date().getTime();
+
+    const engineCache = ddcsControllers.getEngineCache();
+    const iUnitId = eventObj.data.initiator.unitId;
+    const tUnitId = eventObj.data.initiator.target;
+
+    const iUnit = await ddcsControllers.unitActionRead({unitId: iUnitId});
+    const tUnit = await ddcsControllers.unitActionRead({unitId: tUnitId});
+
+    const playerArray = await ddcsControllers.srvPlayerActionsRead({sessionName: ddcsControllers.getSessionName()});
+
+    let mesg: string = "";
+    const iCurObj = {
+        sessionName: ddcsControllers.getSessionName(),
+        eventCode: ddcsControllers.shortNames[eventObj.action],
+        displaySide: "A",
+        roleCode: "I",
+        showInChart: true,
+        initiator : {
+            unit: iUnit[0],
+            player: _.find(playerArray, {name: iUnit[0].playername}),
+            isGroundTarget: (ddcsControllers.UNIT_CATEGORY[iUnit[0].unitCategory] === "GROUND_UNIT")
+        },
+        target: {
+            unit: tUnit[0],
+            player: _.find(playerArray, {name: tUnit[0].playername}),
+            isGroundTarget: (ddcsControllers.UNIT_CATEGORY[tUnit[0].unitCategory] === "GROUND_UNIT")
+        }
+    };
+
+    if (iCurObj.initiator.unit) {
+        if (iCurObj.initiator.player) {
+            mesg += iCurObj.initiator.unit.type + "(" + iCurObj.initiator.player.name + ")";
+        } else {
+            mesg += iCurObj.initiator.unit.type;
+        }
+    } else {
+        mesg += "Something";
+    }
+
+    mesg += " has killed ";
+
+    if (iCurObj.target.unit) {
+        if (iCurObj.target.player) {
+            mesg += iCurObj.target.unit.type + "(" + iCurObj.target.player.name + ")";
+        } else {
+            mesg += iCurObj.target.unit.type;
+        }
+    } else {
+        mesg += "Something";
+    }
+
+    mesg += " with " + eventObj.data.weapon_name;
+
+    console.log("outmesg: ", mesg);
+
+    /*
+    await ddcsControllers.sendMesgToAll(
+        "A: " + mesg,
+        20,
+        nowTime + ddcsControllers.time.oneMin
+    );
+*/
+
 
     /*
     const engineCache = ddcsControllers.getEngineCache();
