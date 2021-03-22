@@ -23,7 +23,7 @@ export async function processThirtySecActions(fullySynced: boolean) {
 
         await ddcsControllers.aliveJtac30SecCheck();
 
-        // await ddcsControllers.getAllDetectedUnitsByNameArray();
+        await ddcsControllers.getAllDetectedUnitsByNameArray();
         // auto GCI crashing hard leave off, when it finds a bad unit name
 
         await ddcsControllers.checkCmdCenters();

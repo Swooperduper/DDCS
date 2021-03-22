@@ -510,8 +510,10 @@ function runRequest(request)
                         local ewrController = curUnit:getGroup():getController()
                         local detectedTargets = ewrController:getDetectedTargets(Controller.Detection.RADAR)
                         for k,v in pairs (detectedTargets) do
-                            if v["object"]:getCategory() == Object.Category.UNIT then
-                                table.insert(detectedUnitNames, v["object"]:getName())
+                            if v["object"] ~= nil then
+                                if v["object"]:getCategory() == Object.Category.UNIT then
+                                    table.insert(detectedUnitNames, v["object"]:getName())
+                                end
                             end
                         end
                     end
