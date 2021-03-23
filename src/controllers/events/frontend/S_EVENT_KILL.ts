@@ -110,12 +110,6 @@ export async function processEventKill(eventObj: any): Promise<void> {
         } else {
             mesg += eventObj.data.target.type;
         }
-
-        if (iCurObj.target.player) {
-            mesg += eventObj.data.target.type + "(" + iCurObj.target.player.name + ")";
-        } else {
-            mesg += eventObj.data.target.type;
-        }
     } else {
         mesg += "Something";
     }
