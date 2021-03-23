@@ -52,18 +52,52 @@ export async function processEventKill(eventObj: any): Promise<void> {
      time: 52935.23,
      weapon_name: 'Vikhr_M' },
   type: 'event' }
+
+  Event Kill:  { action: 'S_EVENT_KILL',
+  data:
+   { id: 28,
+     name: 'S_EVENT_KILL',
+     target:
+      { category: 1,
+        groupId: 4704,
+        side: 1,
+        type: 'Su-25T',
+        unitId: 10026 },
+     targetId: 10026,
+     time: 46565.944,
+     weapon_name: '' },
+  type: 'event' }
      */
 
     const nowTime = new Date().getTime();
-
     const engineCache = ddcsControllers.getEngineCache();
-    const iUnitId = eventObj.data.initiator.unitId;
-    const tUnitId = eventObj.data.target.unitId;
-
-    const iUnit = await ddcsControllers.unitActionRead({unitId: iUnitId});
-    const tUnit = await ddcsControllers.unitActionRead({unitId: tUnitId});
-
     const playerArray = await ddcsControllers.srvPlayerActionsRead({sessionName: ddcsControllers.getSessionName()});
+    let curInitiator: any = {};
+    let curTarget: any = {};
+
+    if (eventObj.data.initiator.unitId) {
+        const iUnitId = eventObj.data.initiator.unitId;
+        const iUnit = await ddcsControllers.unitActionRead({unitId: iUnitId});
+        curInitiator = {
+            unit: iUnit[0],
+            player: _.find(playerArray, {name: iUnit[0].playername}),
+            playerOwner: _.find(playerArray, {_id: iUnit[0].playerOwnerId}),
+            isGroundTarget: (ddcsControllers.UNIT_CATEGORY[iUnit[0].unitCategory] === "GROUND_UNIT")
+        };
+    }
+
+    if (eventObj.data.target.unitId) {
+        const tUnitId = eventObj.data.target.unitId;
+        const tUnit = await ddcsControllers.unitActionRead({unitId: tUnitId});
+        curTarget = {
+            unit: tUnit[0],
+            player: _.find(playerArray, {name: tUnit[0].playername}),
+            playerOwner: _.find(playerArray, {_id: tUnit[0].playerOwnerId}),
+            isGroundTarget: (ddcsControllers.UNIT_CATEGORY[tUnit[0].unitCategory] === "GROUND_UNIT")
+        };
+    }
+
+
 
     let mesg: string = "";
     const iCurObj = {
@@ -71,27 +105,15 @@ export async function processEventKill(eventObj: any): Promise<void> {
         eventCode: ddcsControllers.shortNames[eventObj.action],
         displaySide: "A",
         roleCode: "I",
-        showInChart: true,
-        initiator : {
-            unit: iUnit[0],
-            player: _.find(playerArray, {name: iUnit[0].playername}),
-            playerOwner: _.find(playerArray, {_id: iUnit[0].playerOwnerId}),
-            isGroundTarget: (ddcsControllers.UNIT_CATEGORY[iUnit[0].unitCategory] === "GROUND_UNIT")
-        },
-        target: {
-            unit: tUnit[0],
-            player: _.find(playerArray, {name: tUnit[0].playername}),
-            playerOwner: _.find(playerArray, {_id: tUnit[0].playerOwnerId}),
-            isGroundTarget: (ddcsControllers.UNIT_CATEGORY[tUnit[0].unitCategory] === "GROUND_UNIT")
-        }
+        showInChart: true
     };
 
-    if (iCurObj.initiator.unit) {
+    if (curInitiator.unit) {
         mesg +=  capitalizeFirstLetter(ddcsControllers.side[eventObj.data.initiator.side]) + " ";
-        if (iCurObj.initiator.playerOwner) {
-            mesg += eventObj.data.initiator.type + "(" + iCurObj.initiator.playerOwner.name + ")";
-        } else if (iCurObj.initiator.player) {
-            mesg += eventObj.data.initiator.type + "(" + iCurObj.initiator.player.name + ")";
+        if (curInitiator.playerOwner) {
+            mesg += eventObj.data.initiator.type + "(" + curInitiator.playerOwner.name + ")";
+        } else if (curInitiator.player) {
+            mesg += eventObj.data.initiator.type + "(" + curInitiator.player.name + ")";
         } else {
             mesg += eventObj.data.initiator.type;
         }
@@ -101,12 +123,12 @@ export async function processEventKill(eventObj: any): Promise<void> {
 
     mesg += " has killed ";
 
-    if (iCurObj.target.unit) {
+    if (curTarget.unit) {
         mesg += capitalizeFirstLetter(ddcsControllers.side[eventObj.data.target.side]) + " ";
-        if (iCurObj.target.playerOwner) {
-            mesg += eventObj.data.target.type + "(" + iCurObj.target.playerOwner.name + ")";
-        } else if (iCurObj.target.player) {
-            mesg += eventObj.data.target.type + "(" + iCurObj.target.player.name + ")";
+        if (curTarget.playerOwner) {
+            mesg += eventObj.data.target.type + "(" + curTarget.playerOwner.name + ")";
+        } else if (curTarget.player) {
+            mesg += eventObj.data.target.type + "(" + curTarget.player.name + ")";
         } else {
             mesg += eventObj.data.target.type;
         }
