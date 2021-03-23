@@ -124,14 +124,12 @@ export async function processEventKill(eventObj: any): Promise<void> {
 
     console.log("outmesg: ", mesg);
 
-    /*
+
     await ddcsControllers.sendMesgToAll(
         "A: " + mesg,
         20,
         nowTime + ddcsControllers.time.oneMin
     );
-*/
-
 
     /*
     const engineCache = ddcsControllers.getEngineCache();
