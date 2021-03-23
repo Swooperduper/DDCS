@@ -118,7 +118,7 @@ export async function processEventKill(eventObj: any): Promise<void> {
 
     if (eventObj.data.weapon) {
         mesg += eventObj.data.weapon.displayName;
-    } else if (eventObj.data.weapon_name) {
+    } else if (eventObj.data.weapon_name && eventObj.data.weapon_name !== "") {
         mesg += eventObj.data.weapon_name;
     }
 
