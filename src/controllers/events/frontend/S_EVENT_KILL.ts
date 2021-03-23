@@ -75,18 +75,22 @@ export async function processEventKill(eventObj: any): Promise<void> {
         initiator : {
             unit: iUnit[0],
             player: _.find(playerArray, {name: iUnit[0].playername}),
+            playerOwner: _.find(playerArray, {_id: iUnit[0].playerOwnerId}),
             isGroundTarget: (ddcsControllers.UNIT_CATEGORY[iUnit[0].unitCategory] === "GROUND_UNIT")
         },
         target: {
             unit: tUnit[0],
             player: _.find(playerArray, {name: tUnit[0].playername}),
+            playerOwner: _.find(playerArray, {_id: tUnit[0].playerOwnerId}),
             isGroundTarget: (ddcsControllers.UNIT_CATEGORY[tUnit[0].unitCategory] === "GROUND_UNIT")
         }
     };
 
     if (iCurObj.initiator.unit) {
         mesg +=  capitalizeFirstLetter(ddcsControllers.side[eventObj.data.initiator.side]) + " ";
-        if (iCurObj.initiator.player) {
+        if (iCurObj.initiator.playerOwner) {
+            mesg += eventObj.data.initiator.type + "(" + iCurObj.initiator.playerOwner.name + ")";
+        } else if (iCurObj.initiator.player) {
             mesg += eventObj.data.initiator.type + "(" + iCurObj.initiator.player.name + ")";
         } else {
             mesg += eventObj.data.initiator.type;
@@ -99,6 +103,14 @@ export async function processEventKill(eventObj: any): Promise<void> {
 
     if (iCurObj.target.unit) {
         mesg += capitalizeFirstLetter(ddcsControllers.side[eventObj.data.target.side]) + " ";
+        if (iCurObj.target.playerOwner) {
+            mesg += eventObj.data.target.type + "(" + iCurObj.target.playerOwner.name + ")";
+        } else if (iCurObj.target.player) {
+            mesg += eventObj.data.target.type + "(" + iCurObj.target.player.name + ")";
+        } else {
+            mesg += eventObj.data.target.type;
+        }
+
         if (iCurObj.target.player) {
             mesg += eventObj.data.target.type + "(" + iCurObj.target.player.name + ")";
         } else {
@@ -108,8 +120,12 @@ export async function processEventKill(eventObj: any): Promise<void> {
         mesg += "Something";
     }
 
-    if (eventObj.data.weapon_name) {
-        mesg += " with " + eventObj.data.weapon_name;
+    mesg += " with ";
+
+    if (eventObj.data.weapon) {
+        mesg += eventObj.data.weapon.displayName;
+    } else if (eventObj.data.weapon_name) {
+        mesg += eventObj.data.weapon_name;
     }
 
     console.log("outmesg: ", mesg);
