@@ -136,12 +136,10 @@ export async function processEventKill(eventObj: any): Promise<void> {
         mesg += "Something";
     }
 
-    mesg += " with ";
-
     if (eventObj.data.weapon) {
-        mesg += eventObj.data.weapon.displayName;
+        mesg += " with " + eventObj.data.weapon.displayName;
     } else if (eventObj.data.weapon_name && eventObj.data.weapon_name !== "") {
-        mesg += eventObj.data.weapon_name;
+        mesg += " with " + eventObj.data.weapon_name;
     }
 
     console.log("outmesg: ", mesg);
