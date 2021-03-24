@@ -119,7 +119,6 @@ export async function processTimer(serverSecs: number): Promise<void> {
             }
         }
 
-        console.log("GMT: ", getMaxTime(), " > 0 ", getCurSeconds(), " > ", getMaxTime(), mesg);
         // restart server
         if (getCurSeconds() > getMaxTime()) {
            /* restart server on next or same map depending on rotation
