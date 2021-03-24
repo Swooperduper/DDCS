@@ -1290,6 +1290,7 @@ export async function spawnLogiGroup(spawnArray: typing.IUnit[], side: number): 
         await ddcsControllers.sendUDPPacket("frontEnd", actionObj);
     }
 }
+{} as IStaticSpawnMin, true, curBase, curPlayerUnit.coalition, "Shelter"
 */
 
 export async function spawnStaticBuilding(
@@ -1324,6 +1325,7 @@ export async function spawnStaticBuilding(
                 isActive: true
             };
 
+            console.log("STATICBUILD: ", curStaticObj, " staticCall: ", staticObj, init, baseObj, side, staticType);
 
             await ddcsControllers.sendUDPPacket("frontEnd", {
                 actionObj: {
@@ -1346,6 +1348,9 @@ export async function spawnStaticBuilding(
             await staticTemplate(staticObj as typing.IStaticUnitTemp),
             staticObj.country
         );
+
+        console.log("STATICBUILD2 staticCall: ", staticObj, init, baseObj, side, staticType);
+
         await ddcsControllers.sendUDPPacket("frontEnd", {actionObj: {action: "CMD", cmd: [curCMD], reqID: 0}});
     }
 }
