@@ -1558,9 +1558,10 @@ export async function healBase(baseName: string, curPlayerUnit: any, init: boole
                     return false;
                 } else {
                     console.log("NOT A MOB: ", {}, true, curBase, curPlayerUnit.coalition, "Shelter");
-
                     await ddcsControllers.spawnStaticBuilding({} as IStaticSpawnMin, true, curBase, curPlayerUnit.coalition, "Shelter");
                 }
+                await ddcsControllers.unitActionDelete({_id: curBase.name + " Shelter"});
+
             } else {
                 const shelterUnit = await ddcsControllers.unitActionRead({name: curBase.name + " Shelter", dead: false});
                 const curShelterUnit = shelterUnit[0];
@@ -1577,6 +1578,7 @@ export async function healBase(baseName: string, curPlayerUnit: any, init: boole
                 } else {
                     await ddcsControllers.spawnStaticBuilding({} as IStaticSpawnMin, true, curBase, curPlayerUnit.coalition, "Shelter");
                 }
+                await ddcsControllers.unitActionDelete({_id: curBase.name + " Shelter"});
 
                 const commUnit = await ddcsControllers.unitActionRead({name: curBase.name + " Comms tower M", dead: false});
                 const curCommUnit = commUnit[0];
@@ -1594,6 +1596,7 @@ export async function healBase(baseName: string, curPlayerUnit: any, init: boole
                     await ddcsControllers.spawnStaticBuilding({} as IStaticSpawnMin,
                         true, curBase, curPlayerUnit.coalition, "Comms tower M");
                 }
+                await ddcsControllers.unitActionDelete({_id: curBase.name + " Comms tower M"});
                 await spawnSupportBaseGrp(curBase.name, curPlayerUnit.coalition, init);
             }
         }
