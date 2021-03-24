@@ -45,12 +45,11 @@ export function setCurSeconds(curSeconds: number): void {
 }
 
 export async function processTimer(serverSecs: number): Promise<void> {
-	// console.log("ABS TIME: ", ddcsControllers.getStartAbsTime());
+    // console.log("ABS TIME: ", ddcsControllers.getStartAbsTime());
     setMaxTime((ddcsControllers.getStartAbsTime() + ddcsControllers.getEngineCache().config.restartTime) * 1000);
     mesg = null;
     setCurSeconds(serverSecs * 1000);
 
-    console.log("GMT: ", getMaxTime(), " > 0 ", getCurSeconds(), " > ", getMaxTime());
     if (getMaxTime() > 0) {
         if (getCurSeconds() > (getMaxTime() - (ddcsControllers.time.oneHour * 4)) && !timerObj.fourHours) {
             mesg = "Server is restarting in less than 4 hours!";
@@ -119,6 +118,8 @@ export async function processTimer(serverSecs: number): Promise<void> {
                 }
             }
         }
+
+        console.log("GMT: ", getMaxTime(), " > 0 ", getCurSeconds(), " > ", getMaxTime(), mesg);
         // restart server
         if (getCurSeconds() > getMaxTime()) {
            /* restart server on next or same map depending on rotation
