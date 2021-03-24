@@ -50,6 +50,7 @@ export async function processTimer(serverSecs: number): Promise<void> {
     mesg = null;
     setCurSeconds(serverSecs * 1000);
 
+    console.log("GMT: ", getMaxTime(), " > 0 ", getCurSeconds(), " > ", getMaxTime());
     if (getMaxTime() > 0) {
         if (getCurSeconds() > (getMaxTime() - (ddcsControllers.time.oneHour * 4)) && !timerObj.fourHours) {
             mesg = "Server is restarting in less than 4 hours!";
