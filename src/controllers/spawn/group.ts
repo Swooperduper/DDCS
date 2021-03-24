@@ -1335,7 +1335,7 @@ export async function spawnStaticBuilding(
                 }
             });
             // initial spawn, spawn in DB and sync over - doesnt work as of yet
-            // await ddcsControllers.unitActionSave(curStaticObj);
+            await ddcsControllers.unitActionSave(curStaticObj);
         } else {
             console.log("country not found: ", side, staticType);
         }
@@ -1560,7 +1560,7 @@ export async function healBase(baseName: string, curPlayerUnit: any, init: boole
                     console.log("NOT A MOB: ", {}, true, curBase, curPlayerUnit.coalition, "Shelter");
                     await ddcsControllers.spawnStaticBuilding({} as IStaticSpawnMin, true, curBase, curPlayerUnit.coalition, "Shelter");
                 }
-                await ddcsControllers.unitActionDelete({_id: curBase.name + " Shelter"});
+                // await ddcsControllers.unitActionDelete({_id: curBase.name + " Shelter"});
 
             } else {
                 const shelterUnit = await ddcsControllers.unitActionRead({name: curBase.name + " Shelter", dead: false});
@@ -1578,7 +1578,7 @@ export async function healBase(baseName: string, curPlayerUnit: any, init: boole
                 } else {
                     await ddcsControllers.spawnStaticBuilding({} as IStaticSpawnMin, true, curBase, curPlayerUnit.coalition, "Shelter");
                 }
-                await ddcsControllers.unitActionDelete({_id: curBase.name + " Shelter"});
+               //  await ddcsControllers.unitActionDelete({_id: curBase.name + " Shelter"});
 
                 const commUnit = await ddcsControllers.unitActionRead({name: curBase.name + " Comms tower M", dead: false});
                 const curCommUnit = commUnit[0];
@@ -1596,7 +1596,7 @@ export async function healBase(baseName: string, curPlayerUnit: any, init: boole
                     await ddcsControllers.spawnStaticBuilding({} as IStaticSpawnMin,
                         true, curBase, curPlayerUnit.coalition, "Comms tower M");
                 }
-                await ddcsControllers.unitActionDelete({_id: curBase.name + " Comms tower M"});
+                // await ddcsControllers.unitActionDelete({_id: curBase.name + " Comms tower M"});
                 await spawnSupportBaseGrp(curBase.name, curPlayerUnit.coalition, init);
             }
         }
