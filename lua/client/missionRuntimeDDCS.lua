@@ -307,7 +307,6 @@ function runRequest(request)
         }
 
         if request.action == "addTask" then
-            env.info('ADD TASK')
             if request.verbose ~= null then
                 tprint(request, 1)
             end
@@ -360,8 +359,9 @@ function runRequest(request)
 
                 local x1, y1 = land.getClosestPointOnRoads(request.type, curStart.x, curStart.z)
                 local x2, y2 = land.getClosestPointOnRoads(request.type, curEnd.x, curEnd.z)
-                --env.info("getRoute: "..request.type.." "..x1.." "..y1.." "..x2.." "..y2)
-                --tprint(land.findPathOnRoads(request.type, x1, y1, x2, y2), 1)
+                if request.verbose ~= null then
+                    env.info("getRoute: "..request.type.." "..x1.." "..y1.." "..x2.." "..y2)
+                end
                 if request.reqID > 0 then
                     outObj.returnObj ={
                         {["x"] = x1, ["y"] = y1},
@@ -518,7 +518,6 @@ function runRequest(request)
             if type(request.ewrNames) == 'table' then
                 for nIndex = 1, #request.ewrNames do
                     local curUnit = Unit.getByName(request.ewrNames[nIndex])
-                    --env.info("DETECT3: "..request.ewrNames[nIndex]);
                     if curUnit ~= nil then
                         local ewrController = curUnit:getGroup():getController()
                         local detectedTargets = ewrController:getDetectedTargets(Controller.Detection.RADAR)
@@ -559,7 +558,9 @@ end
 function runPerFrame(ourArgument, time)
     local request = udpMissionRuntime:receive()
     if request ~= nil then
-        env.info(request)
+        if request.verbose ~= null then
+            env.info(request)
+        end
         requestObj = JSON:decode(request)
         if requestObj.actionObj ~= nil then
             runRequest(requestObj.actionObj)
@@ -637,7 +638,6 @@ weaponCategory = {
 clientEventHandler = {}
 function clientEventHandler:onEvent(_event)
     local status, err = pcall(function(_event)
-        --env.info("EVENT: "..eventTypes[_event.id])
         if _event == nil or eventTypes[_event.id] == nil then
             return false
         else
