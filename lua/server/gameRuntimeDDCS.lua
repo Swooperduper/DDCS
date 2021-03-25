@@ -99,7 +99,9 @@ function runPerFrame()
 	local request = udpGameRuntime:receive()
 	if request ~= nil then
 		decodeJSON = JSON:decode(request)
-		net.log(decodeJSON)
+		if decodeJSON.verbose ~= null then
+			net.log(decodeJSON)
+		end
 		runRequest(decodeJSON)
 	end
 end
@@ -133,23 +135,15 @@ end
 function getSlotSide(curSlot)
 	if curSlot ~= nil then
 		local curPlayerSlot = playerSlots[curSlot]
-		net.log("slot2"..JSON:encode(curPlayerSlot))
 		if curPlayerSlot.groupName ~= nil then
-			net.log("return slot: "..JSON:encode(curPlayerSlot))
 			return curPlayerSlot
-		else
-			net.log("slot3")
-			return 0
 		end
-	else
-		net.log("slot1")
-		return 0
 	end
+	return 0
 end
 
 function ddcs.onPlayerChangeSlot(id)
 	local playerInfo = net.get_player_info(id)
-	net.log("player change: "..playerInfo.slot.." "..JSON:encode(getSlotSide(playerInfo.slot)))
 	if playerInfo.ucid ~= nil then
 		udpClient:send(JSON:encode({
 			["action"] = "playerChangeSlot",
