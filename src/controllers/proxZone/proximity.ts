@@ -92,8 +92,6 @@ export async function checkUnitsToBaseForCapture(): Promise<void> {
             }
         }
     }
-
-    /*
     if (!_.isEmpty(bases)) {
         if (campaignState.red === 0) {
             console.log("BLUE WON BLUE WON BLUE WON BLUE WON BLUE WON BLUE WON BLUE WON BLUE WON ");
@@ -114,7 +112,6 @@ export async function checkUnitsToBaseForCapture(): Promise<void> {
             );
         }
     }
-     */
 }
 
 export async function getCoalitionGroundUnitsInProximity(

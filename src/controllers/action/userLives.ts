@@ -36,13 +36,13 @@ export async function getPlayerBalance(): Promise<typings.ISrvPlayerBalance> {
         if (redAll > blueAll && redAll !== 0) {
             return {
                 side: 1,
-                modifier: 2 / (blueAll / redAll),
+                modifier: 1 / (blueAll / redAll),
                 players: playerArray
             };
         } else if (redAll < blueAll && blueAll !== 0) {
             return {
                 side: 2,
-                modifier: 2 / (redAll / blueAll),
+                modifier: 1 / (redAll / blueAll),
                 players: playerArray
             };
         }

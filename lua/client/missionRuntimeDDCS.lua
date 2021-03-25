@@ -101,7 +101,7 @@ function generateInitialUnitObj(group, unit, isActive, curName, coalition, lon, 
     end
     return curUnit
 end
-function generateInitialStaticsObj(static, curStaticName, coalition, lon, lat, alt, staticPosition, country)
+function generateInitialStaticsObj(static, curStaticName, coalition, lon, lat, alt, staticPosition)
     local curStatic = {
         ["uType"] = "static",
         ["data"] = {
@@ -118,7 +118,7 @@ function generateInitialStaticsObj(static, curStaticName, coalition, lon, lat, a
             ["objectCategory"] = static:getCategory(),
             ["type"] = static:getTypeName(),
             ["coalition"] = coalition,
-            ["country"] = country
+            ["country"] = static:getCountry()
         }
     }
     return curStatic
@@ -201,28 +201,23 @@ function addStatics(statics, coalition)
         local staticPosition = static:getPosition()
         local lat, lon, alt = coord.LOtoLL(staticPosition.p)
         local curStaticName = static:getName()
-        local country = static:getCountry()
         table.insert(tempNames, curStaticName)
 
         if objCache[curStaticName] ~= nil then
-            if objCache[curStaticName].lat ~= lat or objCache[curStaticName].lon ~= lon or objCache[curStaticName].coalition ~= coalition or objCache[curStaticName].country ~= country then
-                local curStaticObj = generateInitialStaticsObj(static, curStaticName, coalition, lon, lat, alt, staticPosition, country)
+            if objCache[curStaticName].lat ~= lat or objCache[curStaticName].lon ~= lon then
+                local curStaticObj = generateInitialStaticsObj(static, curStaticName, coalition, lon, lat, alt, staticPosition)
                 objCache[curStaticName] = {
                     ["lat"] = lat,
-                    ["lon"] = lon,
-                    ["coalition"] = coalition,
-                    ["country"] = country
+                    ["lon"] = lon
                 }
                 curStaticObj.action = "U"
                 sendUDPPacket(curStaticObj)
             end
         else
-            local curStaticObj = generateInitialStaticsObj(static, curStaticName, coalition, lon, lat, alt, staticPosition, country)
+            local curStaticObj = generateInitialStaticsObj(static, curStaticName, coalition, lon, lat, alt, staticPosition)
             objCache[curStaticName] = {
                 ["lat"] = lat,
-                ["lon"] = lon,
-                ["coalition"] = coalition,
-                ["country"] = country
+                ["lon"] = lon
             }
             curStaticObj.action = "C"
             sendUDPPacket(curStaticObj)
@@ -307,27 +302,20 @@ function runRequest(request)
         }
 
         if request.action == "addTask" then
-            if request.verbose ~= null then
-                tprint(request, 1)
-            end
+            env.info('ADD TASK')
+            tprint(request, 1)
             if request.taskType == 'Mission' then
                 local taskGroup = Group.getByName(request.groupName)
                 if taskGroup ~= nil then
-                    if request.verbose ~= null then
-                        tprint(taskGroup:getUnits(), 1)
-                    end
+                    tprint(taskGroup:getUnits(), 1)
                     local _controller = taskGroup:getController()
                     local routeTable = JSON:decode(request.route)
-                    if request.verbose ~= null then
-                        tprint(routeTable, 1)
-                    end
+                    tprint(routeTable, 1)
                     local _Mission = {
                         id = 'Mission',
                         params = routeTable
                     }
-                    if request.verbose ~= null then
-                        tprint(_Mission, 1)
-                    end
+                    tprint(_Mission, 1)
                     _controller:pushTask(_Mission)
                     local hasTask = _controller:hasTask()
                     if hasTask ~= nil then
@@ -359,9 +347,8 @@ function runRequest(request)
 
                 local x1, y1 = land.getClosestPointOnRoads(request.type, curStart.x, curStart.z)
                 local x2, y2 = land.getClosestPointOnRoads(request.type, curEnd.x, curEnd.z)
-                if request.verbose ~= null then
-                    env.info("getRoute: "..request.type.." "..x1.." "..y1.." "..x2.." "..y2)
-                end
+                --env.info("getRoute: "..request.type.." "..x1.." "..y1.." "..x2.." "..y2)
+                --tprint(land.findPathOnRoads(request.type, x1, y1, x2, y2), 1)
                 if request.reqID > 0 then
                     outObj.returnObj ={
                         {["x"] = x1, ["y"] = y1},
@@ -518,14 +505,13 @@ function runRequest(request)
             if type(request.ewrNames) == 'table' then
                 for nIndex = 1, #request.ewrNames do
                     local curUnit = Unit.getByName(request.ewrNames[nIndex])
+                    --env.info("DETECT3: "..request.ewrNames[nIndex]);
                     if curUnit ~= nil then
                         local ewrController = curUnit:getGroup():getController()
                         local detectedTargets = ewrController:getDetectedTargets(Controller.Detection.RADAR)
                         for k,v in pairs (detectedTargets) do
-                            if v["object"] ~= nil then
-                                if v["object"]:getCategory() == Object.Category.UNIT then
-                                    table.insert(detectedUnitNames, v["object"]:getName())
-                                end
+                            if v["object"]:getCategory() == Object.Category.UNIT then
+                                table.insert(detectedUnitNames, v["object"]:getName())
                             end
                         end
                     end
@@ -558,9 +544,7 @@ end
 function runPerFrame(ourArgument, time)
     local request = udpMissionRuntime:receive()
     if request ~= nil then
-        if request.verbose ~= null then
-            env.info(request)
-        end
+        env.info(request)
         requestObj = JSON:decode(request)
         if requestObj.actionObj ~= nil then
             runRequest(requestObj.actionObj)
@@ -638,6 +622,7 @@ weaponCategory = {
 clientEventHandler = {}
 function clientEventHandler:onEvent(_event)
     local status, err = pcall(function(_event)
+        --env.info("EVENT: "..eventTypes[_event.id])
         if _event == nil or eventTypes[_event.id] == nil then
             return false
         else

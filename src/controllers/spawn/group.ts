@@ -1290,7 +1290,6 @@ export async function spawnLogiGroup(spawnArray: typing.IUnit[], side: number): 
         await ddcsControllers.sendUDPPacket("frontEnd", actionObj);
     }
 }
-{} as IStaticSpawnMin, true, curBase, curPlayerUnit.coalition, "Shelter"
 */
 
 export async function spawnStaticBuilding(
@@ -1324,7 +1323,8 @@ export async function spawnStaticBuilding(
                 lonLatLoc: ddcsControllers.getRandomLatLonFromBase(baseObj.name, "buildingPoly"),
                 isActive: true
             };
-            console.log("STATIC1: ", curStaticObj);
+
+
             await ddcsControllers.sendUDPPacket("frontEnd", {
                 actionObj: {
                     action: "CMD",
@@ -1342,12 +1342,10 @@ export async function spawnStaticBuilding(
     } else {
         staticObj.canCargo = staticObj.canCargo || false;
         staticObj.isActive = true;
-        console.log("STATIC2: ", staticObj);
         const curCMD = await spawnStatic(
             await staticTemplate(staticObj as typing.IStaticUnitTemp),
             staticObj.country
         );
-
         await ddcsControllers.sendUDPPacket("frontEnd", {actionObj: {action: "CMD", cmd: [curCMD], reqID: 0}});
     }
 }
@@ -1561,10 +1559,9 @@ export async function healBase(baseName: string, curPlayerUnit: any, init: boole
                     return false;
                 } else {
                     console.log("NOT A MOB: ", {}, true, curBase, curPlayerUnit.coalition, "Shelter");
+
                     await ddcsControllers.spawnStaticBuilding({} as IStaticSpawnMin, true, curBase, curPlayerUnit.coalition, "Shelter");
                 }
-                // await ddcsControllers.unitActionDelete({_id: curBase.name + " Shelter"});
-
             } else {
                 const shelterUnit = await ddcsControllers.unitActionRead({name: curBase.name + " Shelter", dead: false});
                 const curShelterUnit = shelterUnit[0];
@@ -1581,13 +1578,12 @@ export async function healBase(baseName: string, curPlayerUnit: any, init: boole
                 } else {
                     await ddcsControllers.spawnStaticBuilding({} as IStaticSpawnMin, true, curBase, curPlayerUnit.coalition, "Shelter");
                 }
-               //  await ddcsControllers.unitActionDelete({_id: curBase.name + " Shelter"});
 
                 const commUnit = await ddcsControllers.unitActionRead({name: curBase.name + " Comms tower M", dead: false});
                 const curCommUnit = commUnit[0];
                 if (curCommUnit) {
                     curCommUnit.coalition = curBase.side;
-                    curCommUnit.country =
+                    curShelterUnit.country =
                         ddcsControllers.countryId.indexOf(
                             _.intersection(
                                 ddcsControllers.defCountriesByName,
@@ -1599,7 +1595,6 @@ export async function healBase(baseName: string, curPlayerUnit: any, init: boole
                     await ddcsControllers.spawnStaticBuilding({} as IStaticSpawnMin,
                         true, curBase, curPlayerUnit.coalition, "Comms tower M");
                 }
-                // await ddcsControllers.unitActionDelete({_id: curBase.name + " Comms tower M"});
                 await spawnSupportBaseGrp(curBase.name, curPlayerUnit.coalition, init);
             }
         }

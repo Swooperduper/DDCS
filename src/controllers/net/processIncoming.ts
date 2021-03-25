@@ -40,10 +40,10 @@ export async function processingIncomingData(incomingObj: any) {
             await ddcsController.processEventLand(incomingObj);
             break;
         case "S_EVENT_EJECTION":
-            // await ddcsController.processEventEjection(incomingObj);
+            await ddcsController.processEventEjection(incomingObj);
             break;
         case "S_EVENT_CRASH":
-            // await ddcsController.processEventCrash(incomingObj);
+            await ddcsController.processEventCrash(incomingObj);
             break;
         case "S_EVENT_DEAD":
             await ddcsController.processEventDead(incomingObj);
@@ -52,10 +52,10 @@ export async function processingIncomingData(incomingObj: any) {
             await ddcsController.processEventPilotDead(incomingObj);
             break;
         case "S_EVENT_REFUELING":
-            // await ddcsController.processEventRefueling(incomingObj);
+            await ddcsController.processEventRefueling(incomingObj);
             break;
         case "S_EVENT_REFUELING_STOP":
-            // await ddcsController.processEventRefuelingStop(incomingObj);
+            await ddcsController.processEventRefuelingStop(incomingObj);
             break;
         case "S_EVENT_BIRTH":
             // console.log("player unit birth: ", incomingObj);
@@ -67,7 +67,7 @@ export async function processingIncomingData(incomingObj: any) {
             break;
         case "S_EVENT_PLAYER_LEAVE_UNIT":
             // console.log("player EXIT unit1");
-            // await ddcsController.processEventPlayerLeaveUnit(incomingObj);
+            await ddcsController.processEventPlayerLeaveUnit(incomingObj);
             break;
         case "unitsAlive":
             await ddcsController.sendMissingUnits(incomingObj.data);

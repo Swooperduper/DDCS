@@ -6,7 +6,7 @@ import * as _ from "lodash";
 import * as ddcsControllers from "../../";
 
 export async function processEventTakeoff(eventObj: any): Promise<void> {
-    // console.log("TAKEOFF: ", eventObj);
+    console.log("TAKEOFF: ", eventObj);
     const engineCache = ddcsControllers.getEngineCache();
     let place: string;
     if (eventObj && eventObj.data && eventObj.data.place) {
