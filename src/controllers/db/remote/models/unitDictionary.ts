@@ -67,10 +67,6 @@ export function unitDictionaryModel(dbconn: mongoose.Connection): mongoose.Docum
                 type: Number,
                 default: 0
             },
-            playerCanDrive: {
-                type: Boolean,
-                default: true
-            },
             centerRadar: {
                 type: Boolean,
                 default: false

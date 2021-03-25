@@ -1354,7 +1354,6 @@ export async function spawnUnitGroup(spawnArray: typing.IUnitSpawnMin[], init: b
     if (spawnArray.length > 0) {
         let groupTemplate: string = "";
         const groupNum = _.random(1000000, 9999999);
-        const engineCache = ddcsControllers.getEngineCache();
         const grpObj = spawnArray[0];
         const curBaseName = baseName || "";
         const curGroupName = (grpObj.groupName) ? grpObj.groupName : baseName + " #" + groupNum;
@@ -1374,7 +1373,7 @@ export async function spawnUnitGroup(spawnArray: typing.IUnitSpawnMin[], init: b
             unitObj.country = grpObj.country;
             unitObj.countryName = ddcsControllers.countryId[grpObj.country];
             unitObj.skill = grpObj.skill || "Excellent";
-            unitObj.playerCanDrive = _.find(engineCache.unitDictionary, {type: curUnit.type}).playerCanDrive || false;
+            unitObj.playerCanDrive = curUnit.playerCanDrive || false;
             unitObj.groupName = curGroupName;
             unitObj.type = curUnit.type;
 
