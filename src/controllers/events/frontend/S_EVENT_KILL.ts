@@ -10,7 +10,7 @@ function capitalizeFirstLetter(string: string) {
 }
 
 export async function processEventKill(eventObj: any): Promise<void> {
-    console.log("Event Kill: ", eventObj);
+    // console.log("Event Kill: ", eventObj);
 
     /*
     INC2:  { action: 'S_EVENT_KILL',
