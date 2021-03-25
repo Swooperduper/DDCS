@@ -1324,7 +1324,7 @@ export async function spawnStaticBuilding(
                 lonLatLoc: ddcsControllers.getRandomLatLonFromBase(baseObj.name, "buildingPoly"),
                 isActive: true
             };
-
+            console.log("STATIC1: ", curStaticObj);
             await ddcsControllers.sendUDPPacket("frontEnd", {
                 actionObj: {
                     action: "CMD",
@@ -1342,6 +1342,7 @@ export async function spawnStaticBuilding(
     } else {
         staticObj.canCargo = staticObj.canCargo || false;
         staticObj.isActive = true;
+        console.log("STATIC2: ", staticObj);
         const curCMD = await spawnStatic(
             await staticTemplate(staticObj as typing.IStaticUnitTemp),
             staticObj.country
@@ -1585,7 +1586,7 @@ export async function healBase(baseName: string, curPlayerUnit: any, init: boole
                 const curCommUnit = commUnit[0];
                 if (curCommUnit) {
                     curCommUnit.coalition = curBase.side;
-                    curShelterUnit.country =
+                    curCommUnit.country =
                         ddcsControllers.countryId.indexOf(
                             _.intersection(
                                 ddcsControllers.defCountriesByName,
