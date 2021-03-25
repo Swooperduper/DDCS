@@ -79,6 +79,10 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
                     dead: false,
                     hdg: curData.hdg,
                     groupId: curData.groupId,
+                    ammo: curData.ammo,
+                    isActive: curData.isActive,
+                    country: curData.country,
+                    coalition: curUnit.coalition,
                     inAir: curData.inAir,
                     name: curData.name,
                     lonLatLoc: curData.lonLatLoc,
@@ -95,24 +99,12 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
                     isResync: true
                 }
             };
-            iCurObj.data.isActive = curData.isActive;
 
             if (curData.type) {
                 iCurObj.data.type = curData.type;
             }
             if (curData.groupName) {
                 iCurObj.data.groupName = curData.groupName;
-            }
-            if (curData.ammo) {
-                iCurObj.data.ammo = curData.ammo;
-            }
-            if (curData.coalition) {
-                iCurObj.data.coalition = curData.coalition;
-            } else {
-                iCurObj.data.coalition = curUnit.coalition;
-            }
-            if (curData.country) {
-                iCurObj.data.country = curData.country;
             }
 
             if (_.includes(unitObj.data.name, "Shelter")) {
