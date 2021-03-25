@@ -6,8 +6,8 @@ import * as _ from "lodash";
 import * as ddcsControllers from "../";
 
 export async function processUnitUpdates(unitObj: any): Promise<void> {
-    if (unitObj.data.name === "~TRAIN-3-1") {
-        console.log("unitUp: ", unitObj);
+    if (_.includes(unitObj.data.name, "Shelter")) {
+        console.log("ShelterProcess: ", unitObj);
     }
 /*
     if (unitObj.data.unitCategory === ddcsControllers.UNIT_CATEGORY("STRUCTURE")) {
@@ -79,6 +79,10 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
                     dead: false,
                     hdg: curData.hdg,
                     groupId: curData.groupId,
+                    ammo: curData.ammo,
+                    isActive: curData.isActive,
+                    country: curData.country,
+                    coalition: curUnit.coalition,
                     inAir: curData.inAir,
                     name: curData.name,
                     lonLatLoc: curData.lonLatLoc,
@@ -95,7 +99,6 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
                     isResync: true
                 }
             };
-            iCurObj.data.isActive = curData.isActive;
 
             if (curData.type) {
                 iCurObj.data.type = curData.type;
@@ -103,19 +106,12 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
             if (curData.groupName) {
                 iCurObj.data.groupName = curData.groupName;
             }
-            if (curData.ammo) {
-                iCurObj.data.ammo = curData.ammo;
-            }
-            if (curData.coalition) {
-                iCurObj.data.coalition = curData.coalition;
-            } else {
-                iCurObj.data.coalition = curUnit.coalition;
-            }
-            if (curData.country) {
-                iCurObj.data.country = curData.country;
-            }
 
+            if (_.includes(unitObj.data.name, "Shelter")) {
+                console.log("ShelterProcess2: ", iCurObj);
+            }
             await ddcsControllers.unitActionUpdate(iCurObj.data);
+            /*
             await ddcsControllers.sendToCoalition({payload: {
                     action: "U",
                     data: {
@@ -128,6 +124,7 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
                         coalition: iCurObj.data.coalition
                     }
                 }});
+             */
             if (ddcsControllers.UNIT_CATEGORY[curData.unitCategory] === "STRUCTURE") {
                 await ddcsControllers.setUnitMark(curData);
             }
@@ -150,13 +147,18 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
                 if (curData.coalition) {
                     iCurObj.data.coalition = curData.coalition;
                 }
+                if (curData.country) {
+                    iCurObj.data.country = curData.country;
+                }
 
                 await ddcsControllers.unitActionUpdate(iCurObj.data);
+                /*
                 iCurObj.data.coalition = iCurObj.data.coalition || curUnit.coalition;
                 if (iCurObj.data.coalition) {
                     // console.log('get side: ', _.get(iCurObj, 'data.coalition'));
                     ddcsControllers.sendToCoalition({payload: _.cloneDeep(iCurObj)});
                 }
+                 */
             } else {
                 console.log("is not a number: ", curData.unitId, curData);
             }
@@ -164,7 +166,6 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
     } else {
         if (unitObj.action !== "D") {
             if (curData.name) {
-                // console.log("NAME: ", curData.name, curData);
                 curData._id = curData.name;
                 curData.isResync = true;
                 iCurObj = {
@@ -177,7 +178,13 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
                         curData.proxChkGrp = "logisticTowers";
                     }
                 }
+
+                if (_.includes(unitObj.data.name, "Shelter")) {
+                    console.log("ShelterProcess3: ", iCurObj);
+                }
                 await ddcsControllers.unitActionSave(iCurObj.data);
+
+                /*
                 await ddcsControllers.sendToCoalition({
                     payload: {
                         action: "C",
@@ -202,6 +209,7 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
                         }
                     }
                 });
+                 */
                 if (ddcsControllers.UNIT_CATEGORY[curData.unitCategory] === "STRUCTURE") {
                     // console.log('SUM: ', curData);
                     await ddcsControllers.setUnitMark(curData);

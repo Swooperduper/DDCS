@@ -189,6 +189,7 @@ export async function unitActionRemoveAllDead(): Promise<void> {
 
 export async function unitActionDelete(obj: any): Promise<void> {
     return new Promise((resolve, reject) => {
+        console.log("UAD: ", obj._id);
         dbModels.unitModel.findByIdAndRemove(obj._id, (err: any) => {
             if (err) { reject(err); }
             resolve();
