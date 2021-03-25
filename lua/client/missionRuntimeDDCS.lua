@@ -101,7 +101,7 @@ function generateInitialUnitObj(group, unit, isActive, curName, coalition, lon, 
     end
     return curUnit
 end
-function generateInitialStaticsObj(static, curStaticName, coalition, lon, lat, alt, staticPosition)
+function generateInitialStaticsObj(static, curStaticName, coalition, lon, lat, alt, staticPosition, country)
     local curStatic = {
         ["uType"] = "static",
         ["data"] = {
@@ -118,7 +118,7 @@ function generateInitialStaticsObj(static, curStaticName, coalition, lon, lat, a
             ["objectCategory"] = static:getCategory(),
             ["type"] = static:getTypeName(),
             ["coalition"] = coalition,
-            ["country"] = static:getCountry()
+            ["country"] = country
         }
     }
     return curStatic
@@ -201,23 +201,28 @@ function addStatics(statics, coalition)
         local staticPosition = static:getPosition()
         local lat, lon, alt = coord.LOtoLL(staticPosition.p)
         local curStaticName = static:getName()
+        local country = static:getCountry()
         table.insert(tempNames, curStaticName)
 
         if objCache[curStaticName] ~= nil then
-            if objCache[curStaticName].lat ~= lat or objCache[curStaticName].lon ~= lon then
-                local curStaticObj = generateInitialStaticsObj(static, curStaticName, coalition, lon, lat, alt, staticPosition)
+            if objCache[curStaticName].lat ~= lat or objCache[curStaticName].lon ~= lon or objCache[curStaticName].coalition ~= coalition or objCache[curStaticName].country ~= country then
+                local curStaticObj = generateInitialStaticsObj(static, curStaticName, coalition, lon, lat, alt, staticPosition, country)
                 objCache[curStaticName] = {
                     ["lat"] = lat,
-                    ["lon"] = lon
+                    ["lon"] = lon,
+                    ["coalition"] = coalition,
+                    ["country"] = country
                 }
                 curStaticObj.action = "U"
                 sendUDPPacket(curStaticObj)
             end
         else
-            local curStaticObj = generateInitialStaticsObj(static, curStaticName, coalition, lon, lat, alt, staticPosition)
+            local curStaticObj = generateInitialStaticsObj(static, curStaticName, coalition, lon, lat, alt, staticPosition, country)
             objCache[curStaticName] = {
                 ["lat"] = lat,
-                ["lon"] = lon
+                ["lon"] = lon,
+                ["coalition"] = coalition,
+                ["country"] = country
             }
             curStaticObj.action = "C"
             sendUDPPacket(curStaticObj)
@@ -303,19 +308,27 @@ function runRequest(request)
 
         if request.action == "addTask" then
             env.info('ADD TASK')
-            tprint(request, 1)
+            if request.verbose ~= null then
+                tprint(request, 1)
+            end
             if request.taskType == 'Mission' then
                 local taskGroup = Group.getByName(request.groupName)
                 if taskGroup ~= nil then
-                    tprint(taskGroup:getUnits(), 1)
+                    if request.verbose ~= null then
+                        tprint(taskGroup:getUnits(), 1)
+                    end
                     local _controller = taskGroup:getController()
                     local routeTable = JSON:decode(request.route)
-                    tprint(routeTable, 1)
+                    if request.verbose ~= null then
+                        tprint(routeTable, 1)
+                    end
                     local _Mission = {
                         id = 'Mission',
                         params = routeTable
                     }
-                    tprint(_Mission, 1)
+                    if request.verbose ~= null then
+                        tprint(_Mission, 1)
+                    end
                     _controller:pushTask(_Mission)
                     local hasTask = _controller:hasTask()
                     if hasTask ~= nil then

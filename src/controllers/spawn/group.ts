@@ -1325,8 +1325,6 @@ export async function spawnStaticBuilding(
                 isActive: true
             };
 
-            console.log("STATICBUILD: ", curStaticObj, " staticCall: ", staticObj, init, baseObj, side, staticType);
-
             await ddcsControllers.sendUDPPacket("frontEnd", {
                 actionObj: {
                     action: "CMD",
@@ -1337,7 +1335,7 @@ export async function spawnStaticBuilding(
                 }
             });
             // initial spawn, spawn in DB and sync over - doesnt work as of yet
-            await ddcsControllers.unitActionSave(curStaticObj);
+            // await ddcsControllers.unitActionSave(curStaticObj);
         } else {
             console.log("country not found: ", side, staticType);
         }
@@ -1348,8 +1346,6 @@ export async function spawnStaticBuilding(
             await staticTemplate(staticObj as typing.IStaticUnitTemp),
             staticObj.country
         );
-
-        console.log("STATICBUILD2 staticCall: ", staticObj, init, baseObj, side, staticType);
 
         await ddcsControllers.sendUDPPacket("frontEnd", {actionObj: {action: "CMD", cmd: [curCMD], reqID: 0}});
     }
