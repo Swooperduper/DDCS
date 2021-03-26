@@ -781,7 +781,11 @@ export async function spawnBaseAWACS(baseName: string) {
     if (isAwacsAlive.length === 0) {
         const bases = await ddcsControllers.baseActionRead({_id: baseName});
         const curBase = bases[0];
-        const replenEpoc = new Date(curBase.awacsReplenTime).getTime();
+        let replenEpoc = new Date(curBase.awacsReplenTime).getTime();
+        if (_.isNaN(replenEpoc)) {
+            replenEpoc = new Date().getTime() - 1000;
+
+        }
 
         console.log("replenEpoc: ", replenEpoc, " < ", new Date().getTime());
         if (replenEpoc < new Date().getTime()) {
