@@ -790,7 +790,7 @@ export async function spawnBaseAWACS(baseName: string) {
         console.log("replenEpoc: ", replenEpoc, " < ", new Date().getTime());
         if (replenEpoc < new Date().getTime()) {
             await ddcsControllers.baseActionUpdateAwacsTimer({
-                name: curBase._id,
+                name: baseName,
                 awacsReplenTime: new Date().getTime() + (ddcsControllers.time.oneHour * 1000)
             });
 
@@ -851,6 +851,11 @@ export async function spawnBaseAWACS(baseName: string) {
                 }
             });
         }
+    } else {
+        await ddcsControllers.baseActionUpdateAwacsTimer({
+            name: baseName,
+            awacsReplenTime: new Date().getTime() + (ddcsControllers.time.oneHour * 1000)
+        });
     }
 }
 
