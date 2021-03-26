@@ -112,6 +112,10 @@ export async function processingIncomingData(incomingObj: any) {
             if (incomingObj.message === "-blue") {
                 await ddcsController.lockUserToSide(incomingObj, 2);
             }
+            if (incomingObj.message === "-at") {
+                await ddcsController.spawnBaseAWACS();
+            }
+
             /*
             if (incomingObj.message === "-reload") {
                 await ddcsController.sendUDPPacket("backEnd", {
