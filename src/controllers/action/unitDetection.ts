@@ -24,19 +24,21 @@ export async function processGCIDetection(incomingObj: any): Promise<void> {
             _id: {$in: dedupeDetectedUnitNames}
         });
         const sortByThreat = detectedUnits.sort((a, b) => (a.threatLvl > b.threatLvl) ? 1 : -1);
+        const sortByCategory = _.groupBy(sortByThreat, "unitCategory");
+        console.log("CategorySort: ", sortByCategory, sortByThreat);
 
         const sideStack = ddcsController.checkRealtimeSideBalance();
         // console.log("sidestack: ", sideStack);
 
         if (sideStack.underdog === 1) {
             const enemyBlue = sortByThreat.filter((du) => du.coalition === 2);
-			console.log("enemyBlue: ", enemyBlue);
+            console.log("enemyBlue: ", enemyBlue);
             await gciUpdatePilots(enemyBlue, 1);
         }
 
         if (sideStack.underdog === 2) {
             const enemyRed = sortByThreat.filter((du) => du.coalition === 1);
-			console.log("enemyBlue: ", enemyRed);
+            console.log("enemyBlue: ", enemyRed);
             await gciUpdatePilots(enemyRed, 2);
         }
     } else {
@@ -50,8 +52,8 @@ export async function gciUpdatePilots(detectedUnits: any, friendlySide: number) 
     const playerArray = ddcsController.getRTPlayerArray();
 
     for (const player of playerArray) {
-		const curPlayerDistance: IUnit[] = [];
-		
+        const curPlayerDistance: IUnit[] = [];
+
         const curPlayerUnits: IUnit[] = await ddcsController.unitActionRead({
             dead: false,
             coalition: friendlySide,
