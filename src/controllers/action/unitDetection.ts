@@ -30,11 +30,13 @@ export async function processGCIDetection(incomingObj: any): Promise<void> {
 
         if (sideStack.underdog === 1) {
             const enemyBlue = sortByThreat.filter((du) => du.coalition === 2);
+			console.log("enemyBlue: ", enemyBlue);
             await gciUpdatePilots(enemyBlue, 1);
         }
 
         if (sideStack.underdog === 2) {
             const enemyRed = sortByThreat.filter((du) => du.coalition === 1);
+			console.log("enemyBlue: ", enemyRed);
             await gciUpdatePilots(enemyRed, 2);
         }
     } else {
@@ -46,9 +48,10 @@ export async function gciUpdatePilots(detectedUnits: any, friendlySide: number) 
     // pull up all player units to loop through (that doesnt have GCI off, menu option in f10)
     // console.log("SIDE: ", friendlySide, "DET: ", detectedUnits);
     const playerArray = ddcsController.getRTPlayerArray();
-    const curPlayerDistance: IUnit[] = [];
 
     for (const player of playerArray) {
+		const curPlayerDistance: IUnit[] = [];
+		
         const curPlayerUnits: IUnit[] = await ddcsController.unitActionRead({
             dead: false,
             coalition: friendlySide,
