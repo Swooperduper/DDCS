@@ -798,13 +798,18 @@ export async function spawnBaseAWACS(baseName: string) {
             let country: number = 0;
 
             if (curBase.side === 1) {
-                awacsType = "A-50";
-                country = 0;
+                awacsType = "E-2C";
+                country = 7;
             } else if (curBase.side === 2) {
                 awacsType = "E-2C";
                 country = 2;
             }
-
+			//Quick dirty and unreliable band-aid awacs callsign fix - to be removed - Kirkwood
+			const awacsCallsign = {
+				one: _.random(1, 5),
+				two: _.random(1, 9),
+				name: ["Overlord","Overlord","Magic","Wizard","Focus","Darkstar"]
+			}
             const awacsTemplateObj = {
                 country,
                 side: curBase.side,
@@ -823,11 +828,12 @@ export async function spawnBaseAWACS(baseName: string) {
                     gun: 1000,
                 },
                 hdg: _.random(0, 359),
+				//Quick dirty and unreliable band-aid awacs callsign fix - to be removed
                 callsign: {
-                    one: 5,
-                    two: 5,
+                    one: awacsCallsign.one,
+                    two: awacsCallsign.two,
                     three: 1,
-                    name: "Darkstar51",
+                    name: awacsCallsign.name[awacsCallsign.one]+ awacsCallsign.two + 1,
                 },
                 onboard_num: "010",
                 frequency: 251
@@ -854,7 +860,7 @@ export async function spawnBaseAWACS(baseName: string) {
     } else {
         await ddcsControllers.baseActionUpdateAwacsTimer({
             name: baseName,
-            awacsReplenTime: new Date().getTime() + (ddcsControllers.time.oneHour * 1000)
+            awacsReplenTime: new Date().getTime() + (ddcsControllers.time.oneHour)
         });
     }
 }
