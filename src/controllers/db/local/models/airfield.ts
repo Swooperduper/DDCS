@@ -91,7 +91,10 @@ export function airfieldModel(dbconn: mongoose.Connection): mongoose.Document | 
                 max: 2,
                 required: true,
                 default: 0
-            }
+            },
+            awacsReplenTime: {
+                type: Date
+            },
         },
         {
             timestamps: true

@@ -5,7 +5,7 @@
 import * as _ from "lodash";
 import * as typing from "../../typings";
 import * as ddcsControllers from "../";
-import {getNextUniqueId, processLOSEnemy, setRequestJobArray} from "../";
+import {airUnitTemplate, getNextUniqueId, processLOSEnemy, setRequestJobArray, spawnGrp} from "../";
 
 export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: string) {
     const engineCache = ddcsControllers.getEngineCache();
@@ -412,7 +412,7 @@ export async function processReceiveRoadPath(incomingObj: any): Promise<void> {
 }
 
 export async function menuCmdProcess(pObj: any) {
-    console.log("MENU COMMAND: ", pObj);
+    // console.log("MENU COMMAND: ", pObj);
     const engineCache = ddcsControllers.getEngineCache();
     const defCrate = "iso_container_small";
 
@@ -760,6 +760,102 @@ export async function spawnAtkHeli(curUnit: typing.IUnit, curPlayer: typing.ISrv
     const spentPoints = await ddcsControllers.spendResourcePoints(curPlayer, rsCost, "AtkHeli", heliObj);
     if (spentPoints) {
         await ddcsControllers.spawnAtkChopper(curUnit, heliObj);
+    }
+}
+
+export async function baseAWACSUpkeep() {
+    const engineCache = ddcsControllers.getEngineCache();
+
+    const getBaseAwacs = engineCache.config.baseAwacs;
+
+    for ( const baseName of getBaseAwacs) {
+        console.log("chkBase: ", baseName);
+        await spawnBaseAWACS(baseName);
+    }
+}
+
+export async function spawnBaseAWACS(baseName: string) {
+    const awacsName = "AI|baseAWACS|" + baseName + "|";
+    const isAwacsAlive = await ddcsControllers.unitActionRead({name: awacsName, dead: false});
+    // console.log("IAA: ", isAwacsAlive);
+    if (isAwacsAlive.length === 0) {
+        const bases = await ddcsControllers.baseActionRead({_id: baseName});
+        const curBase = bases[0];
+        let replenEpoc = new Date(curBase.awacsReplenTime).getTime();
+        if (_.isNaN(replenEpoc)) {
+            replenEpoc = new Date().getTime() - 1000;
+
+        }
+
+        console.log("replenEpoc: ", replenEpoc, " < ", new Date().getTime());
+        if (replenEpoc < new Date().getTime()) {
+            await ddcsControllers.baseActionUpdateAwacsTimer({
+                name: baseName,
+                awacsReplenTime: new Date().getTime() + (ddcsControllers.time.oneHour * 1000)
+            });
+
+            let awacsType: string = "";
+            let country: number = 0;
+
+            if (curBase.side === 1) {
+                awacsType = "A-50";
+                country = 0;
+            } else if (curBase.side === 2) {
+                awacsType = "E-2C";
+                country = 2;
+            }
+
+            const awacsTemplateObj = {
+                country,
+                side: curBase.side,
+                groupName: awacsName,
+                name: awacsName,
+                airdromeId: curBase.baseId,
+                parking: Number(curBase.polygonLoc.AICapTemplate.units[0].parking),
+                parking_id: curBase.polygonLoc.AICapTemplate.units[0].parking_id,
+                routeLocs: curBase.centerLoc,
+                type: awacsType,
+                skill: "Excellent",
+                payload: {
+                    fuel: 100000,
+                    flare: 1000,
+                    chaff: 1000,
+                    gun: 1000,
+                },
+                hdg: _.random(0, 359),
+                callsign: {
+                    one: 5,
+                    two: 5,
+                    three: 1,
+                    name: "Darkstar51",
+                },
+                onboard_num: "010",
+                frequency: 251
+            };
+
+            const unitTemplate = await ddcsControllers.templateRead({_id: "awacsTemplateFull"});
+            const compiled = _.template(unitTemplate[0].template);
+            const curGroupSpawn = compiled({awacsTemplateObj});
+
+            const curCMD = await spawnGrp(
+                curGroupSpawn,
+                awacsTemplateObj.country,
+                ddcsControllers.UNIT_CATEGORY.indexOf("AIRPLANE")
+            );
+            console.log("CMD: ", curCMD);
+            await ddcsControllers.sendUDPPacket("frontEnd", {
+                actionObj: {
+                    action: "CMD",
+                    cmd: [curCMD],
+                    reqID: 0
+                }
+            });
+        }
+    } else {
+        await ddcsControllers.baseActionUpdateAwacsTimer({
+            name: baseName,
+            awacsReplenTime: new Date().getTime() + (ddcsControllers.time.oneHour * 1000)
+        });
     }
 }
 

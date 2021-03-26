@@ -7,7 +7,7 @@ import * as typing from "../../typings";
 import * as ddcsControllers from "../";
 
 export async function checkUnitsToBaseForCapture(): Promise<void> {
-    console.log("CHECK BASE CAPTURE");
+    // console.log("CHECK BASE CAPTURE");
     let sideArray = {};
     const campaignState: any = {
         red: 0,
@@ -22,7 +22,7 @@ export async function checkUnitsToBaseForCapture(): Promise<void> {
             (result[value.coalition] || (result[value.coalition] = [])).push(value);
         });
         if (base.side === 1 && _.get(sideArray, [2], []).length > 0) {
-            console.log("enemy in range: ", base.name + ": enemy Blue");
+            // console.log("enemy in range: ", base.name + ": enemy Blue");
             if (_.get(sideArray, [1], []).length === 0) {
                 console.log("BASE HAS BEEN CAPTURED: ", base.name, " is now ", 2);
                 await ddcsControllers.sendMesgToAll(
@@ -44,7 +44,7 @@ export async function checkUnitsToBaseForCapture(): Promise<void> {
             }
         }
         if (base.side === 2 && _.get(sideArray, [1], []).length > 0) {
-            console.log("enemy in range: ", base.name + ": enemy Red");
+            // console.log("enemy in range: ", base.name + ": enemy Red");
             if (_.get(sideArray, [2], []).length === 0) {
                 console.log("BASE HAS BEEN CAPTURED: ", base.name, " is now ", 1);
                 await ddcsControllers.sendMesgToAll(

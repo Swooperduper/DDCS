@@ -191,6 +191,22 @@ export async function baseActionUpdateReplenTimer(obj: {
     });
 }
 
+export async function baseActionUpdateAwacsTimer(obj: {
+    name: string,
+    awacsReplenTime: number
+}): Promise<types.IBase[]> {
+    return new Promise((resolve, reject) => {
+        dbModels.airfieldModel.updateOne(
+            {_id: obj.name},
+            {$set: {awacsReplenTime: obj.awacsReplenTime}},
+            (err: any, airfield: types.IBase[]) => {
+                if (err) { reject(err); }
+                resolve(airfield);
+            }
+        );
+    });
+}
+
 export async function baseActionSave(obj: any): Promise<void> {
     return new Promise((resolve, reject) => {
         dbModels.airfieldModel.find({_id: obj._id}, (findErr: any, airfieldObj: types.IBase[]) => {
