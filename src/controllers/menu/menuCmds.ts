@@ -811,7 +811,7 @@ export async function spawnBaseAWACS(baseName: string) {
                 groupName: awacsName,
                 name: awacsName,
                 airdromeId: curBase.baseId,
-                parking: curBase.polygonLoc.AICapTemplate.units[0].parking,
+                parking: Number(curBase.polygonLoc.AICapTemplate.units[0].parking),
                 parking_id: curBase.polygonLoc.AICapTemplate.units[0].parking_id,
                 routeLocs: curBase.centerLoc,
                 type: awacsType,
