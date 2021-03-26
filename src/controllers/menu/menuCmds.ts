@@ -801,7 +801,7 @@ export async function spawnBaseAWACS(baseName: string) {
                 awacsType = "A-50";
                 country = 0;
             } else if (curBase.side === 2) {
-                awacsType = "E-3A";
+                awacsType = "E-2C";
                 country = 2;
             }
 
