@@ -25,12 +25,15 @@ export async function processGCIDetection(incomingObj: any): Promise<void> {
             dead: false,
             _id: {$in: dedupeDetectedUnitNames}
         });
-        const sortByThreat = detectedUnits.sort((a, b) => {
-            console.log("A: ", engineCache.unitDictionary.find((unit1: IUnitDictionary) => unit1._id === a.type));
-            return (engineCache.unitDictionary.find((unit1: IUnitDictionary) => unit1._id === a.type).threatLvl >
-                engineCache.unitDictionary.find((unit2: IUnitDictionary) => unit2._id === b.type).threatLvl
-            ) ? 1 : -1;
-        });
+
+        const unitsPlusThreat = [];
+
+        for (const detectedUnit of detectedUnits) {
+            detectedUnit.threatLvl = engineCache.unitDictionary.find((uD: IUnitDictionary) => uD._id === detectedUnit.type).threatLvl;
+            unitsPlusThreat.push(detectedUnit);
+        }
+
+        const sortByThreat = unitsPlusThreat.sort((a, b) => (a.threatLvl > b.threatLvl) ? 1 : -1);
 
         const sideStack = ddcsController.checkRealtimeSideBalance();
         // console.log("sidestack: ", sideStack);
