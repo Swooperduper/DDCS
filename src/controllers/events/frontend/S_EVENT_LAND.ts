@@ -6,7 +6,7 @@ import * as _ from "lodash";
 import * as ddcsControllers from "../../";
 
 export async function processEventLand(eventObj: any): Promise<void> {
-    console.log("LAND: ", eventObj);
+    // console.log("LAND: ", eventObj);
     const engineCache = ddcsControllers.getEngineCache();
     let place: string = "";
 

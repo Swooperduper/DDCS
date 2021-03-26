@@ -2,6 +2,7 @@
  * DDCS Licensed under AGPL-3.0 by Andrew "Drex" Finegan https://github.com/afinegan/DynamicDCS
  */
 
+import * as _ from "lodash";
 import * as ddcsController from "../";
 import {IUnit} from "../../typings";
 
@@ -15,11 +16,12 @@ export async function getAllEWRUnitNames(): Promise <string[]> {
 }
 
 export async function processGCIDetection(incomingObj: any): Promise<void> {
-    if (incomingObj.detectedUnitNames.length > 0) {
+    const dedupeDetectedUnitNames = _.uniq(incomingObj.detectedUnitNames);
+    if (dedupeDetectedUnitNames.length > 0) {
         // enemy detected, process
         const detectedUnits = await ddcsController.unitActionRead({
             dead: false,
-            _id: {$in: incomingObj.detectedUnitNames}
+            _id: {$in: dedupeDetectedUnitNames}
         });
         const sortByThreat = detectedUnits.sort((a, b) => (a.threatLvl > b.threatLvl) ? 1 : -1);
 

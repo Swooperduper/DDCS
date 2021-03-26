@@ -45,7 +45,7 @@ export function setCurSeconds(curSeconds: number): void {
 }
 
 export async function processTimer(serverSecs: number): Promise<void> {
-	// console.log("ABS TIME: ", ddcsControllers.getStartAbsTime());
+    // console.log("ABS TIME: ", ddcsControllers.getStartAbsTime());
     setMaxTime((ddcsControllers.getStartAbsTime() + ddcsControllers.getEngineCache().config.restartTime) * 1000);
     mesg = null;
     setCurSeconds(serverSecs * 1000);
@@ -118,6 +118,7 @@ export async function processTimer(serverSecs: number): Promise<void> {
                 }
             }
         }
+
         // restart server
         if (getCurSeconds() > getMaxTime()) {
            /* restart server on next or same map depending on rotation
