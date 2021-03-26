@@ -4,7 +4,7 @@
 
 import * as _ from "lodash";
 import * as ddcsController from "../";
-import {IUnit} from "../../typings";
+import {IUnit, IUnitDictionary} from "../../typings";
 
 const displayGCIOutputs = 5; // how many output lines on GCI output
 const maxKMDistanceToRead = 161; // about 100 miles
@@ -16,6 +16,8 @@ export async function getAllEWRUnitNames(): Promise <string[]> {
 }
 
 export async function processGCIDetection(incomingObj: any): Promise<void> {
+    const engineCache = ddcsController.getEngineCache();
+
     const dedupeDetectedUnitNames = _.uniq(incomingObj.detectedUnitNames);
     if (dedupeDetectedUnitNames.length > 0) {
         // enemy detected, process
@@ -23,9 +25,10 @@ export async function processGCIDetection(incomingObj: any): Promise<void> {
             dead: false,
             _id: {$in: dedupeDetectedUnitNames}
         });
-        const sortByThreat = detectedUnits.sort((a, b) => (a.threatLvl > b.threatLvl) ? 1 : -1);
-        const sortByCategory = _.groupBy(sortByThreat, "unitCategory");
-        console.log("CategorySort: ", sortByCategory, sortByThreat);
+        const sortByThreat = detectedUnits.sort((a, b) => (
+            engineCache.unitDictionary.find((unit1: IUnitDictionary) => unit1._id = a.type).threatLvl >
+            engineCache.unitDictionary.find((unit2: IUnitDictionary) => unit2._id = b.type).threatLvl
+        ) ? 1 : -1);
 
         const sideStack = ddcsController.checkRealtimeSideBalance();
         // console.log("sidestack: ", sideStack);
