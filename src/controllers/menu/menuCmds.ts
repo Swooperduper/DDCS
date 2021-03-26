@@ -763,56 +763,90 @@ export async function spawnAtkHeli(curUnit: typing.IUnit, curPlayer: typing.ISrv
     }
 }
 
-export async function spawnBaseAWACS() {
+export async function baseAWACSUpkeep() {
+    const engineCache = ddcsControllers.getEngineCache();
 
-    const bases = await ddcsControllers.baseActionRead({_id: "Maykop-Khanskaya"});
-    const curBase = bases[0];
+    const getBaseAwacs = engineCache.config.baseAwacs;
 
-    const awacsTemplateObj = {
-        country: 0,
-        side: curBase.side,
-        groupName: "AI|baseAWACS|Maykop-Khanskaya|",
-        name: "AI|baseAWACS|Maykop-Khanskaya|",
-        airdromeId: curBase.baseId,
-        parking: curBase.polygonLoc.AICapTemplate.units[0].parking,
-        parking_id: curBase.polygonLoc.AICapTemplate.units[0].parking_id,
-        routeLocs: curBase.centerLoc,
-        type: "A-50",
-        skill: "Excellent",
-        payload: {
-            fuel: 100000,
-            flare: 1000,
-            chaff: 1000,
-            gun: 1000,
-        },
-        hdg: _.random(0, 359),
-        callsign: {
-            one: 5,
-            two: 5,
-            three: 1,
-            name: "Darkstar51",
-        },
-        onboard_num: "010",
-        frequency: 251
-    };
+    for ( const baseName of getBaseAwacs) {
+        console.log("chkBase: ", baseName);
+        await spawnBaseAWACS(baseName);
+    }
+}
 
-    const unitTemplate = await ddcsControllers.templateRead({_id: "awacsTemplateFull"});
-    const compiled = _.template(unitTemplate[0].template);
-    const curGroupSpawn = compiled({awacsTemplateObj});
+export async function spawnBaseAWACS(baseName: string) {
+    const awacsName = "AI|baseAWACS|" + baseName + "|";
+    const isAwacsAlive = await ddcsControllers.unitActionRead({name: awacsName, dead: false});
 
-    const curCMD = await spawnGrp(
-        curGroupSpawn,
-        awacsTemplateObj.country,
-        ddcsControllers.UNIT_CATEGORY.indexOf("AIRPLANE")
-    );
-    console.log("CMD: ", curCMD);
-    await ddcsControllers.sendUDPPacket("frontEnd", {
-        actionObj: {
-            action: "CMD",
-            cmd: [curCMD],
-            reqID: 0
+    if (isAwacsAlive.length > 0) {
+        const bases = await ddcsControllers.baseActionRead({_id: baseName});
+        const curBase = bases[0];
+        const replenEpoc = new Date(curBase.awacsReplenTime).getTime();
+
+        if (replenEpoc < new Date().getTime()) {
+            await ddcsControllers.baseActionUpdateAwacsTimer({
+                name: curBase._id,
+                awacsReplenTime: new Date().getTime() + (ddcsControllers.time.oneHour * 1000)
+            });
+
+            let awacsType: string = "";
+            let country: number = 0;
+
+            if (curBase.side === 1) {
+                awacsType = "A-50";
+                country = 0;
+            } else if (curBase.side === 2) {
+                awacsType = "E-3A";
+                country = 2;
+            }
+
+            const awacsTemplateObj = {
+                country,
+                side: curBase.side,
+                groupName: awacsName,
+                name: awacsName,
+                airdromeId: curBase.baseId,
+                parking: curBase.polygonLoc.AICapTemplate.units[0].parking,
+                parking_id: curBase.polygonLoc.AICapTemplate.units[0].parking_id,
+                routeLocs: curBase.centerLoc,
+                type: awacsType,
+                skill: "Excellent",
+                payload: {
+                    fuel: 100000,
+                    flare: 1000,
+                    chaff: 1000,
+                    gun: 1000,
+                },
+                hdg: _.random(0, 359),
+                callsign: {
+                    one: 5,
+                    two: 5,
+                    three: 1,
+                    name: "Darkstar51",
+                },
+                onboard_num: "010",
+                frequency: 251
+            };
+
+            const unitTemplate = await ddcsControllers.templateRead({_id: "awacsTemplateFull"});
+            const compiled = _.template(unitTemplate[0].template);
+            const curGroupSpawn = compiled({awacsTemplateObj});
+
+            const curCMD = await spawnGrp(
+                curGroupSpawn,
+                awacsTemplateObj.country,
+                ddcsControllers.UNIT_CATEGORY.indexOf("AIRPLANE")
+            );
+            console.log("CMD: ", curCMD);
+            await ddcsControllers.sendUDPPacket("frontEnd", {
+                actionObj: {
+                    action: "CMD",
+                    cmd: [curCMD],
+                    reqID: 0
+                }
+            });
         }
-    });
+    }
 }
 
 export async function spawnAWACS(curUnit: typing.IUnit, curPlayer: typing.ISrvPlayers, awacsType: string, rsCost: number) {

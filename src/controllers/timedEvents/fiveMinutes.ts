@@ -8,5 +8,6 @@ export async function processFiveMinuteActions(fullySynced: boolean): Promise<vo
     if (fullySynced) {
         await ddcsControllers.checkBaseWarnings();
         await ddcsControllers.recordFiveMinutesPlayed();
+        await ddcsControllers.baseAWACSUpkeep();
     }
 }

@@ -1,4 +1,5 @@
 export interface IBase {
+    awacsReplenTime: any;
     _id: string;
     baseType: string;
     enabled: boolean;
