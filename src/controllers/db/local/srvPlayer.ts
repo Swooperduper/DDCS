@@ -181,7 +181,7 @@ export async function srvPlayerActionsRemoveLifePoints(obj: {
                     ddcsController.forcePlayerSpectator(
                         serverObj[0].playerId,
                         "You Do Not Have Enough Points To Fly This Vehicle" +
-                        "{" + removePoints || "" + "/" + curPlayerLifePoints || "" + ")"
+                        "{" + removePoints || "" + "/" + curPlayerLifePoints.toFixed(2) || "" + ")"
                     );
                     resolve();
                 } else {
@@ -198,7 +198,7 @@ export async function srvPlayerActionsRemoveLifePoints(obj: {
                             if (updateErr) { reject(updateErr); }
                             ddcsController.sendMesgToGroup( obj.groupId, serverObj[0].name + " Have Just Used " +
                                 removePoints || "" + " Life Points! " + obj.execAction +
-                                "(Total:" + curTotalPoints || "" + ")", 5);
+                                "(Total:" + curTotalPoints.toFixed(2) || "" + ")", 5);
                             resolve();
                         }
                     );
