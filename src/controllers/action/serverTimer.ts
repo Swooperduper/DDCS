@@ -2,17 +2,20 @@
  * DDCS Licensed under AGPL-3.0 by Andrew "Drex" Finegan https://github.com/afinegan/DynamicDCS
  */
 
-import * as _ from "lodash";
 import * as typings from "../../typings";
 import * as ddcsControllers from "../";
 
 let currentSeconds = 0;
-let curTime = new Date().getTime();
-let lastSentLoader = _.cloneDeep(curTime);
 let maxTime = 0;
 let mesg;
 
 export let timerObj = {
+    tenHours: false,
+    nineHours: false,
+    eightHours: false,
+    sevenHours: false,
+    sixHours: false,
+    fiveHours: false,
     fourHours: false,
     threeHours: false,
     twoHours: false,
@@ -51,6 +54,37 @@ export async function processTimer(serverSecs: number): Promise<void> {
     setCurSeconds(serverSecs * 1000);
 
     if (getMaxTime() > 0) {
+        // 10 hours
+        if (getCurSeconds() > (getMaxTime() - (ddcsControllers.time.oneHour * 10)) && !timerObj.tenHours) {
+            mesg = "Server is restarting in less than 10 hours!";
+            timerObj.tenHours = true;
+        }
+        // 9 hours
+        if (getCurSeconds() > (getMaxTime() - (ddcsControllers.time.oneHour * 9)) && !timerObj.nineHours) {
+            mesg = "Server is restarting in less than 9 hours!";
+            timerObj.nineHours = true;
+        }
+        // 8 hours
+        if (getCurSeconds() > (getMaxTime() - (ddcsControllers.time.oneHour * 8)) && !timerObj.eightHours) {
+            mesg = "Server is restarting in less than 8 hours!";
+            timerObj.eightHours = true;
+        }
+        // 7 hours
+        if (getCurSeconds() > (getMaxTime() - (ddcsControllers.time.oneHour * 7)) && !timerObj.sevenHours) {
+            mesg = "Server is restarting in less than 7 hours!";
+            timerObj.sevenHours = true;
+        }
+        // 6 hours
+        if (getCurSeconds() > (getMaxTime() - (ddcsControllers.time.oneHour * 6)) && !timerObj.sixHours) {
+            mesg = "Server is restarting in less than 6 hours!";
+            timerObj.sixHours = true;
+        }
+        // 5 hours
+        if (getCurSeconds() > (getMaxTime() - (ddcsControllers.time.oneHour * 5)) && !timerObj.fiveHours) {
+            mesg = "Server is restarting in less than 5 hours!";
+            timerObj.fiveHours = true;
+        }
+        // 4 hours
         if (getCurSeconds() > (getMaxTime() - (ddcsControllers.time.oneHour * 4)) && !timerObj.fourHours) {
             mesg = "Server is restarting in less than 4 hours!";
             timerObj.fourHours = true;
@@ -71,43 +105,43 @@ export async function processTimer(serverSecs: number): Promise<void> {
             timerObj.oneHour = true;
         }
         // 30 mins
-        if (getCurSeconds() > (getMaxTime() - 1800) && !timerObj.thirtyMinutes) {
+        if (getCurSeconds() > (getMaxTime() - ddcsControllers.time.thirtyMinutes) && !timerObj.thirtyMinutes) {
             mesg = "Server is restarting in less than 30 minutes!";
             timerObj.thirtyMinutes = true;
         }
         // 20 mins
-        if (getCurSeconds() > (getMaxTime() - 1440) && !timerObj.twentyMinutes) {
+        if (getCurSeconds() > (getMaxTime() - ddcsControllers.time.twentyMinutes) && !timerObj.twentyMinutes) {
             mesg = "Server is restarting in less than 20 mins!";
             timerObj.twentyMinutes = true;
         }
         // 10 mins
-        if (getCurSeconds() > (getMaxTime() - 720) && !timerObj.tenMinutes) {
+        if (getCurSeconds() > (getMaxTime() - ddcsControllers.time.tenMinutes) && !timerObj.tenMinutes) {
             mesg = "Server is restarting in less than 10 mins!";
             timerObj.tenMinutes = true;
         }
         // 5 mins
-        if (getCurSeconds() > (getMaxTime() - 360) && !timerObj.fiveMinutes) {
+        if (getCurSeconds() > (getMaxTime() - ddcsControllers.time.fiveMins) && !timerObj.fiveMinutes) {
             mesg = "Server is restarting in less than 5 minutes!";
             timerObj.fiveMinutes = true;
         }
         // 4 mins
-        if (getCurSeconds() > (getMaxTime() - 240) && !timerObj.fourMinutes) {
+        if (getCurSeconds() > (getMaxTime() - ddcsControllers.time.fourMins) && !timerObj.fourMinutes) {
             mesg = "Server is restarting in less than 4 minutes!";
             timerObj.fourMinutes = true;
         }
         // 3 mins
-        if (getCurSeconds() > (getMaxTime() - 180) && !timerObj.threeMinutes) {
+        if (getCurSeconds() > (getMaxTime() - ddcsControllers.time.threeMinutes) && !timerObj.threeMinutes) {
             mesg = "Server is restarting in less than 3 minutes!";
             timerObj.threeMinutes = true;
         }
         // 2 mins
-        if (getCurSeconds() > (getMaxTime() - 120) && !timerObj.twoMinutes) {
+        if (getCurSeconds() > (getMaxTime() - ddcsControllers.time.twoMinutes) && !timerObj.twoMinutes) {
             mesg = "Server is restarting in less than 2 minutes, Locking Server Down!";
             timerObj.twoMinutes = true;
         }
         // 1 min
         // console.log("SECONDS: ", getCurSeconds(), " > ", getMaxTime(), " - ", 60);
-        if (getCurSeconds() > (getMaxTime() - 60) && !timerObj.oneMinute) {
+        if (getCurSeconds() > (getMaxTime() - ddcsControllers.time.oneMin) && !timerObj.oneMinute) {
             mesg = "Server is restarting in less than 1 minute, Server Is Locked!";
             timerObj.oneMinute = true;
             const latestSession = await ddcsControllers.sessionsActionsReadLatest();
@@ -142,23 +176,6 @@ export async function processTimer(serverSecs: number): Promise<void> {
             }
         }
     }
-}
-
-export function resetTimerObj(): void {
-    timerObj = {
-        fourHours: false,
-        threeHours: false,
-        twoHours: false,
-        oneHour: false,
-        thirtyMinutes: false,
-        twentyMinutes: false,
-        tenMinutes: false,
-        fiveMinutes: false,
-        fourMinutes: false,
-        threeMinutes: false,
-        twoMinutes: false,
-        oneMinute: false
-    };
 }
 
 export async function restartServer(): Promise<void> {
