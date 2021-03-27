@@ -32,7 +32,7 @@ export async function processGCIDetection(incomingObj: any): Promise<void> {
             for (const detectedUnit of detectedUnits) {
                 const dictionaryRecord = engineCache.unitDictionary.find((uD: IUnitDictionary) => uD._id === detectedUnit.type);
                 if (!dictionaryRecord) {
-                    console.log("TL: ", detectedUnit.type, " ", detectedUnit);
+                    console.log(detectedUnit.type, " doesnt have a dictionary record");
                 } else {
                     detectedUnit.threatLvl = dictionaryRecord.threatLvl;
                     unitsPlusThreat.push(detectedUnit);
