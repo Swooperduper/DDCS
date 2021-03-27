@@ -82,7 +82,7 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
                     ammo: curData.ammo,
                     isActive: curData.isActive,
                     country: curData.country,
-                    coalition: curUnit.coalition,
+                    coalition: curData.coalition,
                     inAir: curData.inAir,
                     name: curData.name,
                     lonLatLoc: curData.lonLatLoc,
