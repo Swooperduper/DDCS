@@ -33,7 +33,7 @@ export async function processGCIDetection(incomingObj: any): Promise<void> {
             unitsPlusThreat.push(detectedUnit);
         }
 
-        const sortByThreat = unitsPlusThreat.sort((a, b) => (a.threatLvl > b.threatLvl) ? 1 : -1);
+        const sortByThreat = unitsPlusThreat.sort((a, b) => (a.threatLvl > b.threatLvl) ? -1 : 1);
 
         const sideStack = ddcsController.checkRealtimeSideBalance();
         // console.log("sidestack: ", sideStack);
