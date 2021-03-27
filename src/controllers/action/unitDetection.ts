@@ -30,11 +30,11 @@ export async function processGCIDetection(incomingObj: any): Promise<void> {
 
         if (detectedUnits.length > 0) {
             for (const detectedUnit of detectedUnits) {
-                if (!detectedUnit.type) {
+                const dictionaryRecord = engineCache.unitDictionary.find((uD: IUnitDictionary) => uD._id === detectedUnit.type);
+                if (!dictionaryRecord) {
                     console.log("TL: ", detectedUnit.type, " ", detectedUnit);
                 } else {
-                    console.log("TL2: ", detectedUnit.type, " ", detectedUnit);
-                    detectedUnit.threatLvl = engineCache.unitDictionary.find((uD: IUnitDictionary) => uD._id === detectedUnit.type).threatLvl;
+                    detectedUnit.threatLvl = dictionaryRecord.threatLvl;
                     unitsPlusThreat.push(detectedUnit);
                 }
             }
