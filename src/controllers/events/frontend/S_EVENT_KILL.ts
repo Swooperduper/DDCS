@@ -75,7 +75,7 @@ export async function processEventKill(eventObj: any): Promise<void> {
     let curInitiator: any = {};
     let curTarget: any = {};
 
-    if (eventObj.data.initiator.unitId) {
+    if (eventObj.data.initiator && eventObj.data.initiator.unitId) {
         const iUnitId = eventObj.data.initiator.unitId;
         const iUnit = await ddcsControllers.unitActionRead({unitId: iUnitId});
         curInitiator = {
@@ -86,7 +86,7 @@ export async function processEventKill(eventObj: any): Promise<void> {
         };
     }
 
-    if (eventObj.data.target.unitId) {
+    if (eventObj.data.target && eventObj.data.target.unitId) {
         const tUnitId = eventObj.data.target.unitId;
         const tUnit = await ddcsControllers.unitActionRead({unitId: tUnitId});
         curTarget = {
