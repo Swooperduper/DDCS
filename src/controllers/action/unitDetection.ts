@@ -28,30 +28,34 @@ export async function processGCIDetection(incomingObj: any): Promise<void> {
 
         const unitsPlusThreat = [];
 
-        for (const detectedUnit of detectedUnits) {
-            if (!detectedUnit.type) {
-                console.log("TL: ", detectedUnit.type, " ", detectedUnit);
+        if (detectedUnits.length > 0) {
+            for (const detectedUnit of detectedUnits) {
+                if (!detectedUnit.type) {
+                    console.log("TL: ", detectedUnit.type, " ", detectedUnit);
+                }
+
+                detectedUnit.threatLvl = engineCache.unitDictionary.find((uD: IUnitDictionary) => uD._id === detectedUnit.type).threatLvl;
+                unitsPlusThreat.push(detectedUnit);
             }
 
-            detectedUnit.threatLvl = engineCache.unitDictionary.find((uD: IUnitDictionary) => uD._id === detectedUnit.type).threatLvl;
-            unitsPlusThreat.push(detectedUnit);
-        }
+            const sortByThreat = unitsPlusThreat.sort((a, b) => (a.threatLvl > b.threatLvl) ? -1 : 1);
 
-        const sortByThreat = unitsPlusThreat.sort((a, b) => (a.threatLvl > b.threatLvl) ? -1 : 1);
+            const sideStack = ddcsController.checkRealtimeSideBalance();
+            // console.log("sidestack: ", sideStack);
 
-        const sideStack = ddcsController.checkRealtimeSideBalance();
-        // console.log("sidestack: ", sideStack);
+            if (sideStack.underdog === 1) {
+                const enemyBlue = sortByThreat.filter((du) => du.coalition === 2);
+                console.log("enemyBlue: ", enemyBlue);
+                await gciUpdatePilots(enemyBlue, 1);
+            }
 
-        if (sideStack.underdog === 1) {
-            const enemyBlue = sortByThreat.filter((du) => du.coalition === 2);
-            console.log("enemyBlue: ", enemyBlue);
-            await gciUpdatePilots(enemyBlue, 1);
-        }
-
-        if (sideStack.underdog === 2) {
-            const enemyRed = sortByThreat.filter((du) => du.coalition === 1);
-            console.log("enemyBlue: ", enemyRed);
-            await gciUpdatePilots(enemyRed, 2);
+            if (sideStack.underdog === 2) {
+                const enemyRed = sortByThreat.filter((du) => du.coalition === 1);
+                console.log("enemyBlue: ", enemyRed);
+                await gciUpdatePilots(enemyRed, 2);
+            }
+        } else {
+            console.log("Detected Units Not Alive");
         }
     } else {
         console.log("No detected units");
