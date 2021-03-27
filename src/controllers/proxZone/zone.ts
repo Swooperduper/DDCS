@@ -89,22 +89,26 @@ export function getLonLatFromDistanceDirection(lonLatLoc: number[], direction: n
 }
 
 export function getBoundingSquare(pArray: number[]): object {
-    let x1 = _.get(pArray, [0, 0]);
-    let y1 = _.get(pArray, [0, 1]);
-    let x2 = _.get(pArray, [0, 0]);
-    let y2 = _.get(pArray, [0, 1]);
-    for (let i = 1; i < pArray.length; i++) {
-        x1 = ( x1 > _.get(pArray, [i, 0])) ? _.get(pArray, [i, 0]) : x1;
-        x2 = ( x2 < _.get(pArray, [i, 0])) ? _.get(pArray, [i, 0]) : x2;
-        y1 = ( y1 > _.get(pArray, [i, 1])) ? _.get(pArray, [i, 1]) : y1;
-        y2 = ( y2 < _.get(pArray, [i, 1]) ) ? _.get(pArray, [i, 1]) : y2;
+    if (pArray.length > 0) {
+        let x1 = _.get(pArray, [0, 0]);
+        let y1 = _.get(pArray, [0, 1]);
+        let x2 = _.get(pArray, [0, 0]);
+        let y2 = _.get(pArray, [0, 1]);
+        for (let i = 1; i < pArray.length; i++) {
+            x1 = ( x1 > _.get(pArray, [i, 0])) ? _.get(pArray, [i, 0]) : x1;
+            x2 = ( x2 < _.get(pArray, [i, 0])) ? _.get(pArray, [i, 0]) : x2;
+            y1 = ( y1 > _.get(pArray, [i, 1])) ? _.get(pArray, [i, 1]) : y1;
+            y2 = ( y2 < _.get(pArray, [i, 1]) ) ? _.get(pArray, [i, 1]) : y2;
+        }
+        return {
+            x1,
+            y1,
+            x2,
+            y2
+        };
+    } else {
+        return {};
     }
-    return {
-        x1,
-        y1,
-        x2,
-        y2
-    };
 }
 
 export function isLatLonInZone(lonLat: number[], polyZone: any[]) {
