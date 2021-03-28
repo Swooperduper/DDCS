@@ -106,6 +106,7 @@ export async function processingIncomingData(incomingObj: any) {
             }
             break;
         case "incomingMessage":
+            console.log("MESG: ", incomingObj.message);
             if (incomingObj.message === "-red") {
                 await ddcsController.lockUserToSide(incomingObj, 1);
             } else if (incomingObj.message === "-blue") {
