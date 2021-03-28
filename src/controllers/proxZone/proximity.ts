@@ -9,14 +9,10 @@ import * as ddcsControllers from "../";
 export async function checkUnitsToBaseForCapture(): Promise<void> {
     // console.log("CHECK BASE CAPTURE");
     let sideArray = {};
-    const campaignState: any = {
-        red: 0,
-        blue: 0
-    };
+
     const bases = await ddcsControllers.baseActionRead({baseType: "MOB"});
     for (const base of bases) {
         const sideLabel: any = ddcsControllers.side[base.side];
-        campaignState[sideLabel] += 1;
         const unitsInRange = await getGroundUnitsInProximity(base.centerLoc, 3, true);
         sideArray = _.transform(unitsInRange, (result: any[], value) => {
             (result[value.coalition] || (result[value.coalition] = [])).push(value);
@@ -92,7 +88,20 @@ export async function checkUnitsToBaseForCapture(): Promise<void> {
             }
         }
     }
-    console.log("BASES: ", campaignState, bases);
+
+    const warWon = await ddcsControllers.baseActionRead({baseType: "MOB", _id: { $not: /~/ }, enabled: true});
+
+    if (!_.isEmpty(warWon)) {
+        const campaignStateGroup = _.groupBy(warWon, "side");
+
+        const campaignState: any = {
+            red: campaignStateGroup[1].length || 0,
+            blue: campaignStateGroup[2].length || 0
+        };
+
+        console.log("CAMPAIGN STATE: ", campaignState);
+    }
+
     /*
     if (!_.isEmpty(bases)) {
         if (campaignState.red === 0) {
