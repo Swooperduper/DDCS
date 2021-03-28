@@ -110,7 +110,7 @@ export async function processingIncomingData(incomingObj: any) {
                 await ddcsController.lockUserToSide(incomingObj, 1);
             } else if (incomingObj.message === "-blue") {
                 await ddcsController.lockUserToSide(incomingObj, 2);
-            } else {
+            } else if (_.includes(incomingObj.message, "-")) {
                 dbModels.srvPlayerModel.find({_id: incomingObj.from}, async (err: any, serverObj: typings.ISrvPlayers[]) => {
                     if (err) { console.log("incomingMsgError: ", err); }
                     const curPly = serverObj[0];
