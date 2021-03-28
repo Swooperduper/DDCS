@@ -32,9 +32,11 @@ export async function checkCmdCenters(): Promise<void> {
             }
         }
     }
+    /*
     if (basesChanged) {
         await ddcsControllers.setbaseSides();
     }
+     */
 }
 
 export async function spawnCCAtNeutralBase(curPlayerUnit: typings.IUnit): Promise<boolean> {
@@ -42,7 +44,7 @@ export async function spawnCCAtNeutralBase(curPlayerUnit: typings.IUnit): Promis
     const mainNeutralBases = _.remove(bases, (base) => {
         return !_.includes(base.name, "#");
     });
-	console.log("bases: ", bases, curPlayerUnit);
+    console.log("bases: ", bases, curPlayerUnit);
     for ( const base of mainNeutralBases) {
         const unitsInProx = await ddcsControllers.getPlayersInProximity(base.centerLoc, 3.4, false, curPlayerUnit.coalition);
         if (_.find(unitsInProx, {playername: curPlayerUnit.playername})) {
@@ -72,7 +74,7 @@ export async function spawnCCAtNeutralBase(curPlayerUnit: typings.IUnit): Promis
                 console.log("cmdCenter doesnt exist " + base.name);
                 // await ddcsControllers.spawnLogisticCmdCenter({}, false, base, curPlayerUnit.coalition);
                 await ddcsControllers.baseActionUpdateSide({name: base.name, side: curPlayerUnit.coalition});
-                await ddcsControllers.setbaseSides();
+                // await ddcsControllers.setbaseSides();
                 await ddcsControllers.spawnSupportBaseGrp(base.name, curPlayerUnit.coalition, false);
                 await ddcsControllers.sendMesgToCoalition(
                     curPlayerUnit.coalition,

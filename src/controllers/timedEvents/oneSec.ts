@@ -5,8 +5,10 @@
 import * as ddcsControllers from "../";
 
 export async function processOneSecActions(fullySynced: boolean) {
+    /*
     if (fullySynced) {
         await ddcsControllers.checkShootingUsers();
     }
+     */
 }
 

@@ -4,6 +4,7 @@
 
 import * as ddcsControllers from "../";
 
+/*
 export async function setbaseSides(): Promise<void> {
     const baseSides = await ddcsControllers.baseActionGetBaseSides();
     ddcsControllers.sendUDPPacket("frontEnd", {
@@ -14,3 +15,4 @@ export async function setbaseSides(): Promise<void> {
         }
     });
 }
+ */

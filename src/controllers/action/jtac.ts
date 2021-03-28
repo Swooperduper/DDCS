@@ -87,7 +87,7 @@ export async function processLOSEnemy(jtacUnitName: string, data: string[]): Pro
 
 export async function removeLaserIR(jtUnit: typings.IUnit): Promise<void> {
     console.log("Removing Laser: ", jtUnit.name);
-    ddcsControllers.sendUDPPacket("frontEnd", {
+    await ddcsControllers.sendUDPPacket("frontEnd", {
         actionObj: {
             action : "removeLaserIR",
             jtacUnitName: jtUnit.name
@@ -121,7 +121,7 @@ export async function setLaserSmoke(jtUnit: typings.IUnit, enemyUnit: typings.IU
         }
     }, curNextUniqueId);
 
-    ddcsControllers.sendUDPPacket("frontEnd", {
+    await ddcsControllers.sendUDPPacket("frontEnd", {
         actionObj: {
             action: "setLaserSmoke",
             jtacUnitName: jtUnit.name,

@@ -1,6 +1,6 @@
 export * from "./airfield";
 export * from "./campaigns";
-export * from "./cmdQue";
+export * from "./futureCommandQue";
 export * from "./sessions";
 export * from "./simpleStatEvent";
 export * from "./srvPlayer";

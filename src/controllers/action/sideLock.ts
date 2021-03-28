@@ -34,6 +34,7 @@ export async function lockUserToSide(incomingObj: any, lockToSide: number): Prom
     });
 }
 
+/*
 export async function setSideLockFlags(): Promise<void> {
     const playerSideLockTable: any[] = [];
     const latestSession = await ddcsControllers.sessionsActionsReadLatest();
@@ -63,7 +64,7 @@ export async function setSideLockFlags(): Promise<void> {
         }
 
         console.log("setSideLock: ", playerSideLockTable);
-        ddcsControllers.sendUDPPacket("frontEnd", {
+        await ddcsControllers.sendUDPPacket("frontEnd", {
             actionObj: {
                 action : "SETSIDELOCK",
                 data: playerSideLockTable
@@ -72,3 +73,4 @@ export async function setSideLockFlags(): Promise<void> {
         });
     }
 }
+ */

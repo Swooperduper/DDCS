@@ -7,13 +7,21 @@ const backendClient = dgram.createSocket("udp4");
 const frontendClient = dgram.createSocket("udp4");
 import * as ddcsControllers from "../";
 
-export function sendUDPPacket(environment: string, packetObj: any) {
-    if (environment === "backEnd") {
-        backendClient.send(JSON.stringify(packetObj), Number(process.env.BACKEND_PORT), process.env.DB_LOCAL_HOST);
-    }
+export async function sendUDPPacket(environment: string, packetObj: any) {
+    if (packetObj.timeToExecute > 0) {
+        await ddcsControllers.futureCommandQueActionsSave({
+            actionObj: packetObj.actionObj,
+            queName: environment,
+            timeToExecute: packetObj.timeToExecute
+        });
+    } else {
+        if (environment === "backEnd") {
+            backendClient.send(JSON.stringify(packetObj), Number(process.env.BACKEND_PORT), process.env.DB_LOCAL_HOST);
+        }
 
-    if (environment === "frontEnd") {
-        frontendClient.send(JSON.stringify(packetObj), Number(process.env.MISSION_PORT), process.env.DB_LOCAL_HOST);
+        if (environment === "frontEnd") {
+            frontendClient.send(JSON.stringify(packetObj), Number(process.env.MISSION_PORT), process.env.DB_LOCAL_HOST);
+        }
     }
 }
 

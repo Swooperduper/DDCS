@@ -26,7 +26,7 @@ setInterval( async () => {
             console.log("Connecting to " + serverName + " Frontend");
             sessionName = "";
             ddcsController.setSyncLockdownMode(false);
-            await ddcsController.cmdQueActionsRemoveAll();
+            // await ddcsController.cmdQueActionsRemoveAll();
             await ddcsSocket.connSocket();
         }
     } else {

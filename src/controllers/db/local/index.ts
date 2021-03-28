@@ -1,7 +1,7 @@
 // modules
 export * from "./airfield";
 export * from "./campaign";
-export * from "./cmdQue";
+export * from "./futureCommandQue";
 export * from "./process";
 export * from "./sessions";
 export * from "./simpleStatEvent";

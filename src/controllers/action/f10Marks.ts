@@ -20,7 +20,7 @@ export async function setFarpMarks() {
                 }
             });
         }
-        ddcsControllers.sendUDPPacket("frontEnd", {
+        await ddcsControllers.sendUDPPacket("frontEnd", {
             actionObj: {
                 action: "CMD",
                 cmd: [
