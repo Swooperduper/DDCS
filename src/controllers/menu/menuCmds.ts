@@ -728,7 +728,7 @@ export async function menuCmdProcess(pObj: any) {
                     await internalCargo(curUnit, curPlayer, pObj.type);
                     break;
             }
-        }``
+        }
     }
 }
 
@@ -791,7 +791,7 @@ export async function spawnBaseAWACS(baseName: string) {
         if (replenEpoc < new Date().getTime()) {
             await ddcsControllers.baseActionUpdateAwacsTimer({
                 name: baseName,
-                awacsReplenTime: new Date().getTime() + (ddcsControllers.time.oneHour * 1000)
+                awacsReplenTime: new Date().getTime() + ddcsControllers.time.oneHour
             });
 
             let awacsType: string = "";
@@ -804,12 +804,12 @@ export async function spawnBaseAWACS(baseName: string) {
                 awacsType = "E-2C";
                 country = 2;
             }
-			//Quick dirty and unreliable band-aid awacs callsign fix - to be removed - Kirkwood
-			const awacsCallsign = {
-				one: _.random(1, 5),
-				two: _.random(1, 9),
-				name: ["Overlord","Overlord","Magic","Wizard","Focus","Darkstar"]
-			}
+            // Quick dirty and unreliable band-aid awacs callsign fix - to be removed - Kirkwood
+            const awacsCallsign = {
+                one: _.random(1, 5),
+                two: _.random(1, 9),
+                name: ["Overlord", "Overlord", "Magic", "Wizard", "Focus", "Darkstar"]
+            };
             const awacsTemplateObj = {
                 country,
                 side: curBase.side,
@@ -825,15 +825,15 @@ export async function spawnBaseAWACS(baseName: string) {
                     fuel: 100000,
                     flare: 1000,
                     chaff: 1000,
-                    gun: 1000,
+                    gun: 1000
                 },
                 hdg: _.random(0, 359),
-				//Quick dirty and unreliable band-aid awacs callsign fix - to be removed
+                // Quick dirty and unreliable band-aid awacs callsign fix - to be removed
                 callsign: {
                     one: awacsCallsign.one,
                     two: awacsCallsign.two,
                     three: 1,
-                    name: awacsCallsign.name[awacsCallsign.one]+ awacsCallsign.two + 1,
+                    name: awacsCallsign.name[awacsCallsign.one] + awacsCallsign.two + 1
                 },
                 onboard_num: "010",
                 frequency: 251
@@ -860,7 +860,7 @@ export async function spawnBaseAWACS(baseName: string) {
     } else {
         await ddcsControllers.baseActionUpdateAwacsTimer({
             name: baseName,
-            awacsReplenTime: new Date().getTime() + (ddcsControllers.time.oneHour)
+            awacsReplenTime: new Date().getTime() + ddcsControllers.time.oneHour
         });
     }
 }
