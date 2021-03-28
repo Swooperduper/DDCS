@@ -92,7 +92,7 @@ export async function checkUnitsToBaseForCapture(): Promise<void> {
             }
         }
     }
-    console.log("BASES: ", campaignState);
+    console.log("BASES: ", campaignState, bases);
     /*
     if (!_.isEmpty(bases)) {
         if (campaignState.red === 0) {
