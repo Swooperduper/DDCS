@@ -92,14 +92,14 @@ export async function checkUnitsToBaseForCapture(): Promise<void> {
     if (!_.isEmpty(warWon)) {
         const campaignStateGroup = _.groupBy(warWon, "side");
 
-        if (!campaignStateGroup[1]) {	
+        if (!campaignStateGroup[1]) {
             console.log("BLUE WON BLUE WON BLUE WON BLUE WON BLUE WON BLUE WON BLUE WON BLUE WON ");
             const engineCache = ddcsControllers.getEngineCache();
             await ddcsControllers.serverActionsUpdate({name: engineCache.config.name, resetFullCampaign: true});
             if (ddcsControllers.getTimeToRestart() === 0) {
-					console.log("Setting TTR");
-					await ddcsControllers.setTimeToRestart(new Date().getTime() + ddcsControllers.time.fiveMins);
-			}
+                console.log("Setting TTR");
+                await ddcsControllers.setTimeToRestart(new Date().getTime() + ddcsControllers.time.fiveMins);
+            }
             await ddcsControllers.sendMesgToAll(
                 "Blue has won the campaign, Campaign will reset soon.",
                 5
@@ -110,10 +110,10 @@ export async function checkUnitsToBaseForCapture(): Promise<void> {
             console.log("RED WON RED WON RED WON RED WON RED WON RED WON RED WON RED WON RED WON ");
             const engineCache = ddcsControllers.getEngineCache();
             await ddcsControllers.serverActionsUpdate({name: engineCache.config.name, resetFullCampaign: true});
-			if (ddcsControllers.getTimeToRestart() === 0) {
-					console.log("Setting TTR");
-					await ddcsControllers.setTimeToRestart(new Date().getTime() + ddcsControllers.time.fiveMins);
-			}
+            if (ddcsControllers.getTimeToRestart() === 0) {
+                console.log("Setting TTR");
+                await ddcsControllers.setTimeToRestart(new Date().getTime() + ddcsControllers.time.fiveMins);
+            }
             await ddcsControllers.sendMesgToAll(
                 "Blue has won the campaign, Campaign will reset soon.",
                 5
