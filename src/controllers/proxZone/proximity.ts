@@ -12,7 +12,6 @@ export async function checkUnitsToBaseForCapture(): Promise<void> {
 
     const bases = await ddcsControllers.baseActionRead({baseType: "MOB"});
     for (const base of bases) {
-        const sideLabel: any = ddcsControllers.side[base.side];
         const unitsInRange = await getGroundUnitsInProximity(base.centerLoc, 3, true);
         sideArray = _.transform(unitsInRange, (result: any[], value) => {
             (result[value.coalition] || (result[value.coalition] = [])).push(value);
@@ -99,6 +98,24 @@ export async function checkUnitsToBaseForCapture(): Promise<void> {
             blue: campaignStateGroup[2].length || 0
         };
 
+        if (campaignState.red === 0) {
+            console.log("BLUE WON BLUE WON BLUE WON BLUE WON BLUE WON BLUE WON BLUE WON BLUE WON ");
+            await ddcsControllers.serverActionsUpdate({resetFullCampaign: true});
+            await ddcsControllers.setTimeToRestart(new Date().getTime() + ddcsControllers.time.fiveMins);
+            await ddcsControllers.sendMesgToAll(
+                "Blue has won the campaign, Map will reset in 5 minutes.",
+                ddcsControllers.time.fiveMins
+            );
+        }
+        if (campaignState.blue === 0) {
+            console.log("RED WON RED WON RED WON RED WON RED WON RED WON RED WON RED WON RED WON ");
+            await ddcsControllers.serverActionsUpdate({resetFullCampaign: true});
+            await ddcsControllers.setTimeToRestart(new Date().getTime() + ddcsControllers.time.fiveMins);
+            await ddcsControllers.sendMesgToAll(
+                "Red has won the campaign, Map will reset in 5 minutes.",
+                ddcsControllers.time.fiveMins
+            );
+        }
         console.log("CAMPAIGN STATE: ", campaignState);
     }
 

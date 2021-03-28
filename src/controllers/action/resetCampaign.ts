@@ -15,11 +15,12 @@ export function setTimeToRestart(timestamp: number): void {
 
 // Create shutdown function
 export async function shutdown(): Promise<void> {
-	console.log("trying to shutdown");
+    console.log("trying to shutdown");
     await exec("shutdown.exe /r /t 00");
 }
 
 export async function checkTimeToRestart(): Promise<void> {
+    console.log("CheckTimeToRestart: ", timeToRestart);
     if (timeToRestart !== 0) {
         if (new Date().getTime() > timeToRestart) {
             await restartCampaign();
