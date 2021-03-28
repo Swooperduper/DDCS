@@ -89,37 +89,37 @@ export async function checkUnitsToBaseForCapture(): Promise<void> {
     }
 
     const warWon = await ddcsControllers.baseActionRead({baseType: "MOB", _id: { $not: /~/ }, enabled: true});
-    console.log("WW: ", !_.isEmpty(warWon), warWon);
-
     if (!_.isEmpty(warWon)) {
         const campaignStateGroup = _.groupBy(warWon, "side");
 
-        const campaignState: any = {
-            red: campaignStateGroup[1].length || 0,
-            blue: campaignStateGroup[2].length || 0
-        };
-
-        if (campaignState.red === 0) {
+        if (!campaignStateGroup[1]) {	
             console.log("BLUE WON BLUE WON BLUE WON BLUE WON BLUE WON BLUE WON BLUE WON BLUE WON ");
             const engineCache = ddcsControllers.getEngineCache();
             await ddcsControllers.serverActionsUpdate({name: engineCache.config.name, resetFullCampaign: true});
-            await ddcsControllers.setTimeToRestart(new Date().getTime() + ddcsControllers.time.fiveMins);
+            if (ddcsControllers.getTimeToRestart() === 0) {
+					console.log("Setting TTR");
+					await ddcsControllers.setTimeToRestart(new Date().getTime() + ddcsControllers.time.fiveMins);
+			}
             await ddcsControllers.sendMesgToAll(
-                "Blue has won the campaign, Map will reset in 5 minutes.",
-                ddcsControllers.time.fiveMins
+                "Blue has won the campaign, Campaign will reset soon.",
+                5
             );
         }
-        if (campaignState.blue === 0) {
+
+        if (!campaignStateGroup[2]) {
             console.log("RED WON RED WON RED WON RED WON RED WON RED WON RED WON RED WON RED WON ");
             const engineCache = ddcsControllers.getEngineCache();
             await ddcsControllers.serverActionsUpdate({name: engineCache.config.name, resetFullCampaign: true});
-            await ddcsControllers.setTimeToRestart(new Date().getTime() + ddcsControllers.time.fiveMins);
+			if (ddcsControllers.getTimeToRestart() === 0) {
+					console.log("Setting TTR");
+					await ddcsControllers.setTimeToRestart(new Date().getTime() + ddcsControllers.time.fiveMins);
+			}
             await ddcsControllers.sendMesgToAll(
-                "Red has won the campaign, Map will reset in 5 minutes.",
-                ddcsControllers.time.fiveMins
+                "Blue has won the campaign, Campaign will reset soon.",
+                5
             );
         }
-        console.log("CAMPAIGN STATE: ", campaignState);
+        // console.log("CAMPAIGN STATE: ", campaignState);
     }
     /*
     if (!_.isEmpty(bases)) {

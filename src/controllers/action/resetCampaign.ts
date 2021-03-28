@@ -9,6 +9,10 @@ import * as ddcsControllers from "../";
 
 export let timeToRestart = 0;
 
+export function getTimeToRestart(): number {
+    return timeToRestart;
+}
+
 export function setTimeToRestart(timestamp: number): void {
     timeToRestart = timestamp;
 }
