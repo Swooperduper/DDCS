@@ -89,6 +89,7 @@ export async function checkUnitsToBaseForCapture(): Promise<void> {
     }
 
     const warWon = await ddcsControllers.baseActionRead({baseType: "MOB", _id: { $not: /~/ }, enabled: true});
+    console.log("WW: ", !_.isEmpty(warWon), warWon);
 
     if (!_.isEmpty(warWon)) {
         const campaignStateGroup = _.groupBy(warWon, "side");
@@ -120,7 +121,6 @@ export async function checkUnitsToBaseForCapture(): Promise<void> {
         }
         console.log("CAMPAIGN STATE: ", campaignState);
     }
-
     /*
     if (!_.isEmpty(bases)) {
         if (campaignState.red === 0) {
