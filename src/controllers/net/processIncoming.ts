@@ -108,9 +108,14 @@ export async function processingIncomingData(incomingObj: any) {
         case "incomingMessage":
             if (incomingObj.message === "-red") {
                 await ddcsController.lockUserToSide(incomingObj, 1);
-            }
-            if (incomingObj.message === "-blue") {
+            } else if (incomingObj.message === "-blue") {
                 await ddcsController.lockUserToSide(incomingObj, 2);
+            } else {
+                dbModels.srvPlayerModel.find({_id: incomingObj.from}, async (err: any, serverObj: typings.ISrvPlayers[]) => {
+                    if (err) { console.log("incomingMsgError: ", err); }
+                    const curPly = serverObj[0];
+                    await ddcsController.sendMesgToPlayerChatWindow(`DDCS is a war simulation engine built over 5 years, Currently built/Admined by Drex, Kirkwood, Red Teufel, biz, Pom, Tuli, Hambone307, Aries144 `, curPly.playerId);
+                });
             }
 
             /*
