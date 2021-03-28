@@ -5,8 +5,8 @@
 import * as mongoose from "mongoose";
 
 // Schema defines how chat messages will be stored in MongoDB
-export function cmdQueModel(dbconn: mongoose.Connection): mongoose.Document | {} {
-    return dbconn.model("cmdque", new mongoose.Schema({
+export function futureCommandQueModel(dbconn: mongoose.Connection): mongoose.Document | {} {
+    return dbconn.model("futurecommandque", new mongoose.Schema({
             actionObj: {
                 type: Object,
                 required: true
@@ -26,9 +26,3 @@ export function cmdQueModel(dbconn: mongoose.Connection): mongoose.Document | {}
         }
     ));
 }
-
-/*
-CmdQueSchema.static('findByName', function (name, callback) {
-    return this.find({ name: name }, callback);
-});
-*/
