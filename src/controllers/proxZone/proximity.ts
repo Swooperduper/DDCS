@@ -100,7 +100,8 @@ export async function checkUnitsToBaseForCapture(): Promise<void> {
 
         if (campaignState.red === 0) {
             console.log("BLUE WON BLUE WON BLUE WON BLUE WON BLUE WON BLUE WON BLUE WON BLUE WON ");
-            await ddcsControllers.serverActionsUpdate({resetFullCampaign: true});
+            const engineCache = ddcsControllers.getEngineCache();
+            await ddcsControllers.serverActionsUpdate({name: engineCache.config.name, resetFullCampaign: true});
             await ddcsControllers.setTimeToRestart(new Date().getTime() + ddcsControllers.time.fiveMins);
             await ddcsControllers.sendMesgToAll(
                 "Blue has won the campaign, Map will reset in 5 minutes.",
@@ -109,7 +110,8 @@ export async function checkUnitsToBaseForCapture(): Promise<void> {
         }
         if (campaignState.blue === 0) {
             console.log("RED WON RED WON RED WON RED WON RED WON RED WON RED WON RED WON RED WON ");
-            await ddcsControllers.serverActionsUpdate({resetFullCampaign: true});
+            const engineCache = ddcsControllers.getEngineCache();
+            await ddcsControllers.serverActionsUpdate({name: engineCache.config.name, resetFullCampaign: true});
             await ddcsControllers.setTimeToRestart(new Date().getTime() + ddcsControllers.time.fiveMins);
             await ddcsControllers.sendMesgToAll(
                 "Red has won the campaign, Map will reset in 5 minutes.",
