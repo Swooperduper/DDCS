@@ -114,7 +114,7 @@ export async function processingIncomingData(incomingObj: any) {
                 dbModels.srvPlayerModel.find({_id: incomingObj.from}, async (err: any, serverObj: typings.ISrvPlayers[]) => {
                     if (err) { console.log("incomingMsgError: ", err); }
                     const curPly = serverObj[0];
-                    await ddcsController.sendMesgToPlayerChatWindow(`DDCS is a war simulation engine built over 5 years, Currently built/Admined by Drex, Kirkwood, Red Teufel, biz, Pom, Tuli, Hambone307, Aries144 `, curPly.playerId);
+                    await ddcsController.sendMesgToPlayerChatWindow(`DDCS is a Air, Sea, and Ground Warfare Simulation Engine Built Over 5 Years - Please read the briefing for more information, Currently Built/Admined By Drex, Kirkwood, Red Teufel, biz, Pom, Tuli, Hambone307, and Aries144 `, curPly.playerId);
                 });
             }
 
