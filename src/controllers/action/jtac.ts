@@ -16,7 +16,12 @@ const fiveMins = 5 * 60 * 1000;
 export async function baseDefenseDetectSmoke() {
     const mainBaseMOBs = await ddcsControllers.baseActionRead({baseType: "MOB", _id: { $not: /~/ }, enabled: true});
     for (const base of mainBaseMOBs) {
-        const enemyUnits = await ddcsControllers.getCoalitionGroundUnitsInProximity( base.centerLoc, jtacDistance, base.side);
+        const enemyUnits = await ddcsControllers.getCoalitionGroundUnitsInProximity(
+            base.centerLoc,
+            jtacDistance,
+            ddcsControllers.enemyCountry[base.side]
+        );
+        console.log("Enemy Near MOB: ", enemyUnits);
         if (enemyUnits.length > 0) {
             for (const unit of enemyUnits) {
                 await ddcsControllers.sendUDPPacket("frontEnd", {
