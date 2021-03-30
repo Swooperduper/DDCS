@@ -13,6 +13,24 @@ const redLaserCode = 1686;
 const blueLaserCode = 1687;
 const fiveMins = 5 * 60 * 1000;
 
+export async function baseDefenseDetectSmoke() {
+    const mainBaseMOBs = await ddcsControllers.baseActionRead({baseType: "MOB", _id: { $not: /~/ }, enabled: true});
+    for (const base of mainBaseMOBs) {
+        const enemyUnits = await ddcsControllers.getCoalitionGroundUnitsInProximity( base.centerLoc, jtacDistance, base.side);
+        if (enemyUnits.length > 0) {
+            for (const unit of enemyUnits) {
+                await ddcsControllers.sendUDPPacket("frontEnd", {
+                    actionObj: {
+                        action: "setSmoke",
+                        enemyUnitName: unit._id,
+                        coalition: base.side
+                    }
+                });
+            }
+        }
+    }
+}
+
 export async function processJtacLos(incomingObj: any): Promise<void> {
     await processLOSEnemy(incomingObj.jtacUnit, incomingObj.returnObj);
 }
