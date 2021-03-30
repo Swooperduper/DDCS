@@ -155,11 +155,12 @@ function addGroups(groups, coalition)
             if Unit.isActive(unit) then
                 --env.info("ISACTIVE " .. curUnitName)
                 if objCache[curUnitName] ~= nil then
-                    if objCache[curUnitName].lat ~= lat or objCache[curUnitName].lon ~= lon or objCache[curUnitName].isActive ~= true or not TableComp(objCache[curUnitName].ammo, ammo) then
+                    if objCache[curUnitName].lat ~= lat or objCache[curUnitName].lon ~= lon or objCache[curUnitName].playername ~= playername or objCache[curUnitName].isActive ~= true or not TableComp(objCache[curUnitName].ammo, ammo) then
                         objCache[curUnitName] = {
                             ["lat"] = lat,
                             ["lon"] = lon,
                             ["isActive"] = true,
+                            ["playername"] = playername,
                             ["ammo"] = ammo
                         }
                         local curUnitObj = generateInitialUnitObj(group, unit, true, curUnitName, coalition, lon, lat, alt, unitPosition, playername, ammo)
@@ -171,6 +172,7 @@ function addGroups(groups, coalition)
                         ["lat"] = lat,
                         ["lon"] = lon,
                         ["isActive"] = true,
+                        ["playername"] = playername,
                         ["ammo"] = ammo
                     }
                     local curUnitObj = generateInitialUnitObj(group, unit, true, curUnitName, coalition, lon, lat, alt, unitPosition, playername, ammo)
@@ -184,6 +186,7 @@ function addGroups(groups, coalition)
                         ["lat"] = lat,
                         ["lon"] = lon,
                         ["isActive"] = false,
+                        ["playername"] = playername,
                         ["ammo"] = ammo
                     }
                     local curUnitObj = generateInitialUnitObj(group, unit, false, curUnitName, coalition, lon, lat, alt, unitPosition, playername, ammo)
@@ -429,6 +432,21 @@ function runRequest(request)
             end
         end
 
+        if request.action == "setSmoke" then
+            local curEnemyUnit = Unit.getByName(request.enemyUnitName)
+            if curEnemyUnit ~= nil then
+                local _enemyVector = curEnemyUnit:getPoint()
+                local _enemyVectorUpdated = { x = _enemyVector.x, y = _enemyVector.y + 2.0, z = _enemyVector.z }
+
+                if request.coalition == 1 then
+                    trigger.action.smoke(_enemyVectorUpdated, 4 )
+                end
+                if request.coalition == 2 then
+                    trigger.action.smoke(_enemyVectorUpdated, 1 )
+                end
+            end
+        end
+
         if request.action == "setLaserSmoke" then
             local curJtacUnit = Unit.getByName(request.jtacUnitName)
             local curEnemyUnit = Unit.getByName(request.enemyUnitName)
@@ -437,7 +455,7 @@ function runRequest(request)
                 local _enemyVector = curEnemyUnit:getPoint()
                 local _enemyVectorUpdated = { x = _enemyVector.x, y = _enemyVector.y + 2.0, z = _enemyVector.z }
                 local _oldLase = laserSpots[curJtacUnit]
-                local _oldIR = IRSpots[curJtacUnit]
+                --local _oldIR = IRSpots[curJtacUnit]
 
                 if _oldLase == nil then
                     local _status, _result = pcall(function()
@@ -454,20 +472,20 @@ function runRequest(request)
                     _oldLase:setPoint(_enemyVectorUpdated)
                 end
 
-                if _oldIR == nil then
-                    local _status, _result = pcall(function()
-                        return Spot.createInfraRed(curJtacUnit, { x = 0, y = 2.0, z = 0 }, _enemyVectorUpdated)
-                    end)
-                    if not _status then
-                        env.error('ERROR: ' .. _result, false)
-                    else
-                        if _result then
-                            IRSpots[curJtacUnit] = _result
-                        end
-                    end
-                else
-                    _oldIR:setPoint(_enemyVectorUpdated)
-                end
+                --if _oldIR == nil then
+                --    local _status, _result = pcall(function()
+                --        return Spot.createInfraRed(curJtacUnit, { x = 0, y = 2.0, z = 0 }, _enemyVectorUpdated)
+                --    end)
+                --    if not _status then
+                --        env.error('ERROR: ' .. _result, false)
+                --    else
+                --        if _result then
+                --            IRSpots[curJtacUnit] = _result
+                --        end
+                --    end
+                --else
+                --    _oldIR:setPoint(_enemyVectorUpdated)
+                --end
 
                 local elat, elon, ealt = coord.LOtoLL(_enemyVectorUpdated)
                 local MGRS = coord.LLtoMGRS(coord.LOtoLL(_enemyVectorUpdated))
