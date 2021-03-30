@@ -28,7 +28,8 @@ export async function baseDefenseDetectSmoke() {
                     actionObj: {
                         action: "setSmoke",
                         enemyUnitName: unit._id,
-                        coalition: base.side
+                        coalition: base.side,
+                        reqID: 0
                     }
                 });
             }
