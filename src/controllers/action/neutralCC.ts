@@ -5,6 +5,8 @@
 import * as _ from "lodash";
 import * as typings from "../../typings";
 import * as ddcsControllers from "../";
+import * as ddcsController from "./unitDetection";
+import {I18nResolver} from "i18n-ts";
 
 export async function checkCmdCenters(): Promise<void> {
     let basesChanged = false;
@@ -40,6 +42,10 @@ export async function checkCmdCenters(): Promise<void> {
 }
 
 export async function spawnCCAtNeutralBase(curPlayerUnit: typings.IUnit): Promise<boolean> {
+    const curPlayerArray = await ddcsControllers.srvPlayerActionsRead({name: curPlayerUnit.playername});
+    const curPly = curPlayerArray[0];
+    const engineCache = ddcsControllers.getEngineCache();
+    const i18n = new I18nResolver(engineCache.i18n, curPly.lang).translation as any;
     const bases = await ddcsControllers.baseActionRead({baseType: "FOB", enabled: true});
     const mainNeutralBases = _.remove(bases, (base) => {
         return !_.includes(base.name, "#");
@@ -55,7 +61,7 @@ export async function spawnCCAtNeutralBase(curPlayerUnit: typings.IUnit): Promis
                     console.log("cmdCenter already exists, replace units: " + base.name + " " + cmdCenters);
                     await ddcsControllers.sendMesgToGroup(
                         curPlayerUnit.groupId,
-                        "G: " + base.name + " Command Center Already Exists, Support Units Replaced.",
+                        "G: " + i18n.BASECOMMANDCENTEREXISTS.replace("#1", base.name),
                         5
                     );
                     // console.log('SSB: ', serverName, base.name, curPlayerUnit.coalition);
@@ -65,7 +71,7 @@ export async function spawnCCAtNeutralBase(curPlayerUnit: typings.IUnit): Promis
                     console.log(" enemy cmdCenter already exists: " + base.name + " " + cmdCenters);
                     await ddcsControllers.sendMesgToGroup(
                         curPlayerUnit.groupId,
-                        "G: Enemy " + base.name + " Command Center Already Exists.",
+                        "G: " + i18n.ENEMYCOMMANDCENTEREXISTS.replace("#1", base.name),
                         5
                     );
                     return false;
