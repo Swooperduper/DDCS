@@ -6,6 +6,7 @@ import * as _ from "lodash";
 import * as typings from "../../typings";
 import * as ddcsControllers from "../";
 import {I18nResolver} from "i18n-ts";
+import * as ddcsController from "./unitDetection";
 
 export function getWeaponCost(typeName: string, count: number): number {
     const engineCache = ddcsControllers.getEngineCache();
@@ -147,6 +148,7 @@ export async function checkAircraftCosts(): Promise<void> {
     if (latestSession && latestSession.name) {
         const srvPlayers = await ddcsControllers.srvPlayerActionsRead({sessionName: latestSession.name, playername: {$ne: ""}});
         for (const curPlayer of srvPlayers) {
+            const i18n = new I18nResolver(engineCache.i18n, curPlayer.lang).translation as any;
             if (curPlayer.name) {
                 const cUnit = await ddcsControllers.unitActionRead({dead: false, playername: curPlayer.name});
                 if (cUnit.length > 0) {
@@ -161,9 +163,8 @@ export async function checkAircraftCosts(): Promise<void> {
                     }
                     totalTakeoffCosts = curUnitLPCost + curTopWeaponCost;
                     if ((curPlayer.curLifePoints || 0) < totalTakeoffCosts && !curUnit.inAir) {
-                        mesg = "G: You Do Not Have Enough Points To Takeoff In " + curUnit.type + " + Loadout(" +
-                            totalTakeoffCosts.toFixed(2) + "/" +
-                            curPlayer.curLifePoints.toFixed(2) + "}";
+                        mesg = "G: " + i18n.YOUDONOTHAVEENOUGHPOINTS.replace("#1", curUnit.type)
+                            .replace("#2", totalTakeoffCosts.toFixed(2)).replace("#3", curPlayer.curLifePoints.toFixed(2));
                         console.log(curPlayer.name + " " + mesg);
                         await ddcsControllers.sendMesgToGroup(
                             curUnit.groupId,
