@@ -3,8 +3,6 @@
  */
 
 import * as ddcsController from "../";
-import { dbModels } from "../db";
-import * as typings from "../../typings";
 import {I18nResolver} from "i18n-ts";
 
 export async function lockUserToSide(incomingObj: any, lockToSide: number): Promise<void> {
@@ -22,14 +20,7 @@ export async function lockUserToSide(incomingObj: any, lockToSide: number): Prom
         } else {
             const mesg = i18n.PLAYERISNOWLOCKEDTOSIDE.replace("#1", i18n[curPly.sideLock].toUpperCase());
             await ddcsController.sendMesgToPlayerChatWindow(mesg, curPly.playerId);
-            dbModels.srvPlayerModel.updateOne(
-                {_id: incomingObj.from},
-                {$set: {sideLock: lockToSide}},
-                (updateErr: any) => {
-                    if (updateErr) { reject(updateErr); }
-                    resolve();
-                }
-            );
+            await ddcsController.srvPlayerActionsUpdate({_id: incomingObj.from, sideLock: lockToSide});
         }
     });
 }
