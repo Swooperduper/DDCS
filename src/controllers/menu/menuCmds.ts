@@ -1381,7 +1381,7 @@ export async function unpackCrate(
                     const curUnitStart = _.cloneDeep(cbUnit) as any;
                     curUnitStart.groupName = genName + randInc;
                     curUnitStart.name = genName + (randInc + x);
-                    curUnitStart.lonLatLoc = ddcsControllers.getLonLatFromDistanceDirection(playerUnit.lonLatLoc, curUnitHdg, 0.05);
+                    curUnitStart.lonLatLoc = ddcsControllers.getLonLatFromDistanceDirection(playerUnit.lonLatLoc, curUnitHdg, 0.08);
                     curUnitStart.hdg = curUnitHdg;
                     curUnitStart.country = country;
                     curUnitStart.playerCanDrive = mobile || false;
@@ -1414,7 +1414,7 @@ export async function unpackCrate(
                     }
                     unitStart.name = genName + (randInc + x);
                     unitStart.groupName = genName + randInc;
-                    unitStart.lonLatLoc = ddcsControllers.getLonLatFromDistanceDirection(playerUnit.lonLatLoc, curUnitHdg, 0.05);
+                    unitStart.lonLatLoc = ddcsControllers.getLonLatFromDistanceDirection(playerUnit.lonLatLoc, curUnitHdg, 0.08);
                     unitStart.hdg = curUnitHdg;
                     unitStart.country = pCountry;
                     unitStart.playerCanDrive = mobile || false;
