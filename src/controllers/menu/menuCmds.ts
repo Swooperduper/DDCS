@@ -6,6 +6,8 @@ import * as _ from "lodash";
 import * as typing from "../../typings";
 import * as ddcsControllers from "../";
 import {airUnitTemplate, getNextUniqueId, processLOSEnemy, setRequestJobArray, spawnGrp} from "../";
+import * as ddcsController from "../action/unitDetection";
+import {I18nResolver} from "i18n-ts";
 
 export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: string) {
     const engineCache = ddcsControllers.getEngineCache();
@@ -13,17 +15,18 @@ export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: 
     let crateCount: number = 0;
     let curBaseName: string;
     let curBaseObj: any;
+    const i18n = new I18nResolver(engineCache.i18n, curPlayer.lang).translation as any;
     if (intCargoType === "loaded") {
         if (curUnit.intCargoType) {
             await ddcsControllers.sendMesgToGroup(
                 curUnit.groupId,
-                "G: " + curUnit.intCargoType + " Internal Crate is Onboard!",
+                "G: " + i18n.INTERNALCRATEONBOARD.replace("#1", curUnit.intCargoType),
                 5
             );
         } else {
             await ddcsControllers.sendMesgToGroup(
                 curUnit.groupId,
-                "G: No Internal Crates Onboard!",
+                "G: " + i18n.NOINTERNALCRATEONBOARD,
                 5
             );
         }
@@ -36,7 +39,7 @@ export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: 
         if (curUnit.inAir) {
             await ddcsControllers.sendMesgToGroup(
                 curUnit.groupId,
-                "G: Please Land Before Attempting Cargo Commands!",
+                "G: " + i18n.LANDBEFORECARGOCOMMAND,
                 5
          );
         } else {
@@ -53,7 +56,7 @@ export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: 
                 if (curBaseObj && curIntCrateBaseOrigin === _.split(curBaseObj.name, " #")[0]) {
                     await ddcsControllers.sendMesgToGroup(
                         curUnit.groupId,
-                        "G: You can't unpack this internal crate from same base it is acquired!",
+                        "G: " + i18n.CANTUNPACKSAMEBASECRATE,
                         5
                     );
                 } else {
@@ -62,7 +65,7 @@ export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: 
                         await ddcsControllers.unitActionUpdateByUnitId({unitId: curUnit.unitId, intCargoType: ""});
                         await ddcsControllers.sendMesgToGroup(
                             curUnit.groupId,
-                            "G: You Have Spawned A JTAC Unit From Internal Cargo!",
+                            "G: " + i18n.SPAWNJTACFROMINTERNALCARGO,
                             5
                         );
                     }
@@ -72,7 +75,7 @@ export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: 
                         } else {
                             await ddcsControllers.sendMesgToGroup(
                                 curUnit.groupId,
-                                "G: You are not near any friendly bases!",
+                                "G: " + i18n.YOUARENOTNEARANYFRIENDLYBASES,
                                 5
                             );
                         }
@@ -111,7 +114,7 @@ export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: 
                         await ddcsControllers.unitActionUpdateByUnitId({unitId: curUnit.unitId, intCargoType: ""});
                         await ddcsControllers.sendMesgToGroup(
                             curUnit.groupId,
-                            "G: Command Center Build crate has been spawned!",
+                            "G: " + i18n.COMMANDCENTERBUILDCRATESPAWNED,
                             5
                         );
                     }
@@ -119,7 +122,7 @@ export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: 
             } else {
                 await ddcsControllers.sendMesgToGroup(
                     curUnit.groupId,
-                    "G: No Internal Crates Onboard!",
+                    "G: " + i18n.NOINTERNALCRATEONBOARD,
                     5
                 );
             }
@@ -129,7 +132,7 @@ export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: 
         if (curUnit.inAir) {
             await ddcsControllers.sendMesgToGroup(
                 curUnit.groupId,
-                "G: Please Land Before Attempting Cargo Commands!",
+                "G: " + i18n.LANDBEFORECARGOCOMMAND,
                 5
             );
         } else {
@@ -154,7 +157,7 @@ export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: 
                         });
                         await ddcsControllers.sendMesgToGroup(
                             curUnit.groupId,
-                            "G: Picked Up A JTAC Internal Crate From " + curBaseName + "!",
+                            "G: " + i18n.PICKEDUPJTACINTERNALCRATE.replace("#1", curBaseName),
                             5
                         );
                     }
@@ -172,7 +175,7 @@ export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: 
                         });
                         await ddcsControllers.sendMesgToGroup(
                             curUnit.groupId,
-                            "G: Picked Up A Base Repair Internal Crate From " + curBaseName + "!",
+                            "G: " + i18n.PICKEDUPBASEREPAIRINTERNALCRATES.replace("#1", curBaseName),
                             5
                         );
                     }
@@ -183,21 +186,21 @@ export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: 
                         });
                         await ddcsControllers.sendMesgToGroup(
                             curUnit.groupId,
-                            "G: Picked Up A Base Command Center Build Crate From " + curBaseName + "!",
+                            "G: " + i18n.PICKEDUPBASEREPAIRBUILDCRATE.replace("#1", curBaseName),
                             5
                         );
                     }
                 } else {
                     await ddcsControllers.sendMesgToGroup(
                         curUnit.groupId,
-                        "G: " + curBaseName + " logistical supply system is cut, repair the base!",
+                        "G: " + i18n.LOGISTICALSUPPLYHASBEENCUT.replace("#1", curBaseName),
                         5
                     );
                 }
             } else {
                 await ddcsControllers.sendMesgToGroup(
                     curUnit.groupId,
-                    "G: You are not within 2km of a friendly base to load internal crate!",
+                    "G: " + i18n.YOUARENOTWITHINDISTANCEFRIENDLYBASE.replace("#1", "2km"),
                     5
                 );
             }
@@ -206,11 +209,15 @@ export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: 
 }
 
 export async function isCrateOnboard(unit: any, verbose: boolean) {
+    const curPlayerArray = await ddcsControllers.srvPlayerActionsRead({name: unit.playername});
+    const curPly = curPlayerArray[0];
+    const engineCache = ddcsControllers.getEngineCache();
+    const i18n = new I18nResolver(engineCache.i18n, curPly.lang).translation as any;
     if (unit.virtCrateType) {
         if (verbose) {
             await ddcsControllers.sendMesgToGroup(
                 unit.groupId,
-                "G: " + _.split(unit.virtCrateType, "|")[2] + " is Onboard!",
+                "G: " + i18n.CRATEISONBOARD.replace("#1", _.split(unit.virtCrateType, "|")[2]),
                 5
             );
         }
@@ -219,7 +226,7 @@ export async function isCrateOnboard(unit: any, verbose: boolean) {
     if (verbose) {
         await ddcsControllers.sendMesgToGroup(
             unit.groupId,
-            "G: No Crates Onboard!",
+            "G: " + i18n.NOCRATESONBOARD,
             5
         );
     }
@@ -227,11 +234,15 @@ export async function isCrateOnboard(unit: any, verbose: boolean) {
 }
 
 export async function isTroopOnboard(unit: any, verbose?: boolean) {
+    const curPlayerArray = await ddcsControllers.srvPlayerActionsRead({name: unit.playername});
+    const curPly = curPlayerArray[0];
+    const engineCache = ddcsControllers.getEngineCache();
+    const i18n = new I18nResolver(engineCache.i18n, curPly.lang).translation as any;
     if (unit.troopType) {
         if (verbose) {
             await ddcsControllers.sendMesgToGroup(
                 unit.groupId,
-                "G: " + unit.troopType + " is Onboard!",
+                "G: " + i18n.CRATEISONBOARD.replace("#1", unit.troopType),
                 5
             );
         }
@@ -240,7 +251,7 @@ export async function isTroopOnboard(unit: any, verbose?: boolean) {
     if (verbose) {
         await ddcsControllers.sendMesgToGroup(
             unit.groupId,
-            "G: No Troops Onboard!",
+            "G: " + i18n.NOTROOPSONBOARD,
             5
         );
     }
@@ -250,10 +261,14 @@ export async function isTroopOnboard(unit: any, verbose?: boolean) {
 export async function loadTroops(unitId: string, troopType: string) {
     const units = await ddcsControllers.unitActionRead({unitId});
     const curUnit = _.get(units, 0);
+    const curPlayerArray = await ddcsControllers.srvPlayerActionsRead({name: curUnit.playername});
+    const curPly = curPlayerArray[0];
+    const engineCache = ddcsControllers.getEngineCache();
+    const i18n = new I18nResolver(engineCache.i18n, curPly.lang).translation as any;
     if (curUnit.inAir) {
         await ddcsControllers.sendMesgToGroup(
             curUnit.groupId,
-            "G: Please Land Before Attempting Logistic Commands!",
+            "G: " + i18n.LANDBEFORECARGOCOMMAND,
             5
         );
     } else {
@@ -267,7 +282,7 @@ export async function loadTroops(unitId: string, troopType: string) {
             await ddcsControllers.unitActionUpdateByUnitId({unitId, troopType});
             await ddcsControllers.sendMesgToGroup(
                 curUnit.groupId,
-                "G: " + troopType + " Has Been Loaded!",
+                "G: " + i18n.HASBEENLOADED.replace("#1", troopType),
                 5
             );
         } else {
@@ -295,7 +310,7 @@ export async function loadTroops(unitId: string, troopType: string) {
                     .then(() => {
                         ddcsControllers.sendMesgToGroup(
                             curUnit.groupId,
-                            "G: " + troopType + " Has Been Loaded!",
+                            "G: " + i18n.HASBEENLOADED.replace("#1", troopType),
                             5
                         );
                     })
@@ -306,7 +321,7 @@ export async function loadTroops(unitId: string, troopType: string) {
             } else {
                 await ddcsControllers.sendMesgToGroup(
                     curUnit.groupId,
-                    "G: You are too far from a friendly base to load troops!",
+                    "G: " + i18n.TOOFARFROMFRIENDLYBASE.replace("#1", "troops"),
                     5
                 );
             }
@@ -315,32 +330,34 @@ export async function loadTroops(unitId: string, troopType: string) {
 }
 
 export async function getActiveJTACTargets(unit: any, player: any, target: number) {
+    const engineCache = ddcsControllers.getEngineCache();
+    const i18n = new I18nResolver(engineCache.i18n, player.lang).translation as any;
     const closestJTAC = await ddcsControllers.getFirst5CoalitionJTACInProximity(unit.lonLatLoc, 10000, unit.coalition);
-    let mesg = "";
+    let message = "";
     if (target) {
         if (closestJTAC[(target - 1)]) {
             const curJtacEnemy = closestJTAC[(target - 1)].jtacEnemyLocation;
             const closestBase = await ddcsControllers.getAnyBasesInProximity([curJtacEnemy.lonLat.lon, curJtacEnemy.lonLat.lat], 100);
             // console.log("target: ", target, closestJTAC[target - 1]);
-            mesg += "Target: " + target + " Type: " + curJtacEnemy.type;
+            message += i18n.TARGET + ": " + target + " " + i18n.TYPE + ": " + curJtacEnemy.type;
             if (closestBase[0] && closestBase[0]._id) {
-                mesg += " near " + closestBase[0]._id + "\n";
+                message += " " + i18n.NEAR + " " + closestBase[0]._id + "\n";
             }
-            mesg += "Lat: " + curJtacEnemy.lonLat.lat + " Lon: " + curJtacEnemy.lonLat.lon + "\n";
-            mesg += "DMS: " + ddcsControllers.convertDMS(curJtacEnemy.lonLat.lat, curJtacEnemy.lonLat.lon) + "\n";
-            mesg += "MGRS: " + curJtacEnemy.mgrs.UTMZone + curJtacEnemy.mgrs.MGRSDigraph +
+            message += "Lat: " + curJtacEnemy.lonLat.lat + " Lon: " + curJtacEnemy.lonLat.lon + "\n";
+            message += "DMS: " + ddcsControllers.convertDMS(curJtacEnemy.lonLat.lat, curJtacEnemy.lonLat.lon) + "\n";
+            message += "MGRS: " + curJtacEnemy.mgrs.UTMZone + curJtacEnemy.mgrs.MGRSDigraph +
                 curJtacEnemy.mgrs.Easting + curJtacEnemy.mgrs.Northing + "\n";
-            mesg += "Shot IR and Laser, Laser Code: " + curJtacEnemy.laserCode;
+            message +=  i18n.SHOTLASERCODE.replace("#1", curJtacEnemy.laserCode);
 
             await ddcsControllers.sendMesgToGroup(
                 unit.groupId,
-                mesg,
+                message,
                 60
             );
         } else {
             await ddcsControllers.sendMesgToGroup(
                 unit.groupId,
-                "There is no JTAC target: " + target,
+                i18n.NOJTACTARGET.replace("#1", target),
                 10
             );
         }
@@ -348,7 +365,7 @@ export async function getActiveJTACTargets(unit: any, player: any, target: numbe
         if (closestJTAC.length > 0) {
             for (let x = 0; x < closestJTAC.length; x++) {
                 if (x !== 0) {
-                    mesg += "\n";
+                    message += "\n";
                 }
 
                 const curJtacEnemy = closestJTAC[x].jtacEnemyLocation;
@@ -358,20 +375,21 @@ export async function getActiveJTACTargets(unit: any, player: any, target: numbe
                     curJtacEnemy.lonLat.lat, curJtacEnemy.lonLat.lon).toFixed(2);
                 const closestBase = await ddcsControllers.getAnyBasesInProximity([curJtacEnemy.lonLat.lon, curJtacEnemy.lonLat.lat], 100);
                 console.log("BRA", enemyBRA, enemyDist, curJtacEnemy);
-                mesg += (x + 1) + ". " + curJtacEnemy.type + " at BRA " + enemyBRA + " for " + enemyDist + "KM";
+                message += i18n.JTACTARGET.replace("#1", (x + 1))
+                    .replace("#2", curJtacEnemy.type).replace("#3", enemyBRA).replace("#4", enemyDist);
                 if (closestBase[0] && closestBase[0]._id) {
-                    mesg += " near " + closestBase[0]._id;
+                    message += " " + i18n.NEAR + " " + closestBase[0]._id;
                 }
             }
             await ddcsControllers.sendMesgToGroup(
                 unit.groupId,
-                mesg,
+                message,
                 20
             );
         } else {
             await ddcsControllers.sendMesgToGroup(
                 unit.groupId,
-                "There is no JTAC targets",
+                i18n.NOJTACTARGETS,
                 10
             );
         }
