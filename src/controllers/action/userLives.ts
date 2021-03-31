@@ -104,6 +104,7 @@ export async function lookupAircraftCosts(playerUcid: string): Promise<void> {
     if (srvPlayer.length > 0) {
         const curPlayer = srvPlayer[0];
         if (curPlayer) {
+            const i18n = new I18nResolver(engineCache.i18n, curPlayer.lang).translation as any;
             if (curPlayer.name) {
                 const cUnit = await ddcsControllers.unitActionRead({dead: false, playername: curPlayer.name});
                 if (cUnit.length > 0) {
@@ -123,12 +124,11 @@ export async function lookupAircraftCosts(playerUcid: string): Promise<void> {
                             }
                         }
                         totalTakeoffCosts = curUnitLPCost + curTopWeaponCost;
-                        await ddcsControllers.sendMesgToGroup(
-                            curUnit.groupId,
-                            "G: You aircraft costs " + totalTakeoffCosts + "( " + curUnitLPCost + "(" +
-                            curUnit.type + ")+" + curTopWeaponCost + "(" + curTopAmmo + ") ) Life Points.",
-                            5
-                        );
+
+                        const messages = "G: " + i18n.YOURAIRCRAFTCOSTS.replace("#1", totalTakeoffCosts).replace("#2", curUnitLPCost)
+                            .replace("#3", curUnit.type).replace("#4", curTopWeaponCost).replace("#5", curTopAmmo);
+
+                        await ddcsControllers.sendMesgToGroup(curUnit.groupId, messages, 5);
                     } else {
                         console.log("cant find unit in dictionary: line 129");
                         console.log("lookup unit: ", curUnit);
