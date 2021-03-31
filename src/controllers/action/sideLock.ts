@@ -2,25 +2,24 @@
  * DDCS Licensed under AGPL-3.0 by Andrew "Drex" Finegan https://github.com/afinegan/DynamicDCS
  */
 
-import * as _ from "lodash";
 import * as ddcsControllers from "../";
-import { dbModels } from "../db/common";
+import { dbModels } from "../db";
 import * as typings from "../../typings";
-import {sendMesgToPlayerChatWindow} from "../";
+import {I18nResolver} from "i18n-ts";
+
 
 export async function lockUserToSide(incomingObj: any, lockToSide: number): Promise<void> {
     return new Promise((resolve, reject) => {
         dbModels.srvPlayerModel.find({_id: incomingObj.from}, async (err: any, serverObj: typings.ISrvPlayers[]) => {
             if (err) { reject(err); }
             const curPly = serverObj[0];
-            // console.log("current player: ", curPly, incomingObj);
+            const i18n = new I18nResolver(ddcsControllers.engineCache.i18n.definitions, curPly.lang) as any;
             if (curPly && curPly.sideLock !== 0) {
-                await sendMesgToPlayerChatWindow("Player ALREADY Locked to side " +
-                    ddcsControllers.side[curPly.sideLock].toUpperCase(), curPly.playerId);
+                const mesg = i18n.PLAYERALREADYLOCKEDTOSIDE.replace("#1", i18n[curPly.sideLock].toUpperCase());
+                await ddcsControllers.sendMesgToPlayerChatWindow(mesg, curPly.playerId);
             } else {
-                // console.log("lockToSide: ", lockToSide, curPly.name);
-                await sendMesgToPlayerChatWindow("Player is now Locked to side " +
-                    ddcsControllers.side[lockToSide].toUpperCase(), curPly.playerId);
+                const mesg = i18n.PLAYERISNOWLOCKEDTOSIDE.replace("#1", i18n[curPly.sideLock].toUpperCase());
+                await ddcsControllers.sendMesgToPlayerChatWindow(mesg, curPly.playerId);
                 dbModels.srvPlayerModel.updateOne(
                     {_id: incomingObj.from},
                     {$set: {sideLock: lockToSide}},
@@ -33,44 +32,3 @@ export async function lockUserToSide(incomingObj: any, lockToSide: number): Prom
         });
     });
 }
-
-/*
-export async function setSideLockFlags(): Promise<void> {
-    const playerSideLockTable: any[] = [];
-    const latestSession = await ddcsControllers.sessionsActionsReadLatest();
-    if (latestSession.name) {
-        const playerArray = await ddcsControllers.srvPlayerActionsRead({sessionName: latestSession.name});
-        for (const player of playerArray) {
-            let lockObj;
-            if (player.isGameMaster) {
-                lockObj = {
-                    ucid: player._id + "_GM",
-                    val: 1
-                };
-            } else {
-                if (player.sideLock > 0) {
-                    lockObj = {
-                        ucid: player._id + "_" + player.sideLock,
-                        val: 1
-                    };
-                } else {
-                    lockObj = {
-                        ucid: player._id + "_" + player.sideLock,
-                        val: 0
-                    };
-                }
-            }
-            playerSideLockTable.push(lockObj);
-        }
-
-        console.log("setSideLock: ", playerSideLockTable);
-        await ddcsControllers.sendUDPPacket("frontEnd", {
-            actionObj: {
-                action : "SETSIDELOCK",
-                data: playerSideLockTable
-            },
-            queName: "clientArray"
-        });
-    }
-}
- */

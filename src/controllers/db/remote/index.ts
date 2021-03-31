@@ -8,3 +8,4 @@ export * from "./userAccount";
 export * from "./weaponScore";
 export * from "./template";
 export * from "./menuCommand";
+export * from "./i18n";

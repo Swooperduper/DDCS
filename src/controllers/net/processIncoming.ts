@@ -2,6 +2,8 @@ import * as _ from "lodash";
 import * as ddcsController from "../";
 import { dbModels } from "../db/common";
 import * as typings from "../../typings";
+import {I18nResolver} from "i18n-ts";
+import * as ddcsControllers from "../action/aiConvoys";
 
 export async function processingIncomingData(incomingObj: any) {
     switch (incomingObj.action) {
@@ -107,17 +109,21 @@ export async function processingIncomingData(incomingObj: any) {
             break;
         case "incomingMessage":
             console.log("MESG: ", incomingObj.message);
-            if (incomingObj.message === "-red") {
-                await ddcsController.lockUserToSide(incomingObj, 1);
-            } else if (incomingObj.message === "-blue") {
-                await ddcsController.lockUserToSide(incomingObj, 2);
-            } else if (_.includes(incomingObj.message, "-")) {
-                dbModels.srvPlayerModel.find({_id: incomingObj.from}, async (err: any, serverObj: typings.ISrvPlayers[]) => {
-                    if (err) { console.log("incomingMsgError: ", err); }
-                    const curPly = serverObj[0];
-                    await ddcsController.sendMesgToPlayerChatWindow(`DDCS is a Air, Sea, and Ground Warfare Simulation Engine Built Over 5 Years - Please read the briefing for more information, Currently Built/Admined By Drex, Kirkwood, Red Teufel, biz, Pom, Tuli, Hambone307, and Aries144 `, curPly.playerId);
-                });
-            }
+            dbModels.srvPlayerModel.find({_id: incomingObj.from}, async (err: any, serverObj: typings.ISrvPlayers[]) => {
+                if (err) { console.log("incomingMsgError: ", err); }
+                const curPly = serverObj[0];
+                const i18n = new I18nResolver(ddcsController.engineCache.i18n.definitions, curPly.lang) as any;
+                if (incomingObj.message === i18n.COMMANDRED) {
+                    await ddcsController.lockUserToSide(incomingObj, 1);
+
+                } else if (incomingObj.message === i18n.COMMANDBLUE) {
+                    await ddcsController.lockUserToSide(incomingObj, 2);
+
+                } else if (_.includes(incomingObj.message, i18n.COMMANDDEFAULT)) {
+                    const mesg = i18n.COMMANDDEFAULTRESPONSE;
+                    await ddcsController.sendMesgToPlayerChatWindow(mesg, curPly.playerId);
+                }
+            });
 
             /*
             if (incomingObj.message === "-reload") {

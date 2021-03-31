@@ -41,6 +41,10 @@ export async function updateConfig(): Promise<void> {
     ddcsController.setConfig(curServer[0]);
 }
 
+export async function updateI18n(): Promise<void> {
+    ddcsController.setI18n(await ddcsController.i18nActionsRead());
+}
+
 export async function updateStaticDictionary(): Promise<void> {
     ddcsController.setStaticDictionary(await ddcsController.staticDictionaryActionsRead({}));
 }
@@ -71,6 +75,7 @@ export async function initV3Engine(): Promise<void> {
 
 
     await updateConfig();
+    await updateI18n();
     await updateStaticDictionary();
     await updateUnitDictionary(ddcsController.getEngineCache().config.timePeriod);
     await updateWeaponDictionary();

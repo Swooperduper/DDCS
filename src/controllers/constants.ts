@@ -11,7 +11,8 @@ export const engineCache = {
     weaponsDictionary: [],
     bases: [],
     menuCommands: [],
-    config: {} as typings.IServer
+    config: {} as typings.IServer,
+    i18n: {} as any
 };
 
 export const OBJECT_CATEGORY: string[] = [
@@ -319,6 +320,24 @@ export function getEngineCache(): any {
 
 export function setConfig(curConfig: typings.IServer): void {
     engineCache.config = curConfig;
+}
+
+export function setI18n(i18nLocalization: any): void {
+    engineCache.i18n = {
+        default: i18nLocalization.find((loc: any) => loc._id === "en"),
+        en: i18nLocalization.find((loc: any) => loc._id === "en")
+        // ru: i18nLocalization.find((loc: any) => loc._id === "ru"),
+        // cn: i18nLocalization.find((loc: any) => loc._id === "cn"),
+        // de: i18nLocalization.find((loc: any) => loc._id === "de"),
+        // cs: i18nLocalization.find((loc: any) => loc._id === "cs"),
+        // fr: i18nLocalization.find((loc: any) => loc._id === "fr"),
+        // es: i18nLocalization.find((loc: any) => loc._id === "es"),
+        // ko: i18nLocalization.find((loc: any) => loc._id === "ko"),
+        // jp: i18nLocalization.find((loc: any) => loc._id === "jp"),
+        // pl: i18nLocalization.find((loc: any) => loc._id === "pl"),
+        // it: i18nLocalization.find((loc: any) => loc._id === "it"),
+        // us: i18nLocalization.find((loc: any) => loc._id === "en")
+    };
 }
 
 export function setStaticDictionary(curStaticDictionary: any): void {
