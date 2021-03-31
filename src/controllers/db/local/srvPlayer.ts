@@ -220,16 +220,14 @@ export async function srvPlayerActionsClearTempScore(obj: {
         dbModels.srvPlayerModel.find({_id: obj._id}, (err: any, serverObj: typings.ISrvPlayers[]) => {
             if (err) { reject(err); }
             if (serverObj.length !== 0) {
+                const engineCache = ddcsController.getEngineCache();
+                const i18n = new I18nResolver(engineCache.i18n, serverObj[0].lang).translation as any;
                 dbModels.srvPlayerModel.updateOne(
                     {_id: obj._id},
                     {$set: {tmpRSPoints: 0}},
                     (updateErr: any) => {
                         if (updateErr) { reject(updateErr); }
-                        ddcsController.sendMesgToGroup(
-                            obj.groupId,
-                            "Your Tmp Score Has Been Cleared",
-                            15
-                        );
+                        ddcsController.sendMesgToGroup(obj.groupId, i18n.YOURTEMPSCOREHASBEENCLEARED, 15);
                         resolve();
                     }
                 );
@@ -250,6 +248,7 @@ export async function srvPlayerActionsAddTempScore(obj: {
         dbModels.srvPlayerModel.find({_id: obj._id}, (err: any, serverObj: any[]) => {
             if (err) { reject(err); }
             if (serverObj.length !== 0) {
+                const i18n = new I18nResolver(engineCache.i18n, serverObj[0].lang).translation as any;
                 const newTmpScore = (serverObj[0].tmpRSPoints || 0) + (obj.score || 0);
                 dbModels.srvPlayerModel.updateOne(
                     {_id: obj._id},
@@ -257,11 +256,7 @@ export async function srvPlayerActionsAddTempScore(obj: {
                     (updateErr: any) => {
                         if (updateErr) { reject(updateErr); }
                         if (engineCache.config.inGameHitMessages) {
-                            ddcsController.sendMesgToGroup(
-                                obj.groupId,
-                                "TmpScore: " + newTmpScore + ", Land at a friendly base/farp to receive these points",
-                                15
-                            );
+                            ddcsController.sendMesgToGroup( obj.groupId, i18n.ADDTEMPSCORE, 15);
                         }
                         resolve();
                     }
@@ -281,7 +276,9 @@ export async function srvPlayerActionsApplyTempToRealScore(obj: {
         dbModels.srvPlayerModel.find({_id: obj._id}, (err: any, serverObj: any[]) => {
             if (err) { reject(err); }
             if (serverObj.length !== 0) {
-                let mesg: string;
+                const engineCache = ddcsController.getEngineCache();
+                const i18n = new I18nResolver(engineCache.i18n, serverObj[0].lang).translation as any;
+                let message: string;
                 const curPly = serverObj[0];
                 const rsTotals = {
                     redRSPoints: curPly.redRSPoints || 0,
@@ -290,12 +287,14 @@ export async function srvPlayerActionsApplyTempToRealScore(obj: {
                 };
                 if (curPly.side === 1) {
                     rsTotals.redRSPoints = rsTotals.redRSPoints + rsTotals.tmpRSPoints;
-                    mesg = "You have been awarded: " + rsTotals.tmpRSPoints + " Points, Total Red RS Points: " + rsTotals.redRSPoints;
+                    message = i18n.AWARDEDRSPOINTS.replace("#1", rsTotals.tmpRSPoints)
+                        .replace("#2", "Red").replace("#3", rsTotals.redRSPoints);
                     rsTotals.tmpRSPoints = 0;
                 }
                 if (curPly.side === 2) {
                     rsTotals.blueRSPoints = rsTotals.blueRSPoints + rsTotals.tmpRSPoints;
-                    mesg = "You have been awarded: " + rsTotals.tmpRSPoints + " Points, Total Blue RS Points: " + rsTotals.blueRSPoints;
+                    message = i18n.AWARDEDRSPOINTS.replace("#1", rsTotals.tmpRSPoints)
+                        .replace("#2", "Blue").replace("#3", rsTotals.blueRSPoints);
                     rsTotals.tmpRSPoints = 0;
                 }
                 dbModels.srvPlayerModel.updateOne(
@@ -304,7 +303,7 @@ export async function srvPlayerActionsApplyTempToRealScore(obj: {
                     (updateErr: any) => {
                         if (updateErr) { reject(updateErr); }
                         // console.log("aplyT2R: ", curPly.name, mesg);
-                        ddcsController.sendMesgToGroup(obj.groupId, mesg, 15);
+                        ddcsController.sendMesgToGroup(obj.groupId, message, 15);
                         resolve();
                     }
                 );
