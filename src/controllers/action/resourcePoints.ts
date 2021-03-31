@@ -4,7 +4,6 @@
 
 import * as typings from "../../typings";
 import * as ddcsControllers from "../";
-import * as ddcsController from "./unitDetection";
 import {I18nResolver} from "i18n-ts";
 
 export async function spendResourcePoints(
