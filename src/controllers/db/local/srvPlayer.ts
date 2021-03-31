@@ -173,6 +173,8 @@ export async function srvPlayerActionsRemoveLifePoints(obj: {
 }): Promise<void> {
     return new Promise((resolve, reject) => {
         dbModels.srvPlayerModel.find({_id: obj._id}, (err: any, serverObj: typings.ISrvPlayers[]) => {
+            const engineCache = ddcsController.getEngineCache();
+            const i18n = new I18nResolver(engineCache.i18n, serverObj[0].lang).translation as any;
             const removePoints = obj.removeLifePoints;
             const curAction = "removeLifePoints";
             const curPlayerLifePoints = serverObj[0].curLifePoints || 0;
@@ -181,11 +183,8 @@ export async function srvPlayerActionsRemoveLifePoints(obj: {
             if (err) { reject(err); }
             if (serverObj.length > 0 && serverObj[0].playerId) {
                 if (curTotalPoints < 0) {
-                    ddcsController.forcePlayerSpectator(
-                        serverObj[0].playerId,
-                        "You Do Not Have Enough Points To Fly This Vehicle" +
-                        "{" + removePoints || "" + "/" + curPlayerLifePoints.toFixed(2) || "" + ")"
-                    );
+                    const message = i18n.REMOVEPOINTSNOPOINTS.replace("#1", removePoints).replace("#2", curPlayerLifePoints.toFixed(2));
+                    ddcsController.forcePlayerSpectator(serverObj[0].playerId, message);
                     resolve();
                 } else {
                     const setObj = {
@@ -199,9 +198,9 @@ export async function srvPlayerActionsRemoveLifePoints(obj: {
                         { $set: setObj },
                         (updateErr: any) => {
                             if (updateErr) { reject(updateErr); }
-                            ddcsController.sendMesgToGroup( obj.groupId, serverObj[0].name + " Have Just Used " +
-                                removePoints || "" + " Life Points! " + obj.execAction +
-                                "(Total:" + curTotalPoints.toFixed(2) || "" + ")", 5);
+                            const message = i18n.PLAYERHASJUSTUSEDLIFEPOINTS.replace("#1", serverObj[0].name)
+                                .replace("#2", removePoints).replace("#3", obj.execAction).replace("#4", curTotalPoints.toFixed(2));
+                            ddcsController.sendMesgToGroup( obj.groupId, message, 5);
                             resolve();
                         }
                     );
