@@ -5,6 +5,7 @@
 import * as _ from "lodash";
 import * as typings from "../../typings";
 import * as ddcsControllers from "../";
+import { futureCommandQueActionsDelete } from "../db";
 
 const checkMenuLevels = 2;
 const startLightCrateWeight = 500;
@@ -94,15 +95,18 @@ export async function initializeMenu(playerUnit: any): Promise<void> {
         return (menuCommand.allowedUnitTypes.length === 0 || _.includes(menuCommand.allowedUnitTypes, playerUnit.type)) &&
             (menuCommand.side === 0 || menuCommand.side === playerUnit.coalition);
     });
-
     // build master menu levels, every first lvl, clear menu line out
     for (let i = 0; i < checkMenuLevels; i++) {
         const curMenuLvls = _.groupBy(curMenuCommands, (gb: any) => gb.menuPath[i]);
         for (const curMenuName of Object.keys(curMenuLvls)) {
             if ( curMenuName !== "undefined" ) {
                 if (curMenuLvls[curMenuName][0].cmdProp.mass) {
-                    lightCrateWeight = await spawnNewMenuCategory(playerUnit, curMenuLvls, curMenuName, i, "Light", lightCrateWeight);
-                    heavyCrateWeight = await spawnNewMenuCategory(playerUnit, curMenuLvls, curMenuName, i, "Heavy", heavyCrateWeight);
+                    //dirty fix for light crate menu, drex to revisit ~Kirkwood
+                    if (playerUnit.type == "UH-1H"){
+                        lightCrateWeight = await spawnNewMenuCategory(playerUnit, curMenuLvls, curMenuName, i, "Light", lightCrateWeight);
+                    } else {
+                        heavyCrateWeight = await spawnNewMenuCategory(playerUnit, curMenuLvls, curMenuName, i, "Heavy", heavyCrateWeight);
+                    }
                 } else {
                     await spawnNewMenuCategory(playerUnit, curMenuLvls, curMenuName, i);
                 }
