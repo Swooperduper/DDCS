@@ -440,6 +440,7 @@ export async function menuCmdProcess(pObj: any) {
         const player = await ddcsControllers.srvPlayerActionsRead({name: curUnit.playername});
         if (player.length > 0) {
             const curPlayer = player[0];
+            const i18n = new I18nResolver(engineCache.i18n, curPlayer.lang).translation as any;
             let curSpawnUnit;
             // action menu
             switch (pObj.cmd) {
@@ -462,7 +463,7 @@ export async function menuCmdProcess(pObj: any) {
                     if (curUnit.inAir) {
                         await ddcsControllers.sendMesgToGroup(
                             curUnit.groupId,
-                            "G: Please Land Before Attempting Logistic Commands!",
+                            "G: " + i18n.LANDBEFORECARGOCOMMAND,
                             5
                         );
                     } else {
@@ -483,7 +484,7 @@ export async function menuCmdProcess(pObj: any) {
                                 });
                                 await ddcsControllers.sendMesgToGroup(
                                     curUnit.groupId,
-                                    "G: " + curUnit.troopType + " has been dropped off at the base!",
+                                    "G: " + i18n.HASBEENDROPPEDOFFATBASE.replace("#1", curUnit.troopType),
                                     5
                                 );
                             } else {
@@ -544,7 +545,7 @@ export async function menuCmdProcess(pObj: any) {
                                 await ddcsControllers.spawnUnitGroup(curTroops, false);
                                 await ddcsControllers.sendMesgToGroup(
                                     curUnit.groupId,
-                                    "G: " + curSpawnUnit.type + " has been deployed!",
+                                    "G: " + i18n.HASBEENDEPLOYED.replace("#1", curSpawnUnit.type),
                                     5
                                 );
                             }
@@ -570,14 +571,14 @@ export async function menuCmdProcess(pObj: any) {
                                     });
                                 await ddcsControllers.sendMesgToGroup(
                                     curUnit.groupId,
-                                    "G: Picked Up " + curTroop.type + "!",
+                                    "G: " + i18n.PICKEDUP.replace("#1", curTroop.type),
                                     5
                                 );
                             } else {
                                 // no troops
                                 await ddcsControllers.sendMesgToGroup(
                                     curUnit.groupId,
-                                    "G: No Troops To Extract Or Unload!",
+                                    "G:" + i18n.NOTROOPSTOEXTRACTORUNLOAD,
                                     5
                                 );
                             }
@@ -595,14 +596,14 @@ export async function menuCmdProcess(pObj: any) {
                     if (logiProx.length) {
                         await ddcsControllers.sendMesgToGroup(
                             curUnit.groupId,
-                            "G: You need to move farther away from Command Towers (800m)",
+                            "G: " + i18n.YOUNEEDTOMOVEFARTHERAWAY.replace("#1", "Command Towers (800m)"),
                             5
                         );
                     } else {
                         if (curUnit.inAir) {
                             await ddcsControllers.sendMesgToGroup(
                                 curUnit.groupId,
-                                "G: Please Land Before Attempting Logistic Commands!",
+                                "G: " + i18n.LANDBEFORECARGOCOMMAND,
                                 5
                             );
                         } else {
@@ -642,7 +643,8 @@ export async function menuCmdProcess(pObj: any) {
 
                     await ddcsControllers.sendMesgToGroup(
                         curUnit.groupId,
-                        "G: You Have " + _.size(grpGroups) + "/" + engineCache.config.maxUnitsMoving + " Unit Acquisitions In Play!",
+                        "G: " + i18n.YOUHAVEUNITAQUISITIONSINPLAY
+                            .replace("#1", _.size(grpGroups)).replace("#2", engineCache.config.maxUnitsMoving),
                         10
                     );
                     break;
@@ -992,6 +994,9 @@ export async function spawnCrateFromLogi(
     crateType: string
 ) {
     const engineCache = ddcsControllers.getEngineCache();
+    const curPlayerArray = await ddcsControllers.srvPlayerActionsRead({name: unit.playername});
+    const curPly = curPlayerArray[0];
+    const i18n = new I18nResolver(engineCache.i18n, curPly.lang).translation as any;
     const curUnitDict = _.find(engineCache.unitDictionary, (uD) => _.includes(uD.comboName, type) );
     const isCombo = !!curUnitDict;
     // console.log(unit, type, crates, isCombo, special, mobile, mass, crateType);
@@ -1007,7 +1012,7 @@ export async function spawnCrateFromLogi(
     if (unit.inAir) {
         await ddcsControllers.sendMesgToGroup(
             unit.groupId,
-            "G: Please Land Before Attempting Logistic Commands!",
+            "G: " + i18n.LANDBEFORECARGOCOMMAND,
             5
         );
     } else {
@@ -1082,13 +1087,13 @@ export async function spawnCrateFromLogi(
 
             await ddcsControllers.sendMesgToGroup(
                 unit.groupId,
-                "G: " + _.toUpper(spc) + " " + type + " crate has been spawned!",
+                "G: " + i18n.CRATEHASBEENSPAWNED.replace("#1",  _.toUpper(spc) + " " + type),
                 5
             );
         } else {
             await ddcsControllers.sendMesgToGroup(
                 unit.groupId,
-                "G: You are not close enough to the command center to spawn a crate!",
+                "G: " + i18n.YOUARENOTCLOSEENOUGHTOCOMMANDCENTER,
                 5
             );
         }
@@ -1130,6 +1135,9 @@ export async function spawnTanker(curUnit: any, curPlayer: any, tankerType: stri
     let tankerObj: any;
     const safeSpawnDistance: number = 100;
     let remoteLoc: number[];
+
+    const engineCache = ddcsControllers.getEngineCache();
+    const i18n = new I18nResolver(engineCache.i18n, curPlayer.lang).translation as any;
     console.log("tankerType: ", tankerType, rsCost);
 
     if (tankerType === "BHABTKR") {
@@ -1310,7 +1318,7 @@ export async function spawnTanker(curUnit: any, curPlayer: any, tankerType: stri
     if (closeMOBs1.length > 0 || closeMOBs2.length > 0) {
         await ddcsControllers.sendMesgToGroup(
             curUnit.groupId,
-            "G: Please spawn Tanker farther away from enemy bases!",
+            "G: " + i18n.SPAWNTANKERFARTHERAWAYFROMENEMYBASE,
             5
         );
     } else {
@@ -1329,18 +1337,19 @@ export async function unpackCrate(
     combo: boolean,
     mobile: boolean
 ) {
+    const curPlayerArray = await ddcsControllers.srvPlayerActionsRead({name: playerUnit.playername});
+    const curPlayer = curPlayerArray[0];
     const engineCache = ddcsControllers.getEngineCache();
+    const i18n = new I18nResolver(engineCache.i18n, curPlayer.lang).translation as any;
     const curTimePeriod = engineCache.config.timePeriod || "modern";
     if (playerUnit.inAir) {
         await ddcsControllers.sendMesgToGroup(
             playerUnit.groupId,
-            "G: Please Land Before Attempting Logistic Commands!",
+            "G: " + i18n.LANDBEFORECARGOCOMMAND,
             5
         );
         return false;
     } else {
-        const player = await ddcsControllers.srvPlayerActionsRead({name: playerUnit.playername});
-        const curPlayer = player[0];
         const delUnits = await ddcsControllers.unitActionReadStd({
             playerOwnerId: curPlayer.ucid,
             playerCanDrive: mobile || false,
