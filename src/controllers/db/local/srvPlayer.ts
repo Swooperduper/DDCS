@@ -326,18 +326,19 @@ export async function srvPlayerActionsUnitAddToRealScore(obj: {
         dbModels.srvPlayerModel.find({_id: obj._id}, (err: any, serverObj: any[]) => {
             if (err) { reject(err); }
             if (serverObj.length !== 0) {
-                let mesg: string;
+                let message: string;
                 const curPly = serverObj[0];
+                const i18n = new I18nResolver(engineCache.i18n, curPly.lang).translation as any;
                 const addScore = obj.score || 0;
                 const curType = obj.unitType || "";
                 const tObj: any = {};
                 if (obj.unitCoalition === curPly.side) {
                     if (curPly.side === 1) {
-                        mesg = "You have been awarded " + addScore + " from your " + curType + " for red";
+                        message = i18n.AWARDEDRSPOINTSFROMUNIT.replace("#1", addScore).replace("#2", curType).replace("#3", "red");
                         tObj.redRSPoints = (curPly.redRSPoints || 0) + addScore;
                     }
                     if (curPly.side === 2) {
-                        mesg = "You have been awarded " + addScore + " from your " + curType + " for blue";
+                        message = i18n.AWARDEDRSPOINTSFROMUNIT.replace("#1", addScore).replace("#2", curType).replace("#3", "blue");
                         tObj.blueRSPoints = (curPly.blueRSPoints || 0) + addScore;
                     }
                     dbModels.srvPlayerModel.updateOne(
@@ -348,11 +349,7 @@ export async function srvPlayerActionsUnitAddToRealScore(obj: {
                             console.log(obj.unitType + " has given " + addScore +
                                 " to " + curPly.name + " on " + curPly.side + ", Total: ", tObj);
                             if (engineCache.config.inGameHitMessages) {
-                                ddcsController.sendMesgToGroup(
-                                    obj.groupId,
-                                    mesg,
-                                    15
-                                );
+                                ddcsController.sendMesgToGroup(obj.groupId, message, 15);
                             }
                             resolve();
                         }
