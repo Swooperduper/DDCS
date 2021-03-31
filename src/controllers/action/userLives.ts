@@ -93,8 +93,8 @@ export async function lookupLifeResource(playerUcid: string): Promise<void> {
         if (curPlayer.name) {
             const cUnit = await ddcsControllers.unitActionRead({dead: false, playername: curPlayer.name});
             const curUnit = cUnit[0];
-            const message = i18n.LIFERESOURCEPOINTS.replace("#1", curPlayer.curLifePoints.toFixed(2));
-            await ddcsControllers.sendMesgToGroup( curUnit.groupId, "G: " + message, 5);
+            const message = "G: " + i18n.LIFERESOURCEPOINTS.replace("#1", curPlayer.curLifePoints.toFixed(2));
+            await ddcsControllers.sendMesgToGroup( curUnit.groupId, message, 5);
         }
     }
 }
@@ -143,7 +143,7 @@ export async function lookupAircraftCosts(playerUcid: string): Promise<void> {
 export async function checkAircraftCosts(): Promise<void> {
     const engineCache = ddcsControllers.getEngineCache();
     const latestSession = await ddcsControllers.sessionsActionsReadLatest();
-    let mesg: string;
+    let message: string;
 
     if (latestSession && latestSession.name) {
         const srvPlayers = await ddcsControllers.srvPlayerActionsRead({sessionName: latestSession.name, playername: {$ne: ""}});
@@ -163,10 +163,10 @@ export async function checkAircraftCosts(): Promise<void> {
                     }
                     totalTakeoffCosts = curUnitLPCost + curTopWeaponCost;
                     if ((curPlayer.curLifePoints || 0) < totalTakeoffCosts && !curUnit.inAir) {
-                        mesg = "G: " + i18n.YOUDONOTHAVEENOUGHPOINTS.replace("#1", curUnit.type)
+                        message = "G: " + i18n.YOUDONOTHAVEENOUGHPOINTS.replace("#1", curUnit.type)
                             .replace("#2", totalTakeoffCosts.toFixed(2)).replace("#3", curPlayer.curLifePoints.toFixed(2));
-                        console.log(curPlayer.name + " " + mesg);
-                        await ddcsControllers.sendMesgToGroup( curUnit.groupId, mesg, 30);
+                        console.log(curPlayer.name + " " + message);
+                        await ddcsControllers.sendMesgToGroup( curUnit.groupId, message, 30);
                     }
                 }
             }
