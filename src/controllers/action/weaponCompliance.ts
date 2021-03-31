@@ -4,6 +4,8 @@
 
 import * as _ from "lodash";
 import * as ddcsControllers from "../";
+import * as ddcsController from "./unitDetection";
+import {I18nResolver} from "i18n-ts";
 
 export async function checkWeaponComplianceOnTakeoff(iPlayer: any, curIUnit: any): Promise<boolean> {
     const engineCache = ddcsControllers.getEngineCache();
@@ -39,6 +41,7 @@ export async function checkAircraftWeaponCompliance(): Promise<void> {
     if (latestSession && latestSession.name) {
         const srvPlayers = await ddcsControllers.srvPlayerActionsRead({sessionName: latestSession.name, playername: {$ne: ""}});
         for (const curPlayer of srvPlayers) {
+            const i18n = new I18nResolver(engineCache.i18n, curPlayer.lang).translation as any;
             const cUnit = await ddcsControllers.unitActionRead({dead: false, playername: curPlayer.name});
             if (cUnit.length > 0) {
                 const curUnit = cUnit[0];
@@ -60,12 +63,10 @@ export async function checkAircraftWeaponCompliance(): Promise<void> {
                         }
                     }
                     if (maxLimitedWeaponCount > weaponRule.maxTotalAllowed && !curUnit.inAir) {
-                        await ddcsControllers.sendMesgToGroup(
-                            curUnit.groupId,
-                            "G: You have too many/banned weapons(" + maxLimitedWeaponCount + " of " +
-                            _.join(limitedWeapons) + "), Max Allowed " + weaponRule.maxTotalAllowed,
-                            30
-                        );
+                        const message = "G: " + i18n.YOUHAVEBANNEDWEAPONS.replace("#1", maxLimitedWeaponCount)
+                            .replace("#2", _.join(limitedWeapons)).replace("#3", weaponRule.maxTotalAllowed);
+
+                        await ddcsControllers.sendMesgToGroup( curUnit.groupId, message, 30);
                     }
                 }
             }

@@ -119,18 +119,18 @@ export async function gciUpdatePilots(detectedUnits: any, friendlySide: number) 
             }
 
             if (curPlayerDistance.length > 0) {
-                let mesg: string =  i18n.AUTOGCIHEADER + `\n`;
+                let message: string =  i18n.AUTOGCIHEADER + `\n`;
                 for ( let x = 0; x < displayGCIOutputs; x++) {
                     // F15, BRA 217 FOR 60M, AT 14000FT, DRAG
                     if (!!curPlayerDistance[x]) {
                         const curUnit = curPlayerDistance[x];
                         if (x !== 0) {
-                            mesg += `\n`;
+                            message += `\n`;
                         }
-                        mesg += `${curUnit.type.toUpperCase()}, ${i18n.BRAA} ${curUnit.bearingTo.toFixed(0)} ${i18n.FOR} ${(curUnit.distanceTo * 0.621371).toFixed(0)}${i18n.M}, ${i18n.AT} ${(curUnit.alt * 3.28084).toFixed(0)}${i18n.FT}, ${curUnit.curEnemyAspect}`;
+                        message += `${curUnit.type.toUpperCase()}, ${i18n.BRAA} ${curUnit.bearingTo.toFixed(0)} ${i18n.FOR} ${(curUnit.distanceTo * 0.621371).toFixed(0)}${i18n.M}, ${i18n.AT} ${(curUnit.alt * 3.28084).toFixed(0)}${i18n.FT}, ${curUnit.curEnemyAspect}`;
                     }
                 }
-                await ddcsController.sendMesgToGroup(curPlayerUnit.groupId, mesg, 15);
+                await ddcsController.sendMesgToGroup(curPlayerUnit.groupId, message, 15);
             }
         }
     }
