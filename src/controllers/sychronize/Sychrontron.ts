@@ -263,6 +263,7 @@ export async function syncCheck(serverCount: number): Promise<void> {
                 } else {
                     // unlock server port
                     // send message to discord
+                    await ddcsControllers.setFarpMarks();
                     await activateInactiveSpawn();
                     setMissionStartupReSync(false);
                     setServerSynced(true);
