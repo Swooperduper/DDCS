@@ -7,6 +7,7 @@ import * as typing from "../../typings";
 import * as ddcsControllers from "../";
 import {IGroundUnitTemp, IStaticSpawnMin} from "../../typings";
 import * as ddcsController from "../action/unitDetection";
+import {I18nResolver} from "i18n-ts";
 
 let openSAM: string;
 
@@ -1534,6 +1535,10 @@ export async function destroyUnit(unitName: string, type: string): Promise<void>
 }
 
 export async function healBase(baseName: string, curPlayerUnit: any, init: boolean): Promise<boolean> {
+    const curPlayerArray = await ddcsControllers.srvPlayerActionsRead({name: curPlayerUnit.playername});
+    const curPly = curPlayerArray[0];
+    const engineCache = ddcsControllers.getEngineCache();
+    const i18n = new I18nResolver(engineCache.i18n, curPly.lang).translation as any;
     const baseUnit = await ddcsControllers.baseActionRead({name: baseName});
     // console.log("healBase: ", baseName, baseUnit);
     if (baseUnit.length > 0) {
@@ -1542,7 +1547,7 @@ export async function healBase(baseName: string, curPlayerUnit: any, init: boole
         if (curBase.side !== 0 && curBase.side !== curPlayerUnit.coalition) {
             await ddcsControllers.sendMesgToGroup(
                 curPlayerUnit.groupId,
-                "G: Enemy " + curBase._id + " could not be repaired!",
+                "G: " + i18n.ENEMYBASECOULDNOTBEREPAIRED.replace("#1", curBase._id),
                 5
             );
             return false;
@@ -1554,7 +1559,7 @@ export async function healBase(baseName: string, curPlayerUnit: any, init: boole
                 if (shelterUnit.length > 0) {
                     await ddcsControllers.sendMesgToGroup(
                         curPlayerUnit.groupId,
-                        "G: Shelter at " + curBase._id + " already exists!",
+                        "G: " + i18n.SHELTERATBASEALREADYEXISTS.replace("#1", curBase._id),
                         5
                     );
                     return false;

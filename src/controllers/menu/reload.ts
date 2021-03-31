@@ -5,9 +5,14 @@
 import * as _ from "lodash";
 import * as typing from "../../typings";
 import * as ddcsControllers from "../";
+import * as ddcsController from "../action/unitDetection";
+import {I18nResolver} from "i18n-ts";
 
 export async function reloadSAM(unitCalling: typing.IUnit): Promise<boolean> {
+    const curPlayerArray = await ddcsControllers.srvPlayerActionsRead({name: unitCalling.playername});
+    const curPly = curPlayerArray[0];
     const engineCache = ddcsControllers.getEngineCache();
+    const i18n = new I18nResolver(engineCache.i18n, curPly.lang).translation as any;
     const units = await ddcsControllers.getGroundUnitsInProximity(unitCalling.lonLatLoc, 0.2, false);
     const closestUnit = _.filter(units, {coalition: unitCalling.coalition})[0];
     if (closestUnit) {
@@ -23,7 +28,7 @@ export async function reloadSAM(unitCalling: typing.IUnit): Promise<boolean> {
                 } else {
                     await ddcsControllers.sendMesgToGroup(
                         unitCalling.groupId,
-                        "G: " + curSamType + " Is Too Damaged To Be Reloaded!",
+                        "G: " + i18n.TOODAMAGEDTOBERELOADED.replace("#1", curSamType),
                         5
                     );
                     return false;
@@ -32,7 +37,7 @@ export async function reloadSAM(unitCalling: typing.IUnit): Promise<boolean> {
         } else {
             await ddcsControllers.sendMesgToGroup(
                 unitCalling.groupId,
-                "G: Group does not have all of the pieces to reload",
+                "G: " + i18n.DOESNOTHAVEENOUGHPIECES,
                 5
             );
             return false;
@@ -40,7 +45,7 @@ export async function reloadSAM(unitCalling: typing.IUnit): Promise<boolean> {
     } else {
         await ddcsControllers.sendMesgToGroup(
             unitCalling.groupId,
-            "G: There are no units close enough to reload",
+            "G: " + i18n.THEREARENOUNITSCLOSEENOUGHTORELOAD,
             5
         );
         return false;

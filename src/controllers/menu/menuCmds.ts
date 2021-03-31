@@ -307,8 +307,8 @@ export async function loadTroops(unitId: string, troopType: string) {
             }
             if (_.some(checkAllSecondBase)) {
                 await ddcsControllers.unitActionUpdateByUnitId({unitId, troopType})
-                    .then(() => {
-                        ddcsControllers.sendMesgToGroup(
+                    .then(async () => {
+                        await ddcsControllers.sendMesgToGroup(
                             curUnit.groupId,
                             "G: " + i18n.HASBEENLOADED.replace("#1", troopType),
                             5
