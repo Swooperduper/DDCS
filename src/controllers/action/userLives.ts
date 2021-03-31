@@ -166,11 +166,7 @@ export async function checkAircraftCosts(): Promise<void> {
                         mesg = "G: " + i18n.YOUDONOTHAVEENOUGHPOINTS.replace("#1", curUnit.type)
                             .replace("#2", totalTakeoffCosts.toFixed(2)).replace("#3", curPlayer.curLifePoints.toFixed(2));
                         console.log(curPlayer.name + " " + mesg);
-                        await ddcsControllers.sendMesgToGroup(
-                            curUnit.groupId,
-                            mesg,
-                            30
-                        );
+                        await ddcsControllers.sendMesgToGroup( curUnit.groupId, mesg, 30);
                     }
                 }
             }
