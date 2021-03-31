@@ -4,6 +4,8 @@
 
 import * as typings from "../../typings";
 import * as ddcsControllers from "../";
+import * as ddcsController from "./unitDetection";
+import {I18nResolver} from "i18n-ts";
 
 export async function spendResourcePoints(
     player: typings.ISrvPlayers,
@@ -13,22 +15,23 @@ export async function spendResourcePoints(
 ): Promise<boolean> {
 
     let curUnit: typings.IUnit;
-
+    const engineCache = ddcsControllers.getEngineCache();
+    const i18n = new I18nResolver(engineCache.i18n, player.lang).translation as any;
     if (isNaN(Number(player.slot))) {
         console.log("player doesnt have slotID: " + player);
         return Promise.resolve(false);
     } else {
         const cUnit = await ddcsControllers.unitActionRead({unitId: Number(player.slot)});
-        let mesg;
+        let message;
         let currentObjUpdate: any;
         curUnit = cUnit[0];
         if (curUnit.inAir) {
             const unitExist = await ddcsControllers.unitActionRead({_id: "AI|" + itemObj.name + "|"});
             if (unitExist.length > 0 && rsItem === "Tanker") {
-                mesg = "G: Tanker your trying to spawn already exists";
+                message = "G: " + i18n.TANKERSPAWNALREADYEXISTS;
                 await ddcsControllers.sendMesgToGroup(
                     curUnit.groupId,
-                    mesg,
+                    message,
                     5
                 );
                 return false;
@@ -40,20 +43,20 @@ export async function spendResourcePoints(
                             redRSPoints: player.redRSPoints - rsCost
                         };
                         await ddcsControllers.srvPlayerActionsUpdate(currentObjUpdate);
-                        mesg = "G: You have spent red " + rsCost + " points on a " + rsItem +
-                            "(" + currentObjUpdate.redRSPoints + "pts left)";
+                        message = "G: " + i18n.YOUHAVESPENTRSPOINTS.replace("#1", i18n[1])
+                            .replace("#2", rsCost).replace("#3", rsItem).replace("#4", currentObjUpdate.redRSPoints);
                         await ddcsControllers.sendMesgToGroup(
                             curUnit.groupId,
-                            mesg,
+                            message,
                             5
                         );
                         return true;
                     } else {
-                        mesg = "G: You do not have red " + rsCost + " points to buy a " +
-                            rsItem + " (" + player.redRSPoints + "pts)";
+                        message = "G: " + i18n.YOUDONTHAVEENOUGHRSPOINTSTOBUY.replace("#1", i18n[1])
+                            .replace("#2", rsCost).replace("#3", rsItem).replace("#4", player.redRSPoints);
                         await ddcsControllers.sendMesgToGroup(
                             curUnit.groupId,
-                            mesg,
+                            message,
                             5
                         );
                         return false;
@@ -65,20 +68,20 @@ export async function spendResourcePoints(
                             blueRSPoints: player.blueRSPoints - rsCost
                         };
                         await ddcsControllers.srvPlayerActionsUpdate(currentObjUpdate);
-                        mesg = "G: You have spent " + rsCost + " blue points on a " + rsItem +
-                            "(" + currentObjUpdate.blueRSPoints + "pts left)";
+                        message = "G: " + i18n.YOUHAVESPENTRSPOINTS.replace("#1", i18n[2])
+                            .replace("#2", rsCost).replace("#3", rsItem).replace("#4", currentObjUpdate.blueRSPoints);
                         await ddcsControllers.sendMesgToGroup(
                             curUnit.groupId,
-                            mesg,
+                            message,
                             5
                         );
                         return true;
                     } else {
-                        mesg = "G: You do not have " + rsCost + " blue points to buy a " +
-                            rsItem + " (" + player.blueRSPoints + "pts)";
+                        message = "G: " + i18n.YOUDONTHAVEENOUGHRSPOINTSTOBUY.replace("#1", i18n[2])
+                            .replace("#2", rsCost).replace("#3", rsItem).replace("#4", player.blueRSPoints);
                         await ddcsControllers.sendMesgToGroup(
                             curUnit.groupId,
-                            mesg,
+                            message,
                             5
                         );
                         return false;
@@ -86,10 +89,10 @@ export async function spendResourcePoints(
                 }
             }
         } else {
-            mesg = "G: You cannot spend RS points on the ground, Please TakeOff First, Then Call RS Point Option!";
+            message = "G: " + i18n.YOUCANNOTSPENDRSPOINTSONGROUND;
             await ddcsControllers.sendMesgToGroup(
                 curUnit.groupId,
-                mesg,
+                message,
                 5
             );
             return false;
@@ -99,18 +102,20 @@ export async function spendResourcePoints(
 
 export async function checkResourcePoints(player: typings.ISrvPlayers): Promise<void> {
     if (player.name) {
+        const engineCache = ddcsControllers.getEngineCache();
+        const i18n = new I18nResolver(engineCache.i18n, player.lang).translation as any;
         const cUnit = await ddcsControllers.unitActionRead({dead: false, playername: player.name});
-        let mesg;
+        let message;
         if (cUnit.length > 0) {
             if (player.side === 1) {
-                mesg = "G: You have " + player.redRSPoints + " Red Resource Points!";
+                message = "G: " + i18n.YOUHAVERESOURCEPOINTS.replace("#1", player.redRSPoints).replace("#2", i18n[1]);
             } else {
-                mesg = "G: You have " + player.blueRSPoints + " Blue Resource Points!";
+                message = "G: " + i18n.YOUHAVERESOURCEPOINTS.replace("#1", player.blueRSPoints).replace("#2", i18n[2]);
             }
 
             await ddcsControllers.sendMesgToGroup(
                 cUnit[0].groupId,
-                mesg,
+                message,
                 5
             );
         }
