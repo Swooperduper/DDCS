@@ -18,7 +18,7 @@ export async function lockUserToSide(incomingObj: any, lockToSide: number): Prom
             const mesg = i18n.PLAYERALREADYLOCKEDTOSIDE.replace("#1", i18n[curPly.sideLock].toUpperCase());
             await ddcsController.sendMesgToPlayerChatWindow(mesg, curPly.playerId);
         } else {
-            const mesg = i18n.PLAYERISNOWLOCKEDTOSIDE.replace("#1", i18n[curPly.sideLock].toUpperCase());
+            const mesg = i18n.PLAYERISNOWLOCKEDTOSIDE.replace("#1", i18n[lockToSide].toUpperCase());
             await ddcsController.sendMesgToPlayerChatWindow(mesg, curPly.playerId);
             await ddcsController.srvPlayerActionsUpdate({_id: incomingObj.from, sideLock: lockToSide});
         }
