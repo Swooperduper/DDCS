@@ -7,6 +7,7 @@ import * as typings from "../../../typings";
 import { dbModels } from "../common";
 import * as ddcsController from "../../";
 import {IBase, ISrvPlayers} from "../../../typings";
+import {I18nResolver} from "i18n-ts";
 
 export async function srvPlayerActionsRead(obj: any): Promise<typings.ISrvPlayers[]> {
     return new Promise((resolve, reject) => {
@@ -119,13 +120,15 @@ export async function srvPlayerActionsAddLifePoints(obj: {
     return new Promise((resolve, reject) => {
         dbModels.srvPlayerModel.find({_id: obj._id}, (err: any, serverObj: typings.ISrvPlayers[]) => {
             if (err) { reject(err); }
+            const engineCache = ddcsController.getEngineCache();
+            const i18n = new I18nResolver(engineCache.i18n, serverObj[0].lang).translation as any;
             const addPoints: number = (obj.addLifePoints) ? obj.addLifePoints : serverObj[0].cachedRemovedLPPoints;
             const curAction: string = "addLifePoint";
             const curPlayerLifePoints: number = serverObj[0].curLifePoints || 0;
             const curTotalPoints: number = (curPlayerLifePoints >= 0) ? curPlayerLifePoints + addPoints : addPoints;
             const maxLimitedPoints: number = (curTotalPoints > ddcsController.maxLifePoints) ?
                 ddcsController.maxLifePoints : curTotalPoints;
-            let msg;
+            let message: string;
             // console.log("OBJ: ", obj, addPoints, maxLimitedPoints);
             if (serverObj.length > 0) {
                 const setObj = {
@@ -140,15 +143,15 @@ export async function srvPlayerActionsAddLifePoints(obj: {
                     (updateErr: any, srvPlayer: typings.ISrvPlayers) => {
                         if (updateErr) { reject(updateErr); }
                         if (obj.execAction === "PeriodicAdd") {
-                            msg = "+" + _.round(addPoints, 2) + " Life Point (Total: " + maxLimitedPoints + ")";
+                            message = i18n.PERIODICLIFEPOINTADD
+                                .replace("#1", _.round(addPoints, 2)).replace("#2", _.round(maxLimitedPoints, 2));
                         } else {
-                            msg = srvPlayer.name + " Have Just Gained " +
-                                addPoints + " Life Points! " +
-                                obj.execAction + "(Total:" + maxLimitedPoints + ")";
+                            message = i18n.ADDLIFEPOINTS.replace("#1", srvPlayer.name)
+                                .replace("#2", addPoints).replace("#3", obj.execAction).replace("#4", _.round(maxLimitedPoints, 2));
                         }
                         // console.log("MESG: ", msg);
                         if (obj.groupId) {
-                            ddcsController.sendMesgToGroup( obj.groupId, msg, 5);
+                            ddcsController.sendMesgToGroup( obj.groupId, message, 5);
                         }
                         resolve();
                     }
