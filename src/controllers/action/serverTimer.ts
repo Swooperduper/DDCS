@@ -191,20 +191,22 @@ export async function restartServer(): Promise<void> {
      */
 }
 
-export function secondsToHms(d: number): string {
+export function secondsToHms(d: number, language: string): string {
     const hLeft = d / 3600000;
     const h = Math.floor(hLeft);
     const m = Math.floor(60 * (hLeft - h));
+    const engineCache = ddcsController.getEngineCache();
+    const i18n = new I18nResolver(engineCache.i18n, language).translation as any;
     // const s = Math.floor(d % 3600 % 60);
 
-    const hDisplay = h > 0 ? h + (h === 1 ? " hour, " : " hours, ") : "";
-    const mDisplay = m > 0 ? m + (m === 1 ? " minute, " : " minutes") : "";
+    const hDisplay = h > 0 ? h + (h === 1 ? " " + i18n.HOUR + ", " : " " + i18n.HOURS + ", ") : "";
+    const mDisplay = m > 0 ? m + (m === 1 ? " " + i18n.MINUTE + ", " : " " + i18n.MINUTES) : "";
     // const sDisplay = s > 0 ? s + (s === 1 ? " second" : " seconds") : "";
     return hDisplay + mDisplay;
 }
 
 export async function timeLeft(curUnit: typings.IUnit, curPlayer: typings.ISrvPlayers): Promise<void> {
-    const formatTime = secondsToHms(getMaxTime() - getCurSeconds());
+    const formatTime = secondsToHms(getMaxTime() - getCurSeconds(), curPlayer.lang as string);
     const engineCache = ddcsController.getEngineCache();
     const i18n = new I18nResolver(engineCache.i18n, curPlayer.lang).translation as any;
     const message = "G: " + i18n.SERVERTIMELEFT.replace("#1", formatTime);
