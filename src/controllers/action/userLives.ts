@@ -129,7 +129,7 @@ export async function lookupAircraftCosts(playerUcid: string): Promise<void> {
                         const messages = "G: " + i18n.YOURAIRCRAFTCOSTS.replace("#1", totalTakeoffCosts).replace("#2", curUnitLPCost)
                             .replace("#3", curUnit.type).replace("#4", curTopWeaponCost).replace("#5", curTopAmmo);
 
-                        await ddcsControllers.sendMesgToGroup(curUnit.groupId, messages, 5);
+                        await ddcsControllers.sendMesgToGroup( curUnit.groupId, messages, 5);
                     } else {
                         console.log("cant find unit in dictionary: line 129");
                         console.log("lookup unit: ", curUnit);
