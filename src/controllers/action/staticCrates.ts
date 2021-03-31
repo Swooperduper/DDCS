@@ -5,6 +5,8 @@
 import * as _ from "lodash";
 import * as typings from "../../typings";
 import * as ddcsControllers from "../";
+import * as ddcsController from "./unitDetection";
+import {I18nResolver} from "i18n-ts";
 
 export async function destroyCrates(
     grpTypes: {[key: string]: typings.ICrate[]},
@@ -27,9 +29,13 @@ export async function destroyCrates(
 }
 
 export async function unpackStaticCrate(curPlayerUnit: any): Promise<void> {
+    const curPlayerArray = await ddcsControllers.srvPlayerActionsRead({name: curPlayerUnit.playername});
+    const curPly = curPlayerArray[0];
+    const engineCache = ddcsControllers.getEngineCache();
+    const i18n = new I18nResolver(engineCache.i18n, curPly.lang).translation as any;
     const crates = await ddcsControllers.getStaticCratesInProximity(curPlayerUnit.lonLatLoc, 0.2, curPlayerUnit.coalition);
     let localCrateNum: number;
-    let msg: string;
+    let message: string;
     if (crates.length > 0) {
         const curCrate: any = crates[0];
         // const crateInfo = _.find(ddcsControllers.getEngineCache().unitDictionary, {_id: curCrate.type.split("|")[2]});
@@ -59,7 +65,7 @@ export async function unpackStaticCrate(curPlayerUnit: any): Promise<void> {
                     await destroyCrates(grpTypes, curCrateType, numCrate);
                 }
             } else {
-                msg = "G: Unpacking " + _.toUpper(curCrateSpecial) + " " + curCrateType + "!";
+                message = "G: " + i18n.UNPACKINGCRATE.replace("#1", _.toUpper(curCrateSpecial)).replace("#2", curCrateType);
                 // console.log("del crate obj: ", grpTypes, curCrateType, numCrate);
                 // exports.destroyCrates(grpTypes, curCrateType, numCrate);
 
@@ -85,7 +91,7 @@ export async function unpackStaticCrate(curPlayerUnit: any): Promise<void> {
                 // groupController.destroyUnit(serverName, curCrate.name);
                 await ddcsControllers.sendMesgToGroup(
                     curPlayerUnit.groupId,
-                    msg,
+                    message,
                     5
                 );
             }
@@ -94,13 +100,13 @@ export async function unpackStaticCrate(curPlayerUnit: any): Promise<void> {
             if (localCrateNum) {
                 await ddcsControllers.sendMesgToGroup(
                     curPlayerUnit.groupId,
-                    "G: Not Enough Crates for " + curCrateType + "!(" + localCrateNum + "/" + numCrate + ")",
+                    "G: " + i18n.NOTENOUGHCRATESFOR.replace("#1", curCrateType).replace("#2", localCrateNum).replace("#3", numCrate),
                     5
                 );
             } else {
                 await ddcsControllers.sendMesgToGroup(
                     curPlayerUnit.groupId,
-                    "G: No Crates In Area!",
+                    "G: " + i18n.NOCRATESINAREA,
                     5
                 );
             }
@@ -109,7 +115,7 @@ export async function unpackStaticCrate(curPlayerUnit: any): Promise<void> {
         // no troops
         await ddcsControllers.sendMesgToGroup(
             curPlayerUnit.groupId,
-            "G: No Crates To Unpack!",
+            "G: " + i18n.NOCRATESTOUNPACK,
             5
         );
     }
