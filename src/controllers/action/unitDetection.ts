@@ -5,6 +5,7 @@
 import * as _ from "lodash";
 import * as ddcsController from "../";
 import {IUnit, IUnitDictionary} from "../../typings";
+import {I18nResolver} from "i18n-ts";
 
 const displayGCIOutputs = 5; // how many output lines on GCI output
 const maxKMDistanceToRead = 161; // about 100 miles
@@ -70,6 +71,8 @@ export async function gciUpdatePilots(detectedUnits: any, friendlySide: number) 
 
     for (const player of playerArray) {
         const curPlayerDistance: IUnit[] = [];
+        const engineCache = ddcsController.getEngineCache();
+        const i18n = new I18nResolver(engineCache.i18n, player.lang).translation as any;
 
         const curPlayerUnits: IUnit[] = await ddcsController.unitActionRead({
             dead: false,
@@ -89,13 +92,13 @@ export async function gciUpdatePilots(detectedUnits: any, friendlySide: number) 
                 let curEnemyAspect: string = "";
 
                 if ( unit.hdg > 340 || unit.hdg <= 20 ) {
-                    curEnemyAspect = "HOT";
+                    curEnemyAspect = i18n.HOT;
                 } else if ((unit.hdg > 20 && unit.hdg <= 60) || (unit.hdg > 300 && unit.hdg <= 340 )) {
-                    curEnemyAspect = "FLANK";
+                    curEnemyAspect = i18n.FLANK;
                 } else if ((unit.hdg > 60 && unit.hdg <= 110) || (unit.hdg > 250 && unit.hdg <= 300 )) {
-                    curEnemyAspect = "BEAM";
+                    curEnemyAspect = i18n.BEAM;
                 } else if (unit.hdg > 110 && unit.hdg <= 250) {
-                    curEnemyAspect = "DRAG";
+                    curEnemyAspect = i18n.DRAG;
                 }
 
                 // console.log("DT: ", distanceTo, " <= ", maxKMDistanceToRead, unit);
@@ -116,7 +119,7 @@ export async function gciUpdatePilots(detectedUnits: any, friendlySide: number) 
             }
 
             if (curPlayerDistance.length > 0) {
-                let mesg: string = `Automated GCI\n`;
+                let mesg: string =  i18n.AUTOGCIHEADER + `\n`;
                 for ( let x = 0; x < displayGCIOutputs; x++) {
                     // F15, BRA 217 FOR 60M, AT 14000FT, DRAG
                     if (!!curPlayerDistance[x]) {
@@ -124,7 +127,7 @@ export async function gciUpdatePilots(detectedUnits: any, friendlySide: number) 
                         if (x !== 0) {
                             mesg += `\n`;
                         }
-                        mesg += `${curUnit.type.toUpperCase()}, BRAA ${curUnit.bearingTo.toFixed(0)} FOR ${(curUnit.distanceTo * 0.621371).toFixed(0)}M, at ${(curUnit.alt * 3.28084).toFixed(0)}FT, ${curUnit.curEnemyAspect}`;
+                        mesg += `${curUnit.type.toUpperCase()}, ${i18n.BRAA} ${curUnit.bearingTo.toFixed(0)} ${i18n.FOR} ${(curUnit.distanceTo * 0.621371).toFixed(0)}${i18n.M}, ${i18n.AT} ${(curUnit.alt * 3.28084).toFixed(0)}${i18n.FT}, ${curUnit.curEnemyAspect}`;
                     }
                 }
                 await ddcsController.sendMesgToGroup(curPlayerUnit.groupId, mesg, 15);

@@ -5,6 +5,7 @@
 import * as _ from "lodash";
 import * as typings from "../../typings";
 import * as ddcsControllers from "../";
+import {I18nResolver} from "i18n-ts";
 
 export function getWeaponCost(typeName: string, count: number): number {
     const engineCache = ddcsControllers.getEngineCache();
@@ -85,14 +86,14 @@ export async function lookupLifeResource(playerUcid: string): Promise<void> {
     const srvPlayer = await ddcsControllers.srvPlayerActionsRead({_id: playerUcid});
     const curPlayer = srvPlayer[0];
     if (curPlayer) {
+        const engineCache = ddcsControllers.getEngineCache();
+        const i18n = new I18nResolver(engineCache.i18n, curPlayer.lang).translation as any;
+
         if (curPlayer.name) {
             const cUnit = await ddcsControllers.unitActionRead({dead: false, playername: curPlayer.name});
             const curUnit = cUnit[0];
-            await ddcsControllers.sendMesgToGroup(
-                curUnit.groupId,
-                "G: You Have " + curPlayer.curLifePoints.toFixed(2) + " Life Resource Points.",
-                5
-            );
+            const message = i18n.LIFERESOURCEPOINTS.replace("#1", curPlayer.curLifePoints.toFixed(2));
+            await ddcsControllers.sendMesgToGroup( curUnit.groupId, "G: " + message, 5);
         }
     }
 }
