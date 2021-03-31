@@ -324,8 +324,8 @@ export function setConfig(curConfig: typings.IServer): void {
 
 export function setI18n(i18nLocalization: any): void {
     engineCache.i18n = {
-        default: i18nLocalization.find((loc: any) => loc._id === "en"),
-        en: i18nLocalization.find((loc: any) => loc._id === "en")
+        default: i18nLocalization.find((loc: any) => loc._id === "en").definitions,
+        en: i18nLocalization.find((loc: any) => loc._id === "en").definitions
         // ru: i18nLocalization.find((loc: any) => loc._id === "ru"),
         // cn: i18nLocalization.find((loc: any) => loc._id === "cn"),
         // de: i18nLocalization.find((loc: any) => loc._id === "de"),

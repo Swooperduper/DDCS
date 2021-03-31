@@ -3,7 +3,6 @@ import * as ddcsController from "../";
 import { dbModels } from "../db/common";
 import * as typings from "../../typings";
 import {I18nResolver} from "i18n-ts";
-import * as ddcsControllers from "../action/aiConvoys";
 
 export async function processingIncomingData(incomingObj: any) {
     switch (incomingObj.action) {
@@ -112,7 +111,8 @@ export async function processingIncomingData(incomingObj: any) {
             dbModels.srvPlayerModel.find({_id: incomingObj.from}, async (err: any, serverObj: typings.ISrvPlayers[]) => {
                 if (err) { console.log("incomingMsgError: ", err); }
                 const curPly = serverObj[0];
-                const i18n = new I18nResolver(ddcsController.engineCache.i18n.definitions, curPly.lang) as any;
+				const engineCache = ddcsController.getEngineCache();
+                const i18n = new I18nResolver(engineCache.i18n, curPly.lang).translation as any;
                 if (incomingObj.message === i18n.COMMANDRED) {
                     await ddcsController.lockUserToSide(incomingObj, 1);
 

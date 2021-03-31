@@ -5,8 +5,8 @@
 import * as mongoose from "mongoose";
 
 export function i18nModel(dbconn: mongoose.Connection): mongoose.Document | {} {
-    return dbconn.model("i18n", new mongoose.Schema({
-            _id: {
+    return dbconn.model("international", new mongoose.Schema({
+			_id: {
                 type: String,
                 required: true
             },
