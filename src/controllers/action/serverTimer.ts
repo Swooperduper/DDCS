@@ -60,110 +60,110 @@ export async function processTimer(serverSecs: number): Promise<void> {
         // 10 hours
         if (getCurSeconds() > (getMaxTime() - (ddcsController.time.oneHour * 10)) && !timerObj.tenHours) {
             messageTemplate = "SERVERRESTARTINGINLESSTHAN";
-            args = ["10", "#hours"];
+            args = ["10", "#HOURS"];
             timerObj.tenHours = true;
         }
         // 9 hours
         if (getCurSeconds() > (getMaxTime() - (ddcsController.time.oneHour * 9)) && !timerObj.nineHours) {
             messageTemplate = "SERVERRESTARTINGINLESSTHAN";
-            args = ["9", "#hours"];
+            args = ["9", "#HOURS"];
             timerObj.nineHours = true;
         }
         // 8 hours
         if (getCurSeconds() > (getMaxTime() - (ddcsController.time.oneHour * 8)) && !timerObj.eightHours) {
             messageTemplate = "SERVERRESTARTINGINLESSTHAN";
-            args = ["8", "#hours"];
+            args = ["8", "#HOURS"];
             timerObj.eightHours = true;
         }
         // 7 hours
         if (getCurSeconds() > (getMaxTime() - (ddcsController.time.oneHour * 7)) && !timerObj.sevenHours) {
             messageTemplate = "SERVERRESTARTINGINLESSTHAN";
-            args = ["7", "#hours"];
+            args = ["7", "#HOURS"];
             timerObj.sevenHours = true;
         }
         // 6 hours
         if (getCurSeconds() > (getMaxTime() - (ddcsController.time.oneHour * 6)) && !timerObj.sixHours) {
             messageTemplate = "SERVERRESTARTINGINLESSTHAN";
-            args = ["6", "#hours"];
+            args = ["6", "#HOURS"];
             timerObj.sixHours = true;
         }
         // 5 hours
         if (getCurSeconds() > (getMaxTime() - (ddcsController.time.oneHour * 5)) && !timerObj.fiveHours) {
             messageTemplate = "SERVERRESTARTINGINLESSTHAN";
-            args = ["5", "#hours"];
+            args = ["5", "#HOURS"];
             timerObj.fiveHours = true;
         }
         // 4 hours
         if (getCurSeconds() > (getMaxTime() - (ddcsController.time.oneHour * 4)) && !timerObj.fourHours) {
             messageTemplate = "SERVERRESTARTINGINLESSTHAN";
-            args = ["4", "#hours"];
+            args = ["4", "#HOURS"];
             timerObj.fourHours = true;
         }
         // 3 hours
         if (getCurSeconds() > (getMaxTime() - (ddcsController.time.oneHour * 3)) && !timerObj.threeHours) {
             messageTemplate = "SERVERRESTARTINGINLESSTHAN";
-            args = ["3", "#hours"];
+            args = ["3", "#HOURS"];
             timerObj.threeHours = true;
         }
         // 2 hours
         if (getCurSeconds() > (getMaxTime() - (ddcsController.time.oneHour * 2)) && !timerObj.twoHours) {
             messageTemplate = "SERVERRESTARTINGINLESSTHAN";
-            args = ["2", "#hours"];
+            args = ["2", "#HOURS"];
             timerObj.twoHours = true;
         }
         // 1 hour
         if (getCurSeconds() > (getMaxTime() - ddcsController.time.oneHour) && !timerObj.oneHour) {
             messageTemplate = "SERVERRESTARTINGINLESSTHAN";
-            args = ["1", "#hours"];
+            args = ["1", "#HOUR"];
             timerObj.oneHour = true;
         }
         // 30 mins
         if (getCurSeconds() > (getMaxTime() - ddcsController.time.thirtyMinutes) && !timerObj.thirtyMinutes) {
             messageTemplate = "SERVERRESTARTINGINLESSTHAN";
-            args = ["30", "#minutes"];
+            args = ["30", "#MINUTES"];
             timerObj.thirtyMinutes = true;
         }
         // 20 mins
         if (getCurSeconds() > (getMaxTime() - ddcsController.time.twentyMinutes) && !timerObj.twentyMinutes) {
             messageTemplate = "SERVERRESTARTINGINLESSTHAN";
-            args = ["20", "#minutes"];
+            args = ["20", "#MINUTES"];
             timerObj.twentyMinutes = true;
         }
         // 10 mins
         if (getCurSeconds() > (getMaxTime() - ddcsController.time.tenMinutes) && !timerObj.tenMinutes) {
             messageTemplate = "SERVERRESTARTINGINLESSTHAN";
-            args = ["10", "#minutes"];
+            args = ["10", "#MINUTES"];
             timerObj.tenMinutes = true;
         }
         // 5 mins
         if (getCurSeconds() > (getMaxTime() - ddcsController.time.fiveMins) && !timerObj.fiveMinutes) {
             messageTemplate = "SERVERRESTARTINGINLESSTHAN";
-            args = ["5", "#minutes"];
+            args = ["5", "#MINUTES"];
             timerObj.fiveMinutes = true;
         }
         // 4 mins
         if (getCurSeconds() > (getMaxTime() - ddcsController.time.fourMins) && !timerObj.fourMinutes) {
             messageTemplate = "SERVERRESTARTINGINLESSTHAN";
-            args = ["4", "#minutes"];
+            args = ["4", "#MINUTES"];
             timerObj.fourMinutes = true;
         }
         // 3 mins
         if (getCurSeconds() > (getMaxTime() - ddcsController.time.threeMinutes) && !timerObj.threeMinutes) {
             messageTemplate = "SERVERRESTARTINGINLESSTHAN";
-            args = ["3", "#minutes"];
+            args = ["3", "#MINUTES"];
             timerObj.threeMinutes = true;
         }
         // 2 mins
         if (getCurSeconds() > (getMaxTime() - ddcsController.time.twoMinutes) && !timerObj.twoMinutes) {
             messageTemplate = "SERVERRESTARTINGINLESSTHAN";
-            args = ["2", "#minutes"];
+            args = ["2", "#MINUTES"];
             timerObj.twoMinutes = true;
         }
         // 1 min
         // console.log("SECONDS: ", getCurSeconds(), " > ", getMaxTime(), " - ", 60);
         if (getCurSeconds() > (getMaxTime() - ddcsController.time.oneMin) && !timerObj.oneMinute) {
             messageTemplate = "SERVERRESTARTINGINLESSTHAN";
-            args = ["1", "#minutes"];
+            args = ["1", "#MINUTE"];
             timerObj.oneMinute = true;
             const latestSession = await ddcsController.sessionsActionsReadLatest();
             if (latestSession.name) {
@@ -192,7 +192,6 @@ export async function processTimer(serverSecs: number): Promise<void> {
             exports.restartServer();
         } else {
             if (messageTemplate) {
-                console.log("serverMesg: ", messageTemplate, args);
                 await ddcsController.sendMesgToAll(messageTemplate, args, 20);
             }
         }

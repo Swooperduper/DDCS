@@ -4,7 +4,6 @@
 
 import * as _ from "lodash";
 import * as ddcsController from "../";
-import * as ddcsControllers from "../action/aiConvoys";
 import {I18nResolver} from "i18n-ts";
 
 export async function forcePlayerSpectator(playerId: string, mesg: string): Promise<void> {
@@ -67,9 +66,11 @@ export async function sendMesgToAll(
                 const curPlayerUnit = playerUnits[0];
                 if (playerUnits.length > 0) {
                     const i18n = new I18nResolver(engineCache.i18n, player.lang).translation as any;
-                    const message = "A: " + i18n[messageTemplate];
+                    let message = "A: " + i18n[messageTemplate];
                     for (const [i, v] of argArray.entries()) {
-                        message.replace("#" + i, (_.includes(v, "#") ? i18n[v] : v ));
+						const templateReplace = "#" + (i + 1);
+						const templateVal = (_.includes(v, "#")) ? i18n[v.split("#")[1]] : v;
+                        message = message.replace(templateReplace, templateVal);
                     }
                     await sendMesgToGroup(
                         curPlayerUnit.groupId,
