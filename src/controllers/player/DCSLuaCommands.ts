@@ -2,7 +2,9 @@
  * DDCS Licensed under AGPL-3.0 by Andrew "Drex" Finegan https://github.com/afinegan/DynamicDCS
  */
 
+import * as _ from "lodash";
 import * as ddcsController from "../";
+import * as ddcsControllers from "../action/aiConvoys";
 
 export async function forcePlayerSpectator(playerId: string, mesg: string): Promise<void> {
 
@@ -47,7 +49,23 @@ export async function sendMesgToPlayerChatWindow(mesg: string, playerId: string)
     });
 }
 
-export async function sendMesgToAll(mesg: string, time: number, delayTime?: number): Promise<void> {
+export async function sendMesgToAll(message: string, time: number, delayTime?: number): Promise<void> {
+    // send to everyone individually
+    const latestSession = await ddcsController.sessionsActionsReadLatest();
+    if (latestSession) {
+        const playerArray = await ddcsController.srvPlayerActionsRead({sessionName: latestSession.name});
+        if (playerArray.length > 0) {
+            const playerList = _.uniq(playerArray.map((pl) => pl.name));
+            const playerUnits = await ddcsController.unitActionRead({dead: false, playername: {$in: playerList}});
+
+            if (playerUnits.length > 0) {
+                for (const playerUnit of playerUnits) {
+                    await sendMesgToGroup(playerUnit.groupId, message, time, delayTime);
+                }
+            }
+        }
+    }
+    /*
     await ddcsController.sendUDPPacket("frontEnd", {
         actionObj: {
             action: "CMD",
@@ -56,9 +74,26 @@ export async function sendMesgToAll(mesg: string, time: number, delayTime?: numb
         },
         timeToExecute: delayTime
     });
+     */
 }
 
-export async function sendMesgToCoalition(coalition: number, mesg: string, time: number, delayTime?: number): Promise<void> {
+export async function sendMesgToCoalition(coalition: number, message: string, time: number, delayTime?: number): Promise<void> {
+    // send to everyone individually
+    const latestSession = await ddcsController.sessionsActionsReadLatest();
+    if (latestSession) {
+        const playerArray = await ddcsController.srvPlayerActionsRead({sessionName: latestSession.name});
+        if (playerArray.length > 0) {
+            const playerList = _.uniq(playerArray.map((pl) => pl.name));
+            const playerUnits = await ddcsController.unitActionRead({dead: false, coalition, playername: {$in: playerList}});
+
+            if (playerUnits.length > 0) {
+                for (const playerUnit of playerUnits) {
+                    await sendMesgToGroup(playerUnit.groupId, message, time, delayTime);
+                }
+            }
+        }
+    }
+    /*
     await ddcsController.sendUDPPacket("frontEnd", {
         actionObj: {
             action: "CMD",
@@ -67,6 +102,7 @@ export async function sendMesgToCoalition(coalition: number, mesg: string, time:
         },
         timeToExecute: delayTime
     });
+     */
 }
 
 export async function sendMesgToGroup(groupId: number, mesg: string, time: number, delayTime?: number): Promise<void> {
@@ -77,14 +113,5 @@ export async function sendMesgToGroup(groupId: number, mesg: string, time: numbe
             reqID: 0
         },
         timeToExecute: delayTime
-    });
-}
-
-export async function setIsOpenSlotFlag(lockFlag: number): Promise<void> {
-    await ddcsController.sendUDPPacket("frontEnd", {
-        actionObj: {
-            action: "SETISOPENSLOT",
-            val: lockFlag
-        }
     });
 }
