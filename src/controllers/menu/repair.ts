@@ -14,7 +14,8 @@ export async function repairBase(base: typing.IBase, curUnit: typing.IUnit): Pro
         await ddcsControllers.unitActionUpdateByUnitId({unitId: curUnit.unitId, intCargoType: ""});
         await ddcsControllers.sendMesgToCoalition(
             curUnit.coalition,
-            "C: " + curBaseName + " Base Has Been Repaired/Built!",
+            "BASEHASBEENBUILT",
+            [curBaseName],
             5
         );
     }

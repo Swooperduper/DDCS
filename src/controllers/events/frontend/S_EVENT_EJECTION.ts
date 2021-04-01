@@ -24,7 +24,7 @@ export async function processEventEjection(eventObj: any): Promise<void> {
                 iName: curIUnit.playername,
                 displaySide: "A",
                 roleCode: "I",
-                msg: "A: " + ddcsControllers.side[curIUnit.coalition] + " " + curIUnit.type + "(" + curIUnit.playername +
+                msg: ddcsControllers.side[curIUnit.coalition] + " " + curIUnit.type + "(" + curIUnit.playername +
                     ") ejected",
                 groupId: curIUnit.groupId
             };
@@ -38,7 +38,8 @@ export async function processEventEjection(eventObj: any): Promise<void> {
 
             if (engineCache.config.inGameHitMessages) {
                 await ddcsControllers.sendMesgToAll(
-                    iCurObj.msg,
+                    "PLAYEREJECTED",
+                    ["#" + curIUnit.coalition, curIUnit.type, curIUnit.playername],
                     5,
                     nowTime + ddcsControllers.time.oneMin
                 );

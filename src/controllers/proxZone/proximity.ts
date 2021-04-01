@@ -21,7 +21,8 @@ export async function checkUnitsToBaseForCapture(): Promise<void> {
             if (_.get(sideArray, [1], []).length === 0) {
                 console.log("BASE HAS BEEN CAPTURED: ", base.name, " is now ", 2);
                 await ddcsControllers.sendMesgToAll(
-                    base.name + " HAS BEEN CAPTURED BY BLUE",
+                    "HASBEENCAPTUREDBY",
+                    [base.name, "#" + 2],
                     60
                 );
 
@@ -43,7 +44,8 @@ export async function checkUnitsToBaseForCapture(): Promise<void> {
             if (_.get(sideArray, [2], []).length === 0) {
                 console.log("BASE HAS BEEN CAPTURED: ", base.name, " is now ", 1);
                 await ddcsControllers.sendMesgToAll(
-                    base.name + " HAS BEEN CAPTURED BY RED",
+                    "HASBEENCAPTUREDBY",
+                    [base.name, "#" + 1],
                     60
                 );
 
@@ -70,7 +72,8 @@ export async function checkUnitsToBaseForCapture(): Promise<void> {
             }
             console.log("BASE HAS BEEN CAPTURED: ", base.name, " is now ", unitSide);
             await ddcsControllers.sendMesgToAll(
-                base.name + " HAS BEEN CAPTURED",
+                "HASBEENCAPTUREDBY",
+                [base.name],
                 60
             );
             // console.log('Spawning Support Units', base, unitSide);
@@ -101,7 +104,8 @@ export async function checkUnitsToBaseForCapture(): Promise<void> {
                 await ddcsControllers.setTimeToRestart(new Date().getTime() + ddcsControllers.time.fiveMins);
             }
             await ddcsControllers.sendMesgToAll(
-                "Blue has won the campaign, Campaign will reset soon.",
+                "WONCAMPAIGNRESETSOON",
+                ["#" + 2],
                 5
             );
         }
@@ -115,7 +119,8 @@ export async function checkUnitsToBaseForCapture(): Promise<void> {
                 await ddcsControllers.setTimeToRestart(new Date().getTime() + ddcsControllers.time.fiveMins);
             }
             await ddcsControllers.sendMesgToAll(
-                "Blue has won the campaign, Campaign will reset soon.",
+                "WONCAMPAIGNRESETSOON",
+                ["#" + 1],
                 5
             );
         }

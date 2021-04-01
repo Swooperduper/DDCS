@@ -24,7 +24,7 @@ export async function processEventCrash(eventObj: any): Promise<void> {
                 iName: curIUnit.playername,
                 displaySide: "A",
                 roleCode: "I",
-                msg: "A: " + ddcsControllers.side[curIUnit.coalition] + " " + curIUnit.type + "(" + curIUnit.playername + ") has crashed",
+                msg: ddcsControllers.side[curIUnit.coalition] + " " + curIUnit.type + "(" + curIUnit.playername + ") has crashed",
                 groupId: curIUnit.groupId
             };
             /*
@@ -37,7 +37,8 @@ export async function processEventCrash(eventObj: any): Promise<void> {
 
             if (engineCache.config.inGameHitMessages) {
                 await ddcsControllers.sendMesgToAll(
-                    iCurObj.msg,
+                    "PLAYERHASCRASHED",
+                    ["#" + curIUnit.coalition, curIUnit.type, curIUnit.playername],
                     5,
                     nowTime + ddcsControllers.time.oneMin
                 );

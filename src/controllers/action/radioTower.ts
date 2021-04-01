@@ -30,7 +30,8 @@ export async function checkBaseWarnings(): Promise<void> {
         if (base.underAttack > 0) {
             await ddcsControllers.sendMesgToCoalition(
                 _.get(base, "side"),
-                _.get(base, "name") + " is under attack!",
+                "BASEISUNDERATTACK",
+                [_.get(base, "name")],
                 20
             );
             base.underAttack = 0;

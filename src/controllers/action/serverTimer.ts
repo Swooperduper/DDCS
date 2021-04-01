@@ -8,7 +8,8 @@ import {I18nResolver} from "i18n-ts";
 
 let currentSeconds = 0;
 let maxTime = 0;
-let mesg;
+let messageTemplate;
+let args: any[] = [];
 
 export let timerObj = {
     tenHours: false,
@@ -51,99 +52,118 @@ export function setCurSeconds(curSeconds: number): void {
 export async function processTimer(serverSecs: number): Promise<void> {
     // console.log("ABS TIME: ", ddcsController.getStartAbsTime());
     setMaxTime((ddcsController.getStartAbsTime() + ddcsController.getEngineCache().config.restartTime) * 1000);
-    mesg = null;
+    messageTemplate = null;
+    args = [];
     setCurSeconds(serverSecs * 1000);
 
     if (getMaxTime() > 0) {
         // 10 hours
         if (getCurSeconds() > (getMaxTime() - (ddcsController.time.oneHour * 10)) && !timerObj.tenHours) {
-            mesg = "Server is restarting in less than 10 hours!";
+            messageTemplate = "SERVERRESTARTINGINLESSTHAN";
+            args = ["10", "#hours"];
             timerObj.tenHours = true;
         }
         // 9 hours
         if (getCurSeconds() > (getMaxTime() - (ddcsController.time.oneHour * 9)) && !timerObj.nineHours) {
-            mesg = "Server is restarting in less than 9 hours!";
+            messageTemplate = "SERVERRESTARTINGINLESSTHAN";
+            args = ["9", "#hours"];
             timerObj.nineHours = true;
         }
         // 8 hours
         if (getCurSeconds() > (getMaxTime() - (ddcsController.time.oneHour * 8)) && !timerObj.eightHours) {
-            mesg = "Server is restarting in less than 8 hours!";
+            messageTemplate = "SERVERRESTARTINGINLESSTHAN";
+            args = ["8", "#hours"];
             timerObj.eightHours = true;
         }
         // 7 hours
         if (getCurSeconds() > (getMaxTime() - (ddcsController.time.oneHour * 7)) && !timerObj.sevenHours) {
-            mesg = "Server is restarting in less than 7 hours!";
+            messageTemplate = "SERVERRESTARTINGINLESSTHAN";
+            args = ["7", "#hours"];
             timerObj.sevenHours = true;
         }
         // 6 hours
         if (getCurSeconds() > (getMaxTime() - (ddcsController.time.oneHour * 6)) && !timerObj.sixHours) {
-            mesg = "Server is restarting in less than 6 hours!";
+            messageTemplate = "SERVERRESTARTINGINLESSTHAN";
+            args = ["6", "#hours"];
             timerObj.sixHours = true;
         }
         // 5 hours
         if (getCurSeconds() > (getMaxTime() - (ddcsController.time.oneHour * 5)) && !timerObj.fiveHours) {
-            mesg = "Server is restarting in less than 5 hours!";
+            messageTemplate = "SERVERRESTARTINGINLESSTHAN";
+            args = ["5", "#hours"];
             timerObj.fiveHours = true;
         }
         // 4 hours
         if (getCurSeconds() > (getMaxTime() - (ddcsController.time.oneHour * 4)) && !timerObj.fourHours) {
-            mesg = "Server is restarting in less than 4 hours!";
+            messageTemplate = "SERVERRESTARTINGINLESSTHAN";
+            args = ["4", "#hours"];
             timerObj.fourHours = true;
         }
         // 3 hours
         if (getCurSeconds() > (getMaxTime() - (ddcsController.time.oneHour * 3)) && !timerObj.threeHours) {
-            mesg = "Server is restarting in less than 3 hours!";
+            messageTemplate = "SERVERRESTARTINGINLESSTHAN";
+            args = ["3", "#hours"];
             timerObj.threeHours = true;
         }
         // 2 hours
         if (getCurSeconds() > (getMaxTime() - (ddcsController.time.oneHour * 2)) && !timerObj.twoHours) {
-            mesg = "Server is restarting in less than 2 hours!";
+            messageTemplate = "SERVERRESTARTINGINLESSTHAN";
+            args = ["2", "#hours"];
             timerObj.twoHours = true;
         }
         // 1 hour
         if (getCurSeconds() > (getMaxTime() - ddcsController.time.oneHour) && !timerObj.oneHour) {
-            mesg = "Server is restarting in less than 1 hour!";
+            messageTemplate = "SERVERRESTARTINGINLESSTHAN";
+            args = ["1", "#hours"];
             timerObj.oneHour = true;
         }
         // 30 mins
         if (getCurSeconds() > (getMaxTime() - ddcsController.time.thirtyMinutes) && !timerObj.thirtyMinutes) {
-            mesg = "Server is restarting in less than 30 minutes!";
+            messageTemplate = "SERVERRESTARTINGINLESSTHAN";
+            args = ["30", "#minutes"];
             timerObj.thirtyMinutes = true;
         }
         // 20 mins
         if (getCurSeconds() > (getMaxTime() - ddcsController.time.twentyMinutes) && !timerObj.twentyMinutes) {
-            mesg = "Server is restarting in less than 20 mins!";
+            messageTemplate = "SERVERRESTARTINGINLESSTHAN";
+            args = ["20", "#minutes"];
             timerObj.twentyMinutes = true;
         }
         // 10 mins
         if (getCurSeconds() > (getMaxTime() - ddcsController.time.tenMinutes) && !timerObj.tenMinutes) {
-            mesg = "Server is restarting in less than 10 mins!";
+            messageTemplate = "SERVERRESTARTINGINLESSTHAN";
+            args = ["10", "#minutes"];
             timerObj.tenMinutes = true;
         }
         // 5 mins
         if (getCurSeconds() > (getMaxTime() - ddcsController.time.fiveMins) && !timerObj.fiveMinutes) {
-            mesg = "Server is restarting in less than 5 minutes!";
+            messageTemplate = "SERVERRESTARTINGINLESSTHAN";
+            args = ["5", "#minutes"];
             timerObj.fiveMinutes = true;
         }
         // 4 mins
         if (getCurSeconds() > (getMaxTime() - ddcsController.time.fourMins) && !timerObj.fourMinutes) {
-            mesg = "Server is restarting in less than 4 minutes!";
+            messageTemplate = "SERVERRESTARTINGINLESSTHAN";
+            args = ["4", "#minutes"];
             timerObj.fourMinutes = true;
         }
         // 3 mins
         if (getCurSeconds() > (getMaxTime() - ddcsController.time.threeMinutes) && !timerObj.threeMinutes) {
-            mesg = "Server is restarting in less than 3 minutes!";
+            messageTemplate = "SERVERRESTARTINGINLESSTHAN";
+            args = ["3", "#minutes"];
             timerObj.threeMinutes = true;
         }
         // 2 mins
         if (getCurSeconds() > (getMaxTime() - ddcsController.time.twoMinutes) && !timerObj.twoMinutes) {
-            mesg = "Server is restarting in less than 2 minutes, Locking Server Down!";
+            messageTemplate = "SERVERRESTARTINGINLESSTHAN";
+            args = ["2", "#minutes"];
             timerObj.twoMinutes = true;
         }
         // 1 min
         // console.log("SECONDS: ", getCurSeconds(), " > ", getMaxTime(), " - ", 60);
         if (getCurSeconds() > (getMaxTime() - ddcsController.time.oneMin) && !timerObj.oneMinute) {
-            mesg = "Server is restarting in less than 1 minute, Server Is Locked!";
+            messageTemplate = "SERVERRESTARTINGINLESSTHAN";
+            args = ["1", "#minutes"];
             timerObj.oneMinute = true;
             const latestSession = await ddcsController.sessionsActionsReadLatest();
             if (latestSession.name) {
@@ -171,9 +191,9 @@ export async function processTimer(serverSecs: number): Promise<void> {
             }*/
             exports.restartServer();
         } else {
-            if (mesg) {
-                console.log("serverMesg: ", mesg);
-                await ddcsController.sendMesgToAll(mesg, 20);
+            if (messageTemplate) {
+                console.log("serverMesg: ", messageTemplate, args);
+                await ddcsController.sendMesgToAll(messageTemplate, args, 20);
             }
         }
     }
@@ -181,7 +201,7 @@ export async function processTimer(serverSecs: number): Promise<void> {
 
 export async function restartServer(): Promise<void> {
     console.log("restart server");
-    ddcsController.shutdown();
+    await ddcsController.shutdown();
     /*
     const server = await ddcsController.serverActionsRead({});
     const newMap = server[0].curFilePath + "_" + server[0].curSeason + "_" +

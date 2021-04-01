@@ -108,45 +108,55 @@ export async function processEventKill(eventObj: any): Promise<void> {
         showInChart: true
     };
 
+    let initMesg: string = "";
     if (curInitiator.unit) {
-        mesg +=  capitalizeFirstLetter(ddcsControllers.side[eventObj.data.initiator.side]) + " ";
+        // mesg +=  capitalizeFirstLetter(ddcsControllers.side[eventObj.data.initiator.side]) + " ";
         if (curInitiator.playerOwner) {
-            mesg += eventObj.data.initiator.type + "(" + curInitiator.playerOwner.name + ")";
+            initMesg += eventObj.data.initiator.type + "(" + curInitiator.playerOwner.name + ")";
         } else if (curInitiator.player) {
-            mesg += eventObj.data.initiator.type + "(" + curInitiator.player.name + ")";
+            initMesg += eventObj.data.initiator.type + "(" + curInitiator.player.name + ")";
         } else {
-            mesg += eventObj.data.initiator.type;
+            initMesg += eventObj.data.initiator.type;
         }
     } else {
-        mesg += "Something";
+        initMesg += "Something";
     }
 
-    mesg += " has killed ";
+    // mesg += " has killed ";
 
+    let targetMesg: string = "";
     if (curTarget.unit) {
-        mesg += capitalizeFirstLetter(ddcsControllers.side[eventObj.data.target.side]) + " ";
+        // mesg += capitalizeFirstLetter(ddcsControllers.side[eventObj.data.target.side]) + " ";
         if (curTarget.playerOwner) {
-            mesg += eventObj.data.target.type + "(" + curTarget.playerOwner.name + ")";
+            targetMesg += eventObj.data.target.type + "(" + curTarget.playerOwner.name + ")";
         } else if (curTarget.player) {
-            mesg += eventObj.data.target.type + "(" + curTarget.player.name + ")";
+            targetMesg += eventObj.data.target.type + "(" + curTarget.player.name + ")";
         } else {
-            mesg += eventObj.data.target.type;
+            targetMesg += eventObj.data.target.type;
         }
     } else {
-        mesg += "Something";
+        targetMesg += "Something";
     }
 
+    let weaponMesg: string = "";
     if (eventObj.data.weapon) {
-        mesg += " with " + eventObj.data.weapon.displayName;
+        weaponMesg += eventObj.data.weapon.displayName;
     } else if (eventObj.data.weapon_name && eventObj.data.weapon_name !== "") {
-        mesg += " with " + eventObj.data.weapon_name;
+        weaponMesg += eventObj.data.weapon_name;
     }
 
     console.log("outmesg: ", mesg);
 
 
     await ddcsControllers.sendMesgToAll(
-        "A: " + mesg,
+        "HASKILLED",
+        [
+            "#" + eventObj.data.initiator.side,
+            initMesg,
+            "#" + eventObj.data.target.side,
+            targetMesg,
+            weaponMesg
+        ],
         20,
         nowTime + ddcsControllers.time.oneMin
     );

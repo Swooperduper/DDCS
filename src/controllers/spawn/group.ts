@@ -749,11 +749,13 @@ export async function spawnConvoy(
     await ddcsControllers.sendUDPPacket("frontEnd", actionObj);
     // console.log("TASKING ROUTE: ", JSON.stringify(convoyRouteTemplate(curGrpObj)));
     // await ddcsControllers.setMissionTask(groupName, JSON.stringify(convoyRouteTemplate(curGrpObj)));
+    /* needs to be redone for i18n
     await ddcsControllers.sendMesgToCoalition(
         convoySide,
         mesg,
         20
     );
+     */
 }
 
 export async function spawnCAPDefense(
@@ -816,11 +818,13 @@ export async function spawnCAPDefense(
     const sendClient = {action: "CMD", cmd: [curCMD], reqID: 0};
     const actionObj = {actionObj: sendClient, queName: "clientArray"};
     await ddcsControllers.sendUDPPacket("frontEnd", actionObj);
+    /* needs to be redone for i18n
     await ddcsControllers.sendMesgToCoalition(
         convoySide,
         mesg,
         20
     );
+     */
 }
 
 export async function spawnDefenseChopper(playerUnitObj: typing.IUnit, unitObj: typing.IUnit): Promise<void> {
@@ -888,11 +892,13 @@ export async function spawnDefenseChopper(playerUnitObj: typing.IUnit, unitObj: 
     const actionObj = {actionObj: sendClient, queName: "clientArray"};
     await ddcsControllers.sendUDPPacket("frontEnd", actionObj);
     const mesg = "C: A pair of " + unitObj.type + " is defending " + friendlyBase.name;
+    /* needs to be redone for i18n
     await ddcsControllers.sendMesgToCoalition(
         playerUnitObj.coalition,
         mesg,
         20
     );
+     */
 }
 
 export async function spawnAtkChopper(playerUnitObj: typing.IUnit, unitObj: typing.IUnit): Promise<void> {
@@ -968,11 +974,13 @@ export async function spawnAtkChopper(playerUnitObj: typing.IUnit, unitObj: typi
     const actionObj = {actionObj: sendClient, queName: "clientArray"};
     await ddcsControllers.sendUDPPacket("frontEnd", actionObj);
     const mesg = "C: " + unitObj.type + " Atk Heli is departed " + friendlyBase.name + " and it is patrolling toward " + enemyBase.name;
+    /* needs to be redone for i18n
     await ddcsControllers.sendMesgToCoalition(
         playerUnitObj.coalition,
         mesg,
         20
     );
+     */
 }
 
 export async function spawnBomberPlane(playerUnitObj: typing.IUnit, bomberObj: any): Promise<void> {
@@ -1036,11 +1044,13 @@ export async function spawnBomberPlane(playerUnitObj: typing.IUnit, bomberObj: a
     await ddcsControllers.sendUDPPacket("frontEnd", actionObj);
     const mesg = "C: " + bomberObj.type + " Bomber is commencing its run BRA " +
         randomDir + " from " + closeBase.name + " " + bomberObj.details;
+    /* needs to be redone for i18n
     await ddcsControllers.sendMesgToCoalition(
         playerUnitObj.coalition,
         mesg,
         20
     );
+     */
 }
 
 export async function spawnAWACSPlane(playerUnitObj: typing.IUnit, awacsObj: any): Promise<void> {
@@ -1094,11 +1104,13 @@ export async function spawnAWACSPlane(playerUnitObj: typing.IUnit, awacsObj: any
     await ddcsControllers.sendUDPPacket("frontEnd", actionObj);
     const mesg = "C: A " + awacsObj.type + " AWACS Has Been Spawned " +
         playerUnitObj.hdg + " from " + closeBase.name + " " + awacsObj.details;
+    /* needs to be redone for i18n
     await ddcsControllers.sendMesgToCoalition(
         playerUnitObj.coalition,
         mesg,
         20
     );
+     */
 }
 
 export async function spawnTankerPlane(
@@ -1150,11 +1162,13 @@ export async function spawnTankerPlane(
     await ddcsControllers.sendUDPPacket("frontEnd", actionObj);
     const mesg = "C: A " + tankerObj.type + " Tanker Has Been Spawned " +
         playerUnitObj.hdg + " from " + closeBase.name + " " + tankerObj.details;
+    /* needs to be redone for i18n
     await ddcsControllers.sendMesgToCoalition(
         playerUnitObj.coalition,
         mesg,
         20
     );
+     */
 }
 
 export async function spawnSupportPlane(baseObj: typing.IBase, side: number): Promise<void> {
@@ -1224,10 +1238,11 @@ export async function spawnSupportPlane(baseObj: typing.IBase, side: number): Pr
     const sendClient = {action: "CMD", cmd: [curCMD], reqID: 0};
     const actionObj = {actionObj: sendClient, queName: "clientArray"};
     await ddcsControllers.sendUDPPacket("frontEnd", actionObj);
-    const mesg = "C: Cargo Support Plane 10 mins out, BRA " + randomDir + " from " + baseObj.name;
+
     await ddcsControllers.sendMesgToCoalition(
         side,
-        mesg,
+        "CARGOSUPPORTPLANEOUT",
+        [randomDir, baseObj.name],
         20
     );
 }

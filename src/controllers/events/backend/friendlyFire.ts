@@ -12,7 +12,6 @@ export async function processFriendlyFire(eventObj: any): Promise<void> {
     let tPlayer: any;
     let curIUnit;
     let curTUnit;
-    let mesg;
     iPlayer = _.find(ddcsControllers.rtPlayerArray, {id: eventObj.data.arg1});
     tPlayer = _.find(ddcsControllers.rtPlayerArray, {id: eventObj.data.arg3});
 
@@ -44,12 +43,17 @@ export async function processFriendlyFire(eventObj: any): Promise<void> {
                     );
                 }
 
-                mesg = "A: " + ddcsControllers.side[iPlayer.side] + " " + iPlayer.name + "(" + curIUnit.type +
-                    ":-6 LP) has hit friendly " + tPlayer.name + "(" + curTUnit.type + ":+LPLoss) with a " +
-                    eventObj.data.arg2 || "?";
                 await ddcsControllers.sendMesgToCoalition(
                     iPlayer.side,
-                    mesg,
+                    "HASHITFRIENDLY",
+                    [
+                        "#1",
+                        iPlayer.name,
+                        curIUnit.type,
+                        tPlayer.name,
+                        curTUnit.type,
+                        eventObj.data.arg2
+                    ],
                     15
                 );
             }

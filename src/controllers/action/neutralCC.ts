@@ -84,7 +84,8 @@ export async function spawnCCAtNeutralBase(curPlayerUnit: typings.IUnit): Promis
                 await ddcsControllers.spawnSupportBaseGrp(base.name, curPlayerUnit.coalition, false);
                 await ddcsControllers.sendMesgToCoalition(
                     curPlayerUnit.coalition,
-                    "C: " + base.name + " Command Center Is Now Built!",
+                    "BASECOMMANDCENTERISBUILT",
+                    [base.name],
                     20
                 );
                 return true;

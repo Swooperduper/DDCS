@@ -5,6 +5,7 @@
 import * as _ from "lodash";
 import * as ddcsController from "../";
 import * as ddcsControllers from "../action/aiConvoys";
+import {I18nResolver} from "i18n-ts";
 
 export async function forcePlayerSpectator(playerId: string, mesg: string): Promise<void> {
 
@@ -49,18 +50,33 @@ export async function sendMesgToPlayerChatWindow(mesg: string, playerId: string)
     });
 }
 
-export async function sendMesgToAll(message: string, time: number, delayTime?: number): Promise<void> {
+export async function sendMesgToAll(
+    messageTemplate: string,
+    argArray: any[],
+    time: number,
+    delayTime?: number
+): Promise<void> {
     // send to everyone individually
     const latestSession = await ddcsController.sessionsActionsReadLatest();
+    const engineCache = ddcsController.getEngineCache();
     if (latestSession) {
         const playerArray = await ddcsController.srvPlayerActionsRead({sessionName: latestSession.name});
         if (playerArray.length > 0) {
-            const playerList = _.uniq(playerArray.map((pl) => pl.name));
-            const playerUnits = await ddcsController.unitActionRead({dead: false, playername: {$in: playerList}});
-
-            if (playerUnits.length > 0) {
-                for (const playerUnit of playerUnits) {
-                    await sendMesgToGroup(playerUnit.groupId, message, time, delayTime);
+            for (const player of playerArray) {
+                const playerUnits = await ddcsController.unitActionRead({dead: false, playername: player.name});
+                const curPlayerUnit = playerUnits[0];
+                if (playerUnits.length > 0) {
+                    const i18n = new I18nResolver(engineCache.i18n, player.lang).translation as any;
+                    const message = "A: " + i18n[messageTemplate];
+                    for (const [i, v] of argArray.entries()) {
+                        message.replace("#" + i, (_.includes(v, "#") ? i18n[v] : v ));
+                    }
+                    await sendMesgToGroup(
+                        curPlayerUnit.groupId,
+                        message,
+                        time,
+                        delayTime
+                    );
                 }
             }
         }
@@ -77,18 +93,34 @@ export async function sendMesgToAll(message: string, time: number, delayTime?: n
      */
 }
 
-export async function sendMesgToCoalition(coalition: number, message: string, time: number, delayTime?: number): Promise<void> {
+export async function sendMesgToCoalition(
+    coalition: number,
+    messageTemplate: string,
+    argArray: any[],
+    time: number,
+    delayTime?: number
+): Promise<void> {
     // send to everyone individually
     const latestSession = await ddcsController.sessionsActionsReadLatest();
+    const engineCache = ddcsController.getEngineCache();
     if (latestSession) {
         const playerArray = await ddcsController.srvPlayerActionsRead({sessionName: latestSession.name});
         if (playerArray.length > 0) {
-            const playerList = _.uniq(playerArray.map((pl) => pl.name));
-            const playerUnits = await ddcsController.unitActionRead({dead: false, coalition, playername: {$in: playerList}});
-
-            if (playerUnits.length > 0) {
-                for (const playerUnit of playerUnits) {
-                    await sendMesgToGroup(playerUnit.groupId, message, time, delayTime);
+            for (const player of playerArray) {
+                const playerUnits = await ddcsController.unitActionRead({dead: false, coalition, playername: player.name});
+                const curPlayerUnit = playerUnits[0];
+                if (playerUnits.length > 0) {
+                    const i18n = new I18nResolver(engineCache.i18n, player.lang).translation as any;
+                    const message = "C: " + i18n[messageTemplate];
+                    for (const [i, v] of argArray.entries()) {
+                        message.replace("#" + i, (_.includes(v, "#") ? i18n[v] : v ));
+                    }
+                    await sendMesgToGroup(
+                        curPlayerUnit.groupId,
+                        message,
+                        time,
+                        delayTime
+                    );
                 }
             }
         }

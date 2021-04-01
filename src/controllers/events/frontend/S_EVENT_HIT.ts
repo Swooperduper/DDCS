@@ -40,30 +40,36 @@ export async function checkShootingUsers(): Promise<void> {
                     await ddcsControllers.baseUnitUnderAttack(shootObj.tUnit);
                     if (engineCache.config.inGameHitMessages) {
                         console.log("shooting1: ", shootObj.msg);
+                        /*
                         await ddcsControllers.sendMesgToAll(
                             "A: " + shootObj.msg,
                             20,
                             nowTime + ddcsControllers.time.oneMin
                         );
+                         */
                     }
                 } else if (ddcsControllers.UNIT_CATEGORY[shootObj.iUnit.unitCategory] === "GROUND_UNIT") {
                     await ddcsControllers.baseUnitUnderAttack(shootObj.tUnit);
                     if (engineCache.config.inGameHitMessages || exports.shootingUsers[shootKey].isOwnedUnit) {
                         console.log("shooting2: ", shootObj.msg);
+                        /*
                         await ddcsControllers.sendMesgToAll(
                             "A: " + shootObj.msg,
                             20,
                             nowTime + ddcsControllers.time.oneMin
                         );
+                         */
                     }
                 } else {
                     if (engineCache.config.inGameHitMessages) {
                         console.log("shooting3: ", shootObj.msg);
+                        /*
                         await ddcsControllers.sendMesgToAll(
                             "A: " + shootObj.msg,
                             20,
                             nowTime + ddcsControllers.time.oneMin
                         );
+                         */
                     }
                 }
                 delete exports.shootingUsers[shootKey];
@@ -203,29 +209,35 @@ export async function processEventHit(eventObj: any): Promise<void> {
                         await ddcsControllers.baseUnitUnderAttack(iCurObj.tUnit);
                         if (engineCache.config.inGameHitMessages) {
                             console.log("groundhit: ", iCurObj.msg);
+                            /*
                             await ddcsControllers.sendMesgToAll(
                                 "A: " + iCurObj.msg,
                                 20,
                                 nowTime + ddcsControllers.time.oneMin
                             );
+                             */
                         }
                     } else if (ddcsControllers.UNIT_CATEGORY[iCurObj.iUnit.unitCategory] === "GROUND_UNIT") {
                         if (engineCache.config.inGameHitMessages || isOwnedUnit) {
                             console.log("groundrecievehit: ", iCurObj.msg);
+                            /*
                             await ddcsControllers.sendMesgToAll(
                                 "A: " + iCurObj.msg,
                                 20,
                                 nowTime + ddcsControllers.time.oneMin
                             );
+                             */
                         }
                     } else {
                         if (engineCache.config.inGameHitMessages) {
                             console.log("reg hit: ", iCurObj.msg);
+                            /*
                             await ddcsControllers.sendMesgToAll(
                                 "A: " + iCurObj.msg,
                                 20,
                                 nowTime + ddcsControllers.time.oneMin
                             );
+                             */
                         }
                     }
                 }

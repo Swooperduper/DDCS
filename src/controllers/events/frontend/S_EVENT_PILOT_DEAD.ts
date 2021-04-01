@@ -34,7 +34,8 @@ export async function processEventPilotDead(eventObj: any): Promise<void> {
 
             if (engineCache.config.inGameHitMessages) {
                 await ddcsControllers.sendMesgToAll(
-                    iCurObj.msg,
+                    "PILOTISDEAD",
+                    ["#" + iUnit[0].coalition, iUnit[0].type, iUnit[0].playername],
                     5,
                     nowTime + ddcsControllers.time.oneMin
                 );
