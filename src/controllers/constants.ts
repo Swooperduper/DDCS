@@ -325,7 +325,8 @@ export function setConfig(curConfig: typings.IServer): void {
 export function setI18n(i18nLocalization: any): void {
     engineCache.i18n = {
         default: i18nLocalization.find((loc: any) => loc._id === "en").definitions,
-        en: i18nLocalization.find((loc: any) => loc._id === "en").definitions
+        en: i18nLocalization.find((loc: any) => loc._id === "en").definitions,
+        it: i18nLocalization.find((loc: any) => loc._id === "it").definitions
         // ru: i18nLocalization.find((loc: any) => loc._id === "ru"),
         // cn: i18nLocalization.find((loc: any) => loc._id === "cn"),
         // de: i18nLocalization.find((loc: any) => loc._id === "de"),
@@ -335,7 +336,6 @@ export function setI18n(i18nLocalization: any): void {
         // ko: i18nLocalization.find((loc: any) => loc._id === "ko"),
         // jp: i18nLocalization.find((loc: any) => loc._id === "jp"),
         // pl: i18nLocalization.find((loc: any) => loc._id === "pl"),
-        // it: i18nLocalization.find((loc: any) => loc._id === "it"),
         // us: i18nLocalization.find((loc: any) => loc._id === "en")
     };
 }
