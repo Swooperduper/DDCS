@@ -65,23 +65,21 @@ export async function sendMesgToAll(
             for (const player of playerArray) {
                 if (player.displayAllMessages) {
                     const playerUnits = await ddcsController.unitActionRead({dead: false, playername: player.name});
-                    const curPlayerUnit = playerUnits[0];
-                    if (playerUnits.length > 0) {
-                        const i18n = new I18nResolver(engineCache.i18n, player.lang).translation as any;
-                        let message = "A: " + i18n[messageTemplate];
-                        for (const [i, v] of argArray.entries()) {
-                            const templateReplace = "#" + (i + 1);
-                            const templateVal = (_.includes(v, "#")) ? i18n[v.split("#")[1]] : v;
-                            message = message.replace(templateReplace, templateVal);
-                        }
-                        await sendMesgToGroup(
-                            player,
-                            curPlayerUnit.groupId,
-                            message,
-                            time,
-                            delayTime
-                        );
+                    const curPlayerUnit = playerUnits[0] || {};
+                    const i18n = new I18nResolver(engineCache.i18n, player.lang).translation as any;
+                    let message = "A: " + i18n[messageTemplate];
+                    for (const [i, v] of argArray.entries()) {
+                        const templateReplace = "#" + (i + 1);
+                        const templateVal = (_.includes(v, "#")) ? i18n[v.split("#")[1]] : v;
+                        message = message.replace(templateReplace, templateVal);
                     }
+                    await sendMesgToGroup(
+                        player,
+                        curPlayerUnit.groupId,
+                        message,
+                        time,
+                        delayTime
+                    );
                 }
             }
         }
@@ -104,23 +102,21 @@ export async function sendMesgToCoalition(
             for (const player of playerArray) {
                 if (player.displayCoalitionMessages) {
                     const playerUnits = await ddcsController.unitActionRead({dead: false, coalition, playername: player.name});
-                    const curPlayerUnit = playerUnits[0];
-                    if (playerUnits.length > 0) {
-                        const i18n = new I18nResolver(engineCache.i18n, player.lang).translation as any;
-                        let message = "C: " + i18n[messageTemplate];
-                        for (const [i, v] of argArray.entries()) {
-                            const templateReplace = "#" + (i + 1);
-                            const templateVal = (_.includes(v, "#")) ? i18n[v.split("#")[1]] : v;
-                            message = message.replace(templateReplace, templateVal);
-                        }
-                        await sendMesgToGroup(
-                            player,
-                            curPlayerUnit.groupId,
-                            message,
-                            time,
-                            delayTime
-                        );
+                    const curPlayerUnit = playerUnits[0] || {};
+                    const i18n = new I18nResolver(engineCache.i18n, player.lang).translation as any;
+                    let message = "C: " + i18n[messageTemplate];
+                    for (const [i, v] of argArray.entries()) {
+                        const templateReplace = "#" + (i + 1);
+                        const templateVal = (_.includes(v, "#")) ? i18n[v.split("#")[1]] : v;
+                        message = message.replace(templateReplace, templateVal);
                     }
+                    await sendMesgToGroup(
+                        player,
+                        curPlayerUnit.groupId,
+                        message,
+                        time,
+                        delayTime
+                    );
                 }
             }
         }
