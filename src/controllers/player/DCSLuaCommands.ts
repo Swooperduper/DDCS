@@ -129,13 +129,20 @@ export async function sendMesgToCoalition(
 
 export async function sendMesgToGroup(player: ISrvPlayers, groupId: number, mesg: string, time: number, delayTime?: number): Promise<void> {
     if (player.displayGroupMessages) {
-        await ddcsController.sendUDPPacket("frontEnd", {
-            actionObj: {
-                action: "CMD",
-                cmd: ["trigger.action.outTextForGroup(" + groupId + ", [[" + mesg + "]], " + time + ")"],
-                reqID: 0
-            },
-            timeToExecute: delayTime
-        });
+        if (_.includes(player.slot, "instructor") ||
+            _.includes(player.slot, "forward_observer") ||
+            _.includes(player.slot, "artillery_commander")
+        ) {
+            await sendMesgToPlayerChatWindow(mesg, player.slot as string);
+        } else {
+            await ddcsController.sendUDPPacket("frontEnd", {
+                actionObj: {
+                    action: "CMD",
+                    cmd: ["trigger.action.outTextForGroup(" + groupId + ", [[" + mesg + "]], " + time + ")"],
+                    reqID: 0
+                },
+                timeToExecute: delayTime
+            });
+        }
     }
 }
