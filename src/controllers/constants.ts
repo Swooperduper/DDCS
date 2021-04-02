@@ -326,17 +326,17 @@ export function setI18n(i18nLocalization: any): void {
     engineCache.i18n = {
         default: i18nLocalization.find((loc: any) => loc._id === "en").definitions,
         en: i18nLocalization.find((loc: any) => loc._id === "en").definitions,
-        it: i18nLocalization.find((loc: any) => loc._id === "it").definitions
-        // ru: i18nLocalization.find((loc: any) => loc._id === "ru"),
-        // cn: i18nLocalization.find((loc: any) => loc._id === "cn"),
-        // de: i18nLocalization.find((loc: any) => loc._id === "de"),
-        // cs: i18nLocalization.find((loc: any) => loc._id === "cs"),
-        // fr: i18nLocalization.find((loc: any) => loc._id === "fr"),
-        // es: i18nLocalization.find((loc: any) => loc._id === "es"),
-        // ko: i18nLocalization.find((loc: any) => loc._id === "ko"),
-        // jp: i18nLocalization.find((loc: any) => loc._id === "jp"),
-        // pl: i18nLocalization.find((loc: any) => loc._id === "pl"),
-        // us: i18nLocalization.find((loc: any) => loc._id === "en")
+        it: i18nLocalization.find((loc: any) => loc._id === "it").definitions,
+        cn: i18nLocalization.find((loc: any) => loc._id === "cn").definitions,
+        us: i18nLocalization.find((loc: any) => loc._id === "en").definitions
+        // ru: i18nLocalization.find((loc: any) => loc._id === "ru").definitions,
+        // de: i18nLocalization.find((loc: any) => loc._id === "de").definitions,
+        // cs: i18nLocalization.find((loc: any) => loc._id === "cs").definitions,
+        // fr: i18nLocalization.find((loc: any) => loc._id === "fr").definitions,
+        // es: i18nLocalization.find((loc: any) => loc._id === "es").definitions,
+        // ko: i18nLocalization.find((loc: any) => loc._id === "ko").definitions,
+        // jp: i18nLocalization.find((loc: any) => loc._id === "jp").definitions,
+        // pl: i18nLocalization.find((loc: any) => loc._id === "pl").definitions,
     };
 }
 
