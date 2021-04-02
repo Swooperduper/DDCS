@@ -103,6 +103,10 @@ export function srvPlayerModel(dbconn: mongoose.Connection): mongoose.Document |
             currentSessionMinutesPlayed_red: {
                 type: Number,
                 default: 0
+            },
+            displayAllMessages: {
+                type: Boolean,
+                default: true
             }
         },
         {

@@ -56,42 +56,34 @@ export async function sendMesgToAll(
     delayTime?: number
 ): Promise<void> {
     // send to everyone individually
-    const latestSession = await ddcsController.sessionsActionsReadLatest();
     const engineCache = ddcsController.getEngineCache();
-    if (latestSession) {
-        const playerArray = await ddcsController.srvPlayerActionsRead({sessionName: latestSession.name});
-        if (playerArray.length > 0) {
-            for (const player of playerArray) {
-                const playerUnits = await ddcsController.unitActionRead({dead: false, playername: player.name});
-                const curPlayerUnit = playerUnits[0];
-                if (playerUnits.length > 0) {
-                    const i18n = new I18nResolver(engineCache.i18n, player.lang).translation as any;
-                    let message = "A: " + i18n[messageTemplate];
-                    for (const [i, v] of argArray.entries()) {
-                        const templateReplace = "#" + (i + 1);
-                        const templateVal = (_.includes(v, "#")) ? i18n[v.split("#")[1]] : v;
-                        message = message.replace(templateReplace, templateVal);
+    if (engineCache.config.displayAllMessages) {
+        const latestSession = await ddcsController.sessionsActionsReadLatest();
+        if (latestSession) {
+            const playerArray = await ddcsController.srvPlayerActionsRead({sessionName: latestSession.name});
+            if (playerArray.length > 0) {
+                for (const player of playerArray) {
+                    const playerUnits = await ddcsController.unitActionRead({dead: false, playername: player.name});
+                    const curPlayerUnit = playerUnits[0];
+                    if (playerUnits.length > 0) {
+                        const i18n = new I18nResolver(engineCache.i18n, player.lang).translation as any;
+                        let message = "A: " + i18n[messageTemplate];
+                        for (const [i, v] of argArray.entries()) {
+                            const templateReplace = "#" + (i + 1);
+                            const templateVal = (_.includes(v, "#")) ? i18n[v.split("#")[1]] : v;
+                            message = message.replace(templateReplace, templateVal);
+                        }
+                        await sendMesgToGroup(
+                            curPlayerUnit.groupId,
+                            message,
+                            time,
+                            delayTime
+                        );
                     }
-                    await sendMesgToGroup(
-                        curPlayerUnit.groupId,
-                        message,
-                        time,
-                        delayTime
-                    );
                 }
             }
         }
     }
-    /*
-    await ddcsController.sendUDPPacket("frontEnd", {
-        actionObj: {
-            action: "CMD",
-            cmd: ["trigger.action.outText([[" + mesg + "]], " + time + ")"],
-            reqID: 0
-        },
-        timeToExecute: delayTime
-    });
-     */
 }
 
 export async function sendMesgToCoalition(
@@ -102,49 +94,46 @@ export async function sendMesgToCoalition(
     delayTime?: number
 ): Promise<void> {
     // send to everyone individually
-    const latestSession = await ddcsController.sessionsActionsReadLatest();
     const engineCache = ddcsController.getEngineCache();
-    if (latestSession) {
-        const playerArray = await ddcsController.srvPlayerActionsRead({sessionName: latestSession.name});
-        if (playerArray.length > 0) {
-            for (const player of playerArray) {
-                const playerUnits = await ddcsController.unitActionRead({dead: false, coalition, playername: player.name});
-                const curPlayerUnit = playerUnits[0];
-                if (playerUnits.length > 0) {
-                    const i18n = new I18nResolver(engineCache.i18n, player.lang).translation as any;
-                    const message = "C: " + i18n[messageTemplate];
-                    for (const [i, v] of argArray.entries()) {
-                        message.replace("#" + i, (_.includes(v, "#") ? i18n[v] : v ));
+    if (engineCache.config.displayAllMessages) {
+        const latestSession = await ddcsController.sessionsActionsReadLatest();
+        if (latestSession) {
+            const playerArray = await ddcsController.srvPlayerActionsRead({sessionName: latestSession.name});
+            if (playerArray.length > 0) {
+                for (const player of playerArray) {
+                    const playerUnits = await ddcsController.unitActionRead({dead: false, coalition, playername: player.name});
+                    const curPlayerUnit = playerUnits[0];
+                    if (playerUnits.length > 0) {
+                        const i18n = new I18nResolver(engineCache.i18n, player.lang).translation as any;
+                        let message = "C: " + i18n[messageTemplate];
+                        for (const [i, v] of argArray.entries()) {
+                            const templateReplace = "#" + (i + 1);
+                            const templateVal = (_.includes(v, "#")) ? i18n[v.split("#")[1]] : v;
+                            message = message.replace(templateReplace, templateVal);
+                        }
+                        await sendMesgToGroup(
+                            curPlayerUnit.groupId,
+                            message,
+                            time,
+                            delayTime
+                        );
                     }
-                    await sendMesgToGroup(
-                        curPlayerUnit.groupId,
-                        message,
-                        time,
-                        delayTime
-                    );
                 }
             }
         }
     }
-    /*
-    await ddcsController.sendUDPPacket("frontEnd", {
-        actionObj: {
-            action: "CMD",
-            cmd: ["trigger.action.outTextForCoalition(" + coalition + ", [[" + mesg + "]], " + time + ")"],
-            reqID: 0
-        },
-        timeToExecute: delayTime
-    });
-     */
 }
 
 export async function sendMesgToGroup(groupId: number, mesg: string, time: number, delayTime?: number): Promise<void> {
-    await ddcsController.sendUDPPacket("frontEnd", {
-        actionObj: {
-            action: "CMD",
-            cmd: ["trigger.action.outTextForGroup(" + groupId + ", [[" + mesg + "]], " + time + ")"],
-            reqID: 0
-        },
-        timeToExecute: delayTime
-    });
+    const engineCache = ddcsController.getEngineCache();
+    if (engineCache.config.displayAllMessages) {
+        await ddcsController.sendUDPPacket("frontEnd", {
+            actionObj: {
+                action: "CMD",
+                cmd: ["trigger.action.outTextForGroup(" + groupId + ", [[" + mesg + "]], " + time + ")"],
+                reqID: 0
+            },
+            timeToExecute: delayTime
+        });
+    }
 }
