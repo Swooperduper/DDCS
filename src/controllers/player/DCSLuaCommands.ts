@@ -133,7 +133,7 @@ export async function sendMesgToGroup(player: ISrvPlayers, groupId: number, mesg
             _.includes(player.slot, "forward_observer") ||
             _.includes(player.slot, "artillery_commander")
         ) {
-            await sendMesgToPlayerChatWindow(mesg, player.slot as string);
+            await sendMesgToPlayerChatWindow(mesg, player.playerId);
         } else {
             await ddcsController.sendUDPPacket("frontEnd", {
                 actionObj: {
