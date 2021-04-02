@@ -1561,6 +1561,7 @@ export async function healBase(baseName: string, curPlayerUnit: any, init: boole
         // console.log("CB: ", curBase);
         if (curBase.side !== 0 && curBase.side !== curPlayerUnit.coalition) {
             await ddcsControllers.sendMesgToGroup(
+                curPly,
                 curPlayerUnit.groupId,
                 "G: " + i18n.ENEMYBASECOULDNOTBEREPAIRED.replace("#1", curBase._id),
                 5
@@ -1573,6 +1574,7 @@ export async function healBase(baseName: string, curPlayerUnit: any, init: boole
                 const shelterUnit = await ddcsControllers.unitActionRead({name: curBase.name + " Shelter", dead: false});
                 if (shelterUnit.length > 0) {
                     await ddcsControllers.sendMesgToGroup(
+                        curPly,
                         curPlayerUnit.groupId,
                         "G: " + i18n.SHELTERATBASEALREADYEXISTS.replace("#1", curBase._id),
                         5

@@ -19,12 +19,14 @@ export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: 
     if (intCargoType === "loaded") {
         if (curUnit.intCargoType) {
             await ddcsControllers.sendMesgToGroup(
+                curPlayer,
                 curUnit.groupId,
                 "G: " + i18n.INTERNALCRATEONBOARD.replace("#1", curUnit.intCargoType),
                 5
             );
         } else {
             await ddcsControllers.sendMesgToGroup(
+                curPlayer,
                 curUnit.groupId,
                 "G: " + i18n.NOINTERNALCRATEONBOARD,
                 5
@@ -38,6 +40,7 @@ export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: 
         const crateType = (curUnit.coalition === 1) ? "UAZ-469" : "Hummer";
         if (curUnit.inAir) {
             await ddcsControllers.sendMesgToGroup(
+                curPlayer,
                 curUnit.groupId,
                 "G: " + i18n.LANDBEFORECARGOCOMMAND,
                 5
@@ -55,6 +58,7 @@ export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: 
                 }
                 if (curBaseObj && curIntCrateBaseOrigin === _.split(curBaseObj.name, " #")[0]) {
                     await ddcsControllers.sendMesgToGroup(
+                        curPlayer,
                         curUnit.groupId,
                         "G: " + i18n.CANTUNPACKSAMEBASECRATE,
                         5
@@ -64,6 +68,7 @@ export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: 
                         await unpackCrate(curUnit, curUnit.country, crateType, "jtac", false, true);
                         await ddcsControllers.unitActionUpdateByUnitId({unitId: curUnit.unitId, intCargoType: ""});
                         await ddcsControllers.sendMesgToGroup(
+                            curPlayer,
                             curUnit.groupId,
                             "G: " + i18n.SPAWNJTACFROMINTERNALCARGO,
                             5
@@ -74,6 +79,7 @@ export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: 
                             await ddcsControllers.repairBase(curBaseObj, curUnit);
                         } else {
                             await ddcsControllers.sendMesgToGroup(
+                                curPlayer,
                                 curUnit.groupId,
                                 "G: " + i18n.YOUARENOTNEARANYFRIENDLYBASES,
                                 5
@@ -113,6 +119,7 @@ export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: 
                         await ddcsControllers.spawnLogiCrate(crateObj, true);
                         await ddcsControllers.unitActionUpdateByUnitId({unitId: curUnit.unitId, intCargoType: ""});
                         await ddcsControllers.sendMesgToGroup(
+                            curPlayer,
                             curUnit.groupId,
                             "G: " + i18n.COMMANDCENTERBUILDCRATESPAWNED,
                             5
@@ -121,6 +128,7 @@ export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: 
                 }
             } else {
                 await ddcsControllers.sendMesgToGroup(
+                    curPlayer,
                     curUnit.groupId,
                     "G: " + i18n.NOINTERNALCRATEONBOARD,
                     5
@@ -131,6 +139,7 @@ export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: 
     if (intCargoType === "loadJTAC" || intCargoType === "loadBaseRepair" || intCargoType === "loadCCBuild") {
         if (curUnit.inAir) {
             await ddcsControllers.sendMesgToGroup(
+                curPlayer,
                 curUnit.groupId,
                 "G: " + i18n.LANDBEFORECARGOCOMMAND,
                 5
@@ -156,6 +165,7 @@ export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: 
                             intCargoType: "|JTAC|" + curBaseName + "|"
                         });
                         await ddcsControllers.sendMesgToGroup(
+                            curPlayer,
                             curUnit.groupId,
                             "G: " + i18n.PICKEDUPJTACINTERNALCRATE.replace("#1", curBaseName),
                             5
@@ -174,6 +184,7 @@ export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: 
                             intCargoType: "|BaseRepair|" + curBaseName + "|"
                         });
                         await ddcsControllers.sendMesgToGroup(
+                            curPlayer,
                             curUnit.groupId,
                             "G: " + i18n.PICKEDUPBASEREPAIRINTERNALCRATES.replace("#1", curBaseName),
                             5
@@ -185,6 +196,7 @@ export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: 
                             intCargoType: "|CCBuild|" + curBaseName + "|"
                         });
                         await ddcsControllers.sendMesgToGroup(
+                            curPlayer,
                             curUnit.groupId,
                             "G: " + i18n.PICKEDUPBASEREPAIRBUILDCRATE.replace("#1", curBaseName),
                             5
@@ -192,6 +204,7 @@ export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: 
                     }
                 } else {
                     await ddcsControllers.sendMesgToGroup(
+                        curPlayer,
                         curUnit.groupId,
                         "G: " + i18n.LOGISTICALSUPPLYHASBEENCUT.replace("#1", curBaseName),
                         5
@@ -199,6 +212,7 @@ export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: 
                 }
             } else {
                 await ddcsControllers.sendMesgToGroup(
+                    curPlayer,
                     curUnit.groupId,
                     "G: " + i18n.YOUARENOTWITHINDISTANCEFRIENDLYBASE.replace("#1", "2km"),
                     5
@@ -216,6 +230,7 @@ export async function isCrateOnboard(unit: any, verbose: boolean) {
     if (unit.virtCrateType) {
         if (verbose) {
             await ddcsControllers.sendMesgToGroup(
+                curPly,
                 unit.groupId,
                 "G: " + i18n.CRATEISONBOARD.replace("#1", _.split(unit.virtCrateType, "|")[2]),
                 5
@@ -225,6 +240,7 @@ export async function isCrateOnboard(unit: any, verbose: boolean) {
     }
     if (verbose) {
         await ddcsControllers.sendMesgToGroup(
+            curPly,
             unit.groupId,
             "G: " + i18n.NOCRATESONBOARD,
             5
@@ -241,6 +257,7 @@ export async function isTroopOnboard(unit: any, verbose?: boolean) {
     if (unit.troopType) {
         if (verbose) {
             await ddcsControllers.sendMesgToGroup(
+                curPly,
                 unit.groupId,
                 "G: " + i18n.CRATEISONBOARD.replace("#1", unit.troopType),
                 5
@@ -250,6 +267,7 @@ export async function isTroopOnboard(unit: any, verbose?: boolean) {
     }
     if (verbose) {
         await ddcsControllers.sendMesgToGroup(
+            curPly,
             unit.groupId,
             "G: " + i18n.NOTROOPSONBOARD,
             5
@@ -267,6 +285,7 @@ export async function loadTroops(unitId: string, troopType: string) {
     const i18n = new I18nResolver(engineCache.i18n, curPly.lang).translation as any;
     if (curUnit.inAir) {
         await ddcsControllers.sendMesgToGroup(
+            curPly,
             curUnit.groupId,
             "G: " + i18n.LANDBEFORECARGOCOMMAND,
             5
@@ -281,6 +300,7 @@ export async function loadTroops(unitId: string, troopType: string) {
         if (_.some(playerProx)) {
             await ddcsControllers.unitActionUpdateByUnitId({unitId, troopType});
             await ddcsControllers.sendMesgToGroup(
+                curPly,
                 curUnit.groupId,
                 "G: " + i18n.HASBEENLOADED.replace("#1", troopType),
                 5
@@ -309,6 +329,7 @@ export async function loadTroops(unitId: string, troopType: string) {
                 await ddcsControllers.unitActionUpdateByUnitId({unitId, troopType})
                     .then(async () => {
                         await ddcsControllers.sendMesgToGroup(
+                            curPly,
                             curUnit.groupId,
                             "G: " + i18n.HASBEENLOADED.replace("#1", troopType),
                             5
@@ -320,6 +341,7 @@ export async function loadTroops(unitId: string, troopType: string) {
                 ;
             } else {
                 await ddcsControllers.sendMesgToGroup(
+                    curPly,
                     curUnit.groupId,
                     "G: " + i18n.TOOFARFROMFRIENDLYBASE.replace("#1", "troops"),
                     5
@@ -350,12 +372,14 @@ export async function getActiveJTACTargets(unit: any, player: any, target: numbe
             message +=  i18n.SHOTLASERCODE.replace("#1", curJtacEnemy.laserCode);
 
             await ddcsControllers.sendMesgToGroup(
+                player,
                 unit.groupId,
                 message,
                 60
             );
         } else {
             await ddcsControllers.sendMesgToGroup(
+                player,
                 unit.groupId,
                 i18n.NOJTACTARGET.replace("#1", target),
                 10
@@ -382,12 +406,14 @@ export async function getActiveJTACTargets(unit: any, player: any, target: numbe
                 }
             }
             await ddcsControllers.sendMesgToGroup(
+                player,
                 unit.groupId,
                 message,
                 20
             );
         } else {
             await ddcsControllers.sendMesgToGroup(
+                player,
                 unit.groupId,
                 i18n.NOJTACTARGETS,
                 10
@@ -462,6 +488,7 @@ export async function menuCmdProcess(pObj: any) {
                 case "unloadExtractTroops":
                     if (curUnit.inAir) {
                         await ddcsControllers.sendMesgToGroup(
+                            curPlayer,
                             curUnit.groupId,
                             "G: " + i18n.LANDBEFORECARGOCOMMAND,
                             5
@@ -483,6 +510,7 @@ export async function menuCmdProcess(pObj: any) {
                                     troopType: null
                                 });
                                 await ddcsControllers.sendMesgToGroup(
+                                    curPlayer,
                                     curUnit.groupId,
                                     "G: " + i18n.HASBEENDROPPEDOFFATBASE.replace("#1", curUnit.troopType),
                                     5
@@ -544,6 +572,7 @@ export async function menuCmdProcess(pObj: any) {
                                 ;
                                 await ddcsControllers.spawnUnitGroup(curTroops, false);
                                 await ddcsControllers.sendMesgToGroup(
+                                    curPlayer,
                                     curUnit.groupId,
                                     "G: " + i18n.HASBEENDEPLOYED.replace("#1", curSpawnUnit.type),
                                     5
@@ -570,6 +599,7 @@ export async function menuCmdProcess(pObj: any) {
                                         console.log("erroring line57: ", err);
                                     });
                                 await ddcsControllers.sendMesgToGroup(
+                                    curPlayer,
                                     curUnit.groupId,
                                     "G: " + i18n.PICKEDUP.replace("#1", curTroop.type),
                                     5
@@ -577,6 +607,7 @@ export async function menuCmdProcess(pObj: any) {
                             } else {
                                 // no troops
                                 await ddcsControllers.sendMesgToGroup(
+                                    curPlayer,
                                     curUnit.groupId,
                                     "G:" + i18n.NOTROOPSTOEXTRACTORUNLOAD,
                                     5
@@ -595,6 +626,7 @@ export async function menuCmdProcess(pObj: any) {
                     const logiProx = await ddcsControllers.getLogiTowersProximity(curUnit.lonLatLoc, 0.8, curUnit.coalition);
                     if (logiProx.length) {
                         await ddcsControllers.sendMesgToGroup(
+                            curPlayer,
                             curUnit.groupId,
                             "G: " + i18n.YOUNEEDTOMOVEFARTHERAWAY.replace("#1", "Command Towers (800m)"),
                             5
@@ -602,6 +634,7 @@ export async function menuCmdProcess(pObj: any) {
                     } else {
                         if (curUnit.inAir) {
                             await ddcsControllers.sendMesgToGroup(
+                                curPlayer,
                                 curUnit.groupId,
                                 "G: " + i18n.LANDBEFORECARGOCOMMAND,
                                 5
@@ -642,6 +675,7 @@ export async function menuCmdProcess(pObj: any) {
                     }, {});
 
                     await ddcsControllers.sendMesgToGroup(
+                        curPlayer,
                         curUnit.groupId,
                         "G: " + i18n.YOUHAVEUNITAQUISITIONSINPLAY
                             .replace("#1", _.size(grpGroups)).replace("#2", engineCache.config.maxUnitsMoving),
@@ -1011,6 +1045,7 @@ export async function spawnCrateFromLogi(
 
     if (unit.inAir) {
         await ddcsControllers.sendMesgToGroup(
+            curPly,
             unit.groupId,
             "G: " + i18n.LANDBEFORECARGOCOMMAND,
             5
@@ -1086,12 +1121,14 @@ export async function spawnCrateFromLogi(
             // await ddcsControllers.spawnLogiCrate(crateObj, true);
 
             await ddcsControllers.sendMesgToGroup(
+                curPly,
                 unit.groupId,
                 "G: " + i18n.CRATEHASBEENSPAWNED.replace("#1",  _.toUpper(spc) + " " + type),
                 5
             );
         } else {
             await ddcsControllers.sendMesgToGroup(
+                curPly,
                 unit.groupId,
                 "G: " + i18n.YOUARENOTCLOSEENOUGHTOCOMMANDCENTER,
                 5
@@ -1317,6 +1354,7 @@ export async function spawnTanker(curUnit: any, curPlayer: any, tankerType: stri
 
     if (closeMOBs1.length > 0 || closeMOBs2.length > 0) {
         await ddcsControllers.sendMesgToGroup(
+            curPlayer,
             curUnit.groupId,
             "G: " + i18n.SPAWNTANKERFARTHERAWAYFROMENEMYBASE,
             5
@@ -1344,6 +1382,7 @@ export async function unpackCrate(
     const curTimePeriod = engineCache.config.timePeriod || "modern";
     if (playerUnit.inAir) {
         await ddcsControllers.sendMesgToGroup(
+            curPlayer,
             playerUnit.groupId,
             "G: " + i18n.LANDBEFORECARGOCOMMAND,
             5

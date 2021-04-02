@@ -130,7 +130,7 @@ export async function gciUpdatePilots(detectedUnits: any, friendlySide: number) 
                         message += `${curUnit.type.toUpperCase()}, ${i18n.BRAA} ${curUnit.bearingTo.toFixed(0)} ${i18n.FOR} ${(curUnit.distanceTo * 0.621371).toFixed(0)}${i18n.M}, ${i18n.AT} ${(curUnit.alt * 3.28084).toFixed(0)}${i18n.FT}, ${curUnit.curEnemyAspect}`;
                     }
                 }
-                await ddcsController.sendMesgToGroup(curPlayerUnit.groupId, message, 15);
+                await ddcsController.sendMesgToGroup(player, curPlayerUnit.groupId, message, 15);
             }
         }
     }

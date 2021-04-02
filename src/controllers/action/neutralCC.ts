@@ -60,6 +60,7 @@ export async function spawnCCAtNeutralBase(curPlayerUnit: typings.IUnit): Promis
                 if (cmdCenters[0].coalition === curPlayerUnit.coalition) {
                     console.log("cmdCenter already exists, replace units: " + base.name + " " + cmdCenters);
                     await ddcsControllers.sendMesgToGroup(
+                        curPly,
                         curPlayerUnit.groupId,
                         "G: " + i18n.BASECOMMANDCENTEREXISTS.replace("#1", base.name),
                         5
@@ -70,6 +71,7 @@ export async function spawnCCAtNeutralBase(curPlayerUnit: typings.IUnit): Promis
                 } else {
                     console.log(" enemy cmdCenter already exists: " + base.name + " " + cmdCenters);
                     await ddcsControllers.sendMesgToGroup(
+                        curPly,
                         curPlayerUnit.groupId,
                         "G: " + i18n.ENEMYCOMMANDCENTEREXISTS.replace("#1", base.name),
                         5

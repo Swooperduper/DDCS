@@ -5,6 +5,7 @@
 import * as _ from "lodash";
 import * as ddcsController from "../";
 import {I18nResolver} from "i18n-ts";
+import {ISrvPlayers} from "../../typings";
 
 export async function forcePlayerSpectator(playerId: string, mesg: string): Promise<void> {
 
@@ -74,6 +75,7 @@ export async function sendMesgToAll(
                             message = message.replace(templateReplace, templateVal);
                         }
                         await sendMesgToGroup(
+                            player,
                             curPlayerUnit.groupId,
                             message,
                             time,
@@ -112,6 +114,7 @@ export async function sendMesgToCoalition(
                             message = message.replace(templateReplace, templateVal);
                         }
                         await sendMesgToGroup(
+                            player,
                             curPlayerUnit.groupId,
                             message,
                             time,
@@ -124,13 +127,15 @@ export async function sendMesgToCoalition(
     }
 }
 
-export async function sendMesgToGroup(groupId: number, mesg: string, time: number, delayTime?: number): Promise<void> {
-    await ddcsController.sendUDPPacket("frontEnd", {
-        actionObj: {
-            action: "CMD",
-            cmd: ["trigger.action.outTextForGroup(" + groupId + ", [[" + mesg + "]], " + time + ")"],
-            reqID: 0
-        },
-        timeToExecute: delayTime
-    });
+export async function sendMesgToGroup(player: ISrvPlayers, groupId: number, mesg: string, time: number, delayTime?: number): Promise<void> {
+    if (player.displayGroupMessages) {
+        await ddcsController.sendUDPPacket("frontEnd", {
+            actionObj: {
+                action: "CMD",
+                cmd: ["trigger.action.outTextForGroup(" + groupId + ", [[" + mesg + "]], " + time + ")"],
+                reqID: 0
+            },
+            timeToExecute: delayTime
+        });
+    }
 }

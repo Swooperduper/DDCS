@@ -29,6 +29,7 @@ export async function spendResourcePoints(
             if (unitExist.length > 0 && rsItem === "Tanker") {
                 message = "G: " + i18n.TANKERSPAWNALREADYEXISTS;
                 await ddcsControllers.sendMesgToGroup(
+                    player,
                     curUnit.groupId,
                     message,
                     5
@@ -45,6 +46,7 @@ export async function spendResourcePoints(
                         message = "G: " + i18n.YOUHAVESPENTRSPOINTS.replace("#1", i18n[1])
                             .replace("#2", rsCost).replace("#3", rsItem).replace("#4", currentObjUpdate.redRSPoints);
                         await ddcsControllers.sendMesgToGroup(
+                            player,
                             curUnit.groupId,
                             message,
                             5
@@ -54,6 +56,7 @@ export async function spendResourcePoints(
                         message = "G: " + i18n.YOUDONTHAVEENOUGHRSPOINTSTOBUY.replace("#1", i18n[1])
                             .replace("#2", rsCost).replace("#3", rsItem).replace("#4", player.redRSPoints);
                         await ddcsControllers.sendMesgToGroup(
+                            player,
                             curUnit.groupId,
                             message,
                             5
@@ -70,6 +73,7 @@ export async function spendResourcePoints(
                         message = "G: " + i18n.YOUHAVESPENTRSPOINTS.replace("#1", i18n[2])
                             .replace("#2", rsCost).replace("#3", rsItem).replace("#4", currentObjUpdate.blueRSPoints);
                         await ddcsControllers.sendMesgToGroup(
+                            player,
                             curUnit.groupId,
                             message,
                             5
@@ -79,6 +83,7 @@ export async function spendResourcePoints(
                         message = "G: " + i18n.YOUDONTHAVEENOUGHRSPOINTSTOBUY.replace("#1", i18n[2])
                             .replace("#2", rsCost).replace("#3", rsItem).replace("#4", player.blueRSPoints);
                         await ddcsControllers.sendMesgToGroup(
+                            player,
                             curUnit.groupId,
                             message,
                             5
@@ -90,6 +95,7 @@ export async function spendResourcePoints(
         } else {
             message = "G: " + i18n.YOUCANNOTSPENDRSPOINTSONGROUND;
             await ddcsControllers.sendMesgToGroup(
+                player,
                 curUnit.groupId,
                 message,
                 5
@@ -113,6 +119,7 @@ export async function checkResourcePoints(player: typings.ISrvPlayers): Promise<
             }
 
             await ddcsControllers.sendMesgToGroup(
+                player,
                 cUnit[0].groupId,
                 message,
                 5

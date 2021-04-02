@@ -94,7 +94,7 @@ export async function lookupLifeResource(playerUcid: string): Promise<void> {
             const cUnit = await ddcsControllers.unitActionRead({dead: false, playername: curPlayer.name});
             const curUnit = cUnit[0];
             const message = "G: " + i18n.LIFERESOURCEPOINTS.replace("#1", curPlayer.curLifePoints.toFixed(2));
-            await ddcsControllers.sendMesgToGroup( curUnit.groupId, message, 5);
+            await ddcsControllers.sendMesgToGroup(curPlayer, curUnit.groupId, message, 5);
         }
     }
 }
@@ -129,7 +129,7 @@ export async function lookupAircraftCosts(playerUcid: string): Promise<void> {
                         const messages = "G: " + i18n.YOURAIRCRAFTCOSTS.replace("#1", totalTakeoffCosts).replace("#2", curUnitLPCost)
                             .replace("#3", curUnit.type).replace("#4", curTopWeaponCost).replace("#5", curTopAmmo);
 
-                        await ddcsControllers.sendMesgToGroup( curUnit.groupId, messages, 5);
+                        await ddcsControllers.sendMesgToGroup(curPlayer, curUnit.groupId, messages, 5);
                     } else {
                         console.log("cant find unit in dictionary: line 129");
                         console.log("lookup unit: ", curUnit);
@@ -166,7 +166,7 @@ export async function checkAircraftCosts(): Promise<void> {
                         message = "G: " + i18n.YOUDONOTHAVEENOUGHPOINTS.replace("#1", curUnit.type)
                             .replace("#2", totalTakeoffCosts.toFixed(2)).replace("#3", curPlayer.curLifePoints.toFixed(2));
                         console.log(curPlayer.name + " " + message);
-                        await ddcsControllers.sendMesgToGroup( curUnit.groupId, message, 30);
+                        await ddcsControllers.sendMesgToGroup(curPlayer, curUnit.groupId, message, 30);
                     }
                 }
             }

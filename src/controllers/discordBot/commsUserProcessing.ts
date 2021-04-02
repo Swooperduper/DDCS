@@ -69,7 +69,7 @@ export async function processKick(
             console.log("GTBK: ", newLifeCount, curPlayerName, " Not In SRS, discordOnline: " + discordOnline);
         }
         if (curPlayerUnit) {
-            await ddcsControllers.sendMesgToGroup(curPlayerUnit.groupId, mesg, 60);
+            await ddcsControllers.sendMesgToGroup(curPlayer, curPlayerUnit.groupId, mesg, 60);
         }
         await ddcsControllers.srvPlayerActionsUpdate({_id: curPlayer.ucid, gicTimeLeft: newLifeCount});
     } else {
@@ -96,7 +96,7 @@ export async function processKick(
         await ddcsControllers.srvPlayerActionsUpdate({_id: curPlayer.ucid, gicTimeLeft: newLifeCount});
         if (curPlayerUnit) {
             console.log("KICKED FOR NO COMMS: ", curPlayerUnit.playername, curPlayer.playerId);
-            await ddcsControllers.sendMesgToGroup(curPlayerUnit.groupId, mesg, 60);
+            await ddcsControllers.sendMesgToGroup(curPlayer, curPlayerUnit.groupId, mesg, 60);
         }
         await ddcsControllers.forcePlayerSpectator(curPlayer.playerId, mesg);
     }

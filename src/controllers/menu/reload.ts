@@ -27,6 +27,7 @@ export async function reloadSAM(unitCalling: typing.IUnit): Promise<boolean> {
                     return true;
                 } else {
                     await ddcsControllers.sendMesgToGroup(
+                        curPly,
                         unitCalling.groupId,
                         "G: " + i18n.TOODAMAGEDTOBERELOADED.replace("#1", curSamType),
                         5
@@ -36,6 +37,7 @@ export async function reloadSAM(unitCalling: typing.IUnit): Promise<boolean> {
             }
         } else {
             await ddcsControllers.sendMesgToGroup(
+                curPly,
                 unitCalling.groupId,
                 "G: " + i18n.DOESNOTHAVEENOUGHPIECES,
                 5
@@ -44,6 +46,7 @@ export async function reloadSAM(unitCalling: typing.IUnit): Promise<boolean> {
         }
     } else {
         await ddcsControllers.sendMesgToGroup(
+            curPly,
             unitCalling.groupId,
             "G: " + i18n.THEREARENOUNITSCLOSEENOUGHTORELOAD,
             5

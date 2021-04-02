@@ -151,7 +151,7 @@ export async function srvPlayerActionsAddLifePoints(obj: {
                         }
                         // console.log("MESG: ", msg);
                         if (obj.groupId) {
-                            ddcsController.sendMesgToGroup( obj.groupId, message, 5);
+                            ddcsController.sendMesgToGroup(serverObj[0], obj.groupId, message, 5);
                         }
                         resolve();
                     }
@@ -200,7 +200,7 @@ export async function srvPlayerActionsRemoveLifePoints(obj: {
                             if (updateErr) { reject(updateErr); }
                             const message = i18n.PLAYERHASJUSTUSEDLIFEPOINTS.replace("#1", serverObj[0].name)
                                 .replace("#2", removePoints).replace("#3", obj.execAction).replace("#4", curTotalPoints.toFixed(2));
-                            ddcsController.sendMesgToGroup( obj.groupId, message, 5);
+                            ddcsController.sendMesgToGroup(serverObj[0], obj.groupId, message, 5);
                             resolve();
                         }
                     );
@@ -227,7 +227,7 @@ export async function srvPlayerActionsClearTempScore(obj: {
                     {$set: {tmpRSPoints: 0}},
                     (updateErr: any) => {
                         if (updateErr) { reject(updateErr); }
-                        ddcsController.sendMesgToGroup(obj.groupId, i18n.YOURTEMPSCOREHASBEENCLEARED, 15);
+                        ddcsController.sendMesgToGroup(serverObj[0], obj.groupId, i18n.YOURTEMPSCOREHASBEENCLEARED, 15);
                         resolve();
                     }
                 );
@@ -256,7 +256,7 @@ export async function srvPlayerActionsAddTempScore(obj: {
                     (updateErr: any) => {
                         if (updateErr) { reject(updateErr); }
                         if (engineCache.config.inGameHitMessages) {
-                            ddcsController.sendMesgToGroup( obj.groupId, i18n.ADDTEMPSCORE, 15);
+                            ddcsController.sendMesgToGroup(serverObj[0], obj.groupId, i18n.ADDTEMPSCORE, 15);
                         }
                         resolve();
                     }
@@ -303,7 +303,7 @@ export async function srvPlayerActionsApplyTempToRealScore(obj: {
                     (updateErr: any) => {
                         if (updateErr) { reject(updateErr); }
                         // console.log("aplyT2R: ", curPly.name, mesg);
-                        ddcsController.sendMesgToGroup(obj.groupId, message, 15);
+                        ddcsController.sendMesgToGroup(curPly, obj.groupId, message, 15);
                         resolve();
                     }
                 );
@@ -349,7 +349,7 @@ export async function srvPlayerActionsUnitAddToRealScore(obj: {
                             console.log(obj.unitType + " has given " + addScore +
                                 " to " + curPly.name + " on " + curPly.side + ", Total: ", tObj);
                             if (engineCache.config.inGameHitMessages) {
-                                ddcsController.sendMesgToGroup(obj.groupId, message, 15);
+                                ddcsController.sendMesgToGroup(curPly, obj.groupId, message, 15);
                             }
                             resolve();
                         }

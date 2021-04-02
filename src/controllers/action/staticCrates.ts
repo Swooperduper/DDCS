@@ -90,6 +90,7 @@ export async function unpackStaticCrate(curPlayerUnit: any): Promise<void> {
                 // console.log('singleCrateDestroy: ', curCrate.name);
                 // groupController.destroyUnit(serverName, curCrate.name);
                 await ddcsControllers.sendMesgToGroup(
+                    curPly,
                     curPlayerUnit.groupId,
                     message,
                     5
@@ -99,12 +100,14 @@ export async function unpackStaticCrate(curPlayerUnit: any): Promise<void> {
         } else {
             if (localCrateNum) {
                 await ddcsControllers.sendMesgToGroup(
+                    curPly,
                     curPlayerUnit.groupId,
                     "G: " + i18n.NOTENOUGHCRATESFOR.replace("#1", curCrateType).replace("#2", localCrateNum).replace("#3", numCrate),
                     5
                 );
             } else {
                 await ddcsControllers.sendMesgToGroup(
+                    curPly,
                     curPlayerUnit.groupId,
                     "G: " + i18n.NOCRATESINAREA,
                     5
@@ -114,6 +117,7 @@ export async function unpackStaticCrate(curPlayerUnit: any): Promise<void> {
     } else {
         // no troops
         await ddcsControllers.sendMesgToGroup(
+            curPly,
             curPlayerUnit.groupId,
             "G: " + i18n.NOCRATESTOUNPACK,
             5

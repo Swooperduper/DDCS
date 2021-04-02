@@ -157,6 +157,7 @@ export interface IMasterCue {
 }
 
 export interface ISrvPlayers {
+    displayGroupMessages: boolean;
     displayCoalitionMessages: boolean;
     displayAllMessages: boolean;
     _id: string;

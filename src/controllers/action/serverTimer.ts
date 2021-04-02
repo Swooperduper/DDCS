@@ -231,5 +231,5 @@ export async function timeLeft(curUnit: typings.IUnit, curPlayer: typings.ISrvPl
     const message = "G: " + i18n.SERVERTIMELEFT.replace("#1", formatTime);
 
     console.log(message);
-    await ddcsController.sendMesgToGroup(curUnit.groupId, message, 5);
+    await ddcsController.sendMesgToGroup(curPlayer, curUnit.groupId, message, 5);
 }

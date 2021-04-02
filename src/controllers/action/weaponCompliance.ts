@@ -66,7 +66,7 @@ export async function checkAircraftWeaponCompliance(): Promise<void> {
                         const message = "G: " + i18n.YOUHAVEBANNEDWEAPONS.replace("#1", maxLimitedWeaponCount)
                             .replace("#2", _.join(limitedWeapons)).replace("#3", weaponRule.maxTotalAllowed);
 
-                        await ddcsControllers.sendMesgToGroup( curUnit.groupId, message, 30);
+                        await ddcsControllers.sendMesgToGroup(curPlayer, curUnit.groupId, message, 30);
                     }
                 }
             }
