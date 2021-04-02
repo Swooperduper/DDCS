@@ -107,6 +107,10 @@ export function srvPlayerModel(dbconn: mongoose.Connection): mongoose.Document |
             displayAllMessages: {
                 type: Boolean,
                 default: true
+            },
+            displayCoalitionMessages: {
+                type: Boolean,
+                default: true
             }
         },
         {

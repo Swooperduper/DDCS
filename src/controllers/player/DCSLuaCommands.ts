@@ -57,12 +57,12 @@ export async function sendMesgToAll(
 ): Promise<void> {
     // send to everyone individually
     const engineCache = ddcsController.getEngineCache();
-    if (engineCache.config.displayAllMessages) {
-        const latestSession = await ddcsController.sessionsActionsReadLatest();
-        if (latestSession) {
-            const playerArray = await ddcsController.srvPlayerActionsRead({sessionName: latestSession.name});
-            if (playerArray.length > 0) {
-                for (const player of playerArray) {
+    const latestSession = await ddcsController.sessionsActionsReadLatest();
+    if (latestSession) {
+        const playerArray = await ddcsController.srvPlayerActionsRead({sessionName: latestSession.name});
+        if (playerArray.length > 0) {
+            for (const player of playerArray) {
+                if (player.displayAllMessages) {
                     const playerUnits = await ddcsController.unitActionRead({dead: false, playername: player.name});
                     const curPlayerUnit = playerUnits[0];
                     if (playerUnits.length > 0) {
@@ -95,12 +95,12 @@ export async function sendMesgToCoalition(
 ): Promise<void> {
     // send to everyone individually
     const engineCache = ddcsController.getEngineCache();
-    if (engineCache.config.displayAllMessages) {
-        const latestSession = await ddcsController.sessionsActionsReadLatest();
-        if (latestSession) {
-            const playerArray = await ddcsController.srvPlayerActionsRead({sessionName: latestSession.name});
-            if (playerArray.length > 0) {
-                for (const player of playerArray) {
+    const latestSession = await ddcsController.sessionsActionsReadLatest();
+    if (latestSession) {
+        const playerArray = await ddcsController.srvPlayerActionsRead({sessionName: latestSession.name});
+        if (playerArray.length > 0) {
+            for (const player of playerArray) {
+                if (player.displayCoalitionMessages) {
                     const playerUnits = await ddcsController.unitActionRead({dead: false, coalition, playername: player.name});
                     const curPlayerUnit = playerUnits[0];
                     if (playerUnits.length > 0) {
@@ -125,15 +125,12 @@ export async function sendMesgToCoalition(
 }
 
 export async function sendMesgToGroup(groupId: number, mesg: string, time: number, delayTime?: number): Promise<void> {
-    const engineCache = ddcsController.getEngineCache();
-    if (engineCache.config.displayAllMessages) {
-        await ddcsController.sendUDPPacket("frontEnd", {
-            actionObj: {
-                action: "CMD",
-                cmd: ["trigger.action.outTextForGroup(" + groupId + ", [[" + mesg + "]], " + time + ")"],
-                reqID: 0
-            },
-            timeToExecute: delayTime
-        });
-    }
+    await ddcsController.sendUDPPacket("frontEnd", {
+        actionObj: {
+            action: "CMD",
+            cmd: ["trigger.action.outTextForGroup(" + groupId + ", [[" + mesg + "]], " + time + ")"],
+            reqID: 0
+        },
+        timeToExecute: delayTime
+    });
 }
