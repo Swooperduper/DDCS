@@ -328,9 +328,9 @@ export function setI18n(i18nLocalization: any): void {
         en: i18nLocalization.find((loc: any) => loc._id === "en").definitions,
         it: i18nLocalization.find((loc: any) => loc._id === "it").definitions,
         cn: i18nLocalization.find((loc: any) => loc._id === "cn").definitions,
-        us: i18nLocalization.find((loc: any) => loc._id === "en").definitions
+        us: i18nLocalization.find((loc: any) => loc._id === "en").definitions,
+        de: i18nLocalization.find((loc: any) => loc._id === "de").definitions
         // ru: i18nLocalization.find((loc: any) => loc._id === "ru").definitions,
-        // de: i18nLocalization.find((loc: any) => loc._id === "de").definitions,
         // cs: i18nLocalization.find((loc: any) => loc._id === "cs").definitions,
         // fr: i18nLocalization.find((loc: any) => loc._id === "fr").definitions,
         // es: i18nLocalization.find((loc: any) => loc._id === "es").definitions,
