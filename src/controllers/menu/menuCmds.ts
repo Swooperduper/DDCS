@@ -480,7 +480,7 @@ export async function menuCmdProcess(pObj: any) {
                     await ddcsControllers.lookupLifeResource(curPlayer.ucid);
                     break;
                 case "getTargetCoords":
-                    await getActiveJTACTargets(curUnit, player, pObj.target);
+                    await getActiveJTACTargets(curUnit, curPlayer, pObj.target);
                     break;
                 case "resourcePoints":
                     await ddcsControllers.checkResourcePoints(curPlayer);
