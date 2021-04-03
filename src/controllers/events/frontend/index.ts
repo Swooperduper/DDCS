@@ -11,3 +11,4 @@ export * from "./S_EVENT_PLAYER_LEAVE_UNIT";
 export * from "./S_EVENT_REFUELING";
 export * from "./S_EVENT_REFUELING_STOP";
 export * from "./S_EVENT_TAKEOFF";
+export * from "./S_EVENT_SHOT";

@@ -27,6 +27,9 @@ export async function processingIncomingData(incomingObj: any) {
         case "f10Menu":
             await ddcsController.menuCmdProcess(incomingObj);
             break;
+        case "S_EVENT_SHOT":
+            await ddcsController.processEventShot(incomingObj);
+            break;
         case "S_EVENT_HIT":
             // not using hit anymore for kills
             // await ddcsController.processEventHit(incomingObj);
