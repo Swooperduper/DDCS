@@ -1358,7 +1358,7 @@ export async function spawnStaticBuilding(
     } else {
         staticObj.canCargo = staticObj.canCargo || false;
         staticObj.isActive = true;
-        console.log("STATIC2: ", staticObj);
+        // console.log("STATIC2: ", staticObj);
         const curCMD = await spawnStatic(
             await staticTemplate(staticObj as typing.IStaticUnitTemp),
             staticObj.country
