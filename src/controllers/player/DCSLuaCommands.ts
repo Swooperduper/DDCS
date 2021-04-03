@@ -129,6 +129,7 @@ export async function sendMesgToGroup(player: ISrvPlayers, groupId: number, mesg
             _.includes(player.slot, "forward_observer") ||
             _.includes(player.slot, "artillery_commander")
         ) {
+			console.log("toChat: ", mesg, player.playerId, player.name);
             await sendMesgToPlayerChatWindow(mesg, player.playerId);
         } else {
             await ddcsController.sendUDPPacket("frontEnd", {
