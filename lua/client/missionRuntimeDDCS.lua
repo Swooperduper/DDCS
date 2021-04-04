@@ -131,31 +131,44 @@ function addGroups(groups, coalition)
         for unitIndex = 1, #units do
             local unit = units[unitIndex]
             local curUnitName = unit:getName()
-            local unitPosition = unit:getPosition()
-            local lat, lon, alt = coord.LOtoLL(unitPosition.p)
-            table.insert(tempNames, curUnitName)
+            if curUnitName ~= nil then
+                local unitPosition = unit:getPosition()
+                local lat, lon, alt = coord.LOtoLL(unitPosition.p)
+                table.insert(tempNames, curUnitName)
 
-            local playername = unit:getPlayerName()
-            local ammo = {}
-            if playername ~= nil and playername ~= "" then
-                local curFullAmmo = unit:getAmmo()
-                if curFullAmmo ~= nil then
-                    for ammoIndex = 1, #curFullAmmo do
-                        table.insert(ammo, {
-                            ["typeName"] = curFullAmmo[ammoIndex].desc.typeName,
-                            ["count"] = curFullAmmo[ammoIndex].count
-                        })
+                local playername = unit:getPlayerName()
+                local ammo = {}
+                if playername ~= nil and playername ~= "" then
+                    local curFullAmmo = unit:getAmmo()
+                    if curFullAmmo ~= nil then
+                        for ammoIndex = 1, #curFullAmmo do
+                            table.insert(ammo, {
+                                ["typeName"] = curFullAmmo[ammoIndex].desc.typeName,
+                                ["count"] = curFullAmmo[ammoIndex].count
+                            })
+                        end
                     end
+                else
+                    playername = ""
                 end
-            else
-                playername = ""
-            end
 
-            --if Unit.isActive(unit) or unit:getTypeName() == "Locomotive" then
-            if Unit.isActive(unit) then
-                --env.info("ISACTIVE " .. curUnitName)
-                if objCache[curUnitName] ~= nil then
-                    if objCache[curUnitName].lat ~= lat or objCache[curUnitName].lon ~= lon or objCache[curUnitName].playername ~= playername or objCache[curUnitName].isActive ~= true or not TableComp(objCache[curUnitName].ammo, ammo) then
+                --if Unit.isActive(unit) or unit:getTypeName() == "Locomotive" then
+                if Unit.isActive(unit) then
+                    --env.info("ISACTIVE " .. curUnitName)
+                    if objCache[curUnitName] ~= nil then
+                        if objCache[curUnitName].lat ~= lat or objCache[curUnitName].lon ~= lon or objCache[curUnitName].playername ~= playername or objCache[curUnitName].isActive ~= true or not TableComp(objCache[curUnitName].ammo, ammo) then
+                            objCache[curUnitName] = {
+                                ["lat"] = lat,
+                                ["lon"] = lon,
+                                ["isActive"] = true,
+                                ["playername"] = playername,
+                                ["ammo"] = ammo
+                            }
+                            local curUnitObj = generateInitialUnitObj(group, unit, true, curUnitName, coalition, lon, lat, alt, unitPosition, playername, ammo)
+                            curUnitObj.action = "U"
+                            sendUDPPacket(curUnitObj)
+                        end
+                    else
                         objCache[curUnitName] = {
                             ["lat"] = lat,
                             ["lon"] = lon,
@@ -164,51 +177,52 @@ function addGroups(groups, coalition)
                             ["ammo"] = ammo
                         }
                         local curUnitObj = generateInitialUnitObj(group, unit, true, curUnitName, coalition, lon, lat, alt, unitPosition, playername, ammo)
-                        curUnitObj.action = "U"
+                        curUnitObj.action = "C"
                         sendUDPPacket(curUnitObj)
                     end
                 else
-                    objCache[curUnitName] = {
-                        ["lat"] = lat,
-                        ["lon"] = lon,
-                        ["isActive"] = true,
-                        ["playername"] = playername,
-                        ["ammo"] = ammo
-                    }
-                    local curUnitObj = generateInitialUnitObj(group, unit, true, curUnitName, coalition, lon, lat, alt, unitPosition, playername, ammo)
-                    curUnitObj.action = "C"
-                    sendUDPPacket(curUnitObj)
+                    --env.info("NOTACTIVE " .. curUnitName)
+                    if objCache[curUnitName] == nil or objCache[curUnitName].isActive ~= false then
+                        objCache[curUnitName] = {
+                            ["lat"] = lat,
+                            ["lon"] = lon,
+                            ["isActive"] = false,
+                            ["playername"] = playername,
+                            ["ammo"] = ammo
+                        }
+                        local curUnitObj = generateInitialUnitObj(group, unit, false, curUnitName, coalition, lon, lat, alt, unitPosition, playername, ammo)
+                        curUnitObj.action = "C"
+                        sendUDPPacket(curUnitObj)
+                    end
                 end
-            else
-                --env.info("NOTACTIVE " .. curUnitName)
-                if objCache[curUnitName] == nil or objCache[curUnitName].isActive ~= false then
-                    objCache[curUnitName] = {
-                        ["lat"] = lat,
-                        ["lon"] = lon,
-                        ["isActive"] = false,
-                        ["playername"] = playername,
-                        ["ammo"] = ammo
-                    }
-                    local curUnitObj = generateInitialUnitObj(group, unit, false, curUnitName, coalition, lon, lat, alt, unitPosition, playername, ammo)
-                    curUnitObj.action = "C"
-                    sendUDPPacket(curUnitObj)
-                end
+                checkDead[curUnitName] = 1
             end
-            checkDead[curUnitName] = 1
         end
     end
 end
 function addStatics(statics, coalition)
     for staticIndex = 1, #statics do
         local static = statics[staticIndex]
-        local staticPosition = static:getPosition()
-        local lat, lon, alt = coord.LOtoLL(staticPosition.p)
         local curStaticName = static:getName()
-        local country = static:getCountry()
-        table.insert(tempNames, curStaticName)
+        if curStaticName ~= nil then
+            local staticPosition = static:getPosition()
+            local lat, lon, alt = coord.LOtoLL(staticPosition.p)
+            local country = static:getCountry()
+            table.insert(tempNames, curStaticName)
 
-        if objCache[curStaticName] ~= nil then
-            if objCache[curStaticName].lat ~= lat or objCache[curStaticName].lon ~= lon or objCache[curStaticName].coalition ~= coalition or objCache[curStaticName].country ~= country then
+            if objCache[curStaticName] ~= nil then
+                if objCache[curStaticName].lat ~= lat or objCache[curStaticName].lon ~= lon or objCache[curStaticName].coalition ~= coalition or objCache[curStaticName].country ~= country then
+                    local curStaticObj = generateInitialStaticsObj(static, curStaticName, coalition, lon, lat, alt, staticPosition, country)
+                    objCache[curStaticName] = {
+                        ["lat"] = lat,
+                        ["lon"] = lon,
+                        ["coalition"] = coalition,
+                        ["country"] = country
+                    }
+                    curStaticObj.action = "U"
+                    sendUDPPacket(curStaticObj)
+                end
+            else
                 local curStaticObj = generateInitialStaticsObj(static, curStaticName, coalition, lon, lat, alt, staticPosition, country)
                 objCache[curStaticName] = {
                     ["lat"] = lat,
@@ -216,21 +230,11 @@ function addStatics(statics, coalition)
                     ["coalition"] = coalition,
                     ["country"] = country
                 }
-                curStaticObj.action = "U"
+                curStaticObj.action = "C"
                 sendUDPPacket(curStaticObj)
             end
-        else
-            local curStaticObj = generateInitialStaticsObj(static, curStaticName, coalition, lon, lat, alt, staticPosition, country)
-            objCache[curStaticName] = {
-                ["lat"] = lat,
-                ["lon"] = lon,
-                ["coalition"] = coalition,
-                ["country"] = country
-            }
-            curStaticObj.action = "C"
-            sendUDPPacket(curStaticObj)
+            checkDead[curStaticName] = 1
         end
-        checkDead[curStaticName] = 1
     end
 end
 
@@ -724,6 +728,10 @@ function clientEventHandler:onEvent(_event)
                     ["displayName"] = curWeapon.displayName,
                     ["category"] = weaponCategory[curWeapon.category + 1]
                 }
+                local targetObject = _event.weapon:getTarget()
+                if targetObject ~= nil then
+                    curEvent.weapon.targetName = targetObject:getName()
+                end
             end
             if _event.weapon_name ~= nil then
                 curEvent.weapon_name = _event.weapon_name
