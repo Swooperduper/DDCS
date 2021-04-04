@@ -352,7 +352,7 @@ export async function loadTroops(unitId: string, troopType: string) {
 }
 
 export async function getActiveJTACTargets(unit: any, player: any, target: number) {
-	console.log("UPT: ", unit, player, target);
+    // console.log("UPT: ", unit, player, target);
     const engineCache = ddcsControllers.getEngineCache();
     const i18n = new I18nResolver(engineCache.i18n, player.lang).translation as any;
     const closestJTAC = await ddcsControllers.getFirst5CoalitionJTACInProximity(unit.lonLatLoc, 10000, unit.coalition);
