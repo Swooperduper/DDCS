@@ -305,6 +305,23 @@ end
 function commandExecute(s)
     return loadstring("return " ..s)()
 end
+
+function hasRemainingAmmo(group)
+    local units = group:getUnits()
+    for unitIndex = 1, #units do
+        local unit = units[unitIndex]
+        local curFullAmmo = unit:getAmmo()
+        if curFullAmmo ~= nil then
+            for ammoIndex = 1, #curFullAmmo do
+                if curFullAmmo[ammoIndex].count > 0 then
+                    return true
+                end
+            end
+        end
+    end
+    return false
+end
+
 function runRequest(request)
     if request.action ~= nil and request.reqID ~= nil then
 
@@ -312,6 +329,34 @@ function runRequest(request)
             ["action"] = "processReq",
             ["reqId"] = request.reqID
         }
+
+        if request.action == "groupAIControl" then
+            if request.aiCommand == "groupGoLive" then
+                local taskGroup = Group.getByName(request.groupName)
+                if taskGroup ~= nil then
+                    local  cont = taskGroup:getController()
+                    if cont ~= nil then
+                        cont:setOnOff(true)
+                        cont:setOption(AI.Option.Ground.id.ALARM_STATE, AI.Option.Ground.val.ALARM_STATE.RED)
+                        cont:setOption(AI.Option.Air.id.ROE, AI.Option.Air.val.ROE.WEAPON_FREE)
+                    end
+                end
+            end
+            if request.aiCommand == "groupGoDark" then
+                local taskGroup = Group.getByName(request.groupName)
+                if taskGroup ~= nil then
+                    local  cont = taskGroup:getController()
+                    if cont ~= nil then
+                        if request.isEWR or hasRemainingAmmo(taskGroup) then
+                            cont:setOnOff(false)
+                        else
+                            cont:setOption(AI.Option.Ground.id.ALARM_STATE, AI.Option.Ground.val.ALARM_STATE.GREEN)
+                            cont:setOption(AI.Option.Air.id.ROE, AI.Option.Air.val.ROE.WEAPON_HOLD)
+                        end
+                    end
+                end
+            end
+        end
 
         if request.action == "addTask" then
             if request.verbose ~= null then

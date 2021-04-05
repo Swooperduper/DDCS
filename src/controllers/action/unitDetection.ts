@@ -10,6 +10,16 @@ import {I18nResolver} from "i18n-ts";
 const displayGCIOutputs = 5; // how many output lines on GCI output
 const maxKMDistanceToRead = 161; // about 100 miles
 
+let currentEWRDetectedUnits: string[] = [];
+
+export function setEwrDetectionUnits(arrayOfNames: string[]): void {
+    currentEWRDetectedUnits = arrayOfNames;
+}
+
+export function getEwrDetectionUnits(): string[] {
+    return currentEWRDetectedUnits;
+}
+
 export async function getAllEWRUnitNames(): Promise <string[]> {
     const engineCache = ddcsController.getEngineCache();
     const gciUnits = await ddcsController.unitActionRead({dead: false, type: {$in: engineCache.config.GCIDetectTypes}});
@@ -19,7 +29,10 @@ export async function getAllEWRUnitNames(): Promise <string[]> {
 export async function processGCIDetection(incomingObj: any): Promise<void> {
     const engineCache = ddcsController.getEngineCache();
 
-    const dedupeDetectedUnitNames = _.uniq(incomingObj.detectedUnitNames);
+    const dedupeDetectedUnitNames = _.uniq(incomingObj.detectedUnitNames) as string[];
+
+    setEwrDetectionUnits(dedupeDetectedUnitNames);
+
     if (dedupeDetectedUnitNames.length > 0) {
         // enemy detected, process
         const detectedUnits = await ddcsController.unitActionRead({
