@@ -82,7 +82,7 @@ export async function srvPlayerActionsUpdateFromServer(obj: {
                 const curPly = serverObj[0];
 
                 // keep an eye on this check....
-                await ddcsController.protectSlots(curPly.sideLock, obj.side, obj.playerId);
+                await ddcsController.protectSlots(curPly, obj.side, obj.playerId);
 
                 // const iUnit = await ddcsController.unitActionRead({playername: curPly.name});
 

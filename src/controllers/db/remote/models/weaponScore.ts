@@ -36,6 +36,10 @@ export function weaponScoreModel(dbconn: mongoose.Connection): mongoose.Document
             fox2ModUnder2: {
                 type: Number,
                 default: 0
+            },
+            isAntiRadiation: {
+                type: Boolean,
+                default: false
             }
         },
         {

@@ -270,6 +270,8 @@ export interface IAmmo {
 }
 
 export interface IUnit {
+    harmDetectChance: number;
+    natoName: string;
     curEnemyAspect: string;
     distanceTo: number;
     bearingTo: number;

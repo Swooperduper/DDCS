@@ -13,3 +13,4 @@ export * from "./socketIO";
 export * from "./spawn";
 export * from "./sychronize";
 export * from "./timedEvents";
+export * from "./aiBehavior";

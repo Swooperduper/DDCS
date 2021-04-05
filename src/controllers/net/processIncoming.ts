@@ -3,6 +3,8 @@ import * as ddcsController from "../";
 import { dbModels } from "../db/common";
 import * as typings from "../../typings";
 import {I18nResolver} from "i18n-ts";
+import {ISrvPlayers} from "../../typings";
+import * as ddcsControllers from "../action/aiConvoys";
 
 export async function processingIncomingData(incomingObj: any) {
     switch (incomingObj.action) {
@@ -114,7 +116,7 @@ export async function processingIncomingData(incomingObj: any) {
             dbModels.srvPlayerModel.find({_id: incomingObj.from}, async (err: any, serverObj: typings.ISrvPlayers[]) => {
                 if (err) { console.log("incomingMsgError: ", err); }
                 const curPly = serverObj[0];
-				const engineCache = ddcsController.getEngineCache();
+                const engineCache = ddcsController.getEngineCache();
                 const i18n = new I18nResolver(engineCache.i18n, curPly.lang).translation as any;
                 if (incomingObj.message === i18n.COMMANDRED) {
                     await ddcsController.lockUserToSide(incomingObj, 1);
@@ -189,7 +191,7 @@ export async function processingIncomingData(incomingObj: any) {
                         if (serverObj.length > 0) {
                             const curPlayer = serverObj[0];
                             const curSlotBase = bases[0];
-                            await processSlotLock(curPlayer.sideLock, curSlotBase.side, curSlotSide, incomingObj.playerInfo.id);
+                            await processSlotLock(curPlayer, curSlotBase.side, curSlotSide, incomingObj.playerInfo.id);
                         }
                     });
                 }
@@ -198,36 +200,35 @@ export async function processingIncomingData(incomingObj: any) {
     }
 }
 
-export async function processSlotLock(sideLock: number, baseSide: number, curSlotSide: number, playerId: string) {
-    let mesg;
+export async function processSlotLock(curPlayer: ISrvPlayers, baseSide: number, curSlotSide: number, playerId: string) {
+    const engineCache = ddcsController.getEngineCache();
+    const i18n = new I18nResolver(engineCache.i18n, curPlayer.lang).translation as any;
 
-    if (sideLock === 0) {
-        mesg = "You are not locked to a side yet, Please type in chat to join: -red or -blue";
-        await ddcsController.forcePlayerSpectator(playerId, mesg);
+    if (curPlayer.sideLock === 0) {
+        await ddcsController.forcePlayerSpectator(playerId, i18n.CHOOSEASIDE);
     } else {
-        if (sideLock !== curSlotSide) {
-            mesg = "You are locked to " + ddcsController.side[sideLock];
-            await ddcsController.forcePlayerSpectator(playerId, mesg);
+        if (curPlayer.sideLock !== curSlotSide) {
+            await ddcsController.forcePlayerSpectator(playerId, i18n.PLAYERALREADYLOCKEDTOSIDE.replace("#1", i18n[curPlayer.sideLock]));
         }
 
         if (baseSide !== curSlotSide) {
-            mesg = "You must capture this base before you can occupy slot";
-            await ddcsController.forcePlayerSpectator(playerId, mesg);
+            // message = "You must capture this base before you can occupy slot";
+            // TODO: need to get this translation into every language...^^^^ using locked to side for now
+            await ddcsController.forcePlayerSpectator(playerId, i18n.PLAYERALREADYLOCKEDTOSIDE.replace("#1", i18n[curPlayer.sideLock]));
         }
     }
 }
 
-export async function protectSlots(sideLock: number, playerSide: number, playerId: string) {
-    let mesg;
+export async function protectSlots(curPlayer: ISrvPlayers, playerSide: number, playerId: string) {
+    const engineCache = ddcsController.getEngineCache();
+    const i18n = new I18nResolver(engineCache.i18n, curPlayer.lang).translation as any;
 
-    if (sideLock === 0 && playerSide !== 0) {
-        mesg = "You are not locked to a side yet, Please type in chat to join: -red or -blue";
-        await ddcsController.forcePlayerSpectator(playerId, mesg);
+    if (curPlayer.sideLock === 0 && playerSide !== 0) {
+        await ddcsController.forcePlayerSpectator(playerId, i18n.CHOOSEASIDE);
     }
 
-    if (playerSide !== 0 && sideLock !== playerSide) {
-        mesg = "You are locked to " + ddcsController.side[sideLock];
-        await ddcsController.forcePlayerSpectator(playerId, mesg);
+    if (playerSide !== 0 && curPlayer.sideLock !== playerSide) {
+        await ddcsController.forcePlayerSpectator(playerId, i18n.PLAYERALREADYLOCKEDTOSIDE.replace("#1", i18n[curPlayer.sideLock]));
     }
 }
 

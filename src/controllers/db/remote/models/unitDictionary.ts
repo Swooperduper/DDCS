@@ -85,6 +85,13 @@ export function unitDictionaryModel(dbconn: mongoose.Connection): mongoose.Docum
             },
             payload: {
                 type: String
+            },
+            harmDetectChance: {
+                type: Number,
+                default: 0
+            },
+            natoName: {
+                type: String
             }
         },
         {
