@@ -6,7 +6,7 @@ import * as ddcsController from "../../";
 
 export async function processEventShot(eventObj: any): Promise<void> {
 
-    console.log("EVENT_SHOT: ", eventObj);
+    // console.log("EVENT_SHOT: ", eventObj);
     await ddcsController.detectHarmShot(eventObj);
 
     /*
