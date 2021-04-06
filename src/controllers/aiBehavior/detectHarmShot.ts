@@ -51,8 +51,9 @@ export async function detectHarmShot(event: any) {
                                 }
                             )
                         );
+
                         const didRadarDetectHarm = maxPercentChanceOfGroup > _.random(0, 100);
-                        // console.log("did radar detect harm: ", didRadarDetectHarm, curTarget, maxPercentChanceOfGroup);
+                        console.log("IAD friends: ", didRadarDetectHarm, maxPercentChanceOfGroup, friendlySAMs.map((sam: any) => sam.name));
                         if (didRadarDetectHarm) {
                             const groupNameArray = friendlySAMs.map((sam) => sam.groupName);
                             for (const groupName of groupNameArray) {
