@@ -51,13 +51,13 @@ export async function detectHarmShot(event: any) {
                                 }
                             )
                         );
-
-                        const didRadarDetectHarm = maxPercentChanceOfGroup > _.random(0, 100);
-                        console.log("IAD friends: ", didRadarDetectHarm, maxPercentChanceOfGroup, friendlySAMs.map((sam: any) => sam.name));
+						const randomNumber = _.random(1, 100);
+                        const didRadarDetectHarm = maxPercentChanceOfGroup < randomNumber;
+                        console.log("IAD friends: ", maxPercentChanceOfGroup, " < ", randomNumber, didRadarDetectHarm, maxPercentChanceOfGroup);
                         if (didRadarDetectHarm) {
-                            const groupNameArray = friendlySAMs.map((sam) => sam.groupName);
+                            const groupNameArray = _.uniq(friendlySAMs.map((sam) => sam.groupName));
                             for (const groupName of groupNameArray) {
-                                console.log("goDark", groupName);
+                                console.log("goDark", groupName, friendlySAMs[0].type);
                                 // harm detected radars in area around target go dark immediately (simulates radars general area fired at)
                                 await ddcsController.sendUDPPacket("frontEnd", {
                                     actionObj: {
