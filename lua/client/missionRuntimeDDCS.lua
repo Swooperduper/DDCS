@@ -776,6 +776,19 @@ function clientEventHandler:onEvent(_event)
                 local targetObject = _event.weapon:getTarget()
                 if targetObject ~= nil then
                     curEvent.weapon.targetName = targetObject:getName()
+                else
+                    local weaponPos = _event.weapon:getPosition()
+                    if weaponPos ~= nil then
+                        local impactPoint = land.getIP(weaponPos.p, weaponPos.x, 100000)
+                        if impactPoint ~= nil then
+                            local lat, lon, alt = coord.LOtoLL(impactPoint)
+                            curEvent.weapon.impactPoint = {
+                               ["lon"] = lon,
+                               ["lat"] = lat,
+                               ["alt"] = alt
+                            }
+                        end
+                    end
                 end
             end
             if _event.weapon_name ~= nil then
