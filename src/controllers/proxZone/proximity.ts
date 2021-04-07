@@ -19,12 +19,14 @@ export async function checkUnitsToBaseForCapture(): Promise<void> {
         if (base.side === 1 && _.get(sideArray, [2], []).length > 0) {
             // console.log("enemy in range: ", base.name + ": enemy Blue");
             if (_.get(sideArray, [1], []).length === 0) {
-                console.log("BASE HAS BEEN CAPTURED: ", base.name, " is now ", 2);
-                await ddcsControllers.sendMesgToAll(
-                    "HASBEENCAPTUREDBY",
-                    [base.name, "#" + 2],
-                    60
-                );
+                if (base.name) {
+                    console.log("BASE HAS BEEN CAPTURED: ", base.name, " is now ", 2);
+                    await ddcsControllers.sendMesgToAll(
+                        "HASBEENCAPTUREDBY",
+                        [base.name, "#" + 2],
+                        60
+                    );
+                }
 
                 await ddcsControllers.spawnSupportBaseGrp(base.name, 2, false);
                 await ddcsControllers.baseActionUpdateSide({name: base.name, side: 2});
@@ -42,12 +44,14 @@ export async function checkUnitsToBaseForCapture(): Promise<void> {
         if (base.side === 2 && _.get(sideArray, [1], []).length > 0) {
             // console.log("enemy in range: ", base.name + ": enemy Red");
             if (_.get(sideArray, [2], []).length === 0) {
-                console.log("BASE HAS BEEN CAPTURED: ", base.name, " is now ", 1);
-                await ddcsControllers.sendMesgToAll(
-                    "HASBEENCAPTUREDBY",
-                    [base.name, "#" + 1],
-                    60
-                );
+                if (base.name) {
+                    console.log("BASE HAS BEEN CAPTURED: ", base.name, " is now ", 1);
+                    await ddcsControllers.sendMesgToAll(
+                        "HASBEENCAPTUREDBY",
+                        [base.name, "#" + 1],
+                        60
+                    );
+                }
 
                 await ddcsControllers.spawnSupportBaseGrp(base.name, 1, false);
                 await ddcsControllers.baseActionUpdateSide({name: base.name, side: 1});
@@ -70,12 +74,15 @@ export async function checkUnitsToBaseForCapture(): Promise<void> {
             if (_.get(sideArray, [2], []).length > 0) {
                 unitSide = 2;
             }
-            console.log("BASE HAS BEEN CAPTURED: ", base.name, " is now ", unitSide);
-            await ddcsControllers.sendMesgToAll(
-                "HASBEENCAPTUREDBY",
-                [base.name],
-                60
-            );
+            if (base.name) {
+                console.log("BASE HAS BEEN CAPTURED: ", base.name, " is now ", unitSide);
+                await ddcsControllers.sendMesgToAll(
+                    "HASBEENCAPTUREDBY",
+                    [base.name],
+                    60
+                );
+            }
+
             // console.log('Spawning Support Units', base, unitSide);
             await ddcsControllers.spawnSupportBaseGrp(base.name, unitSide, false);
             await ddcsControllers.baseActionUpdateSide({name: base.name, side: unitSide});
@@ -124,30 +131,7 @@ export async function checkUnitsToBaseForCapture(): Promise<void> {
                 5
             );
         }
-        // console.log("CAMPAIGN STATE: ", campaignState);
     }
-    /*
-    if (!_.isEmpty(bases)) {
-        if (campaignState.red === 0) {
-            console.log("BLUE WON BLUE WON BLUE WON BLUE WON BLUE WON BLUE WON BLUE WON BLUE WON ");
-            await ddcsControllers.serverActionsUpdate({resetFullCampaign: true});
-            await ddcsControllers.setTimeToRestart(new Date().getTime() + ddcsControllers.time.fiveMins);
-            await ddcsControllers.sendMesgToAll(
-                "Blue has won the campaign, Map will reset in 5 minutes.",
-                ddcsControllers.time.fiveMins
-            );
-        }
-        if (campaignState.blue === 0) {
-            console.log("RED WON RED WON RED WON RED WON RED WON RED WON RED WON RED WON RED WON ");
-            await ddcsControllers.serverActionsUpdate({resetFullCampaign: true});
-            await ddcsControllers.setTimeToRestart(new Date().getTime() + ddcsControllers.time.fiveMins);
-            await ddcsControllers.sendMesgToAll(
-                "Red has won the campaign, Map will reset in 5 minutes.",
-                ddcsControllers.time.fiveMins
-            );
-        }
-    }
-     */
 }
 
 export async function getCoalitionGroundUnitsInProximity(
