@@ -37,49 +37,58 @@ export async function detectHarmShot(event: any) {
                     if (curTargetLonLat.length > 0) {
                         const localUnits = await ddcsController.getGroundUnitsInProximity(curTargetLonLat, 0.4, false);
                         // console.log("LocalUnits: ", localUnits, curTarget);
-                        const friendlySAMs = localUnits.filter((unit) => {
-                            const unitTypeDict = engineCache.unitDictionary.find((unitDict: IUnitDictionary) => unitDict._id === unit.type);
-                            return unit.coalition === ddcsController.enemyCountry[curInitiator.coalition] &&
-                                unitTypeDict.harmDetectChance > 0;
-                        });
-                        const maxPercentChanceOfGroup = _.max(
-                            friendlySAMs.map(
-                                (sam) => {
-                                    const unitTypeDict = engineCache.unitDictionary
-                                        .find((unitDict: IUnitDictionary) => unitDict._id === sam.type);
-                                    return unitTypeDict.harmDetectChance;
-                                }
-                            )
-                        );
-						const randomNumber = _.random(1, 100);
-                        const didRadarDetectHarm = maxPercentChanceOfGroup < randomNumber;
-                        console.log("IAD friends: ", maxPercentChanceOfGroup, " < ", randomNumber, didRadarDetectHarm, maxPercentChanceOfGroup);
-                        if (didRadarDetectHarm) {
-                            const groupNameArray = _.uniq(friendlySAMs.map((sam) => sam.groupName));
-                            for (const groupName of groupNameArray) {
-                                console.log("goDark", groupName, friendlySAMs[0].type);
-                                // harm detected radars in area around target go dark immediately (simulates radars general area fired at)
-                                await ddcsController.sendUDPPacket("frontEnd", {
-                                    actionObj: {
-                                        action: "groupAIControl",
-                                        aiCommand: "groupGoDark",
-                                        groupName,
-                                        reqID: 0
-                                    }
-                                });
+						if (localUnits.length > 0) {
+								const friendlySAMs = localUnits.filter((unit) => {
+								const unitTypeDict = engineCache.unitDictionary.find((unitDict: IUnitDictionary) => unitDict._id === unit.type);
+								return unit.coalition === ddcsController.enemyCountry[curInitiator.coalition] &&
+									unitTypeDict.harmDetectChance > 0;
+							});
+							
+							if (friendlySAMs.length > 0) {
+									const maxPercentChanceOfGroup = _.max(
+									friendlySAMs.map(
+										(sam) => {
+											const unitTypeDict = engineCache.unitDictionary
+												.find((unitDict: IUnitDictionary) => unitDict._id === sam.type);
+											return unitTypeDict.harmDetectChance;
+										}
+									)
+								);
+								const randomNumber = _.random(1, 100);
+								const didRadarDetectHarm = maxPercentChanceOfGroup > randomNumber;
+								console.log("IAD friends: ", maxPercentChanceOfGroup, " > ", randomNumber, didRadarDetectHarm, maxPercentChanceOfGroup);
+								if (didRadarDetectHarm) {
+									const groupNameArray = _.uniq(friendlySAMs.map((sam) => sam.groupName));
+									for (const groupName of groupNameArray) {
+										console.log("goDark", groupName, friendlySAMs[0].type);
+										// harm detected radars in area around target go dark immediately (simulates radars general area fired at)
+										await ddcsController.sendUDPPacket("frontEnd", {
+											actionObj: {
+												action: "groupAIControl",
+												aiCommand: "groupGoDark",
+												groupName,
+												reqID: 0
+											}
+										});
 
-                                // schedule go back online in 1 minute
-                                await ddcsController.sendUDPPacket("frontEnd", {
-                                    actionObj: {
-                                        action: "groupAIControl",
-                                        aiCommand: "groupGoLive",
-                                        groupName,
-                                        reqID: 0
-                                    },
-                                    timeToExecute: (new Date().getTime() + ddcsController.time.oneMin)
-                                });
-                            }
-                        }
+										// schedule go back online in 1 minute
+										await ddcsController.sendUDPPacket("frontEnd", {
+											actionObj: {
+												action: "groupAIControl",
+												aiCommand: "groupGoLive",
+												groupName,
+												reqID: 0
+											},
+											timeToExecute: (new Date().getTime() + ddcsController.time.oneMin)
+										});
+									}
+								}
+							} else {
+								console.log("No Friendly SAMS Around");
+							}
+						} else {
+							console.log("No Local Units Around");
+						}
                     }
                 }
             }
