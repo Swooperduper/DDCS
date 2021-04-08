@@ -58,31 +58,27 @@ export async function sendMesgToAll(
 ): Promise<void> {
     // send to everyone individually
     const engineCache = ddcsController.getEngineCache();
-    const latestSession = await ddcsController.sessionsActionsReadLatest();
-    if (latestSession) {
-        const playerArray = await ddcsController.srvPlayerActionsRead({sessionName: latestSession.name});
-        const gPlayerArray = ddcsController.getRTPlayerArray();
-        console.log("player array: ", gPlayerArray[0], gPlayerArray[1], gPlayerArray[2]);
-        if (playerArray.length > 0) {
-            for (const player of playerArray) {
-                if (player.displayAllMessages) {
-                    const playerUnits = await ddcsController.unitActionRead({dead: false, playername: player.name});
-                    const curPlayerUnit = playerUnits[0] || {};
-                    const i18n = new I18nResolver(engineCache.i18n, player.lang).translation as any;
-                    let message = "A: " + i18n[messageTemplate];
-                    for (const [i, v] of argArray.entries()) {
-                        const templateReplace = "#" + (i + 1);
-                        const templateVal = (_.includes(v, "#")) ? i18n[v.split("#")[1]] : v;
-                        message = message.replace(templateReplace, templateVal);
-                    }
-                    await sendMesgToGroup(
-                        player,
-                        curPlayerUnit.groupId,
-                        message,
-                        time,
-                        delayTime
-                    );
+    const playerArray = ddcsController.getRTPlayerArray();
+    if (playerArray.length > 0) {
+        for (const player of playerArray) {
+            const playersInfo = await ddcsController.srvPlayerActionsRead({_id: player._id});
+            if (playersInfo[0] && playersInfo[0].displayAllMessages) {
+                const playerUnits = await ddcsController.unitActionRead({dead: false, playername: playersInfo[0].name});
+                const curPlayerUnit = playerUnits[0] || {};
+                const i18n = new I18nResolver(engineCache.i18n, player.lang).translation as any;
+                let message = "A: " + i18n[messageTemplate];
+                for (const [i, v] of argArray.entries()) {
+                    const templateReplace = "#" + (i + 1);
+                    const templateVal = (_.includes(v, "#")) ? i18n[v.split("#")[1]] : v;
+                    message = message.replace(templateReplace, templateVal);
                 }
+                await sendMesgToGroup(
+                    playersInfo[0],
+                    curPlayerUnit.groupId,
+                    message,
+                    time,
+                    delayTime
+                );
             }
         }
     }
@@ -97,31 +93,27 @@ export async function sendMesgToCoalition(
 ): Promise<void> {
     // send to everyone individually
     const engineCache = ddcsController.getEngineCache();
-    const latestSession = await ddcsController.sessionsActionsReadLatest();
-    if (latestSession) {
-        const playerArray = await ddcsController.srvPlayerActionsRead({sessionName: latestSession.name});
-        const gPlayerArray = ddcsController.getRTPlayerArray();
-        console.log("player array: ", gPlayerArray[0], gPlayerArray[1], gPlayerArray[2]);
-        if (playerArray.length > 0) {
-            for (const player of playerArray) {
-                if (player.displayCoalitionMessages) {
-                    const playerUnits = await ddcsController.unitActionRead({dead: false, coalition, playername: player.name});
-                    const curPlayerUnit = playerUnits[0] || {};
-                    const i18n = new I18nResolver(engineCache.i18n, player.lang).translation as any;
-                    let message = "C: " + i18n[messageTemplate];
-                    for (const [i, v] of argArray.entries()) {
-                        const templateReplace = "#" + (i + 1);
-                        const templateVal = (_.includes(v, "#")) ? i18n[v.split("#")[1]] : v;
-                        message = message.replace(templateReplace, templateVal);
-                    }
-                    await sendMesgToGroup(
-                        player,
-                        curPlayerUnit.groupId,
-                        message,
-                        time,
-                        delayTime
-                    );
+    const playerArray = ddcsController.getRTPlayerArray();
+    if (playerArray.length > 0) {
+        for (const player of playerArray) {
+            const playersInfo = await ddcsController.srvPlayerActionsRead({_id: player._id});
+            if (playersInfo[0] && playersInfo[0].displayCoalitionMessages) {
+                const playerUnits = await ddcsController.unitActionRead({dead: false, coalition, playername: playersInfo[0].name});
+                const curPlayerUnit = playerUnits[0] || {};
+                const i18n = new I18nResolver(engineCache.i18n, player.lang).translation as any;
+                let message = "C: " + i18n[messageTemplate];
+                for (const [i, v] of argArray.entries()) {
+                    const templateReplace = "#" + (i + 1);
+                    const templateVal = (_.includes(v, "#")) ? i18n[v.split("#")[1]] : v;
+                    message = message.replace(templateReplace, templateVal);
                 }
+                await sendMesgToGroup(
+                    playersInfo[0],
+                    curPlayerUnit.groupId,
+                    message,
+                    time,
+                    delayTime
+                );
             }
         }
     }
