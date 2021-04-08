@@ -56,7 +56,7 @@ export async function processGCIDetection(incomingObj: any): Promise<void> {
             const sortByThreat = unitsPlusThreat.sort((a, b) => (a.threatLvl > b.threatLvl) ? -1 : 1);
 
             const sideStack = ddcsController.checkRealtimeSideBalance();
-            // console.log("sidestack: ", sideStack);
+            // console.log("sidestack: ", sideStack, dedupeDetectedUnitNames.length);
 
             if (sideStack.underdog === 1) {
                 const enemyBlue = sortByThreat.filter((du) => du.coalition === 2);
@@ -114,8 +114,9 @@ export async function gciUpdatePilots(detectedUnits: any, friendlySide: number) 
                     curEnemyAspect = i18n.DRAG;
                 }
 
-                // console.log("DT: ", distanceTo, " <= ", maxKMDistanceToRead, unit);
+                // console.log("DT: ", distanceTo, " <= ", maxKMDistanceToRead, unit.name);
                 if (distanceTo <= maxKMDistanceToRead) {
+					// console.log("autoGCI: ", unit.type, unit.name, unit.coalition, distanceTo, " <= ", maxKMDistanceToRead);
                     curPlayerDistance.push({
                         ...unit,
                         bearingTo: ddcsController.findBearing(
@@ -143,6 +144,7 @@ export async function gciUpdatePilots(detectedUnits: any, friendlySide: number) 
                         message += `${curUnit.type.toUpperCase()}, ${i18n.BRAA} ${curUnit.bearingTo.toFixed(0)} ${i18n.FOR} ${(curUnit.distanceTo * 0.621371).toFixed(0)}${i18n.M}, ${i18n.AT} ${(curUnit.alt * 3.28084).toFixed(0)}${i18n.FT}, ${curUnit.curEnemyAspect}`;
                     }
                 }
+				// console.log("PCG: ", message);
                 await ddcsController.sendMesgToGroup(player, curPlayerUnit.groupId, message, 15);
             }
         }
