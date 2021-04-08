@@ -61,6 +61,8 @@ export async function sendMesgToAll(
     const latestSession = await ddcsController.sessionsActionsReadLatest();
     if (latestSession) {
         const playerArray = await ddcsController.srvPlayerActionsRead({sessionName: latestSession.name});
+        const gPlayerArray = ddcsController.getRTPlayerArray();
+        console.log("player array: ", gPlayerArray[0], gPlayerArray[1], gPlayerArray[2]);
         if (playerArray.length > 0) {
             for (const player of playerArray) {
                 if (player.displayAllMessages) {
@@ -98,6 +100,8 @@ export async function sendMesgToCoalition(
     const latestSession = await ddcsController.sessionsActionsReadLatest();
     if (latestSession) {
         const playerArray = await ddcsController.srvPlayerActionsRead({sessionName: latestSession.name});
+        const gPlayerArray = ddcsController.getRTPlayerArray();
+        console.log("player array: ", gPlayerArray[0], gPlayerArray[1], gPlayerArray[2]);
         if (playerArray.length > 0) {
             for (const player of playerArray) {
                 if (player.displayCoalitionMessages) {
