@@ -14,6 +14,7 @@ export async function maintainPvEConfig(): Promise<void> {
     for (const pveConfig of engineCache.config.pveAIConfig) {
         lockedStack = false;
         for (const aIConfig of pveConfig.config) {
+			console.log("AI CONFIG: ", aIConfig);
             if (aIConfig.functionCall === "fullAIEnabled") {
                 await processAI({underdog: 1}, aIConfig);
                 await processAI({underdog: 2}, aIConfig);
