@@ -686,14 +686,16 @@ export async function spawnLayer2Reinforcements(
 }
 
 export async function spawnConvoy(
-    groupName: string,
-    convoySide: number,
-    baseTemplate: any,
-    aIConfig: typing.IAIConfig,
-    mesg: string
+    incomingObj: any,
+    reqId: any
 ): Promise<void> {
     const convoyMakeup: any[] = [];
     let curUnit;
+    const groupName = reqId.baseConvoyGroupName;
+    const convoySide = reqId.side;
+    const baseTemplate = incomingObj.returnObj;
+    const aIConfig = reqId.aIConfig;
+    const mesg = reqId.message;
     for (const units of aIConfig.makeup) {
         curUnit = {
             ...getRndFromSpawnCat(units.template, convoySide, false, true)[0],
@@ -744,9 +746,9 @@ export async function spawnConvoy(
     curGroupSpawn = _.replace(curGroupSpawn, "#UNITS", groupArray);
     const curCMD = await spawnGrp(curGroupSpawn, _.get(curGrpObj, "country"), _.get(curGrpObj, "unitCategory"));
     console.log("groundSpawn: ", curCMD);
-    const sendClient = {action: "CMD", cmd: [curCMD], reqID: 0};
-    const actionObj = {actionObj: sendClient};
-    await ddcsControllers.sendUDPPacket("frontEnd", actionObj);
+    // const sendClient = {action: "CMD", cmd: [curCMD], reqID: 0};
+    // const actionObj = {actionObj: sendClient};
+    // await ddcsControllers.sendUDPPacket("frontEnd", actionObj);
     // console.log("TASKING ROUTE: ", JSON.stringify(convoyRouteTemplate(curGrpObj)));
     // await ddcsControllers.setMissionTask(groupName, JSON.stringify(convoyRouteTemplate(curGrpObj)));
     /* needs to be redone for i18n

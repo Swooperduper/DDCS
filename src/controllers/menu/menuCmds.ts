@@ -427,6 +427,7 @@ export async function processReceiveRoadPath(incomingObj: any): Promise<void> {
     // console.log("return road path object: ", incomingObj, incomingObj.returnObj[0]);
     const baseConvoyGroupName = "AI|convoyLarge|Sochi-Adler_Sukhumi-Babushara|";
 
+    /*
     await ddcsControllers.spawnConvoy(
         baseConvoyGroupName,
         2,
@@ -453,6 +454,7 @@ export async function processReceiveRoadPath(incomingObj: any): Promise<void> {
         },
         "Test Spawn Convoy"
     );
+    */
 
 }
 

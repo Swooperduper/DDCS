@@ -5,6 +5,7 @@
 import * as _ from "lodash";
 import * as typings from "../../typings";
 import * as ddcsControllers from "../";
+import {getNextUniqueId, setRequestJobArray} from "../";
 
 export async function maintainPvEConfig(): Promise<void> {
     const engineCache = ddcsControllers.getEngineCache();
@@ -71,6 +72,31 @@ export async function checkBasesToSpawnConvoysFrom(
                     if (convoyGroup.length === 0) {
                         console.log("convoy ", base.name, " attacking ", curBase.name);
                         const message = "C: A convoy just left " + base.name + " is attacking " + curBase.name;
+
+                        const curNextUniqueId = getNextUniqueId();
+                        setRequestJobArray({
+                            reqId: curNextUniqueId,
+                            callBack: "spawnConvoy",
+                            reqArgs: {
+                                baseConvoyGroupName,
+                                side: base.side,
+                                aIConfig,
+                                message
+                            }
+                        }, curNextUniqueId);
+                        await ddcsControllers.sendUDPPacket("frontEnd", {
+                            actionObj: {
+                                action: "getGroundRoute",
+                                type: "roads",
+                                lat1: base.centerLoc[1],
+                                lon1: base.centerLoc[0],
+                                lat2: curBase.centerLoc[1],
+                                lon2: curBase.centerLoc[0],
+                                reqID: curNextUniqueId,
+                                time: new Date()
+                            }
+                        });
+                        /*
                         await ddcsControllers.spawnConvoy(
                             baseConvoyGroupName,
                             base.side,
@@ -78,6 +104,34 @@ export async function checkBasesToSpawnConvoysFrom(
                             aIConfig,
                             message
                         );
+
+                        await ddcsControllers.spawnConvoy(
+                            baseConvoyGroupName,
+                            2,
+                            incomingObj.returnObj,
+                            {
+                                name: "convoyLarge",
+                                AIType: "groundConvoy",
+                                functionCall: "fullCampaignStackStats",
+                                stackTrigger: "1.25",
+                                makeup: [
+                                    {
+                                        template: "tank",
+                                        count: 2
+                                    },
+                                    {
+                                        template: "mobileAntiAir",
+                                        count: 2
+                                    },
+                                    {
+                                        template: "samIR",
+                                        count: 2
+                                    }
+                                ]
+                            },
+                            "Test Spawn Convoy"
+                        );
+                         */
                     }
                 }
             }
