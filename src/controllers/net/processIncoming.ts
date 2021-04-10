@@ -101,7 +101,7 @@ export async function processingIncomingData(incomingObj: any) {
             const curReqJobObj = ddcsController.getRequestJob(incomingObj.reqId);
             if (curReqJobObj) {
                 // @ts-ignore
-                await ddcsController[curReqJobObj.callBack](incomingObj, incomingObj.reqId);
+                await ddcsController[curReqJobObj.callBack](incomingObj, incomingObj.reqId, curReqJobObj.reqArgs);
 
                 // cleanup request job array
                 console.log("req array size before: ", ddcsController.getRequestJobSize());

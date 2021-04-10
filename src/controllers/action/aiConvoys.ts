@@ -51,8 +51,8 @@ export async function checkBasesToSpawnConvoysFrom(
     aIConfig: typings.IAIConfig
 ): Promise<void> {
     for (const base of friendlyBases) {
-        // @ts-ignore
-        for (const baseTemplate of base.polygonLoc.convoyTemplate) {
+		// @ts-ignore
+        for (const [key, baseTemplate] of Object.entries(base.polygonLoc.convoyTemplate)) {
             if (aIConfig.AIType === "groundConvoy" && baseTemplate.route.length > 1) {
                 const destBaseInfo = await ddcsControllers.baseActionRead({
                     _id: baseTemplate.destBase,
@@ -64,11 +64,13 @@ export async function checkBasesToSpawnConvoysFrom(
                     const baseConvoyGroupName = "AI|" + aIConfig.name +
                         "|" + baseTemplate.sourceBase +
                         "_" + baseTemplate.destBase + "|";
+						console.log("CG1: ", baseConvoyGroupName);
                     const convoyGroup = await ddcsControllers.unitActionRead({
                         groupName: baseConvoyGroupName,
                         isCrate: false,
                         dead: false
                     });
+					// console.log("CG2: ", convoyGroup, baseConvoyGroupName);
                     if (convoyGroup.length === 0) {
                         console.log("convoy ", base.name, " attacking ", curBase.name);
                         const message = "C: A convoy just left " + base.name + " is attacking " + curBase.name;

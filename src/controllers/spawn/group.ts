@@ -222,6 +222,7 @@ export function getRndFromSpawnCat(
     launchers?: number,
     useUnitType?: string
 ): typing.IUnitDictionary[] {
+	console.log("randspawn: ", spawnCat, side, spawnShow, spawnAlways);
     const engineCache = ddcsControllers.getEngineCache();
     const curTimePeriod = engineCache.config.timePeriod;
     let findUnits;
@@ -687,26 +688,33 @@ export async function spawnLayer2Reinforcements(
 
 export async function spawnConvoy(
     incomingObj: any,
-    reqId: any
+    reqId: any,
+	reqArgs: any
 ): Promise<void> {
     const convoyMakeup: any[] = [];
     let curUnit;
-    const groupName = reqId.baseConvoyGroupName;
-    const convoySide = reqId.side;
+    const groupName = reqArgs.baseConvoyGroupName;
+    const convoySide = reqArgs.side;
     const baseTemplate = incomingObj.returnObj;
-    const aIConfig = reqId.aIConfig;
-    const mesg = reqId.message;
+    const aIConfig = reqArgs.aIConfig;
+    const mesg = reqArgs.message;
     for (const units of aIConfig.makeup) {
-        curUnit = {
-            ...getRndFromSpawnCat(units.template, convoySide, false, true)[0],
-            country: ddcsControllers.defCountrys[convoySide],
-            speed: "55",
-            hidden: false,
-            playerCanDrive: false
-        };
-        for (let x = 0; x < units.count; x++) {
-            curUnit.name = groupName + units.template + "|" + x + "|";
-            convoyMakeup.push(curUnit);
+        const rndSpawnCat = getRndFromSpawnCat(units.template, convoySide, false, true);
+        if (rndSpawnCat.length > 0) {
+            curUnit = {
+                ...rndSpawnCat[0],
+                country: ddcsControllers.defCountrys[convoySide],
+                speed: "55",
+                hidden: false,
+                playerCanDrive: false
+            };
+
+            for (let x = 0; x < units.count; x++) {
+                curUnit.name = groupName + units.template + "|" + x + "|";
+                convoyMakeup.push(curUnit);
+            }
+        } else {
+            console.log("no template: ", rndSpawnCat, units.template, convoySide, false, true);
         }
     }
 
@@ -746,9 +754,9 @@ export async function spawnConvoy(
     curGroupSpawn = _.replace(curGroupSpawn, "#UNITS", groupArray);
     const curCMD = await spawnGrp(curGroupSpawn, _.get(curGrpObj, "country"), _.get(curGrpObj, "unitCategory"));
     console.log("groundSpawn: ", curCMD);
-    // const sendClient = {action: "CMD", cmd: [curCMD], reqID: 0};
-    // const actionObj = {actionObj: sendClient};
-    // await ddcsControllers.sendUDPPacket("frontEnd", actionObj);
+    const sendClient = {action: "CMD", cmd: [curCMD], reqID: 0};
+    const actionObj = {actionObj: sendClient};
+    await ddcsControllers.sendUDPPacket("frontEnd", actionObj);
     // console.log("TASKING ROUTE: ", JSON.stringify(convoyRouteTemplate(curGrpObj)));
     // await ddcsControllers.setMissionTask(groupName, JSON.stringify(convoyRouteTemplate(curGrpObj)));
     /* needs to be redone for i18n
