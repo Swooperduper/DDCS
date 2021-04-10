@@ -19,7 +19,7 @@ export async function checkUnitsToBaseForCapture(): Promise<void> {
         if (base.side === 1 && _.get(sideArray, [2], []).length > 0) {
             // console.log("enemy in range: ", base.name + ": enemy Blue");
             if (_.get(sideArray, [1], []).length === 0) {
-                if (_.includes(base.name, "#")) {
+                if (!_.includes(base.name, "#")) {
                     console.log("BASE HAS BEEN CAPTURED: ", base.name, " is now ", 2);
                     await ddcsControllers.sendMesgToAll(
                         "HASBEENCAPTUREDBY",
@@ -44,7 +44,7 @@ export async function checkUnitsToBaseForCapture(): Promise<void> {
         if (base.side === 2 && _.get(sideArray, [1], []).length > 0) {
             // console.log("enemy in range: ", base.name + ": enemy Red");
             if (_.get(sideArray, [2], []).length === 0) {
-                if (_.includes(base.name, "#")) {
+                if (!_.includes(base.name, "#")) {
                     console.log("BASE HAS BEEN CAPTURED: ", base.name, " is now ", 1);
                     await ddcsControllers.sendMesgToAll(
                         "HASBEENCAPTUREDBY",
@@ -74,7 +74,7 @@ export async function checkUnitsToBaseForCapture(): Promise<void> {
             if (_.get(sideArray, [2], []).length > 0) {
                 unitSide = 2;
             }
-            if (_.includes(base.name, "#")) {
+            if (!_.includes(base.name, "#")) {
                 console.log("BASE HAS BEEN CAPTURED: ", base.name, " is now ", unitSide);
                 await ddcsControllers.sendMesgToAll(
                     "HASBEENCAPTUREDBY",
