@@ -222,7 +222,7 @@ export function getRndFromSpawnCat(
     launchers?: number,
     useUnitType?: string
 ): typing.IUnitDictionary[] {
-	console.log("randspawn: ", spawnCat, side, spawnShow, spawnAlways);
+    console.log("randspawn: ", spawnCat, side, spawnShow, spawnAlways);
     const engineCache = ddcsControllers.getEngineCache();
     const curTimePeriod = engineCache.config.timePeriod;
     let findUnits;
@@ -689,7 +689,7 @@ export async function spawnLayer2Reinforcements(
 export async function spawnConvoy(
     incomingObj: any,
     reqId: any,
-	reqArgs: any
+    reqArgs: any
 ): Promise<void> {
     const convoyMakeup: any[] = [];
     let curUnit;
