@@ -1239,6 +1239,7 @@ export async function spawnSupportPlane(baseObj: typing.IBase, side: number): Pr
     const actionObj = {actionObj: sendClient, queName: "clientArray"};
     await ddcsControllers.sendUDPPacket("frontEnd", actionObj);
 
+    console.log("Cargo Plane Out: ", side, baseObj.name);
     await ddcsControllers.sendMesgToCoalition(
         side,
         "CARGOSUPPORTPLANEOUT",
