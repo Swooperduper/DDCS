@@ -51,117 +51,89 @@ export async function checkBasesToSpawnConvoysFrom(
     aIConfig: typings.IAIConfig
 ): Promise<void> {
     for (const base of friendlyBases) {
-		// @ts-ignore
-        for (const [key, baseTemplate] of Object.entries(base.polygonLoc.convoyTemplate)) {
-            if (aIConfig.AIType === "groundConvoy" && baseTemplate.route.length > 1) {
-                const destBaseInfo = await ddcsControllers.baseActionRead({
-                    _id: baseTemplate.destBase,
-                    side: ddcsControllers.enemyCountry[base.side],
-                    enabled: true
-                });
-                if (destBaseInfo.length > 0) {
-                    const curBase = destBaseInfo[0];
-                    const baseConvoyGroupName = "AI|" + aIConfig.name +
-                        "|" + baseTemplate.sourceBase +
-                        "_" + baseTemplate.destBase + "|";
-						console.log("CG1: ", baseConvoyGroupName);
-                    const convoyGroup = await ddcsControllers.unitActionRead({
-                        groupName: baseConvoyGroupName,
-                        isCrate: false,
-                        dead: false
+        const shelterAlive = await ddcsControllers.unitActionRead({
+            _id:  base.name + " Shelter",
+            dead: false,
+            coalition: base.side
+        });
+
+        if (shelterAlive.length > 0) {
+            // @ts-ignore
+            for (const [key, baseTemplate] of Object.entries(base.polygonLoc.convoyTemplate)) {
+                if (aIConfig.AIType === "groundConvoy" && baseTemplate.route.length > 1) {
+                    const destBaseInfo = await ddcsControllers.baseActionRead({
+                        _id: baseTemplate.destBase,
+                        side: ddcsControllers.enemyCountry[base.side],
+                        enabled: true
                     });
-					// console.log("CG2: ", convoyGroup, baseConvoyGroupName);
-                    if (convoyGroup.length === 0) {
-                        console.log("convoy ", base.name, " attacking ", curBase.name);
-                        const message = "C: A convoy just left " + base.name + " is attacking " + curBase.name;
-
-                        const curNextUniqueId = getNextUniqueId();
-                        setRequestJobArray({
-                            reqId: curNextUniqueId,
-                            callBack: "spawnConvoy",
-                            reqArgs: {
-                                baseConvoyGroupName,
-                                side: base.side,
-                                aIConfig,
-                                message
-                            }
-                        }, curNextUniqueId);
-                        await ddcsControllers.sendUDPPacket("frontEnd", {
-                            actionObj: {
-                                action: "getGroundRoute",
-                                type: "roads",
-                                lat1: base.centerLoc[1],
-                                lon1: base.centerLoc[0],
-                                lat2: curBase.centerLoc[1],
-                                lon2: curBase.centerLoc[0],
-                                reqID: curNextUniqueId,
-                                time: new Date()
-                            }
+                    if (destBaseInfo.length > 0) {
+                        const curBase = destBaseInfo[0];
+                        const baseConvoyGroupName = "AI|" + aIConfig.name +
+                            "|" + baseTemplate.sourceBase +
+                            "_" + baseTemplate.destBase + "|";
+                        const convoyGroup = await ddcsControllers.unitActionRead({
+                            groupName: baseConvoyGroupName,
+                            isCrate: false,
+                            dead: false
                         });
-                        /*
-                        await ddcsControllers.spawnConvoy(
-                            baseConvoyGroupName,
-                            base.side,
-                            baseTemplate,
-                            aIConfig,
-                            message
-                        );
+                        if (convoyGroup.length === 0) {
+                            console.log("convoy ", base.name, " attacking ", curBase.name);
+                            const message = "C: A convoy just left " + base.name + " is attacking " + curBase.name;
 
-                        await ddcsControllers.spawnConvoy(
-                            baseConvoyGroupName,
-                            2,
-                            incomingObj.returnObj,
-                            {
-                                name: "convoyLarge",
-                                AIType: "groundConvoy",
-                                functionCall: "fullCampaignStackStats",
-                                stackTrigger: "1.25",
-                                makeup: [
-                                    {
-                                        template: "tank",
-                                        count: 2
-                                    },
-                                    {
-                                        template: "mobileAntiAir",
-                                        count: 2
-                                    },
-                                    {
-                                        template: "samIR",
-                                        count: 2
-                                    }
-                                ]
-                            },
-                            "Test Spawn Convoy"
+                            const curNextUniqueId = getNextUniqueId();
+                            setRequestJobArray({
+                                reqId: curNextUniqueId,
+                                callBack: "spawnConvoy",
+                                reqArgs: {
+                                    baseConvoyGroupName,
+                                    side: base.side,
+                                    aIConfig,
+                                    message
+                                }
+                            }, curNextUniqueId);
+                            await ddcsControllers.sendUDPPacket("frontEnd", {
+                                actionObj: {
+                                    action: "getGroundRoute",
+                                    type: "roads",
+                                    lat1: base.centerLoc[1],
+                                    lon1: base.centerLoc[0],
+                                    lat2: curBase.centerLoc[1],
+                                    lon2: curBase.centerLoc[0],
+                                    reqID: curNextUniqueId,
+                                    time: new Date()
+                                }
+                            });
+                        }
+                    }
+                }
+                if (aIConfig.AIType === "CAPDefense") {
+                    const destBaseInfo = await ddcsControllers.baseActionRead({
+                        _id: baseTemplate.destBase,
+                        side: ddcsControllers.enemyCountry[base.side],
+                        enabled: true
+                    });
+                    if (destBaseInfo.length > 0) {
+                        // check if convoy exists first
+                        const baseCapGroupName = "AI|" + aIConfig.name + "|" + base.name + "|";
+                        const capGroup = await ddcsControllers.unitActionRead({
+                            groupName: baseCapGroupName,
+                            isCrate: false,
+                            dead: false
+                        });
+                        console.log("RESPAWNCAP: ", baseCapGroupName, capGroup.length);
+                        // respawn convoy because it doesnt exist
+                        await ddcsControllers.spawnCAPDefense(
+                            baseCapGroupName,
+                            base.side,
+                            base,
+                            aIConfig,
+                            "C: A CAP Defense spawned at " + base.name
                         );
-                         */
                     }
                 }
             }
-            if (aIConfig.AIType === "CAPDefense") {
-                const destBaseInfo = await ddcsControllers.baseActionRead({
-                    _id: baseTemplate.destBase,
-                    side: ddcsControllers.enemyCountry[base.side],
-                    enabled: true
-                });
-                if (destBaseInfo.length > 0) {
-                    // check if convoy exists first
-                    const baseCapGroupName = "AI|" + aIConfig.name + "|" + base.name + "|";
-                    const capGroup = await ddcsControllers.unitActionRead({
-                        groupName: baseCapGroupName,
-                        isCrate: false,
-                        dead: false
-                    });
-                    console.log("RESPAWNCAP: ", baseCapGroupName, capGroup.length);
-                    // respawn convoy because it doesnt exist
-                    await ddcsControllers.spawnCAPDefense(
-                        baseCapGroupName,
-                        base.side,
-                        base,
-                        aIConfig,
-                        "C: A CAP Defense spawned at " + base.name
-                    );
-                }
-            }
+        } else {
+            console.log(base.name + " Shelter does not exist, dont spawn convoys");
         }
     }
 }
