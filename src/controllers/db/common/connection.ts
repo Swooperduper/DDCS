@@ -135,7 +135,7 @@ export async function initV3Engine(): Promise<void> {
             await ddcsController.processThirtyMinuteActions(ddcsController.getServerSynced());
         }
    // }, ddcsController.time.thirtyMinutes);
-    }, ddcsController.time.fiveMins);
+    }, ddcsController.time.oneMin);
 
     setInterval( async () => {
         if (ddcsController.getServerSynced()) {
