@@ -2,8 +2,6 @@ import * as mongoose from "mongoose";
 import * as localModels from "../local/models";
 import * as remoteModels from "../remote/models";
 import * as ddcsController from "../../";
-import {getCurAbsTime} from "../../";
-import * as ddcsControllers from "../../action/aiConvoys";
 
 export let localConnection: mongoose.Connection;
 export let remoteConnection: mongoose.Connection;
@@ -137,7 +135,7 @@ export async function initV3Engine(): Promise<void> {
             await ddcsController.processThirtyMinuteActions(ddcsController.getServerSynced());
         }
    // }, ddcsController.time.thirtyMinutes);
-    }, ddcsController.time.oneMinute);
+    }, ddcsController.time.oneMin);
 
     setInterval( async () => {
         if (ddcsController.getServerSynced()) {
