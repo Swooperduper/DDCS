@@ -15,18 +15,22 @@ export async function maintainPvEConfig(): Promise<void> {
     for (const pveConfig of engineCache.config.pveAIConfig) {
         lockedStack = false;
         for (const aIConfig of pveConfig.config) {
+            console.log("didAiSpawn0: ", didAISpawn);
             if (aIConfig.functionCall === "fullAIEnabled") {
-                (!didAISpawn) ? didAISpawn = await processAI({underdog: 1}, aIConfig) : didAISpawn = false;
-                (!didAISpawn) ? didAISpawn = await processAI({underdog: 2}, aIConfig) : didAISpawn = false;
+                didAISpawn = (!didAISpawn) ? await processAI({underdog: 1}, aIConfig) : false;
+                console.log("didAiSpawn1: ", didAISpawn);
+                didAISpawn = (!didAISpawn) ? await processAI({underdog: 2}, aIConfig) : false;
+                console.log("didAiSpawn2: ", didAISpawn);
             } else {
                 // @ts-ignore
                 const sideStackedAgainst = stackObj[aIConfig.functionCall];
                 if (sideStackedAgainst.ratio >= aIConfig.stackTrigger && !lockedStack) {
                     lockedStack = true;
-                    (!didAISpawn) ?  await processAI(sideStackedAgainst, aIConfig) : didAISpawn = false;
+                    didAISpawn = (!didAISpawn) ?  await processAI(sideStackedAgainst, aIConfig) : false;
+                    console.log("didAiSpawn3: ", didAISpawn);
                 }
             }
-            console.log("didAiSpawn: ", didAISpawn);
+            console.log("didAiSpawn4: ", didAISpawn);
         }
     }
 }
