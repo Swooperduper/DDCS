@@ -5,7 +5,7 @@
 import * as _ from "lodash";
 import * as ddcsControllers from "../";
 
-const aIMaxIdleTime = ddcsControllers.time.thirtySecs;
+const aIMaxIdleTime = ddcsControllers.time.tenMinutes;
 const maxCrateLife = (3 * 60 * 60 * 1000); // 3 hrs
 
 export async function processThirtySecActions(fullySynced: boolean) {

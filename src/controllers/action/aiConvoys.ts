@@ -11,21 +11,22 @@ export async function maintainPvEConfig(): Promise<void> {
     const engineCache = ddcsControllers.getEngineCache();
     const stackObj: {fullCampaignStackStats: typings.IPlayerBalance} = await campaignStackTypes();
     let lockedStack: boolean;
+    let didAISpawn: boolean = false;
     for (const pveConfig of engineCache.config.pveAIConfig) {
         lockedStack = false;
         for (const aIConfig of pveConfig.config) {
-			console.log("AI CONFIG: ", aIConfig);
             if (aIConfig.functionCall === "fullAIEnabled") {
-                await processAI({underdog: 1}, aIConfig);
-                await processAI({underdog: 2}, aIConfig);
+                (!didAISpawn) ? didAISpawn = await processAI({underdog: 1}, aIConfig) : didAISpawn = false;
+                (!didAISpawn) ? didAISpawn = await processAI({underdog: 2}, aIConfig) : didAISpawn = false;
             } else {
                 // @ts-ignore
                 const sideStackedAgainst = stackObj[aIConfig.functionCall];
                 if (sideStackedAgainst.ratio >= aIConfig.stackTrigger && !lockedStack) {
                     lockedStack = true;
-                    await processAI(sideStackedAgainst, aIConfig);
+                    (!didAISpawn) ?  await processAI(sideStackedAgainst, aIConfig) : didAISpawn = false;
                 }
             }
+            console.log("didAiSpawn: ", didAISpawn);
         }
     }
 }
@@ -35,7 +36,7 @@ export async function campaignStackTypes(): Promise<{fullCampaignStackStats: typ
     return { fullCampaignStackStats: sideStackedAgainst };
 }
 
-export async function processAI(sideStackedAgainst: {underdog: number}, aIConfig: typings.IAIConfig): Promise<void> {
+export async function processAI(sideStackedAgainst: {underdog: number}, aIConfig: typings.IAIConfig): Promise<boolean> {
     console.log("sideStackedAgainst: ", sideStackedAgainst);
     if (sideStackedAgainst.underdog > 0) {
         const friendlyBases = await ddcsControllers.baseActionRead({
@@ -43,14 +44,15 @@ export async function processAI(sideStackedAgainst: {underdog: number}, aIConfig
             side: sideStackedAgainst.underdog,
             enabled: true
         });
-        await checkBasesToSpawnConvoysFrom(friendlyBases, aIConfig);
+        return await checkBasesToSpawnConvoysFrom(friendlyBases, aIConfig);
     }
+    return false;
 }
 
 export async function checkBasesToSpawnConvoysFrom(
     friendlyBases: typings.IBase[],
     aIConfig: typings.IAIConfig
-): Promise<void> {
+): Promise<boolean> {
     for (const base of friendlyBases) {
         const shelterAlive = await ddcsControllers.unitActionRead({
             _id:  base.name + " Shelter",
@@ -104,6 +106,7 @@ export async function checkBasesToSpawnConvoysFrom(
                                     time: new Date()
                                 }
                             });
+                            return true;
                         }
                     }
                 }
@@ -137,4 +140,5 @@ export async function checkBasesToSpawnConvoysFrom(
             console.log(base.name + " Shelter does not exist, dont spawn convoys");
         }
     }
+    return false;
 }
