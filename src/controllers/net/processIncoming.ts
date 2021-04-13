@@ -124,7 +124,11 @@ export async function processingIncomingData(incomingObj: any) {
                 } else if (incomingObj.message === i18n.COMMANDBLUE) {
                     await ddcsController.lockUserToSide(incomingObj, 2);
 
-                } else if (_.includes(incomingObj.message, i18n.COMMANDDEFAULT)) {
+                } else if (incomingObj.message === "-joinRandom") {
+					const randSide = _.random(1,2);
+					await ddcsController.lockUserToSide(incomingObj, randSide);
+
+				} else if (_.includes(incomingObj.message, i18n.COMMANDDEFAULT)) {
                     const mesg = i18n.COMMANDDEFAULTRESPONSE;
                     await ddcsController.sendMesgToPlayerChatWindow(mesg, curPly.playerId);
                 }
