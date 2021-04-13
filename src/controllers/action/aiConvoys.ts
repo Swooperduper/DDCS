@@ -25,7 +25,6 @@ export async function maintainPvEConfig(): Promise<void> {
                 if (sideStackedAgainst.ratio >= aIConfig.stackTrigger && !lockedStack) {
                     lockedStack = true;
                     didAISpawn = (!didAISpawn) ?  await processAI(sideStackedAgainst, aIConfig) : false;
-                    console.log("didAiSpawn3: ", didAISpawn);
                 }
             }
         }
