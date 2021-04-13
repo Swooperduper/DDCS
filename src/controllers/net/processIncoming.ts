@@ -133,12 +133,6 @@ export async function processingIncomingData(incomingObj: any) {
                     await ddcsController.sendMesgToPlayerChatWindow(mesg, curPly.playerId);
                 }
             });
-			
-			if (incomingObj.message === "-reload") {
-                await ddcsController.sendUDPPacket("backEnd", {
-                    action: "refreshPlayerSlots"
-                });
-            }
 
             /*
             if (incomingObj.message === "-reload") {
