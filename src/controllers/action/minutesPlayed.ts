@@ -101,7 +101,7 @@ export async function updateSession(sessionName: string) {
         currentSessionMinutesPlayedRed += pa.currentSessionMinutesPlayed_red;
     });
     await ddcsControllers.sessionsActionsUpdate({
-        name: sessionName,
+        _id: sessionName,
         totalMinutesPlayed_blue: currentSessionMinutesPlayedBlue,
         totalMinutesPlayed_red: currentSessionMinutesPlayedRed
     });
