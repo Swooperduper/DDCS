@@ -414,6 +414,7 @@ export interface IPlayerBalance {
 }
 
 export interface IAIConfig {
+    isShelterRequired: boolean;
     name: string;
     AIType: string;
     functionCall: string;

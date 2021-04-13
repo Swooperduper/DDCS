@@ -11,20 +11,20 @@ export async function maintainPvEConfig(): Promise<void> {
     const engineCache = ddcsControllers.getEngineCache();
     const stackObj = await campaignStackTypes();
     console.log("stackobj: ", stackObj);
-    let lockedStack: boolean;
     let didAISpawn: boolean = false;
     for (const pveConfig of engineCache.config.pveAIConfig) {
-        lockedStack = false;
         for (const aIConfig of pveConfig.config) {
             if (aIConfig.functionCall === "fullAIEnabled") {
-                didAISpawn = (!didAISpawn) ? await processAI({underdog: 1}, aIConfig) : false;
-                didAISpawn = (!didAISpawn) ? await processAI({underdog: 2}, aIConfig) : false;
+                didAISpawn = (!didAISpawn) ? await processAI({underdog: 1}, aIConfig, true) : false;
+                didAISpawn = (!didAISpawn) ? await processAI({underdog: 2}, aIConfig, true) : false;
             } else {
                 // @ts-ignore
                 const sideStackedAgainst = stackObj[aIConfig.functionCall];
-                if (sideStackedAgainst.ratio >= aIConfig.stackTrigger && !lockedStack) {
-                    lockedStack = true;
-                    didAISpawn = (!didAISpawn) ?  await processAI(sideStackedAgainst, aIConfig) : false;
+                if (sideStackedAgainst.ratio >= aIConfig.stackTrigger) {
+                    didAISpawn = (!didAISpawn) ?  await processAI(sideStackedAgainst, aIConfig, false) : false;
+                } else {
+                    didAISpawn = (!didAISpawn) ? await processAI({underdog: 1}, aIConfig, true) : false;
+                    didAISpawn = (!didAISpawn) ? await processAI({underdog: 2}, aIConfig, true) : false;
                 }
             }
         }
@@ -40,7 +40,7 @@ export async function campaignStackTypes(): Promise<{}> {
     };
 }
 
-export async function processAI(sideStackedAgainst: {underdog: number}, aIConfig: typings.IAIConfig): Promise<boolean> {
+export async function processAI(sideStackedAgainst: {underdog: number}, aIConfig: typings.IAIConfig, spawnHalf: boolean): Promise<boolean> {
     console.log("sideStackedAgainst: ", sideStackedAgainst);
     if (sideStackedAgainst.underdog > 0) {
         const friendlyBases = await ddcsControllers.baseActionRead({
@@ -48,14 +48,15 @@ export async function processAI(sideStackedAgainst: {underdog: number}, aIConfig
             side: sideStackedAgainst.underdog,
             enabled: true
         });
-        return await checkBasesToSpawnConvoysFrom(friendlyBases, aIConfig);
+        return await checkBasesToSpawnConvoysFrom(friendlyBases, aIConfig, spawnHalf);
     }
     return false;
 }
 
 export async function checkBasesToSpawnConvoysFrom(
     friendlyBases: typings.IBase[],
-    aIConfig: typings.IAIConfig
+    aIConfig: typings.IAIConfig,
+    spawnHalf: boolean
 ): Promise<boolean> {
     for (const base of friendlyBases) {
         const shelterAlive = await ddcsControllers.unitActionRead({
@@ -64,10 +65,15 @@ export async function checkBasesToSpawnConvoysFrom(
             coalition: base.side
         });
 
-        if (shelterAlive.length > 0) {
+        if (shelterAlive.length > 0 || !aIConfig.isShelterRequired) {
             // @ts-ignore
-            for (const [key, baseTemplate] of Object.entries(base.polygonLoc.convoyTemplate)) {
-                if (aIConfig.AIType === "groundConvoy" && baseTemplate.route.length > 1) {
+            const objectKeyArray = Object.keys(base.polygonLoc.convoyTemplate);
+            const maxUnitsSpawned = (spawnHalf) ? Math.floor(objectKeyArray.length / 2 ) : objectKeyArray.length;
+            const curConvoyTemplate = objectKeyArray.slice(0, maxUnitsSpawned);
+
+            for (let x = 0; x < curConvoyTemplate.length; x++) {
+                const baseTemplate = base.polygonLoc.convoyTemplate[x];
+                if (aIConfig.AIType === "groundConvoy") {
                     const destBaseInfo = await ddcsControllers.baseActionRead({
                         _id: baseTemplate.destBase,
                         side: ddcsControllers.enemyCountry[base.side],
