@@ -9,18 +9,16 @@ import {getNextUniqueId, setRequestJobArray} from "../";
 
 export async function maintainPvEConfig(): Promise<void> {
     const engineCache = ddcsControllers.getEngineCache();
-    const stackObj: {fullCampaignStackStats: typings.IPlayerBalance} = await campaignStackTypes();
+    const stackObj = await campaignStackTypes();
+    console.log("stackobj: ", stackObj);
     let lockedStack: boolean;
     let didAISpawn: boolean = false;
     for (const pveConfig of engineCache.config.pveAIConfig) {
         lockedStack = false;
         for (const aIConfig of pveConfig.config) {
-            console.log("didAiSpawn0: ", didAISpawn);
             if (aIConfig.functionCall === "fullAIEnabled") {
                 didAISpawn = (!didAISpawn) ? await processAI({underdog: 1}, aIConfig) : false;
-                console.log("didAiSpawn1: ", didAISpawn);
                 didAISpawn = (!didAISpawn) ? await processAI({underdog: 2}, aIConfig) : false;
-                console.log("didAiSpawn2: ", didAISpawn);
             } else {
                 // @ts-ignore
                 const sideStackedAgainst = stackObj[aIConfig.functionCall];
@@ -30,14 +28,17 @@ export async function maintainPvEConfig(): Promise<void> {
                     console.log("didAiSpawn3: ", didAISpawn);
                 }
             }
-            console.log("didAiSpawn4: ", didAISpawn);
         }
     }
 }
 
-export async function campaignStackTypes(): Promise<{fullCampaignStackStats: typings.IPlayerBalance}> {
-    const sideStackedAgainst = await ddcsControllers.checkCurrentPlayerBalance();
-    return { fullCampaignStackStats: sideStackedAgainst };
+export async function campaignStackTypes(): Promise<{}> {
+    const fullCampaign = await ddcsControllers.checkCurrentPlayerBalance();
+    const instant = await ddcsControllers.checkRealtimeSideBalance();
+    return {
+        fullCampaign,
+        instant
+    };
 }
 
 export async function processAI(sideStackedAgainst: {underdog: number}, aIConfig: typings.IAIConfig): Promise<boolean> {
