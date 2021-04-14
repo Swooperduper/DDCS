@@ -13,7 +13,7 @@ export async function maintainPvEConfig(): Promise<void> {
     console.log("stackobj: ", stackObj);
     let didAISpawn: boolean = false;
     for (const pveConfig of engineCache.config.pveAIConfig) {;
-        for (let x = 0; x < pveConfig.config; x++) {
+        for (let x = 0; x < pveConfig.config.length; x++) {
             const aIConfig = pveConfig.config[x];
             // @ts-ignore
             const sideStackedAgainst = stackObj[aIConfig.functionCall];
