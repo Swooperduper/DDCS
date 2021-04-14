@@ -120,7 +120,9 @@ export async function sendMesgToCoalition(
 }
 
 export async function sendMesgToGroup(player: ISrvPlayers, groupId: number, mesg: string, time: number, delayTime?: number): Promise<void> {
-    if (player.displayGroupMessages) {
+    const playersInfo = await ddcsController.srvPlayerActionsRead({_id: player.ucid});
+    const currentPlayer = playersInfo[0];
+    if (currentPlayer.displayGroupMessages) {
         if (_.includes(player.slot, "instructor") ||
             _.includes(player.slot, "forward_observer") ||
             _.includes(player.slot, "artillery_commander")
