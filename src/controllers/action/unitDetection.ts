@@ -60,12 +60,14 @@ export async function processGCIDetection(incomingObj: any): Promise<void> {
 
             if (sideStack.underdog === 1) {
                 const enemyBlue = sortByThreat.filter((du) => du.coalition === 2);
+                console.log("Auto GCI Serving Red");
                 // console.log("enemyBlue: ", enemyBlue);
                 await gciUpdatePilots(enemyBlue, 1);
             }
 
             if (sideStack.underdog === 2) {
                 const enemyRed = sortByThreat.filter((du) => du.coalition === 1);
+                console.log("Auto GCI Serving Blue");
                 // console.log("enemyBlue: ", enemyRed);
                 await gciUpdatePilots(enemyRed, 2);
             }
