@@ -60,14 +60,12 @@ export async function processGCIDetection(incomingObj: any): Promise<void> {
 
             if (sideStack.underdog === 1) {
                 const enemyBlue = sortByThreat.filter((du) => du.coalition === 2);
-                console.log("Auto GCI Serving Red");
                 // console.log("enemyBlue: ", enemyBlue);
                 await gciUpdatePilots(enemyBlue, 1);
             }
 
             if (sideStack.underdog === 2) {
                 const enemyRed = sortByThreat.filter((du) => du.coalition === 1);
-                console.log("Auto GCI Serving Blue");
                 // console.log("enemyBlue: ", enemyRed);
                 await gciUpdatePilots(enemyRed, 2);
             }
@@ -118,7 +116,7 @@ export async function gciUpdatePilots(detectedUnits: any, friendlySide: number) 
 
                 // console.log("DT: ", distanceTo, " <= ", maxKMDistanceToRead, unit.name);
                 if (distanceTo <= maxKMDistanceToRead) {
-					// console.log("autoGCI: ", unit.type, unit.name, unit.coalition, distanceTo, " <= ", maxKMDistanceToRead);
+                    // console.log("autoGCI: ", unit.type, unit.name, unit.coalition, distanceTo, " <= ", maxKMDistanceToRead);
                     curPlayerDistance.push({
                         ...unit,
                         bearingTo: ddcsController.findBearing(
@@ -146,7 +144,7 @@ export async function gciUpdatePilots(detectedUnits: any, friendlySide: number) 
                         message += `${curUnit.type.toUpperCase()}, ${i18n.BRAA} ${curUnit.bearingTo.toFixed(0)} ${i18n.FOR} ${(curUnit.distanceTo * 0.621371).toFixed(0)}${i18n.M}, ${i18n.AT} ${(curUnit.alt * 3.28084).toFixed(0)}${i18n.FT}, ${curUnit.curEnemyAspect}`;
                     }
                 }
-				// console.log("PCG: ", message);
+                console.log("Auto GCI: ", player.name, player.side, message);
                 await ddcsController.sendMesgToGroup(player, curPlayerUnit.groupId, message, 15);
             }
         }
