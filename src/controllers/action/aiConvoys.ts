@@ -12,19 +12,18 @@ export async function maintainPvEConfig(): Promise<void> {
     const stackObj = await campaignStackTypes();
     console.log("stackobj: ", stackObj);
     let didAISpawn: boolean = false;
-    for (const pveConfig of engineCache.config.pveAIConfig) {
-        for (const aIConfig of pveConfig.config) {
-            if (aIConfig.functionCall === "fullAIEnabled") {
-                didAISpawn = (!didAISpawn) ? await processAI({underdog: 1}, aIConfig, true) : false;
-                didAISpawn = (!didAISpawn) ? await processAI({underdog: 2}, aIConfig, true) : false;
+    for (const pveConfig of engineCache.config.pveAIConfig) {;
+        for (let x = 0; x < pveConfig.config; x++) {
+            const aIConfig = pveConfig.config[x];
+            // @ts-ignore
+            const sideStackedAgainst = stackObj[aIConfig.functionCall];
+            if (sideStackedAgainst.ratio >= aIConfig.stackTrigger) {
+                didAISpawn = (!didAISpawn) ?  await processAI(sideStackedAgainst, aIConfig) : false;
             } else {
-                // @ts-ignore
-                const sideStackedAgainst = stackObj[aIConfig.functionCall];
-                if (sideStackedAgainst.ratio >= aIConfig.stackTrigger) {
-                    didAISpawn = (!didAISpawn) ?  await processAI(sideStackedAgainst, aIConfig, false) : false;
-                } else {
-                    didAISpawn = (!didAISpawn) ? await processAI({underdog: 1}, aIConfig, true) : false;
-                    didAISpawn = (!didAISpawn) ? await processAI({underdog: 2}, aIConfig, true) : false;
+                if (pveConfig.config.length > 1) {
+                    didAISpawn = (!didAISpawn) ? await processAI({underdog: 1}, aIConfig) : false;
+                    didAISpawn = (!didAISpawn) ? await processAI({underdog: 2}, aIConfig) : false;
+                    x++; // double increment
                 }
             }
         }
@@ -40,7 +39,7 @@ export async function campaignStackTypes(): Promise<{}> {
     };
 }
 
-export async function processAI(sideStackedAgainst: {underdog: number}, aIConfig: typings.IAIConfig, spawnHalf: boolean): Promise<boolean> {
+export async function processAI(sideStackedAgainst: {underdog: number}, aIConfig: typings.IAIConfig): Promise<boolean> {
     console.log("sideStackedAgainst: ", sideStackedAgainst);
     if (sideStackedAgainst.underdog > 0) {
         const friendlyBases = await ddcsControllers.baseActionRead({
@@ -48,7 +47,7 @@ export async function processAI(sideStackedAgainst: {underdog: number}, aIConfig
             side: sideStackedAgainst.underdog,
             enabled: true
         });
-        return await checkBasesToSpawnConvoysFrom(friendlyBases, aIConfig, spawnHalf);
+        return await checkBasesToSpawnConvoysFrom(friendlyBases, aIConfig);
     }
     return false;
 }
@@ -56,7 +55,6 @@ export async function processAI(sideStackedAgainst: {underdog: number}, aIConfig
 export async function checkBasesToSpawnConvoysFrom(
     friendlyBases: typings.IBase[],
     aIConfig: typings.IAIConfig,
-    spawnHalf: boolean
 ): Promise<boolean> {
     for (const base of friendlyBases) {
         const shelterAlive = await ddcsControllers.unitActionRead({
@@ -96,7 +94,6 @@ export async function checkBasesToSpawnConvoysFrom(
                                     baseConvoyGroupName,
                                     side: base.side,
                                     aIConfig,
-                                    spawnHalf,
                                     message
                                 }
                             }, curNextUniqueId);

@@ -718,8 +718,8 @@ export async function spawnConvoy(
         }
     }
 
-    const curConvoyMakeup =  (reqArgs.spawnHalf) ? convoyMakeup.slice(0, Math.floor(convoyMakeup.length / 2)) : convoyMakeup;
-    console.log("CONVOY: ", convoySide, curConvoyMakeup);
+    const curConvoyMakeup =  convoyMakeup;
+
     let groupArray: string = "";
     let curGroupSpawn;
     const defaultStartLonLat = baseTemplate[0];
