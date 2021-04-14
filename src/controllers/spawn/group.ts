@@ -704,7 +704,7 @@ export async function spawnConvoy(
             curUnit = {
                 ...rndSpawnCat[0],
                 country: ddcsControllers.defCountrys[convoySide],
-                speed: "55",
+                speed: "20",
                 hidden: false,
                 playerCanDrive: false
             };
