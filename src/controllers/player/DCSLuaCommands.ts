@@ -128,6 +128,7 @@ export async function sendMesgToGroup(player: ISrvPlayers, groupId: number, mesg
             console.log("toChat: ", mesg, player.playerId, player.name);
             await sendMesgToPlayerChatWindow(mesg, player.playerId);
         } else {
+            console.log("toPlane: ", groupId, mesg, player.playerId, player.name);
             await ddcsController.sendUDPPacket("frontEnd", {
                 actionObj: {
                     action: "CMD",
