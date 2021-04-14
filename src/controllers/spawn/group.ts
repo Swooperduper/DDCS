@@ -755,7 +755,7 @@ export async function spawnConvoy(
     }
     curGroupSpawn = _.replace(curGroupSpawn, "#UNITS", groupArray);
     const curCMD = await spawnGrp(curGroupSpawn, _.get(curGrpObj, "country"), _.get(curGrpObj, "unitCategory"));
-    console.log("groundSpawn: ", curCMD);
+    // console.log("groundSpawn: ", curCMD);
     const sendClient = {action: "CMD", cmd: [curCMD], reqID: 0};
     const actionObj = {actionObj: sendClient};
     await ddcsControllers.sendUDPPacket("frontEnd", actionObj);
