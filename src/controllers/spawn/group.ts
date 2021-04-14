@@ -718,7 +718,8 @@ export async function spawnConvoy(
         }
     }
 
-    const curConvoyMakeup = convoyMakeup;
+    const curConvoyMakeup =  (reqArgs.spawnHalf) ? convoyMakeup.slice(0, Math.floor(convoyMakeup.length / 2)) : convoyMakeup;
+    console.log("CONVOY: ", convoySide, curConvoyMakeup);
     let groupArray: string = "";
     let curGroupSpawn;
     const defaultStartLonLat = baseTemplate[0];
@@ -734,6 +735,7 @@ export async function spawnConvoy(
     // console.log("GROUNDGROUP: ", curConvoyMakeup, curGrpObj);
     curGroupSpawn = await grndUnitGroup(curGrpObj, "Ground Nothing", await convoyRouteTemplate(curGrpObj));
     // console.log("CGS: ", curGroupSpawn);
+
     let unitNum = 1;
     for (const convUnit of curConvoyMakeup) {
         const curSpwnUnit = {

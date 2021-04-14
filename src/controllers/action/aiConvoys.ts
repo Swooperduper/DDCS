@@ -67,12 +67,7 @@ export async function checkBasesToSpawnConvoysFrom(
 
         if (shelterAlive.length > 0 || !aIConfig.isShelterRequired) {
             // @ts-ignore
-            const objectKeyArray = Object.keys(base.polygonLoc.convoyTemplate);
-            const maxUnitsSpawned = (spawnHalf) ? Math.floor(objectKeyArray.length / 2 ) : objectKeyArray.length;
-            const curConvoyTemplate = objectKeyArray.slice(0, maxUnitsSpawned);
-
-            for (let x = 0; x < curConvoyTemplate.length; x++) {
-                const baseTemplate = base.polygonLoc.convoyTemplate[x];
+            for (const [key, baseTemplate] of Object.entries(base.polygonLoc.convoyTemplate)) {
                 if (aIConfig.AIType === "groundConvoy") {
                     const destBaseInfo = await ddcsControllers.baseActionRead({
                         _id: baseTemplate.destBase,
@@ -101,6 +96,7 @@ export async function checkBasesToSpawnConvoysFrom(
                                     baseConvoyGroupName,
                                     side: base.side,
                                     aIConfig,
+                                    spawnHalf,
                                     message
                                 }
                             }, curNextUniqueId);
