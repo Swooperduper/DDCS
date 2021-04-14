@@ -92,6 +92,7 @@ export async function gciUpdatePilots(detectedUnits: any, friendlySide: number) 
             coalition: friendlySide,
             playername: player.name
         });
+        console.log("LOOKUP: ", player, curPlayerUnits);
 
         if (curPlayerUnits.length > 0) {
             const curPlayerUnit = curPlayerUnits[0];
