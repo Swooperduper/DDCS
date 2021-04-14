@@ -92,7 +92,6 @@ export async function gciUpdatePilots(detectedUnits: any, friendlySide: number) 
             coalition: friendlySide,
             playername: player.name
         });
-        console.log("LOOKUP: ", player, curPlayerUnits);
 
         if (curPlayerUnits.length > 0) {
             const curPlayerUnit = curPlayerUnits[0];
@@ -145,7 +144,7 @@ export async function gciUpdatePilots(detectedUnits: any, friendlySide: number) 
                         message += `${curUnit.type.toUpperCase()}, ${i18n.BRAA} ${curUnit.bearingTo.toFixed(0)} ${i18n.FOR} ${(curUnit.distanceTo * 0.621371).toFixed(0)}${i18n.M}, ${i18n.AT} ${(curUnit.alt * 3.28084).toFixed(0)}${i18n.FT}, ${curUnit.curEnemyAspect}`;
                     }
                 }
-                console.log("Auto GCI: ", player.name, player.side, message, curPlayerUnit.groupId);
+                console.log("Auto GCI: ", curPlayerUnit.groupId, player.name, player.side, message);
                 await ddcsController.sendMesgToGroup(player, curPlayerUnit.groupId, message, 15);
             }
         }
