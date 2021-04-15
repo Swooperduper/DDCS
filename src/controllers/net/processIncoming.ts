@@ -124,11 +124,20 @@ export async function processingIncomingData(incomingObj: any) {
                 } else if (incomingObj.message === i18n.COMMANDBLUE) {
                     await ddcsController.lockUserToSide(incomingObj, 2);
 
-                } else if (incomingObj.message === "-joinRandom") {
-					const randSide = _.random(1,2);
-					await ddcsController.lockUserToSide(incomingObj, randSide);
+                } else if (incomingObj.message === "-joinrandom") {
+                    const randSide = _.random(1, 2);
+                    await ddcsController.lockUserToSide(incomingObj, randSide);
 
-				} else if (_.includes(incomingObj.message, i18n.COMMANDDEFAULT)) {
+                } else if (incomingObj.message === "-refreshMenu") {
+                    const unit = await ddcsController.unitActionRead({playername: curPly.name});
+                    if (unit.length > 0) {
+                        await ddcsController.initializeMenu(unit[0]);
+                        await ddcsController.sendMesgToPlayerChatWindow("Menu has been refreshed", curPly.playerId);
+                    } else {
+                        await ddcsController.sendMesgToPlayerChatWindow("You are not in a vehicle", curPly.playerId);
+                    }
+
+                } else if (_.includes(incomingObj.message, i18n.COMMANDDEFAULT)) {
                     const mesg = i18n.COMMANDDEFAULTRESPONSE;
                     await ddcsController.sendMesgToPlayerChatWindow(mesg, curPly.playerId);
                 }
