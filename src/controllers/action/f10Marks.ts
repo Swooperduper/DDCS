@@ -8,7 +8,7 @@ import * as ddcsControllers from "../";
 let randomMarkId: number;
 
 export async function setFarpMarks() {
-    const bases = await ddcsControllers.baseActionRead({_id: {$not: /#/}});
+    const bases = await ddcsControllers.baseActionRead({enabled: true, _id: {$not: /#/}});
     for (const base of bases) {
         randomMarkId = _.random(1000, 9999);
         if (base.baseMarkId) {
