@@ -128,7 +128,7 @@ export async function processingIncomingData(incomingObj: any) {
                     const randSide = _.random(1, 2);
                     await ddcsController.lockUserToSide(incomingObj, randSide);
 
-                } else if (incomingObj.message === "-refreshMenu") {
+                } else if (incomingObj.message === "-refreshmenu") {
                     const unit = await ddcsController.unitActionRead({playername: curPly.name});
                     if (unit.length > 0) {
                         await ddcsController.initializeMenu(unit[0]);
