@@ -8,6 +8,7 @@ import * as ddcsControllers from "../";
 let randomMarkId: number;
 
 export async function setFarpMarks() {
+	console.log("SFM1");
     const bases = await ddcsControllers.baseActionRead({enabled: true, _id: {$not: /#/}});
     for (const base of bases) {
         randomMarkId = _.random(1000, 9999);
@@ -37,6 +38,7 @@ export async function setFarpMarks() {
 export async function setUnitMark(
     unit: any
 ) {
+	console.log("SFM2 ", unit);
     if (!_.includes(ddcsControllers.crateTypes, unit.type)) {
         const cUnit = await ddcsControllers.unitActionRead({_id: _.get(unit, "name")});
         const curUnit = cUnit[0];

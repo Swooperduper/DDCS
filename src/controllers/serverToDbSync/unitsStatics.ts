@@ -126,7 +126,8 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
                 }});
              */
             if (ddcsControllers.UNIT_CATEGORY[curData.unitCategory] === "STRUCTURE") {
-                await ddcsControllers.setUnitMark(curData);
+				// tracking everything on a carrier deck, dont turn on until fixed
+                // await ddcsControllers.setUnitMark(curData);
             }
         } else if (unitObj.action === "D") {
             if (curData.name) {
@@ -212,7 +213,8 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
                  */
                 if (ddcsControllers.UNIT_CATEGORY[curData.unitCategory] === "STRUCTURE") {
                     // console.log('SUM: ', curData);
-                    await ddcsControllers.setUnitMark(curData);
+					// tracking everything on a carrier deck, dont turn on until fixed
+                    // await ddcsControllers.setUnitMark(curData);
                 }
                 if (curData.playername !== "" && curData.groupId) {
                     // Only players can get a menu
