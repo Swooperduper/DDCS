@@ -213,7 +213,7 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
                  */
                 if (ddcsControllers.UNIT_CATEGORY[curData.unitCategory] === "STRUCTURE") {
                     // console.log('SUM: ', curData);
-					// tracking everything on a carrier deck, dont turn on until fixed
+                    // tracking everything on a carrier deck, dont turn on until fixed
                     // await ddcsControllers.setUnitMark(curData);
                 }
                 if (curData.playername !== "" && curData.groupId) {
