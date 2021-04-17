@@ -245,6 +245,12 @@ export const enemyCountry: number[] = [
     1
 ];
 
+export const enemySide: number[] = [
+    0,
+    2,
+    1
+];
+
 export const maxLifePoints: number = 18;
 
 export const seasons: string[] = [

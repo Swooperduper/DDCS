@@ -12,7 +12,7 @@ export async function maintainPvEConfig(): Promise<void> {
     const stackObj = await campaignStackTypes();
     console.log("stackobj: ", stackObj);
     let didAISpawn: boolean = false;
-    for (const pveConfig of engineCache.config.pveAIConfig) {;
+    for (const pveConfig of engineCache.config.pveAIConfig) {
         for (let x = 0; x < pveConfig.config.length; x++) {
             const aIConfig = pveConfig.config[x];
             // @ts-ignore
@@ -63,6 +63,7 @@ export async function checkBasesToSpawnConvoysFrom(
             coalition: base.side
         });
 
+        console.log("CONVOY SHELTER ALIVE: ", shelterAlive.length, !aIConfig.isShelterRequired, aIConfig.isShelterRequired);
         if (shelterAlive.length > 0 || !aIConfig.isShelterRequired) {
             // @ts-ignore
             for (const [key, baseTemplate] of Object.entries(base.polygonLoc.convoyTemplate)) {

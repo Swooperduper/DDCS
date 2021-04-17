@@ -134,6 +134,32 @@ export async function checkUnitsToBaseForCapture(): Promise<void> {
     }
 }
 
+export async function getGroundKillInProximity(
+    lonLat: number[],
+    kmDistance: number,
+    side: number
+): Promise<typing.IUnit[]> {
+    return await ddcsControllers.unitActionRead({
+        dead: false,
+        centerLoc: {
+            $near: {
+                $geometry: {
+                    type: "Point",
+                    coordinates: lonLat
+                },
+                $maxDistance: kmDistance * 1000
+            }
+        },
+        unitCategory: {
+            $in: [
+                ddcsControllers.UNIT_CATEGORY.indexOf("HELICOPTER"),
+                ddcsControllers.UNIT_CATEGORY.indexOf("GROUND_UNIT")
+            ]
+        },
+        coalition: side
+    });
+}
+
 export async function getCoalitionGroundUnitsInProximity(
     lonLat: number[],
     kmDistance: number,
