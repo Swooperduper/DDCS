@@ -45,7 +45,7 @@ export async function processThirtySecActions(fullySynced: boolean) {
             }
         }
 
-        await ddcsControllers.killEnemyWithinSightOfConvoy();
+        // await ddcsControllers.killEnemyWithinSightOfConvoy();
 
     }
 }

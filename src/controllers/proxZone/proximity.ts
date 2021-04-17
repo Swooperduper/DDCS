@@ -141,7 +141,7 @@ export async function getGroundKillInProximity(
 ): Promise<typing.IUnit[]> {
     return await ddcsControllers.unitActionRead({
         dead: false,
-        centerLoc: {
+        lonLatLoc: {
             $near: {
                 $geometry: {
                     type: "Point",

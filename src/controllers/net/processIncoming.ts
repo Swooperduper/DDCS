@@ -137,7 +137,9 @@ export async function processingIncomingData(incomingObj: any) {
                         await ddcsController.sendMesgToPlayerChatWindow("You are not in a vehicle", curPly.playerId);
                     }
 
-                } else if (_.includes(incomingObj.message, i18n.COMMANDDEFAULT)) {
+                } else if (incomingObj.message === "-testmdk") {
+					await ddcsController.killEnemyWithinSightOfConvoy();
+				} else if (_.includes(incomingObj.message, i18n.COMMANDDEFAULT)) {
                     const mesg = i18n.COMMANDDEFAULTRESPONSE;
                     await ddcsController.sendMesgToPlayerChatWindow(mesg, curPly.playerId);
                 }
