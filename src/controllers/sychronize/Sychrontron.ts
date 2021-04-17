@@ -288,8 +288,7 @@ export async function syncCheck(serverCount: number): Promise<void> {
             } else {
                 // normal named sync system
                 const dbCount = await ddcsControllers.actionCount({
-                    dead: false,
-                    _id: {$not: /~/}
+                    dead: false
                 });
                 console.log("Server:", serverCount, " Db", dbCount);
                 if (serverCount !== dbCount) {
