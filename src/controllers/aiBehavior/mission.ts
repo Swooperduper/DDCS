@@ -3,7 +3,8 @@ import * as ddcsController from "../";
 
 export async function killEnemyWithinSightOfConvoy(): Promise<void> {
     // get first unit of all aiConvoys
-    const aiGroundUnits = await ddcsController.unitActionRead({dead: false, _id: /AI\|EDPathfindingPOS1\|\S*\|1\|/});
+    // const aiGroundUnits = await ddcsController.unitActionRead({dead: false, _id: /AI\|EDPathfindingPOS1\|\S*\|1\|/});
+    const aiGroundUnits = await ddcsController.unitActionRead({dead: false, _id: /DU\|3c6b625a002627844e68a5cd0c11fbd1\|Leclerc\|\|true\|true\|NIGHTMARE 1-1 \| REPTAR\|6480840/});
 
     if (aiGroundUnits.length > 0) {
         for (const unit of aiGroundUnits) {

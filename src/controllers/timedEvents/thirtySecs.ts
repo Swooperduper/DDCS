@@ -44,5 +44,8 @@ export async function processThirtySecActions(fullySynced: boolean) {
                 await ddcsControllers.destroyUnit( crate.name, "static" );
             }
         }
+
+        await ddcsControllers.killEnemyWithinSightOfConvoy();
+
     }
 }
