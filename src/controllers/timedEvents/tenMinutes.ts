@@ -9,6 +9,7 @@ export async function processTenMinuteActions(fullySynced: boolean): Promise<voi
     if (fullySynced) {
         if (engineCache.config.lifePointsEnabled) {
             await ddcsControllers.updateServerLifePoints();
+            await ddcsControllers.maintainPvEConfig();
         }
     }
 }

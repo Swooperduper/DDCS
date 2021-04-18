@@ -6,6 +6,6 @@ import * as ddcsControllers from "../";
 
 export async function processThirtyMinuteActions(fullySynced: boolean) {
     if (fullySynced) {
-        await ddcsControllers.maintainPvEConfig();
+        // await ddcsControllers.maintainPvEConfig();
     }
 }
