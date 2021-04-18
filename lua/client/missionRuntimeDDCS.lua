@@ -359,47 +359,30 @@ function runRequest(request)
         end
 
         if request.action == "addTask" then
-            if request.verbose ~= null then
-                tprint(request, 1)
-            end
-            if request.taskType == 'Mission' then
-                local taskGroup = Group.getByName(request.groupName)
-                if taskGroup ~= nil then
-                    if request.verbose ~= null then
-                        tprint(taskGroup:getUnits(), 1)
+            local taskGroup = Group.getByName(request.groupName)
+            if taskGroup ~= nil then
+                local taskController = taskGroup:getController()
+                if request.mission ~= nil then
+                    if request.verbose ~= nil then
+                        env.info("curMissionNotTable: "..request.mission)
                     end
-                    local _controller = taskGroup:getController()
-                    local routeTable = JSON:decode(request.route)
-                    if request.verbose ~= null then
-                        tprint(routeTable, 1)
-                    end
-                    local _Mission = {
-                        id = 'Mission',
-                        params = routeTable
-                    }
-                    if request.verbose ~= null then
-                        tprint(_Mission, 1)
-                    end
-                    _controller:pushTask(_Mission)
-                    local hasTask = _controller:hasTask()
-                    if hasTask ~= nil then
-                        env.info(request.groupName..' HAS A TASK ')
+                    local curMission = JSON:decode(request.mission)
+                    if type(curMission) == 'table' then
+                        if taskController ~= nil then
+                            for nIndex = 1, #curMission.params.route.points do
+                                if curMission.params.route.points[nIndex].lat ~= nil and curMission.params.route.points[nIndex].lon ~= nil then
+                                    curMission.params.route.points[nIndex].x = coord.LLtoLO(curMission.params.route.points[nIndex].lat, curMission.params.route.points[nIndex].lon).x
+                                    curMission.params.route.points[nIndex].y = coord.LLtoLO(curMission.params.route.points[nIndex].lat, curMission.params.route.points[nIndex].lon).z
+                                end
+                            end
+                            if request.verbose ~= null then
+                                tprint(curMission, 1)
+                            end
+                            taskController:pushTask(curMission)
+                        end
                     else
-                        env.info(request.groupName..' NO TASK')
+                        env.info("curMissionNotTable: "..request.mission)
                     end
-                end
-            end
-            if request.taskType == 'EWR' then
-                local taskUnit = Unit.getByName(request.unitName)
-                if taskUnit ~= nil then
-                    local _controller = taskUnit:getController();
-                    local _EWR = {
-                        id = 'EWR',
-                        auto = true,
-                        params = {
-                        }
-                    }
-                    _controller:setTask(_EWR)
                 end
             end
         end

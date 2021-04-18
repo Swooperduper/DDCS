@@ -25,7 +25,7 @@ export function getRTPlayerArray() {
 }
 
 export async function processPlayerEvent(playerArray: any): Promise<void> {
-    const curPlayerArray = playerArray.players.filter((pe: any) => pe.id !== 1);
+    const curPlayerArray = playerArray.players;
     const engineCache = ddcsControllers.getEngineCache();
     if (curPlayerArray.length > 0) {
         setRTPlayerArray(curPlayerArray);

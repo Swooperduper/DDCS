@@ -7,7 +7,7 @@ import * as ddcsControllers from "../";
 
 export async function processUnitUpdates(unitObj: any): Promise<void> {
     if (_.includes(unitObj.data.name, "Shelter")) {
-        console.log("ShelterProcess: ", unitObj);
+        // console.log("ShelterProcess: ", unitObj);
     }
 /*
     if (unitObj.data.unitCategory === ddcsControllers.UNIT_CATEGORY("STRUCTURE")) {
@@ -108,7 +108,7 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
             }
 
             if (_.includes(unitObj.data.name, "Shelter")) {
-                console.log("ShelterProcess2: ", iCurObj);
+               // console.log("ShelterProcess2: ", iCurObj);
             }
             await ddcsControllers.unitActionUpdate(iCurObj.data);
             /*
@@ -181,7 +181,7 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
                 }
 
                 if (_.includes(unitObj.data.name, "Shelter")) {
-                    console.log("ShelterProcess3: ", iCurObj);
+                    // console.log("ShelterProcess3: ", iCurObj);
                 }
                 await ddcsControllers.unitActionSave(iCurObj.data);
 

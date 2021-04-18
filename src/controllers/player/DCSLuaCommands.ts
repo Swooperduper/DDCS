@@ -59,6 +59,7 @@ export async function sendMesgToAll(
     // send to everyone individually
     const engineCache = ddcsController.getEngineCache();
     const playerArray = ddcsController.getRTPlayerArray();
+    console.log("PA: ", playerArray);
     if (playerArray.length > 0) {
         for (const player of playerArray) {
             const playersInfo = await ddcsController.srvPlayerActionsRead({_id: player._id});

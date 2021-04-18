@@ -138,8 +138,8 @@ export async function processingIncomingData(incomingObj: any) {
                     }
 
                 } else if (incomingObj.message === "-testmdk") {
-					await ddcsController.killEnemyWithinSightOfConvoy();
-				} else if (_.includes(incomingObj.message, i18n.COMMANDDEFAULT)) {
+                    await ddcsController.killEnemyWithinSightOfConvoy();
+                } else if (incomingObj.message === "-") {
                     const mesg = i18n.COMMANDDEFAULTRESPONSE;
                     await ddcsController.sendMesgToPlayerChatWindow(mesg, curPly.playerId);
                 }
