@@ -100,7 +100,8 @@ export async function checkUnitsToBaseForCapture(): Promise<void> {
 
     const engineCache = ddcsControllers.getEngineCache();
     const baseWinCondition = engineCache.config.mainCampaignBases;
-    const warWon = await ddcsControllers.baseActionRead({$in: baseWinCondition});
+    const warWon = await ddcsControllers.baseActionRead({_id: {$in: baseWinCondition}});
+
     if (!_.isEmpty(warWon)) {
         const campaignStateGroup = _.groupBy(warWon, "side");
 
