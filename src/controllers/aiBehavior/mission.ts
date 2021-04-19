@@ -11,6 +11,8 @@ export async function continueRoadRoute(
     reqId: any,
     reqArgs: any
 ): Promise<void> {
+    console.log("RR: ", incomingObj.returnObj, reqId, reqArgs);
+    /*
     const routes: any = {
         speed: "20",
         routeLocs: incomingObj.returnObj
@@ -26,6 +28,7 @@ export async function continueRoadRoute(
             reqID: 0
         }
     });
+    */
 }
 
 export async function killEnemyWithinSightOfConvoy(): Promise<void> {
