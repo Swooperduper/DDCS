@@ -134,7 +134,15 @@ export async function killEnemyWithinSightOfConvoy(): Promise<void> {
 
                     const spawnTemplate = await ddcsController.templateRead({_id: "missionGroundMDKCircle"});
                     const compiled = _.template(spawnTemplate[0].template);
-
+                    console.log("persueEnemy: ", "frontEnd", {
+                        actionObj: {
+                            action: "addTask",
+                            groupName: unit.groupName,
+                            mission: compiled({routes}),
+                            reqID: 0
+                        }
+                    });
+                    /*
                     await ddcsController.sendUDPPacket("frontEnd", {
                         actionObj: {
                             action: "addTask",
@@ -143,6 +151,7 @@ export async function killEnemyWithinSightOfConvoy(): Promise<void> {
                             reqID: 0
                         }
                     });
+                     */
                 }
             }
         }
