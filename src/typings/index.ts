@@ -270,6 +270,8 @@ export interface IAmmo {
 }
 
 export interface IUnit {
+    pursuingUnit: boolean;
+    pursueExpiration: Date;
     harmDetectChance: number;
     natoName: string;
     curEnemyAspect: string;

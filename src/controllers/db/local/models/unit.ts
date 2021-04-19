@@ -164,7 +164,10 @@ export function unitModel(dbconn: mongoose.Connection): mongoose.Document | {} {
             pursuedByEnemyUnit: {
                 type: String
             },
-            pursuedExpiration: {
+            pursuingUnit: {
+                type: String
+            },
+            pursueExpiration: {
                 type: Date
             }
         },
