@@ -160,6 +160,12 @@ export function unitModel(dbconn: mongoose.Connection): mongoose.Document | {} {
             },
             jtacEnemyLocation: {
                 type: Object
+            },
+            pursuedByEnemyUnit: {
+                type: String
+            },
+            pursuedExpiration: {
+                type: Date
             }
         },
         {

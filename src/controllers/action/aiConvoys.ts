@@ -77,7 +77,7 @@ export async function checkBasesToSpawnConvoysFrom(
                         const curBase = destBaseInfo[0];
                         const baseConvoyGroupName = "AI|" + aIConfig.name +
                             "|" + baseTemplate.sourceBase +
-                            "_" + baseTemplate.destBase + "|";
+                            "|" + baseTemplate.destBase + "|";
                         const convoyGroup = await ddcsControllers.unitActionRead({
                             groupName: baseConvoyGroupName,
                             isCrate: false,
