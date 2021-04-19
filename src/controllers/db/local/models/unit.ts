@@ -168,7 +168,8 @@ export function unitModel(dbconn: mongoose.Connection): mongoose.Document | {} {
                 type: String
             },
             pursueExpiration: {
-                type: Date
+                type: Date,
+				default: Date.now
             }
         },
         {

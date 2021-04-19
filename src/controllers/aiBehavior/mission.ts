@@ -86,7 +86,7 @@ export async function killEnemyWithinSightOfConvoy(): Promise<void> {
                 const unitsInRange = await ddcsController.getGroundKillInProximity(
                     unit.lonLatLoc, detectEnemyDistance, ddcsController.enemySide[unit.coalition]
                 );
-                console.log("enemyInRange: ", unitsInRange.length);
+                console.log("enemyInRange: ", unitsInRange.length, unit.lonLatLoc, detectEnemyDistance, ddcsController.enemySide[unit.coalition]);
                 if (unitsInRange.length > 0) {
                     const routes: any = {
                         speed: "20",
