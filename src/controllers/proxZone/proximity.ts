@@ -157,8 +157,7 @@ export async function getGroundKillInProximity(
                 ddcsControllers.UNIT_CATEGORY.indexOf("GROUND_UNIT")
             ]
         },
-        coalition: side,
-        pursueExpiration: { $lte: new Date().getTime() }
+        coalition: side
     });
 }
 
