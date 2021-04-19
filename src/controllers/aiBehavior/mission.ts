@@ -46,10 +46,11 @@ export async function killEnemyWithinSightOfConvoy(): Promise<void> {
 
     if (aiGroundUnits.length > 0) {
         for (const unit of aiGroundUnits) {
-
             // if pursuit expires and unit was pursuing, go back to road and continue
+            console.log("checking pursuit: ", unit.pursuingUnit, new Date().getTime(), " > ", new Date(unit.pursueExpiration).getTime());
             if ((unit.pursuingUnit != null || unit.pursuingUnit !== "") &&
                 new Date().getTime() > new Date(unit.pursueExpiration).getTime()) {
+                console.log("Breaking off of pursuit, ", unit.pursuingUnit);
 
                 const destBase = await ddcsController.baseActionRead({_id: unit._id.split("|")[3]});
 
@@ -86,7 +87,8 @@ export async function killEnemyWithinSightOfConvoy(): Promise<void> {
                 const unitsInRange = await ddcsController.getGroundKillInProximity(
                     unit.lonLatLoc, detectEnemyDistance, ddcsController.enemySide[unit.coalition]
                 );
-                console.log("enemyInRange: ", unitsInRange.length, unit.lonLatLoc, detectEnemyDistance, ddcsController.enemySide[unit.coalition]);
+                console.log("enemyInRange: ", unitsInRange.length, unit.lonLatLoc,
+                    detectEnemyDistance, ddcsController.enemySide[unit.coalition]);
                 if (unitsInRange.length > 0) {
                     const routes: any = {
                         speed: "20",
