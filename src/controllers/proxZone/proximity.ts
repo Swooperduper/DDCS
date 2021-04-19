@@ -158,7 +158,7 @@ export async function getGroundKillInProximity(
             ]
         },
         coalition: side,
-        pursueExpiration: {$or: [{pursueExpiration: { $lte: new Date().getTime() }}, { pursueExpiration: {$exists: false}}]}
+        pursueExpiration: { $lte: new Date().getTime() }
     });
 }
 
