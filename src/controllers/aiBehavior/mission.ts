@@ -88,11 +88,12 @@ export async function killEnemyWithinSightOfConvoy(): Promise<void> {
                     });
                 }
             } else {
+                console.log("check range: ", unit.lonLatLoc,
+                    detectEnemyDistance, ddcsController.enemySide[unit.coalition]);
                 const unitsInRange = await ddcsController.getGroundKillInProximity(
                     unit.lonLatLoc, detectEnemyDistance, ddcsController.enemySide[unit.coalition]
                 );
-                console.log("enemyInRange: ", unitsInRange.length, unit.lonLatLoc,
-                    detectEnemyDistance, ddcsController.enemySide[unit.coalition]);
+                console.log("enemyInRange: ", unitsInRange.length);
                 if (unitsInRange.length > 0) {
                     const routes: any = {
                         speed: "20",
