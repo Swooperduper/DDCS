@@ -1353,7 +1353,7 @@ export async function spawnStaticBuilding(
                 lonLatLoc: ddcsControllers.getRandomLatLonFromBase(baseObj.name, "buildingPoly"),
                 isActive: true
             };
-            console.log("STATIC1: ", curStaticObj);
+            // console.log("STATIC1: ", curStaticObj);
             await ddcsControllers.sendUDPPacket("frontEnd", {
                 actionObj: {
                     action: "CMD",
@@ -1594,7 +1594,7 @@ export async function healBase(baseName: string, curPlayerUnit: any, init: boole
                     );
                     return false;
                 } else {
-                    console.log("NOT A MOB: ", {}, true, curBase, curPlayerUnit.coalition, "Shelter");
+                    // console.log("NOT A MOB: ", {}, true, curBase, curPlayerUnit.coalition, "Shelter");
                     await ddcsControllers.spawnStaticBuilding({} as IStaticSpawnMin, true, curBase, curPlayerUnit.coalition, "Shelter");
                 }
                 // await ddcsControllers.unitActionDelete({_id: curBase.name + " Shelter"});
