@@ -177,6 +177,11 @@ export function serverModel(dbconn: mongoose.Connection): mongoose.Document | {}
                 type: Array,
                 required: true,
                 default: []
+            },
+            mainCampaignBases: {
+                type: Array,
+                required: true,
+                default: []
             }
         },
         {

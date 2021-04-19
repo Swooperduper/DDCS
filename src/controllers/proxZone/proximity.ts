@@ -98,13 +98,14 @@ export async function checkUnitsToBaseForCapture(): Promise<void> {
         }
     }
 
-    const warWon = await ddcsControllers.baseActionRead({baseType: "MOB", _id: { $not: /~/ }, enabled: true});
+    const engineCache = ddcsControllers.getEngineCache();
+    const baseWinCondition = engineCache.config.mainCampaignBases;
+    const warWon = await ddcsControllers.baseActionRead({$in: baseWinCondition});
     if (!_.isEmpty(warWon)) {
         const campaignStateGroup = _.groupBy(warWon, "side");
 
         if (!campaignStateGroup[1]) {
             console.log("BLUE WON BLUE WON BLUE WON BLUE WON BLUE WON BLUE WON BLUE WON BLUE WON ");
-            const engineCache = ddcsControllers.getEngineCache();
             await ddcsControllers.serverActionsUpdate({name: engineCache.config.name, resetFullCampaign: true});
             if (ddcsControllers.getTimeToRestart() === 0) {
                 console.log("Setting TTR");
@@ -119,7 +120,6 @@ export async function checkUnitsToBaseForCapture(): Promise<void> {
 
         if (!campaignStateGroup[2]) {
             console.log("RED WON RED WON RED WON RED WON RED WON RED WON RED WON RED WON RED WON ");
-            const engineCache = ddcsControllers.getEngineCache();
             await ddcsControllers.serverActionsUpdate({name: engineCache.config.name, resetFullCampaign: true});
             if (ddcsControllers.getTimeToRestart() === 0) {
                 console.log("Setting TTR");
