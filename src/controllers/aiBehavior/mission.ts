@@ -50,9 +50,9 @@ export async function killEnemyWithinSightOfConvoy(): Promise<void> {
     if (aiGroundUnits.length > 0) {
         for (const unit of aiGroundUnits) {
             // if pursuit expires and unit was pursuing, go back to road and continue
-            console.log("checking pursuit: ", unit.pursuingUnit, new Date().getTime(), " > ", new Date(unit.pursueExpiration).getTime(),
-                unit.pursuingUnit !== null && new Date().getTime() > new Date(unit.pursueExpiration).getTime());
-            if (unit.pursuingUnit !== null &&
+            console.log("checking pursuit: ", !!unit.pursuingUnit, new Date().getTime(), " > ", new Date(unit.pursueExpiration).getTime(),
+                !!unit.pursuingUnit && new Date().getTime() > new Date(unit.pursueExpiration).getTime());
+            if (!!unit.pursuingUnit !== null &&
                 new Date().getTime() > new Date(unit.pursueExpiration).getTime()) {
                 console.log("Breaking off of pursuit, ", unit.pursuingUnit);
 
