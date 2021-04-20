@@ -1,8 +1,6 @@
 import * as _ from "lodash";
 import * as ddcsController from "../";
-import * as ddcsControllers from "../action/aiConvoys";
 import {getNextUniqueId, setRequestJobArray} from "../";
-import {isNull} from "util";
 
 const detectEnemyDistance = 10; // in km
 
@@ -14,15 +12,14 @@ export async function continueRoadRoute(
     console.log("RR: ", incomingObj.returnObj, incomingObj.returnObj.length, reqId, reqArgs);
 
     if (incomingObj.returnObj.length === 2) {
-        /*
         const routes: any = {
             speed: "20",
             routeLocs: incomingObj.returnObj
         };
         const spawnTemplate = await ddcsController.templateRead({_id: "missionGround2Route"});
         const compiled = _.template(spawnTemplate[0].template);
-
-        await ddcsController.sendUDPPacket("frontEnd", {
+        /*
+        console.log("TEMP: ", "frontEnd", {
             actionObj: {
                 action: "addTask",
                 groupName: reqArgs.groupName,
@@ -31,6 +28,15 @@ export async function continueRoadRoute(
             }
         });
         */
+        await ddcsController.sendUDPPacket("frontEnd", {
+            actionObj: {
+                action: "addTask",
+                groupName: reqArgs.groupName,
+                mission: compiled({routes}),
+                verbose: true,
+                reqID: 0
+            }
+        });
     }
 }
 
@@ -39,23 +45,17 @@ export async function killEnemyWithinSightOfConvoy(): Promise<void> {
     console.log("KOS");
     const aiGroundUnits = await ddcsController.unitActionRead({
         dead: false,
-        _id: /AI\|EDPathfindingPOS1\|\S*\|\S*\|1\|/
+        _id: /AI\|EDPathfindingPOS1\|(.)*\|(.)*\|1\|/
     });
-    console.log("aiGroundLength: ", aiGroundUnits);
-    /*
-    const aiGroundUnits = await ddcsController.unitActionRead({
-        dead: false,
-        _id: "~Ground-1"
-    });
-    console.log("aiGroundLength: ", aiGroundUnits.length);
-    */
+    console.log("aiGroundLength: ", aiGroundUnits.map((unit) => unit.name));
 
     if (aiGroundUnits.length > 0) {
         for (const unit of aiGroundUnits) {
             // if pursuit expires and unit was pursuing, go back to road and continue
-            console.log("checking pursuit: ", unit.pursuingUnit, new Date().getTime(), " > ", new Date(unit.pursueExpiration).getTime(),
-                unit.pursuingUnit && new Date().getTime() > new Date(unit.pursueExpiration).getTime());
-            if (unit.pursuingUnit && new Date().getTime() > new Date(unit.pursueExpiration).getTime()) {
+            console.log("checking pursuit: ", !!unit.pursuingUnit,
+                unit.pursuingUnit, new Date().getTime(), " > ", new Date(unit.pursueExpiration).getTime(),
+                !!unit.pursuingUnit && new Date().getTime() > new Date(unit.pursueExpiration).getTime());
+            if (!!unit.pursuingUnit && new Date().getTime() > new Date(unit.pursueExpiration).getTime()) {
                 console.log("Breaking off of pursuit, ", unit.pursuingUnit);
 
                 const destBase = await ddcsController.baseActionRead({_id: unit._id.split("|")[3]});
@@ -90,74 +90,92 @@ export async function killEnemyWithinSightOfConvoy(): Promise<void> {
                     });
                 }
             } else {
-                console.log("check range: ", unit.lonLatLoc,
-                    detectEnemyDistance, ddcsController.enemySide[unit.coalition]);
-                const unitsInRange = await ddcsController.getGroundKillInProximity(
-                    unit.lonLatLoc, detectEnemyDistance, ddcsController.enemySide[unit.coalition]
-                );
-                console.log("enemyInRange: ", unitsInRange.length);
-                if (unitsInRange.length > 0) {
-                    const routes: any = {
-                        speed: "20",
-                        routeLocs: []
-                    };
-                    const closestEnemyUnit = unitsInRange[0];
-                    console.log("pursueEnemy: ", closestEnemyUnit);
-
-                    // update unit attacking
-                    await ddcsController.unitActionUpdate({
-                        _id: unit._id,
-                        pursuingUnit: closestEnemyUnit._id,
-                        pursueExpiration: new Date().getTime() + ddcsController.time.fiveMins
-                    }).catch((err: any) => { console.log("42", err); });
-
-                    // update unit getting attacked
-                    await ddcsController.unitActionUpdate({
-                        _id: closestEnemyUnit._id,
-                        pursuedByEnemyUnit: unit._id,
-                        pursueExpiration: new Date().getTime() + ddcsController.time.fiveMins
-                    }).catch((err: any) => { console.log("49", err); });
-
-                    routes.speed = "20";
-                    routes.routeLocs.push(unit.lonLatLoc);
-                    routes.routeLocs.push(
-                        await ddcsController.getLonLatFromDistanceDirection(closestEnemyUnit.lonLatLoc, closestEnemyUnit.hdg, 0.4)
+                if (!unit.pursuingUnit) {
+                    console.log("check range: ", unit.lonLatLoc,
+                        detectEnemyDistance, ddcsController.enemySide[unit.coalition]);
+                    const unitsInRange = await ddcsController.getGroundKillInProximity(
+                        unit.lonLatLoc, detectEnemyDistance, ddcsController.enemySide[unit.coalition]
                     );
-                    routes.routeLocs.push(
-                        ddcsController.getLonLatFromDistanceDirection(closestEnemyUnit.lonLatLoc, (closestEnemyUnit.hdg + 90) % 360, 0.4)
-                    );
-                    routes.routeLocs.push(
-                        ddcsController.getLonLatFromDistanceDirection(closestEnemyUnit.lonLatLoc, (closestEnemyUnit.hdg + 180) % 360, 0.4)
-                    );
-                    routes.routeLocs.push(
-                        ddcsController.getLonLatFromDistanceDirection(closestEnemyUnit.lonLatLoc, (closestEnemyUnit.hdg + 270) % 360, 0.4)
-                    );
-                    routes.routeLocs.push(closestEnemyUnit.lonLatLoc);
+                    console.log("enemyInRange: ", unitsInRange.length);
+                    if (unitsInRange.length > 0) {
+                        const routes: any = {
+                            speed: "20",
+                            routeLocs: []
+                        };
+                        const closestEnemyUnit = unitsInRange[0];
+                        console.log("pursueEnemy: ", closestEnemyUnit);
 
-                    console.log("routeLocAmount: ", routes.routeLocs.length);
+                        // update unit attacking
+                        await ddcsController.unitActionUpdate({
+                            _id: unit._id,
+                            pursuingUnit: closestEnemyUnit._id,
+                            pursueExpiration: new Date().getTime() + ddcsController.time.fiveMins
+                        }).catch((err: any) => { console.log("42", err); });
 
-                    if (routes.routeLocs.length === 5) {
-                        const spawnTemplate = await ddcsController.templateRead({_id: "missionGroundMDKCircle"});
-                        const compiled = _.template(spawnTemplate[0].template);
-                        console.log("persueEnemy: ", "frontEnd", {
-                            actionObj: {
-                                action: "addTask",
-                                groupName: unit.groupName,
-                                mission: compiled({routes}),
-                                reqID: 0
-                            }
-                        });
-                        /*
-                        await ddcsController.sendUDPPacket("frontEnd", {
-                            actionObj: {
-                                action: "addTask",
-                                groupName: unit.groupName,
-                                mission: compiled({routes}),
-                                reqID: 0
-                            }
-                        });
-                         */
+                        // update unit getting attacked
+                        await ddcsController.unitActionUpdate({
+                            _id: closestEnemyUnit._id,
+                            pursuedByEnemyUnit: unit._id,
+                            pursueExpiration: new Date().getTime() + ddcsController.time.fiveMins
+                        }).catch((err: any) => { console.log("49", err); });
+
+                        routes.speed = "20";
+                        routes.routeLocs.push(unit.lonLatLoc);
+                        routes.routeLocs.push(
+                            await ddcsController.getLonLatFromDistanceDirection(
+                                closestEnemyUnit.lonLatLoc,
+                                closestEnemyUnit.hdg,
+                                0.4
+                            )
+                        );
+                        routes.routeLocs.push(
+                            ddcsController.getLonLatFromDistanceDirection(
+                                closestEnemyUnit.lonLatLoc,
+                                (closestEnemyUnit.hdg + 90) % 360,
+                                0.4
+                            )
+                        );
+                        routes.routeLocs.push(
+                            ddcsController.getLonLatFromDistanceDirection(
+                                closestEnemyUnit.lonLatLoc,
+                                (closestEnemyUnit.hdg + 180) % 360,
+                                0.4
+                            )
+                        );
+                        routes.routeLocs.push(
+                            ddcsController.getLonLatFromDistanceDirection(
+                                closestEnemyUnit.lonLatLoc,
+                                (closestEnemyUnit.hdg + 270) % 360,
+                                0.4
+                            )
+                        );
+                        routes.routeLocs.push(closestEnemyUnit.lonLatLoc);
+
+                        console.log("routeLocAmount: ", routes.routeLocs.length);
+
+                        if (routes.routeLocs.length === 6) {
+                            const spawnTemplate = await ddcsController.templateRead({_id: "missionGroundMDKCircle"});
+                            const compiled = _.template(spawnTemplate[0].template);
+                            console.log("persueEnemy: ", "frontEnd", {
+                                actionObj: {
+                                    action: "addTask",
+                                    groupName: unit.groupName,
+                                    mission: compiled({routes}),
+                                    reqID: 0
+                                }
+                            });
+                            await ddcsController.sendUDPPacket("frontEnd", {
+                                actionObj: {
+                                    action: "addTask",
+                                    groupName: unit.groupName,
+                                    mission: compiled({routes}),
+                                    reqID: 0
+                                }
+                            });
+                        }
                     }
+                } else {
+                    console.log("Currently Pursuing: ", unit.pursuingUnit);
                 }
             }
         }

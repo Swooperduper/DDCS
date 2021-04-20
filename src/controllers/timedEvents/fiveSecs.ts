@@ -39,5 +39,7 @@ export async function processFiveSecActions(fullySynced: boolean): Promise<void>
         await ddcsControllers.checkUnitsToBaseForCapture();
 
         await ddcsControllers.processCommandQue();
+
+        await ddcsControllers.killEnemyWithinSightOfConvoy();
     }
 }
