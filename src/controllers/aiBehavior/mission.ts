@@ -11,24 +11,27 @@ export async function continueRoadRoute(
     reqId: any,
     reqArgs: any
 ): Promise<void> {
-    console.log("RR: ", incomingObj.returnObj, reqId, reqArgs);
-    /*
-    const routes: any = {
-        speed: "20",
-        routeLocs: incomingObj.returnObj
-    };
-    const spawnTemplate = await ddcsController.templateRead({_id: "missionGround2Route"});
-    const compiled = _.template(spawnTemplate[0].template);
+    console.log("RR: ", incomingObj.returnObj, incomingObj.returnObj.length, reqId, reqArgs);
 
-    await ddcsController.sendUDPPacket("frontEnd", {
-        actionObj: {
-            action: "addTask",
-            groupName: reqArgs.groupName,
-            mission: compiled({routes}),
-            reqID: 0
-        }
-    });
-    */
+    if (incomingObj.returnObj.length === 2) {
+        /*
+        const routes: any = {
+            speed: "20",
+            routeLocs: incomingObj.returnObj
+        };
+        const spawnTemplate = await ddcsController.templateRead({_id: "missionGround2Route"});
+        const compiled = _.template(spawnTemplate[0].template);
+
+        await ddcsController.sendUDPPacket("frontEnd", {
+            actionObj: {
+                action: "addTask",
+                groupName: reqArgs.groupName,
+                mission: compiled({routes}),
+                reqID: 0
+            }
+        });
+        */
+    }
 }
 
 export async function killEnemyWithinSightOfConvoy(): Promise<void> {
@@ -131,26 +134,30 @@ export async function killEnemyWithinSightOfConvoy(): Promise<void> {
                     );
                     routes.routeLocs.push(closestEnemyUnit.lonLatLoc);
 
-                    const spawnTemplate = await ddcsController.templateRead({_id: "missionGroundMDKCircle"});
-                    const compiled = _.template(spawnTemplate[0].template);
-                    console.log("persueEnemy: ", "frontEnd", {
-                        actionObj: {
-                            action: "addTask",
-                            groupName: unit.groupName,
-                            mission: compiled({routes}),
-                            reqID: 0
-                        }
-                    });
-                    /*
-                    await ddcsController.sendUDPPacket("frontEnd", {
-                        actionObj: {
-                            action: "addTask",
-                            groupName: unit.groupName,
-                            mission: compiled({routes}),
-                            reqID: 0
-                        }
-                    });
-                     */
+                    console.log("routeLocAmount: ", routes.routeLocs.length);
+
+                    if (routes.routeLocs.length === 5) {
+                        const spawnTemplate = await ddcsController.templateRead({_id: "missionGroundMDKCircle"});
+                        const compiled = _.template(spawnTemplate[0].template);
+                        console.log("persueEnemy: ", "frontEnd", {
+                            actionObj: {
+                                action: "addTask",
+                                groupName: unit.groupName,
+                                mission: compiled({routes}),
+                                reqID: 0
+                            }
+                        });
+                        /*
+                        await ddcsController.sendUDPPacket("frontEnd", {
+                            actionObj: {
+                                action: "addTask",
+                                groupName: unit.groupName,
+                                mission: compiled({routes}),
+                                reqID: 0
+                            }
+                        });
+                         */
+                    }
                 }
             }
         }
