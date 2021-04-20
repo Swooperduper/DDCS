@@ -9,7 +9,7 @@ export async function continueRoadRoute(
     reqId: any,
     reqArgs: any
 ): Promise<void> {
-    console.log("RR: ", incomingObj.returnObj, incomingObj.returnObj.length, reqId, reqArgs);
+    // console.log("RR: ", incomingObj.returnObj, incomingObj.returnObj.length, reqId, reqArgs);
 
     if (incomingObj.returnObj.length === 2) {
         const routes: any = {
@@ -18,16 +18,6 @@ export async function continueRoadRoute(
         };
         const spawnTemplate = await ddcsController.templateRead({_id: "missionGround2Route"});
         const compiled = _.template(spawnTemplate[0].template);
-        /*
-        console.log("TEMP: ", "frontEnd", {
-            actionObj: {
-                action: "addTask",
-                groupName: reqArgs.groupName,
-                mission: compiled({routes}),
-                reqID: 0
-            }
-        });
-        */
         await ddcsController.sendUDPPacket("frontEnd", {
             actionObj: {
                 action: "addTask",
@@ -42,21 +32,18 @@ export async function continueRoadRoute(
 
 export async function killEnemyWithinSightOfConvoy(): Promise<void> {
     // get first unit of all aiConvoys
-    console.log("KOS");
+    // console.log("KOS");
     const aiGroundUnits = await ddcsController.unitActionRead({
         dead: false,
         _id: /AI\|EDPathfindingPOS1\|(.)*\|(.)*\|1\|/
     });
-    console.log("aiGroundLength: ", aiGroundUnits.map((unit) => unit.name));
+    // console.log("aiGroundLength: ", aiGroundUnits.map((unit) => unit.name));
 
     if (aiGroundUnits.length > 0) {
         for (const unit of aiGroundUnits) {
             // if pursuit expires and unit was pursuing, go back to road and continue
-            console.log("checking pursuit: ", !!unit.pursuingUnit,
-                unit.pursuingUnit, new Date().getTime(), " > ", new Date(unit.pursueExpiration).getTime(),
-                !!unit.pursuingUnit && new Date().getTime() > new Date(unit.pursueExpiration).getTime());
             if (!!unit.pursuingUnit && new Date().getTime() > new Date(unit.pursueExpiration).getTime()) {
-                console.log("Breaking off of pursuit, ", unit.pursuingUnit);
+                console.log(unit.name, " is breaking off of pursuit, ", unit.pursuingUnit);
 
                 const destBase = await ddcsController.baseActionRead({_id: unit._id.split("|")[3]});
 
@@ -91,8 +78,10 @@ export async function killEnemyWithinSightOfConvoy(): Promise<void> {
                 }
             } else {
                 if (!unit.pursuingUnit) {
+                    /*
                     console.log("check range: ", unit.lonLatLoc,
                         detectEnemyDistance, ddcsController.enemySide[unit.coalition]);
+                     */
                     const unitsInRange = await ddcsController.getGroundKillInProximity(
                         unit.lonLatLoc, detectEnemyDistance, ddcsController.enemySide[unit.coalition]
                     );
@@ -103,7 +92,7 @@ export async function killEnemyWithinSightOfConvoy(): Promise<void> {
                             routeLocs: []
                         };
                         const closestEnemyUnit = unitsInRange[0];
-                        console.log("pursueEnemy: ", closestEnemyUnit);
+                        console.log(unit.name, " is pursing enemy: ", closestEnemyUnit.name);
 
                         // update unit attacking
                         await ddcsController.unitActionUpdate({
@@ -151,19 +140,11 @@ export async function killEnemyWithinSightOfConvoy(): Promise<void> {
                         );
                         routes.routeLocs.push(closestEnemyUnit.lonLatLoc);
 
-                        console.log("routeLocAmount: ", routes.routeLocs.length);
+                        // console.log("routeLocAmount: ", routes.routeLocs.length);
 
                         if (routes.routeLocs.length === 6) {
                             const spawnTemplate = await ddcsController.templateRead({_id: "missionGroundMDKCircle"});
                             const compiled = _.template(spawnTemplate[0].template);
-                            console.log("persueEnemy: ", "frontEnd", {
-                                actionObj: {
-                                    action: "addTask",
-                                    groupName: unit.groupName,
-                                    mission: compiled({routes}),
-                                    reqID: 0
-                                }
-                            });
                             await ddcsController.sendUDPPacket("frontEnd", {
                                 actionObj: {
                                     action: "addTask",
