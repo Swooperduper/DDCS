@@ -65,10 +65,12 @@ export async function aiDefendBase(): Promise<void> {
                             pursuingUnit: null
                         }).catch((err: any) => { console.log("66", err); });
 
+                        /*
                         await ddcsController.unitActionUpdate({
                             _id: unit.pursuingUnit,
                             pursuedByEnemyUnit: null
                         }).catch((err: any) => { console.log("72", err); });
+                        */
 
                         const routes: any = {
                             speed: "20",
@@ -95,19 +97,28 @@ export async function aiDefendBase(): Promise<void> {
                         console.log("check range: ", unit.lonLatLoc,
                             detectEnemyDistance, ddcsController.enemySide[unit.coalition]);
                          */
-                        const unitsInRange = await ddcsController.getGroundKillInProximity(
+                        const enemyUnitsInRange = await ddcsController.getGroundKillInProximity(
                             unit.lonLatLoc, detectEnemyDistance, ddcsController.enemySide[unit.coalition]
                         );
 
-                        const removePersuedEnemy = unitsInRange.filter((enemyUnit) => !enemyUnit.pursuedByEnemyUnit);
+                        // if unit is pursuing, let it continue
+                        const pursueWithExistingAttacker = enemyUnitsInRange.find(
+                            (enemyUnit) => enemyUnit.pursuedByEnemyUnit === unit.name
+                        );
 
-                        // console.log("enemyInRange: ", removePersuedEnemy.length);
-                        if (removePersuedEnemy.length > 0) {
+                        // if nothing is pursuing enemy, send new pursuit
+                        const removePursuedEnemy = enemyUnitsInRange.filter((enemyUnit) => !enemyUnit.pursuedByEnemyUnit);
+
+
+                        // console.log("enemyInRange: ", removePursuedEnemy.length);
+                        if (pursueWithExistingAttacker || removePursuedEnemy.length > 0) {
+                            const closestEnemyUnit =  (pursueWithExistingAttacker) ? pursueWithExistingAttacker : removePursuedEnemy[0];
+
                             const routes: any = {
                                 speed: "20",
                                 routeLocs: []
                             };
-                            const closestEnemyUnit = removePersuedEnemy[0];
+
                             console.log(unit.name, " is pursing enemy near base: ", base.name, closestEnemyUnit.name);
 
                             // update unit attacking
