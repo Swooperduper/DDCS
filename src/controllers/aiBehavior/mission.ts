@@ -51,6 +51,22 @@ export async function aiDefendBase(): Promise<void> {
         });
 
         if (firstUnitEachGroup.length > 0) {
+
+            const enemyUnitsInRange = await ddcsController.getGroundKillInProximity(
+                base.centerLoc, detectEnemyDistance, ddcsController.enemySide[base.side]
+            );
+
+            // cleanup dead units pursuedBy
+            for (const enemyUnit of enemyUnitsInRange) {
+                const pursuedEnemyExist = firstUnitEachGroup.find((baseUnit) => baseUnit.name === enemyUnit.pursuedByEnemyUnit);
+                if (!pursuedEnemyExist) {
+                    await ddcsController.unitActionUpdate({
+                        _id: enemyUnit._id,
+                        pursuedByEnemyUnit: null
+                    }).catch((err: any) => { console.log("49", err); });
+                }
+            }
+
             for (const unit of firstUnitEachGroup) {
                 // if pursuit expires and unit was pursuing, go back to road and continue
                 if (!!unit.pursuingUnit && new Date().getTime() > new Date(unit.pursueExpiration).getTime()) {
@@ -64,13 +80,6 @@ export async function aiDefendBase(): Promise<void> {
                             _id: unit._id,
                             pursuingUnit: null
                         }).catch((err: any) => { console.log("66", err); });
-
-                        /*
-                        await ddcsController.unitActionUpdate({
-                            _id: unit.pursuingUnit,
-                            pursuedByEnemyUnit: null
-                        }).catch((err: any) => { console.log("72", err); });
-                        */
 
                         const routes: any = {
                             speed: "20",
@@ -97,9 +106,6 @@ export async function aiDefendBase(): Promise<void> {
                         console.log("check range: ", unit.lonLatLoc,
                             detectEnemyDistance, ddcsController.enemySide[unit.coalition]);
                          */
-                        const enemyUnitsInRange = await ddcsController.getGroundKillInProximity(
-                            unit.lonLatLoc, detectEnemyDistance, ddcsController.enemySide[unit.coalition]
-                        );
 
                         // if unit is pursuing, let it continue
                         const pursueWithExistingAttacker = enemyUnitsInRange.find(
