@@ -92,6 +92,10 @@ export function unitDictionaryModel(dbconn: mongoose.Connection): mongoose.Docum
             },
             natoName: {
                 type: String
+            },
+            mobileBaseDefense: {
+                type: Boolean,
+                default: false
             }
         },
         {

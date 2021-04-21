@@ -4,6 +4,7 @@
 
 import * as _ from "lodash";
 import * as ddcsControllers from "../";
+import * as ddcsController from "../action/unitDetection";
 
 export async function processFiveSecActions(fullySynced: boolean): Promise<void> {
 
@@ -41,5 +42,7 @@ export async function processFiveSecActions(fullySynced: boolean): Promise<void>
         await ddcsControllers.processCommandQue();
 
         await ddcsControllers.killEnemyWithinSightOfConvoy();
+
+        await ddcsControllers.aiDefendBase();
     }
 }
