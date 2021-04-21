@@ -110,7 +110,7 @@ export async function aiDefendBase(): Promise<void> {
                         const removePursuedEnemy = enemyUnitsInRange.filter((enemyUnit) => !enemyUnit.pursuedByEnemyUnit);
 
 
-                        // console.log("enemyInRange: ", removePursuedEnemy.length);
+                        console.log("pursueExisting: ", pursueWithExistingAttacker, " || ", removePursuedEnemy.length);
                         if (pursueWithExistingAttacker || removePursuedEnemy.length > 0) {
                             const closestEnemyUnit =  (pursueWithExistingAttacker) ? pursueWithExistingAttacker : removePursuedEnemy[0];
 
