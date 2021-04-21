@@ -148,21 +148,21 @@ export async function aiDefendBase(): Promise<void> {
                                 ddcsController.getLonLatFromDistanceDirection(
                                     closestEnemyUnit.lonLatLoc,
                                     (closestEnemyUnit.hdg + 90) % 360,
-                                    0.4
+                                    0.3
                                 )
                             );
                             routes.routeLocs.push(
                                 ddcsController.getLonLatFromDistanceDirection(
                                     closestEnemyUnit.lonLatLoc,
                                     (closestEnemyUnit.hdg + 180) % 360,
-                                    0.4
+                                    0.2
                                 )
                             );
                             routes.routeLocs.push(
                                 ddcsController.getLonLatFromDistanceDirection(
                                     closestEnemyUnit.lonLatLoc,
                                     (closestEnemyUnit.hdg + 270) % 360,
-                                    0.4
+                                    0.1
                                 )
                             );
                             routes.routeLocs.push(closestEnemyUnit.lonLatLoc);
@@ -287,21 +287,21 @@ export async function killEnemyWithinSightOfConvoy(): Promise<void> {
                             ddcsController.getLonLatFromDistanceDirection(
                                 closestEnemyUnit.lonLatLoc,
                                 (closestEnemyUnit.hdg + 90) % 360,
-                                0.4
+                                0.3
                             )
                         );
                         routes.routeLocs.push(
                             ddcsController.getLonLatFromDistanceDirection(
                                 closestEnemyUnit.lonLatLoc,
                                 (closestEnemyUnit.hdg + 180) % 360,
-                                0.4
+                                0.2
                             )
                         );
                         routes.routeLocs.push(
                             ddcsController.getLonLatFromDistanceDirection(
                                 closestEnemyUnit.lonLatLoc,
                                 (closestEnemyUnit.hdg + 270) % 360,
-                                0.4
+                                0.1
                             )
                         );
                         routes.routeLocs.push(closestEnemyUnit.lonLatLoc);
