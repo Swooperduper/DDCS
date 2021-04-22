@@ -59,6 +59,7 @@ export async function aiDefendBase(): Promise<void> {
             // cleanup dead units pursuedBy
             for (const enemyUnit of enemyUnitsInRange) {
                 const pursuedEnemyExist = firstUnitEachGroup.find((baseUnit) => baseUnit.name === enemyUnit.pursuedByEnemyUnit);
+				console.log("clearPursuitBy: ", !pursuedEnemyExist, enemyUnit._id, enemyUnit.pursuedByEnemyUnit);
                 if (!pursuedEnemyExist) {
                     await ddcsController.unitActionUpdate({
                         _id: enemyUnit._id,

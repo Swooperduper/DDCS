@@ -16,6 +16,9 @@ export async function processEventKill(eventObj: any): Promise<void> {
     let curTarget: any = {};
 
     if (eventObj && eventObj.data) {
+		let initSide = 0;
+		let targetSide = 0;
+		
         if (eventObj.data.initiator && eventObj.data.initiator.unitId) {
             const iUnitId = eventObj.data.initiator.unitId;
             const iUnit = await ddcsControllers.unitActionRead({unitId: iUnitId});
@@ -25,6 +28,7 @@ export async function processEventKill(eventObj: any): Promise<void> {
                 playerOwner: _.find(playerArray, {_id: iUnit[0].playerOwnerId}),
                 isGroundTarget: (ddcsControllers.UNIT_CATEGORY[iUnit[0].unitCategory] === "GROUND_UNIT")
             };
+			initSide = eventObj.data.initiator.side;
         }
 
         if (eventObj.data.target && eventObj.data.target.unitId) {
@@ -36,6 +40,7 @@ export async function processEventKill(eventObj: any): Promise<void> {
                 playerOwner: _.find(playerArray, {_id: tUnit[0].playerOwnerId}),
                 isGroundTarget: (ddcsControllers.UNIT_CATEGORY[tUnit[0].unitCategory] === "GROUND_UNIT")
             };
+			targetSide = eventObj.data.target.side;
         }
 
         let initMesg: string = "";
@@ -74,9 +79,9 @@ export async function processEventKill(eventObj: any): Promise<void> {
         await ddcsControllers.sendMesgToAll(
             "HASKILLED",
             [
-                "#" + eventObj.data.initiator.side,
+                "#" + initSide,
                 initMesg,
-                "#" + eventObj.data.target.side,
+                "#" + targetSide,
                 targetMesg,
                 weaponMesg
             ],
