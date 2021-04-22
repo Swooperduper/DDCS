@@ -1,7 +1,6 @@
 import * as _ from "lodash";
 import * as ddcsController from "../";
 import {getNextUniqueId, setRequestJobArray} from "../";
-import * as ddcsControllers from "../action/aiConvoys";
 
 const detectEnemyDistance = 10; // in km
 
@@ -51,15 +50,14 @@ export async function aiDefendBase(): Promise<void> {
         });
 
         if (firstUnitEachGroup.length > 0) {
-
-            const enemyUnitsInRange = await ddcsController.getGroundKillInProximity(
+            const enemyUnitsInRangeToCleanup = await ddcsController.getGroundKillInProximity(
                 base.centerLoc, detectEnemyDistance, ddcsController.enemySide[base.side]
             );
 
             // cleanup dead units pursuedBy
-            for (const enemyUnit of enemyUnitsInRange) {
+            for (const enemyUnit of enemyUnitsInRangeToCleanup) {
                 const pursuedEnemyExist = firstUnitEachGroup.find((baseUnit) => baseUnit.name === enemyUnit.pursuedByEnemyUnit);
-				console.log("clearPursuitBy: ", !pursuedEnemyExist, enemyUnit._id, enemyUnit.pursuedByEnemyUnit);
+                // console.log("clearPursuitBy: ", !pursuedEnemyExist, enemyUnit._id, enemyUnit.pursuedByEnemyUnit);
                 if (!pursuedEnemyExist) {
                     await ddcsController.unitActionUpdate({
                         _id: enemyUnit._id,
@@ -106,11 +104,10 @@ export async function aiDefendBase(): Promise<void> {
                         /*
                         console.log("check range: ", unit.lonLatLoc,
                             detectEnemyDistance, ddcsController.enemySide[unit.coalition]);
-                         */
-
+                        */
                         // if unit is pursuing, let it continue
-                        const pursueWithExistingAttacker = enemyUnitsInRange.find(
-                            (enemyUnit) => enemyUnit.pursuedByEnemyUnit === unit.name
+                        const enemyUnitsInRange = await ddcsController.getGroundKillInProximity(
+                            base.centerLoc, detectEnemyDistance, ddcsController.enemySide[base.side]
                         );
 
                         // if nothing is pursuing enemy, send new pursuit
@@ -118,8 +115,8 @@ export async function aiDefendBase(): Promise<void> {
 
 
                         // console.log("pursueExisting: ", pursueWithExistingAttacker, " || ", removePursuedEnemy.length);
-                        if (pursueWithExistingAttacker || removePursuedEnemy.length > 0) {
-                            const closestEnemyUnit =  (pursueWithExistingAttacker) ? pursueWithExistingAttacker : removePursuedEnemy[0];
+                        if (removePursuedEnemy.length > 0) {
+                            const closestEnemyUnit =  removePursuedEnemy[0];
 
                             const routes: any = {
                                 speed: "20",
