@@ -7,7 +7,7 @@ import * as typings from "../../typings";
 import * as ddcsControllers from "../";
 import {getNextUniqueId, setRequestJobArray} from "../";
 
-const jtacDistance = 5;
+const jtacDistance = 10;
 let curLaserCode = 1688;
 const redLaserCode = 1686;
 const blueLaserCode = 1687;
