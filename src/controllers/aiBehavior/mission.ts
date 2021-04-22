@@ -23,7 +23,6 @@ export async function continueRoadRoute(
                 action: "addTask",
                 groupName: reqArgs.groupName,
                 mission: compiled({routes}),
-                verbose: true,
                 reqID: 0
             }
         });
@@ -94,7 +93,6 @@ export async function aiDefendBase(): Promise<void> {
                                 action: "addTask",
                                 groupName: unit.groupName,
                                 mission: compiled({routes}),
-                                verbose: true,
                                 reqID: 0
                             }
                         });
