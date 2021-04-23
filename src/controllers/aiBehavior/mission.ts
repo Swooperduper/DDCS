@@ -13,15 +13,14 @@ export async function continueRoadRoute(
 
     if (incomingObj.returnObj.length === 2) {
 
-        const curRouteLocs = [
-			{
-				lon: reqArgs.unitStartLonLat[0],
-				lat: reqArgs.unitStartLonLat[1],
-			},
+        const curRouteLocs = [{
+            lon: reqArgs.unitStartLonLat[0],
+            lat: reqArgs.unitStartLonLat[1]
+        },
             incomingObj.returnObj[0],
             incomingObj.returnObj[1]
         ];
-		// console.log("CRL: ", curRouteLocs);
+        // console.log("CRL: ", curRouteLocs);
 
         const routes: any = {
             speed: "20",
@@ -29,7 +28,7 @@ export async function continueRoadRoute(
         };
         const spawnTemplate = await ddcsController.templateRead({_id: "missionGround2Route"});
         const compiled = _.template(spawnTemplate[0].template);
-		/*
+        /*
 		console.log("addTask: ", "frontEnd", {
             actionObj: {
                 action: "addTask",
