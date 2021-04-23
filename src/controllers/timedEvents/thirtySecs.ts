@@ -29,12 +29,14 @@ export async function processThirtySecActions(fullySynced: boolean) {
         await ddcsControllers.checkCmdCenters();
 
         // cleanupAI aIMaxIdleTime
+        /*
         const aICleanup = await ddcsControllers.unitActionRead({isAI: true, dead: false});
         for (const aIUnit of aICleanup) {
             if (_.isEmpty(aIUnit.playername) && new Date(aIUnit.updatedAt).getTime() + aIMaxIdleTime < new Date().getTime()) {
                 await ddcsControllers.destroyUnit( aIUnit.name, "unit" );
             }
         }
+        */
 
         const crateCleanup = await ddcsControllers.staticCrateActionReadStd({});
         for (const crate of crateCleanup) {
