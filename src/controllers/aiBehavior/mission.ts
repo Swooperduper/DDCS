@@ -9,15 +9,19 @@ export async function continueRoadRoute(
     reqId: any,
     reqArgs: any
 ): Promise<void> {
-    console.log("RR2: ", incomingObj.returnObj, incomingObj.returnObj.length, reqId, reqArgs);
-/*
-    if (incomingObj.returnObj.length === 3) {
+    // console.log("RR2: ", incomingObj.returnObj, incomingObj.returnObj.length, reqId, reqArgs);
+
+    if (incomingObj.returnObj.length === 2) {
 
         const curRouteLocs = [
-            reqArgs.unitStartLonLat,
+			{
+				lon: reqArgs.unitStartLonLat[0],
+				lat: reqArgs.unitStartLonLat[1],
+			},
             incomingObj.returnObj[0],
             incomingObj.returnObj[1]
         ];
+		// console.log("CRL: ", curRouteLocs);
 
         const routes: any = {
             speed: "20",
@@ -25,6 +29,16 @@ export async function continueRoadRoute(
         };
         const spawnTemplate = await ddcsController.templateRead({_id: "missionGround2Route"});
         const compiled = _.template(spawnTemplate[0].template);
+		/*
+		console.log("addTask: ", "frontEnd", {
+            actionObj: {
+                action: "addTask",
+                groupName: reqArgs.groupName,
+                mission: compiled({routes}),
+                reqID: 0
+            }
+        });
+		*/
         await ddcsController.sendUDPPacket("frontEnd", {
             actionObj: {
                 action: "addTask",
@@ -34,7 +48,6 @@ export async function continueRoadRoute(
             }
         });
     }
- */
 }
 
 export async function aiDefendBase(): Promise<void> {
