@@ -9,7 +9,7 @@ export async function continueRoadRoute(
     reqId: any,
     reqArgs: any
 ): Promise<void> {
-    // console.log("RR: ", incomingObj.returnObj, incomingObj.returnObj.length, reqId, reqArgs);
+    console.log("RR2: ", incomingObj.returnObj, incomingObj.returnObj.length, reqId, reqArgs);
 
     if (incomingObj.returnObj.length === 2) {
 
@@ -239,6 +239,15 @@ export async function killEnemyWithinSightOfConvoy(): Promise<void> {
                             unitStartLonLat: unit.lonLatLoc
                         }
                     }, curNextUniqueId);
+
+                    console.log("RR1: ", {
+                        reqId: curNextUniqueId,
+                        callBack: "continueRoadRoute",
+                        reqArgs: {
+                            groupName: unit.groupName,
+                            unitStartLonLat: unit.lonLatLoc
+                        }});
+
                     await ddcsController.sendUDPPacket("frontEnd", {
                         actionObj: {
                             action: "getGroundRoute",
