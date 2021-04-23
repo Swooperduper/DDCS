@@ -378,7 +378,7 @@ function runRequest(request)
                             if request.verbose ~= null then
                                 tprint(curMission, 1)
                             end
-                            taskController:pushTask(curMission)
+                            taskController:setTask(curMission)
                         end
                     else
                         env.info("curMissionNotTable: "..request.mission)

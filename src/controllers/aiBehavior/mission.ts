@@ -12,9 +12,16 @@ export async function continueRoadRoute(
     // console.log("RR: ", incomingObj.returnObj, incomingObj.returnObj.length, reqId, reqArgs);
 
     if (incomingObj.returnObj.length === 2) {
+
+        const curRouteLocs = [
+            reqArgs.unitStartLonLat,
+            incomingObj.returnObj[0],
+            incomingObj.returnObj[1]
+        ];
+
         const routes: any = {
             speed: "20",
-            routeLocs: incomingObj.returnObj
+            routeLocs: curRouteLocs
         };
         const spawnTemplate = await ddcsController.templateRead({_id: "missionGround2Route"});
         const compiled = _.template(spawnTemplate[0].template);
@@ -228,7 +235,8 @@ export async function killEnemyWithinSightOfConvoy(): Promise<void> {
                         reqId: curNextUniqueId,
                         callBack: "continueRoadRoute",
                         reqArgs: {
-                            groupName: unit.groupName
+                            groupName: unit.groupName,
+                            unitStartLonLat: unit.lonLatLoc
                         }
                     }, curNextUniqueId);
                     await ddcsController.sendUDPPacket("frontEnd", {
