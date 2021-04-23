@@ -10,8 +10,8 @@ export async function continueRoadRoute(
     reqArgs: any
 ): Promise<void> {
     console.log("RR2: ", incomingObj.returnObj, incomingObj.returnObj.length, reqId, reqArgs);
-
-    if (incomingObj.returnObj.length === 2) {
+/*
+    if (incomingObj.returnObj.length === 3) {
 
         const curRouteLocs = [
             reqArgs.unitStartLonLat,
@@ -34,6 +34,7 @@ export async function continueRoadRoute(
             }
         });
     }
+ */
 }
 
 export async function aiDefendBase(): Promise<void> {
