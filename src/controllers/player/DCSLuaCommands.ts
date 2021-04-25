@@ -126,7 +126,8 @@ export async function sendMesgToGroup(player: ISrvPlayers, groupId: number, mesg
     if (currentPlayer.displayGroupMessages) {
         if (_.includes(player.slot, "instructor") ||
             _.includes(player.slot, "forward_observer") ||
-            _.includes(player.slot, "artillery_commander")
+            _.includes(player.slot, "artillery_commander") ||
+            isNaN(groupId)
         ) {
             // console.log("toChat: ", mesg, player.playerId, player.name);
             await sendMesgToPlayerChatWindow(mesg, player.playerId);
