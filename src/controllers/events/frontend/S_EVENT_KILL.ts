@@ -42,7 +42,7 @@ export async function processEventKill(eventObj: any): Promise<void> {
                 });
             }
 
-            if (!!curInitiator.player._id) {
+            if (!!curInitiator.player && !!curInitiator.player._id) {
                 await ddcsControllers.srvPlayerActionsAddTempScore({
                     _id: curInitiator.player._id,
                     groupId: curInitiator.unit.groupId,
