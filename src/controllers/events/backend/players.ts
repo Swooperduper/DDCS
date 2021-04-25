@@ -27,7 +27,21 @@ export function getRTPlayerArray() {
 export async function processPlayerEvent(playerArray: any): Promise<void> {
     const curPlayerArray = playerArray.players;
     const engineCache = ddcsControllers.getEngineCache();
-    console.log("playerCount: ", curPlayerArray.length);
+
+    if (curPlayerArray.length === 1) {
+        // server just timed out everyone, give all those users their in air their life points back
+        const pastPlayerArray = getRTPlayerArray();
+        for (const player of pastPlayerArray) {
+            console.log("Giving Player Back LP and award RS: ", player);
+            await ddcsControllers.srvPlayerActionsApplyTempToRealScore({
+                _id: player.ucid
+            });
+            await ddcsControllers.srvPlayerActionsAddLifePoints({
+                _id: player.ucid
+            });
+        }
+    }
+
     if (curPlayerArray.length > 0) {
         setRTPlayerArray(curPlayerArray);
         for (const player of curPlayerArray) {

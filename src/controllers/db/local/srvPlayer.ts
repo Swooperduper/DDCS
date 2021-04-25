@@ -112,7 +112,7 @@ export async function srvPlayerActionsUpdateFromServer(obj: {
 
 export async function srvPlayerActionsAddLifePoints(obj: {
     _id: string,
-    groupId: number,
+    groupId?: number,
     addLifePoints?: number,
     execAction?: string
 }): Promise<void> {
@@ -269,7 +269,7 @@ export async function srvPlayerActionsAddTempScore(obj: {
 
 export async function srvPlayerActionsApplyTempToRealScore(obj: {
     _id: string,
-    groupId: number
+    groupId?: number
 }): Promise<void> {
     return new Promise((resolve, reject) => {
         dbModels.srvPlayerModel.find({_id: obj._id}, (err: any, serverObj: any[]) => {
@@ -302,7 +302,9 @@ export async function srvPlayerActionsApplyTempToRealScore(obj: {
                     (updateErr: any) => {
                         if (updateErr) { reject(updateErr); }
                         // console.log("aplyT2R: ", curPly.name, mesg);
-                        ddcsController.sendMesgToGroup(curPly, obj.groupId, message, 15);
+                        if (obj.groupId) {
+                            ddcsController.sendMesgToGroup(curPly, obj.groupId, message, 15);
+                        }
                         resolve();
                     }
                 );
