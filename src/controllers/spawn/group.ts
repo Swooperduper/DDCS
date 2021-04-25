@@ -1131,6 +1131,8 @@ export async function spawnTankerPlane(
     playerLoc: number[],
     remoteLoc: number[]
 ): Promise<void> {
+    console.log("spawnTanker: ", playerUnitObj, tankerObj, playerLoc, remoteLoc);
+
     let curTkrName: string;
     let curUnitSpawn;
     let curGroupSpawn;
