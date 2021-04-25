@@ -87,7 +87,7 @@ export async function aiDefendBase(): Promise<void> {
             for (const unit of firstUnitEachGroup) {
                 // if pursuit expires and unit was pursuing, go back to road and continue
                 if (!!unit.pursuingUnit && new Date().getTime() > new Date(unit.pursueExpiration).getTime()) {
-                    console.log(unit.name, " return to base, ", base._id);
+                    // console.log(unit.name, " return to base, ", base._id);
 
                     const newBaseParkingSpot = ddcsController.getRandomLatLonFromBase(base.name, "unitPoly");
 
@@ -140,7 +140,7 @@ export async function aiDefendBase(): Promise<void> {
                                 routeLocs: []
                             };
 
-                            console.log(unit.name, " is pursing enemy near base: ", base.name, closestEnemyUnit.name);
+                            // console.log(unit.name, " is pursing enemy near base: ", base.name, closestEnemyUnit.name);
 
                             // update unit attacking
                             await ddcsController.unitActionUpdate({
@@ -204,7 +204,7 @@ export async function aiDefendBase(): Promise<void> {
                             }
                         }
                     } else {
-                        console.log("Currently Pursuing: ", unit.pursuingUnit);
+                        // console.log("Currently Pursuing: ", unit.pursuingUnit);
                     }
                 }
             }
@@ -225,7 +225,7 @@ export async function killEnemyWithinSightOfConvoy(): Promise<void> {
         for (const unit of aiGroundUnits) {
             // if pursuit expires and unit was pursuing, go back to road and continue
             if (!!unit.pursuingUnit && new Date().getTime() > new Date(unit.pursueExpiration).getTime()) {
-                console.log(unit.name, " is breaking off of pursuit, ", unit.pursuingUnit);
+                // console.log(unit.name, " is breaking off of pursuit, ", unit.pursuingUnit);
 
                 const destBase = await ddcsController.baseActionRead({_id: unit._id.split("|")[3]});
 
@@ -291,14 +291,14 @@ export async function killEnemyWithinSightOfConvoy(): Promise<void> {
                     const unitsInRange = await ddcsController.getGroundKillInProximity(
                         unit.lonLatLoc, detectEnemyDistance, ddcsController.enemySide[unit.coalition]
                     );
-                    console.log("enemyInRange: ", unitsInRange.length);
+                    // console.log("enemyInRange: ", unitsInRange.length);
                     if (unitsInRange.length > 0) {
                         const routes: any = {
                             speed: "20",
                             routeLocs: []
                         };
                         const closestEnemyUnit = unitsInRange[0];
-                        console.log(unit.name, " is pursing enemy: ", closestEnemyUnit.name);
+                        // console.log(unit.name, " is pursing enemy: ", closestEnemyUnit.name);
 
                         // update unit attacking
                         await ddcsController.unitActionUpdate({
@@ -362,7 +362,7 @@ export async function killEnemyWithinSightOfConvoy(): Promise<void> {
                         }
                     }
                 } else {
-                    console.log("Currently Pursuing: ", unit.pursuingUnit);
+                    // console.log("Currently Pursuing: ", unit.pursuingUnit);
                 }
             }
         }
