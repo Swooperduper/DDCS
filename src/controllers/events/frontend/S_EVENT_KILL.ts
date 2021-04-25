@@ -24,8 +24,8 @@ export async function processEventKill(eventObj: any): Promise<void> {
             const iUnit = await ddcsControllers.unitActionRead({unitId: iUnitId});
             curInitiator = {
                 unit: iUnit[0],
-                player: _.find(playerArray, {name: iUnit[0].playername}),
-                playerOwner: _.find(playerArray, {_id: iUnit[0].playerOwnerId}),
+                player: (!!iUnit[0].playername) ? _.find(playerArray, {name: iUnit[0].playername}) : undefined,
+                playerOwner: (!!iUnit[0].playerOwnerId) ? _.find(playerArray, {_id: iUnit[0].playerOwnerId}) : undefined,
                 isGroundTarget: (ddcsControllers.UNIT_CATEGORY[iUnit[0].unitCategory] === "GROUND_UNIT")
             };
             initSide = eventObj.data.initiator.side;
