@@ -40,14 +40,15 @@ export async function processEventKill(eventObj: any): Promise<void> {
                     unitType: iUnit[0].type,
                     unitCoalition: iUnit[0].coalition
                 });
-            } else {
+            }
+
+            if (!!curInitiator.player._id) {
                 await ddcsControllers.srvPlayerActionsAddTempScore({
                     _id: curInitiator.player._id,
                     groupId: curInitiator.unit.groupId,
                     score: 5
                 });
             }
-
         }
 
         if (eventObj.data.target && eventObj.data.target.unitId) {
