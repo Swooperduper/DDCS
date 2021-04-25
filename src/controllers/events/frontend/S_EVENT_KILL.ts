@@ -30,7 +30,7 @@ export async function processEventKill(eventObj: any): Promise<void> {
             };
             initSide = eventObj.data.initiator.side;
 
-            console.log("playerOwner: ", !!curInitiator.playerOwner, curInitiator.playerOwner, curInitiator.player);
+            console.log("playerOwner: ", !!curInitiator.playerOwner, curInitiator.playerOwner, curInitiator.player, curInitiator.unit);
             if (!!curInitiator.playerOwner) {
                 const playerOwnerUnit = await ddcsControllers.unitActionRead({playername: curInitiator.playerOwner.name});
                 await ddcsControllers.srvPlayerActionsUnitAddToRealScore({
@@ -51,7 +51,7 @@ export async function processEventKill(eventObj: any): Promise<void> {
             }
         }
 
-        if (eventObj.data.target && eventObj.data.target.unitId) {
+        if (eventObj.data.target && !!eventObj.data.target.unitId) {
             const tUnitId = eventObj.data.target.unitId;
             const tUnit = await ddcsControllers.unitActionRead({unitId: tUnitId});
             curTarget = {
@@ -64,7 +64,7 @@ export async function processEventKill(eventObj: any): Promise<void> {
         }
 
         let initMesg: string = "";
-        if (curInitiator.unit) {
+        if (!!curInitiator.unit) {
             if (curInitiator.playerOwner) {
                 initMesg += eventObj.data.initiator.type + "(" + curInitiator.playerOwner.name + ")";
             } else if (curInitiator.player) {
@@ -90,7 +90,7 @@ export async function processEventKill(eventObj: any): Promise<void> {
         }
 
         let weaponMesg: string = "";
-        if (eventObj.data.weapon) {
+        if (!!eventObj.data.weapon) {
             weaponMesg += eventObj.data.weapon.displayName;
         } else if (eventObj.data.weapon_name && eventObj.data.weapon_name !== "") {
             weaponMesg += eventObj.data.weapon_name;
