@@ -100,8 +100,8 @@ export async function initializeMenu(playerUnit: any): Promise<void> {
         for (const curMenuName of Object.keys(curMenuLvls)) {
             if ( curMenuName !== "undefined" ) {
                 if (curMenuLvls[curMenuName][0].cmdProp.mass) {
-                    //dirty fix for light crate menu, drex to revisit ~Kirkwood
-                    if (playerUnit.type == "UH-1H"){
+                    // dirty fix for light crate menu, drex to revisit ~Kirkwood
+                    if (playerUnit.type === "UH-1H") {
                         lightCrateWeight = await spawnNewMenuCategory(playerUnit, curMenuLvls, curMenuName, i, "Light", lightCrateWeight);
                     } else {
                         heavyCrateWeight = await spawnNewMenuCategory(playerUnit, curMenuLvls, curMenuName, i, "Heavy", heavyCrateWeight);

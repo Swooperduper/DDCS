@@ -31,7 +31,7 @@ export async function processEventKill(eventObj: any): Promise<void> {
             initSide = eventObj.data.initiator.side;
 
             console.log("playerOwner: ", !!curInitiator.playerOwner, curInitiator.playerOwner, curInitiator.player, curInitiator.unit);
-            if (!!curInitiator.playerOwner) {
+            if (!!curInitiator.playerOwner && !!curInitiator.playerOwner._id) {
                 const playerOwnerUnit = await ddcsControllers.unitActionRead({playername: curInitiator.playerOwner.name});
                 await ddcsControllers.srvPlayerActionsUnitAddToRealScore({
                     _id: curInitiator.playerOwner._id,
