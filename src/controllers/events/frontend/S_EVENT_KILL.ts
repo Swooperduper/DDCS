@@ -16,9 +16,9 @@ export async function processEventKill(eventObj: any): Promise<void> {
     let curTarget: any = {};
 
     if (eventObj && eventObj.data) {
-		let initSide = 0;
-		let targetSide = 0;
-		
+        let initSide = 0;
+        let targetSide = 0;
+
         if (eventObj.data.initiator && eventObj.data.initiator.unitId) {
             const iUnitId = eventObj.data.initiator.unitId;
             const iUnit = await ddcsControllers.unitActionRead({unitId: iUnitId});
@@ -28,7 +28,25 @@ export async function processEventKill(eventObj: any): Promise<void> {
                 playerOwner: _.find(playerArray, {_id: iUnit[0].playerOwnerId}),
                 isGroundTarget: (ddcsControllers.UNIT_CATEGORY[iUnit[0].unitCategory] === "GROUND_UNIT")
             };
-			initSide = eventObj.data.initiator.side;
+            initSide = eventObj.data.initiator.side;
+
+            if (curInitiator.playerOwner) {
+                const playerOwnerUnit = await ddcsControllers.unitActionRead({playername: curInitiator.playerOwner.name});
+                await ddcsControllers.srvPlayerActionsUnitAddToRealScore({
+                    _id: curInitiator.playerOwner._id,
+                    groupId: playerOwnerUnit[0].groupId,
+                    score: 5,
+                    unitType: iUnit[0].type,
+                    unitCoalition: iUnit[0].coalition
+                });
+            } else {
+                await ddcsControllers.srvPlayerActionsAddTempScore({
+                    _id: curInitiator.player._id,
+                    groupId: curInitiator.unit.groupId,
+                    score: 5
+                });
+            }
+
         }
 
         if (eventObj.data.target && eventObj.data.target.unitId) {
@@ -40,7 +58,7 @@ export async function processEventKill(eventObj: any): Promise<void> {
                 playerOwner: _.find(playerArray, {_id: tUnit[0].playerOwnerId}),
                 isGroundTarget: (ddcsControllers.UNIT_CATEGORY[tUnit[0].unitCategory] === "GROUND_UNIT")
             };
-			targetSide = eventObj.data.target.side;
+            targetSide = eventObj.data.target.side;
         }
 
         let initMesg: string = "";
