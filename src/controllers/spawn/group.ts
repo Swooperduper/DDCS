@@ -1131,12 +1131,11 @@ export async function spawnTankerPlane(
     playerLoc: number[],
     remoteLoc: number[]
 ): Promise<void> {
-    console.log("spawnTanker: ", playerUnitObj, tankerObj, playerLoc, remoteLoc);
+    // console.log("spawnTanker: ", playerUnitObj, tankerObj, playerLoc, remoteLoc);
 
     let curTkrName: string;
     let curUnitSpawn;
     let curGroupSpawn;
-    let curCountry: number;
     let curSpwnUnit: any;
     let curGrpObj: any;
     const randomDir = _.random(0, 359);
@@ -1177,11 +1176,11 @@ export async function spawnTankerPlane(
     const curCMD = await spawnGrp(curGroupSpawn, curSide, curGrpObj.unitCategory);
     // console.log("spawnSupportPlane: ", curCMD);
     const sendClient = {action: "CMD", cmd: [curCMD], reqID: 0};
-    const actionObj = {actionObj: sendClient, queName: "clientArray"};
-    // await ddcsControllers.sendUDPPacket("frontEnd", actionObj);
+    const actionObj = {actionObj: sendClient};
+    await ddcsControllers.sendUDPPacket("frontEnd", actionObj);
     const mesg = "C: A " + tankerObj.type + " Tanker Has Been Spawned " +
         playerUnitObj.hdg + " from " + closeBase.name + " " + tankerObj.details;
-    console.log("spawnCMD: ", curGrpObj, curSpwnUnit, actionObj, curCMD, mesg);
+    // console.log("spawnCMD: ", curGrpObj, curSpwnUnit, actionObj, curCMD, mesg);
     /* needs to be redone for i18n
     await ddcsControllers.sendMesgToCoalition(
         playerUnitObj.coalition,
