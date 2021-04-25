@@ -1178,16 +1178,14 @@ export async function spawnTankerPlane(
     const sendClient = {action: "CMD", cmd: [curCMD], reqID: 0};
     const actionObj = {actionObj: sendClient};
     await ddcsControllers.sendUDPPacket("frontEnd", actionObj);
-    const mesg = "C: A " + tankerObj.type + " Tanker Has Been Spawned " +
-        playerUnitObj.hdg + " from " + closeBase.name + " " + tankerObj.details;
     // console.log("spawnCMD: ", curGrpObj, curSpwnUnit, actionObj, curCMD, mesg);
-    /* needs to be redone for i18n
+    // needs to be redone for i18n
     await ddcsControllers.sendMesgToCoalition(
-        playerUnitObj.coalition,
-        mesg,
+        curSide,
+        "TANKERPLANEOUT",
+        [tankerObj.type, playerUnitObj.hdg, closeBase.name, tankerObj.details],
         20
     );
-     */
 }
 
 export async function spawnSupportPlane(baseObj: typing.IBase, side: number): Promise<void> {
