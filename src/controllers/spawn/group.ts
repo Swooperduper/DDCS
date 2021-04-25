@@ -1139,7 +1139,6 @@ export async function spawnTankerPlane(
     let curCountry: number;
     let curSpwnUnit: any;
     let curGrpObj: any;
-    const curCategory = ddcsControllers.UNIT_CATEGORY.indexOf("AIRPLANE");
     const randomDir = _.random(0, 359);
 
     const curSide = ddcsControllers.defCountrys[playerUnitObj.coalition];
@@ -1151,7 +1150,8 @@ export async function spawnTankerPlane(
     curGrpObj = {
         ..._.cloneDeep(curSpwnUnit),
         groupName: curTkrName + "#" + _.random(1000000, 9999999),
-        country: curSide,
+        country: curCountry,
+        category: ddcsControllers.UNIT_CATEGORY.indexOf("AIRPLANE"),
         routeLocs: [
             remoteLoc,
             playerLoc
