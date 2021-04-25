@@ -1556,7 +1556,7 @@ export async function spawnBaseEWR(serverName: string, type: string, baseName: s
  */
 
 export async function replenishUnits(baseName: string, side: number, init: boolean): Promise<void> {
-    await spawnBaseReinforcementGroup(side, baseName, init);
+    await spawnBaseReinforcementGroup(side, baseName, init, true);
 }
 
 export async function destroyUnit(unitName: string, type: string): Promise<void> {
