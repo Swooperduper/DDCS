@@ -1140,7 +1140,9 @@ export async function spawnTankerPlane(
     let curSpwnUnit: any;
     let curGrpObj: any;
     const curCategory = ddcsControllers.UNIT_CATEGORY.indexOf("AIRPLANE");
+    const randomDir = _.random(0, 359);
 
+    const curSide = ddcsControllers.defCountrys[playerUnitObj.coalition];
     curCountry = tankerObj.country;
     curTkrName = "AI|" + tankerObj.name + "|";
     curSpwnUnit = _.cloneDeep(tankerObj);
@@ -1164,19 +1166,23 @@ export async function spawnTankerPlane(
         lonLatLoc: remoteLoc,
         name: curTkrName + "#" + _.random(1000000, 9999999),
         playerCanDrive: false,
-        hidden: false
+        hidden: false,
+        heading: ddcsControllers.getOppositeHeading(randomDir),
+        skill: "Excellent"
     };
 
     curUnitSpawn = await airUnitTemplate(curSpwnUnit);
 
     curGroupSpawn = _.replace(curGroupSpawn, "#UNITS", curUnitSpawn);
-    const curCMD = await spawnGrp(curGroupSpawn, curCountry, curCategory);
+
+    const curCMD = await spawnGrp(curGroupSpawn, curSide, curGrpObj.unitCategory);
+    // console.log("spawnSupportPlane: ", curCMD);
     const sendClient = {action: "CMD", cmd: [curCMD], reqID: 0};
     const actionObj = {actionObj: sendClient, queName: "clientArray"};
-    await ddcsControllers.sendUDPPacket("frontEnd", actionObj);
+    // await ddcsControllers.sendUDPPacket("frontEnd", actionObj);
     const mesg = "C: A " + tankerObj.type + " Tanker Has Been Spawned " +
         playerUnitObj.hdg + " from " + closeBase.name + " " + tankerObj.details;
-    console.log("spawnCMD: ", curCMD, mesg);
+    console.log("spawnCMD: ", actionObj, mesg);
     /* needs to be redone for i18n
     await ddcsControllers.sendMesgToCoalition(
         playerUnitObj.coalition,
