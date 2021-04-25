@@ -75,7 +75,7 @@ export async function spawnNewMenuCategory(
             menuSpawnArray.push(`missionCommands.addCommandForGroup(${playerUnit.groupId},"${curSubMenu.itemTitle}${curCrates}",{"${curMenuArray.join('","')}"},sendRequest,${cmdProps})`);
         }
     }
-    console.log("drawnMenu: ", menuSpawnArray);
+    // console.log("drawnMenu: ", menuSpawnArray);
     await ddcsControllers.sendUDPPacket("frontEnd", {
         actionObj: {
             action: "CMD",
