@@ -6,7 +6,6 @@ import * as _ from "lodash";
 import * as typings from "../../../typings";
 import { dbModels } from "../common";
 import * as ddcsController from "../../";
-import {IBase, ISrvPlayers} from "../../../typings";
 import {I18nResolver} from "i18n-ts";
 
 export async function srvPlayerActionsRead(obj: any): Promise<typings.ISrvPlayers[]> {
@@ -401,11 +400,18 @@ export async function srvPlayerActionsResetMinutesPlayed(obj: {
     });
 }
 
-export async function srvPlayerActionsUnsetCampaignLock(): Promise<void> {
+export async function srvPlayerActionsUnsetCampaign(): Promise<void> {
+    const serverCache = ddcsController.getEngineCache();
     return new Promise((resolve, reject) => {
         dbModels.srvPlayerModel.updateMany(
             {},
-            {$set: {sideLock: 0}},
+            {$set: {
+                curLifePoints: serverCache.config.startLifePoints,
+                sideLock: 0,
+                redRSPoints: 0,
+                blueRSPoints: 0,
+                tmpRSPoints: 0
+            }},
             (err: any) => {
                 if (err) { reject(err); }
                 resolve();

@@ -122,7 +122,7 @@ export async function populateNewCampaignUnits(): Promise<void> {
     console.log("Spawn New Objs for Campaign: ", missionStartupReSync);
     console.log("Clear Units");
     await ddcsControllers.unitActionRemoveall(); // clear unit table
-    await ddcsControllers.srvPlayerActionsUnsetCampaignLock(); // reset all campaign locks
+    await ddcsControllers.srvPlayerActionsUnsetCampaign(); // reset all campaign locks
     console.log("Generate Units For Database");
     await ddcsControllers.spawnNewMapObjs(); // respond with server spawned num
 }

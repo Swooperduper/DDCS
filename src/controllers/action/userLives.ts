@@ -6,7 +6,6 @@ import * as _ from "lodash";
 import * as typings from "../../typings";
 import * as ddcsControllers from "../";
 import {I18nResolver} from "i18n-ts";
-import * as ddcsController from "./unitDetection";
 
 export function getWeaponCost(typeName: string, count: number): number {
     const engineCache = ddcsControllers.getEngineCache();
