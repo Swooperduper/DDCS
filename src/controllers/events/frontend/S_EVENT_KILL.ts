@@ -30,7 +30,7 @@ export async function processEventKill(eventObj: any): Promise<void> {
             };
             initSide = eventObj.data.initiator.side;
 
-            console.log("playerOwner: ", !!curInitiator.playerOwner, curInitiator.playerOwner, curInitiator.player, curInitiator.unit);
+            // console.log("playerOwner: ", !!curInitiator.playerOwner, curInitiator.playerOwner, curInitiator.player, curInitiator.unit);
             if (!!curInitiator.playerOwner && !!curInitiator.playerOwner._id) {
                 const playerOwnerUnit = await ddcsControllers.unitActionRead({playername: curInitiator.playerOwner.name});
                 await ddcsControllers.srvPlayerActionsUnitAddToRealScore({
@@ -56,8 +56,8 @@ export async function processEventKill(eventObj: any): Promise<void> {
             const tUnit = await ddcsControllers.unitActionRead({unitId: tUnitId});
             curTarget = {
                 unit: tUnit[0],
-                player: _.find(playerArray, {name: tUnit[0].playername}),
-                playerOwner: _.find(playerArray, {_id: tUnit[0].playerOwnerId}),
+                player: (!!tUnit[0].playername) ? _.find(playerArray, {name: tUnit[0].playername}) : undefined,
+                playerOwner: (!!tUnit[0].playerOwnerId) ? _.find(playerArray, {_id: tUnit[0].playerOwnerId}) : undefined,
                 isGroundTarget: (ddcsControllers.UNIT_CATEGORY[tUnit[0].unitCategory] === "GROUND_UNIT")
             };
             targetSide = eventObj.data.target.side;
