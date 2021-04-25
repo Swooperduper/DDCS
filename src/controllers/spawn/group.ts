@@ -1151,8 +1151,7 @@ export async function spawnTankerPlane(
     curGrpObj = {
         ..._.cloneDeep(curSpwnUnit),
         groupName: curTkrName + "#" + _.random(1000000, 9999999),
-        country: ddcsControllers.countryId[curCountry],
-        category: curCategory,
+        country: curSide,
         routeLocs: [
             remoteLoc,
             playerLoc
@@ -1182,7 +1181,7 @@ export async function spawnTankerPlane(
     // await ddcsControllers.sendUDPPacket("frontEnd", actionObj);
     const mesg = "C: A " + tankerObj.type + " Tanker Has Been Spawned " +
         playerUnitObj.hdg + " from " + closeBase.name + " " + tankerObj.details;
-    console.log("spawnCMD: ", actionObj, mesg);
+    console.log("spawnCMD: ", curGrpObj, curSpwnUnit, actionObj, curCMD, mesg);
     /* needs to be redone for i18n
     await ddcsControllers.sendMesgToCoalition(
         playerUnitObj.coalition,
