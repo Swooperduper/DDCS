@@ -58,8 +58,8 @@ export async function detectHarmShot(event: any) {
                                 );
                                 const randomNumber = _.random(1, 100);
                                 const didRadarDetectHarm = maxPercentChanceOfGroup > randomNumber;
-                                console.log("IAD friends: ", maxPercentChanceOfGroup, " > ",
-                                    randomNumber, didRadarDetectHarm, maxPercentChanceOfGroup);
+                                // console.log("IAD friends: ", maxPercentChanceOfGroup, " > ",
+                                //    randomNumber, didRadarDetectHarm, maxPercentChanceOfGroup);
                                 if (didRadarDetectHarm) {
                                     const groupNameArray = _.uniq(friendlySAMs.map((sam) => sam.groupName));
                                     for (const groupName of groupNameArray) {
@@ -88,10 +88,10 @@ export async function detectHarmShot(event: any) {
                                     }
                                 }
                             } else {
-                                console.log("No Friendly SAMS Around");
+                                // console.log("No Friendly SAMS Around");
                             }
                         } else {
-                            console.log("No Local Units Around");
+                            // console.log("No Local Units Around");
                         }
                     }
                 }
