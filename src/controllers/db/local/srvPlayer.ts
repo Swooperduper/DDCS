@@ -317,8 +317,8 @@ export async function srvPlayerActionsApplyTempToRealScore(obj: {
 
 export async function srvPlayerActionsUnitAddToRealScore(obj: {
     _id: string,
-    groupId: number,
     unitCoalition: number,
+    groupId?: number,
     score?: number,
     unitType?: string
 }): Promise<void> {
@@ -349,7 +349,7 @@ export async function srvPlayerActionsUnitAddToRealScore(obj: {
                             if (updateErr) { reject(updateErr); }
                             console.log(obj.unitType + " has given " + addScore +
                                 " to " + curPly.name + " on " + curPly.side + ", Total: ", tObj);
-                            if (engineCache.config.inGameHitMessages) {
+                            if (engineCache.config.inGameHitMessages && !!obj.groupId) {
                                 ddcsController.sendMesgToGroup(curPly, obj.groupId, message, 15);
                             }
                             resolve();

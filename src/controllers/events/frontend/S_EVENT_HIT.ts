@@ -24,8 +24,8 @@ export async function checkShootingUsers(): Promise<void> {
                 if (exports.shootingUsers[shootKey].isOwnedUnit) {
                     await ddcsControllers.srvPlayerActionsUnitAddToRealScore({
                         _id: shootObj.iOwnerId,
-                        groupId: shootObj.groupId,
                         score: shootObj.score,
+                        groupId: shootObj.groupId,
                         unitType: shootObj.iType,
                         unitCoalition: shootObj.iUnitCoalition
                     });
@@ -193,8 +193,8 @@ export async function processEventHit(eventObj: any): Promise<void> {
                     if (isOwnedUnit) {
                         await ddcsControllers.srvPlayerActionsUnitAddToRealScore({
                             _id: iCurObj.iOwnerId,
-                            groupId: iCurObj.groupId,
                             score: iCurObj.score,
+                            groupId: iCurObj.groupId,
                             unitType: iCurObj.iType,
                             unitCoalition: iCurObj.iCoalition
                         });

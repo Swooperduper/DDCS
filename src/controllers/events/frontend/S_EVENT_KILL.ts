@@ -31,12 +31,12 @@ export async function processEventKill(eventObj: any): Promise<void> {
             initSide = eventObj.data.initiator.side;
 
             // console.log("playerOwner: ", !!curInitiator.playerOwner, curInitiator.playerOwner, curInitiator.player, curInitiator.unit);
-            if (!!curInitiator.playerOwner && !!curInitiator.playerOwner._id) {
+            if (!!curInitiator.playerOwner && !!curInitiator.unit.playerOwnerId) {
                 const playerOwnerUnit = await ddcsControllers.unitActionRead({playername: curInitiator.playerOwner.name});
                 await ddcsControllers.srvPlayerActionsUnitAddToRealScore({
-                    _id: curInitiator.playerOwner._id,
-                    groupId: playerOwnerUnit[0].groupId,
+                    _id: curInitiator.unit.playerOwnerId,
                     score: 5,
+                    groupId: (playerOwnerUnit[0].groupId) ? playerOwnerUnit[0].groupId : undefined,
                     unitType: iUnit[0].type,
                     unitCoalition: iUnit[0].coalition
                 });
