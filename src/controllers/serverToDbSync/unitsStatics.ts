@@ -129,6 +129,10 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
 				// tracking everything on a carrier deck, dont turn on until fixed
                 // await ddcsControllers.setUnitMark(curData);
             }
+
+            if (_.includes(curData.name, "AI|baseAWACS|")) {
+                console.log("AWACS1: ", unitObj, unit);
+            }
         } else if (unitObj.action === "D") {
             if (curData.name) {
                 iCurObj = {
@@ -155,7 +159,7 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
                 await ddcsControllers.unitActionUpdate(iCurObj.data);
 
                 if (_.includes(curData.name, "AI|baseAWACS|")) {
-                    console.log("AWACS1: ", unitObj, unit);
+                    console.log("AWACS2: ", unitObj, unit);
                 }
                 /*
                 iCurObj.data.coalition = iCurObj.data.coalition || curUnit.coalition;
@@ -190,7 +194,7 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
                 await ddcsControllers.unitActionSave(iCurObj.data);
 
                 if (_.includes(curData.name, "AI|baseAWACS|")) {
-                    console.log("AWACS2: ", unitObj, unit);
+                    console.log("AWACS3: ", unitObj, unit);
                 }
 
                 // if unit is AWACS spawn support escort
