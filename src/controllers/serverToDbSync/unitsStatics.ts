@@ -187,7 +187,7 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
 
                 // if unit is AWACS spawn support escort
                 if (unitObj.action === "C" && unitObj.data.groupId > 0 && (_.includes(curData.name, "AI|baseAWACS|"))) {
-                    console.log("Spawn AWACS Escort");
+                    console.log("Spawn AWACS Escort: ", unitObj);
                     // await ddcsControllers.spawnEscortFighters(curData.groupId);
                 }
 
