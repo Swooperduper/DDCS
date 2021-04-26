@@ -23,11 +23,6 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
         curData.playerOwnerId = stParse[1];
         curData.isAI = true;
         curData.hidden = true;
-
-        // if unit is AWACS spawn support escort
-        if (curData.groupId > 0 && (_.includes(curData.name, "baseAWACS"))) {
-            // await ddcsControllers.spawnEscortFighters(curData.groupId);
-        }
     }
     if (_.includes(curData.name, "TU|")) {
         stParse = _.split(curData.name, "|");
@@ -189,6 +184,12 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
                     // console.log("ShelterProcess3: ", iCurObj);
                 }
                 await ddcsControllers.unitActionSave(iCurObj.data);
+
+                // if unit is AWACS spawn support escort
+                if (unitObj.action === "C" && unitObj.data.groupId > 0 && (_.includes(curData.name, "AI|baseAWACS|"))) {
+                    console.log("Spawn AWACS Escort");
+                    // await ddcsControllers.spawnEscortFighters(curData.groupId);
+                }
 
                 /*
                 await ddcsControllers.sendToCoalition({
