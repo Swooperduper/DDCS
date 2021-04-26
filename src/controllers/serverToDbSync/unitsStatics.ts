@@ -126,13 +126,15 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
                 }});
              */
             if (ddcsControllers.UNIT_CATEGORY[curData.unitCategory] === "STRUCTURE") {
-				// tracking everything on a carrier deck, dont turn on until fixed
+                // tracking everything on a carrier deck, dont turn on until fixed
                 // await ddcsControllers.setUnitMark(curData);
             }
 
-            if (_.includes(curData.name, "AI|baseAWACS|") && unitObj.action === "C") {
-                console.log("AWACS1: ", unitObj, unit);
+            if (unitObj.action === "C" && unitObj.data.groupId > 0 && (_.includes(curData.name, "AI|baseAWACS|"))) {
+                console.log("Spawn AWACS Escort: ", unitObj);
+                await ddcsControllers.spawnEscortFighters(unitObj.data.groupId);
             }
+
         } else if (unitObj.action === "D") {
             if (curData.name) {
                 iCurObj = {
@@ -157,10 +159,6 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
                 }
 
                 await ddcsControllers.unitActionUpdate(iCurObj.data);
-
-                if (_.includes(curData.name, "AI|baseAWACS|")) {
-                    console.log("AWACS2: ", unitObj, unit);
-                }
                 /*
                 iCurObj.data.coalition = iCurObj.data.coalition || curUnit.coalition;
                 if (iCurObj.data.coalition) {
