@@ -1194,11 +1194,10 @@ export async function spawnEscortFighters(escortGroupId: number) {
 
     if (currentEscort.length > 0) {
         const firstOfGroup = currentEscort[0];
-        const escortName = "AI|baseAWACS|" + escortGroupId + "|";
+        const escortName = "AI|EscortFighters|" + escortGroupId + "|";
 
         const currentEscortFighter = getRndFromSpawnCat("capFighter", firstOfGroup.coalition, false, true)[0];
 
-        // Quick dirty and unreliable band-aid awacs callsign fix - to be removed - Kirkwood
         const escortTemplateObj = {
             ...currentEscortFighter,
             escortGroupId,
@@ -1213,30 +1212,35 @@ export async function spawnEscortFighters(escortGroupId: number) {
                     skill: "Excellent",
                     type: currentEscortFighter.type,
                     name: escortName + "1|",
-                    payload: currentEscortFighter.payload,
                     hdg: _.random(0, 359)
                 },
                 {
                     skill: "Excellent",
                     type: currentEscortFighter.type,
                     name: escortName + "2|",
-                    payload: currentEscortFighter.payload,
                     hdg: _.random(0, 359)
                 }
             ]
         };
 
+		// console.log("esct2: ", escortTemplateObj);
+		
         const unitTemplate = await ddcsControllers.templateRead({_id: "escortFightersTemplateFull"});
         const compiled = _.template(unitTemplate[0].template);
-        const curGroupSpawn = compiled({escortTemplateObj});
-
+        const curGroupSpawn = compiled(escortTemplateObj);
+		const curGroupAndPayload = curGroupSpawn
+			.replace("#PAYLOAD", escortTemplateObj.payload)
+			.replace("#PAYLOAD", escortTemplateObj.payload);
+		
+		console.log("esct3: ", ddcsControllers.countryId.indexOf(currentEscortFighter.country));
+		
         const curCMD = await spawnGrp(
-            curGroupSpawn,
+            curGroupAndPayload,
             currentEscortFighter.country,
             ddcsControllers.UNIT_CATEGORY.indexOf("AIRPLANE")
         );
         console.log("CMD: ", curCMD);
-        /*
+        
         await ddcsControllers.sendUDPPacket("frontEnd", {
             actionObj: {
                 action: "CMD",
@@ -1244,7 +1248,6 @@ export async function spawnEscortFighters(escortGroupId: number) {
                 reqID: 0
             }
         });
-         */
     }
 }
 
