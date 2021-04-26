@@ -26,7 +26,7 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
 
         // if unit is AWACS spawn support escort
         if (curData.groupId > 0 && (_.includes(curData.name, "baseAWACS"))) {
-            await ddcsControllers.spawnEscortFighters(curData.groupId);
+            // await ddcsControllers.spawnEscortFighters(curData.groupId);
         }
     }
     if (_.includes(curData.name, "TU|")) {
