@@ -140,7 +140,7 @@ export async function processingIncomingData(incomingObj: any) {
                 } else if (incomingObj.message === "-testEC") {
                     // await ddcsController.killEnemyWithinSightOfConvoy();
                     // await ddcsController.aiDefendBase();
-                    await ddcsController.spawnEscortFighters(1002067);
+                    // await ddcsController.spawnEscortFighters(1002067);
                 } else if (incomingObj.message === "-") {
                     const mesg = i18n.COMMANDDEFAULTRESPONSE;
                     await ddcsController.sendMesgToPlayerChatWindow(mesg, curPly.playerId);
