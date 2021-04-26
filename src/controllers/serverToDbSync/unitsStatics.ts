@@ -23,6 +23,11 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
         curData.playerOwnerId = stParse[1];
         curData.isAI = true;
         curData.hidden = true;
+
+        // if unit is AWACS spawn support escort
+        if (curData.groupId > 0 && (_.includes(curData.name, "baseAWACS"))) {
+            await ddcsControllers.spawnEscortFighters(curData.groupId);
+        }
     }
     if (_.includes(curData.name, "TU|")) {
         stParse = _.split(curData.name, "|");
