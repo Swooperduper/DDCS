@@ -267,21 +267,6 @@ export async function syncCheck(serverCount: number): Promise<void> {
                     await activateInactiveSpawn();
                     setMissionStartupReSync(false);
                     setServerSynced(true);
-                    // ED BROKE THE GAME MASTER ONLY ON MOVING BOATS....
-                    // preliminary carrier spawn on new sync
-                    const westCarrierGroupName = "~Carrier|West|Lincoln|Red|";
-                    const eastCarrierGroupName = "~Carrier|East|Roosevelt|Blue|";
-                    await ddcsControllers.sendUDPPacket("frontEnd", {
-                        actionObj: {
-                            action: "CMD",
-                            cmd: [
-                                "Group.getByName(\"" + westCarrierGroupName + "\"):activate()",
-                                "Group.getByName(\"" + eastCarrierGroupName + "\"):activate()"
-                            ],
-                            reqID: 0,
-                            time: new Date()
-                        }
-                    });
                     console.log("Server Is Synchronized");
                 }
             } else {

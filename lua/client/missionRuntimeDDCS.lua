@@ -85,18 +85,17 @@ function generateInitialUnitObj(group, unit, isActive, curName, coalition, lon, 
             ["coalition"] = coalition,
             ["type"] = unit:getTypeName(),
             ["playername"] = playername,
-            ["ammo"] = ammo
+            ["ammo"] = ammo,
+            ["groupId"] = group:getID(),
+            ["unitId"] = unit:getID()
         }
     }
 
     if isActive then
-        curUnit.data.groupId = group:getID()
-        curUnit.data.unitId = unit:getID()
         curUnit.data.agl = unitPosition.p.y - land.getHeight({x=unitPosition.p.x, y = unitPosition.p.z})
         curUnit.data.surfType = land.getSurfaceType(unitPosition.p)
         curUnit.data.inAir = unit:inAir()
         curUnit.data.velocity = unit:getVelocity()
-        --curUnit.data.groupName = group:getName()
         curUnit.data.coalition = coalition
     end
     return curUnit
