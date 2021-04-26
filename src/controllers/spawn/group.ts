@@ -718,7 +718,7 @@ export async function spawnConvoy(
         }
     }
 
-    const curConvoyMakeup =  convoyMakeup;
+    const curConvoyMakeup = convoyMakeup;
 
     let groupArray: string = "";
     let curGroupSpawn;
@@ -1223,24 +1223,24 @@ export async function spawnEscortFighters(escortGroupId: number) {
             ]
         };
 
-		// console.log("esct2: ", escortTemplateObj);
-		
+        // console.log("esct2: ", escortTemplateObj);
+
         const unitTemplate = await ddcsControllers.templateRead({_id: "escortFightersTemplateFull"});
         const compiled = _.template(unitTemplate[0].template);
         const curGroupSpawn = compiled(escortTemplateObj);
-		const curGroupAndPayload = curGroupSpawn
-			.replace("#PAYLOAD", escortTemplateObj.payload)
-			.replace("#PAYLOAD", escortTemplateObj.payload);
-		
-		console.log("esct3: ", ddcsControllers.countryId.indexOf(currentEscortFighter.country));
-		
+        const curGroupAndPayload = curGroupSpawn
+            .replace("#PAYLOAD", escortTemplateObj.payload)
+            .replace("#PAYLOAD", escortTemplateObj.payload);
+
+        console.log("esct3: ", ddcsControllers.countryId.indexOf(currentEscortFighter.country));
+
         const curCMD = await spawnGrp(
             curGroupAndPayload,
-            currentEscortFighter.country,
+            ddcsControllers.countryId.indexOf(currentEscortFighter.country),
             ddcsControllers.UNIT_CATEGORY.indexOf("AIRPLANE")
         );
         console.log("CMD: ", curCMD);
-        
+
         await ddcsControllers.sendUDPPacket("frontEnd", {
             actionObj: {
                 action: "CMD",
@@ -1674,16 +1674,16 @@ export async function healBase(baseName: string, curPlayerUnit: any, init: boole
                     curShelterUnit.coalition = curBase.side;
                     curShelterUnit.country =
                         ddcsControllers.countryId.indexOf(
-                        _.intersection(
-                            ddcsControllers.defCountriesByName,
-                            ddcsControllers.engineCache.config.countrySides[(curBase.side || 0)]
-                        )[0])
+                            _.intersection(
+                                ddcsControllers.defCountriesByName,
+                                ddcsControllers.engineCache.config.countrySides[(curBase.side || 0)]
+                            )[0])
                     ;
                     await ddcsControllers.spawnStaticBuilding(curShelterUnit, false, curBase, curPlayerUnit.coalition, "Shelter");
                 } else {
                     await ddcsControllers.spawnStaticBuilding({} as IStaticSpawnMin, true, curBase, curPlayerUnit.coalition, "Shelter");
                 }
-               //  await ddcsControllers.unitActionDelete({_id: curBase.name + " Shelter"});
+                //  await ddcsControllers.unitActionDelete({_id: curBase.name + " Shelter"});
 
                 const commUnit = await ddcsControllers.unitActionRead({name: curBase.name + " Comms tower M", dead: false});
                 const curCommUnit = commUnit[0];

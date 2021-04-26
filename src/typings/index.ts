@@ -87,7 +87,7 @@ export interface IStaticDictionary {
 }
 
 export interface IUnitDictionary {
-    country: number;
+    country: string;
     payload: any;
     _id: string;
     type: string;
