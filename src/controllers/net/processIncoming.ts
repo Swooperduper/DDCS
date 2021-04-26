@@ -137,9 +137,10 @@ export async function processingIncomingData(incomingObj: any) {
                         await ddcsController.sendMesgToPlayerChatWindow("You are not in a vehicle", curPly.playerId);
                     }
 
-                } else if (incomingObj.message === "-testBD") {
+                } else if (incomingObj.message === "-testEC") {
                     // await ddcsController.killEnemyWithinSightOfConvoy();
-                    await ddcsController.aiDefendBase();
+                    // await ddcsController.aiDefendBase();
+                    await ddcsController.spawnEscortFighters(1002063);
                 } else if (incomingObj.message === "-") {
                     const mesg = i18n.COMMANDDEFAULTRESPONSE;
                     await ddcsController.sendMesgToPlayerChatWindow(mesg, curPly.playerId);

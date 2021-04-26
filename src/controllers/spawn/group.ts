@@ -1188,6 +1188,66 @@ export async function spawnTankerPlane(
     );
 }
 
+export async function spawnEscortFighters(escortGroupId: number) {
+
+    const currentEscort = await ddcsControllers.unitActionRead({groupId: escortGroupId, dead: false});
+
+    if (currentEscort.length > 0) {
+        const firstOfGroup = currentEscort[0];
+        const escortName = "AI|baseAWACS|" + escortGroupId + "|";
+
+        const currentEscortFighter = getRndFromSpawnCat("capFighter", firstOfGroup.coalition, false, true)[0];
+
+        // Quick dirty and unreliable band-aid awacs callsign fix - to be removed - Kirkwood
+        const escortTemplateObj = {
+            ...currentEscortFighter,
+            escortGroupId,
+            groupName: escortName,
+            frequency: 251,
+            routeLocs: [
+                ddcsControllers.getLonLatFromDistanceDirection(firstOfGroup.lonLatLoc, firstOfGroup.hdg, 0.2),
+                ddcsControllers.getLonLatFromDistanceDirection(firstOfGroup.lonLatLoc, firstOfGroup.hdg, 0.4)
+            ],
+            unit: [
+                {
+                    skill: "Excellent",
+                    type: currentEscortFighter.type,
+                    name: escortName + "1|",
+                    payload: currentEscortFighter.payload,
+                    hdg: _.random(0, 359)
+                },
+                {
+                    skill: "Excellent",
+                    type: currentEscortFighter.type,
+                    name: escortName + "2|",
+                    payload: currentEscortFighter.payload,
+                    hdg: _.random(0, 359)
+                }
+            ]
+        };
+
+        const unitTemplate = await ddcsControllers.templateRead({_id: "escortFightersTemplateFull"});
+        const compiled = _.template(unitTemplate[0].template);
+        const curGroupSpawn = compiled({escortTemplateObj});
+
+        const curCMD = await spawnGrp(
+            curGroupSpawn,
+            currentEscortFighter.country,
+            ddcsControllers.UNIT_CATEGORY.indexOf("AIRPLANE")
+        );
+        console.log("CMD: ", curCMD);
+        /*
+        await ddcsControllers.sendUDPPacket("frontEnd", {
+            actionObj: {
+                action: "CMD",
+                cmd: [curCMD],
+                reqID: 0
+            }
+        });
+         */
+    }
+}
+
 export async function spawnSupportPlane(baseObj: typing.IBase, side: number): Promise<void> {
     let curBaseName;
     let curUnitName;
