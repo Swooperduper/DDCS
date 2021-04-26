@@ -22,45 +22,52 @@ export async function processEventKill(eventObj: any): Promise<void> {
         if (eventObj.data.initiator && eventObj.data.initiator.unitId) {
             const iUnitId = eventObj.data.initiator.unitId;
             const iUnit = await ddcsControllers.unitActionRead({unitId: iUnitId});
-            curInitiator = {
-                unit: iUnit[0],
-                player: (!!iUnit[0].playername) ? _.find(playerArray, {name: iUnit[0].playername}) : undefined,
-                playerOwner: (!!iUnit[0].playerOwnerId) ? _.find(playerArray, {_id: iUnit[0].playerOwnerId}) : undefined,
-                isGroundTarget: (ddcsControllers.UNIT_CATEGORY[iUnit[0].unitCategory] === "GROUND_UNIT")
-            };
-            initSide = eventObj.data.initiator.side;
+            if (iUnit.length > 0) {
+                curInitiator = {
+                    unit: iUnit[0],
+                    player: (!!iUnit[0].playername) ? _.find(playerArray, {name: iUnit[0].playername}) : undefined,
+                    playerOwner: (!!iUnit[0].playerOwnerId) ? _.find(playerArray, {_id: iUnit[0].playerOwnerId}) : undefined,
+                    isGroundTarget: (ddcsControllers.UNIT_CATEGORY[iUnit[0].unitCategory] === "GROUND_UNIT")
+                };
+                initSide = eventObj.data.initiator.side;
 
-            // console.log("playerOwner: ", !!curInitiator.playerOwner, curInitiator.playerOwner, curInitiator.player, curInitiator.unit);
-            if (!!curInitiator.playerOwner && !!curInitiator.unit.playerOwnerId) {
-                const playerOwnerUnit = await ddcsControllers.unitActionRead({playername: curInitiator.playerOwner.name});
-                await ddcsControllers.srvPlayerActionsUnitAddToRealScore({
-                    _id: curInitiator.unit.playerOwnerId,
-                    score: 5,
-                    groupId: (playerOwnerUnit[0].groupId) ? playerOwnerUnit[0].groupId : undefined,
-                    unitType: iUnit[0].type,
-                    unitCoalition: iUnit[0].coalition
-                });
-            }
+                // console.log("playerOwner: ", !!curInitiator.playerOwner,
+                // curInitiator.playerOwner, curInitiator.player, curInitiator.unit);
+                if (!!curInitiator.playerOwner && !!curInitiator.unit.playerOwnerId) {
+                    const playerOwnerUnit = await ddcsControllers.unitActionRead({playername: curInitiator.playerOwner.name});
+                    if (playerOwnerUnit.length > 0) {
+                        await ddcsControllers.srvPlayerActionsUnitAddToRealScore({
+                            _id: curInitiator.unit.playerOwnerId,
+                            score: 5,
+                            groupId: (playerOwnerUnit[0].groupId) ? playerOwnerUnit[0].groupId : undefined,
+                            unitType: iUnit[0].type,
+                            unitCoalition: iUnit[0].coalition
+                        });
+                    }
+                }
 
-            if (!!curInitiator.player && !!curInitiator.player._id) {
-                await ddcsControllers.srvPlayerActionsAddTempScore({
-                    _id: curInitiator.player._id,
-                    groupId: curInitiator.unit.groupId,
-                    score: 5
-                });
+                if (!!curInitiator.player && !!curInitiator.player._id) {
+                    await ddcsControllers.srvPlayerActionsAddTempScore({
+                        _id: curInitiator.player._id,
+                        groupId: curInitiator.unit.groupId,
+                        score: 5
+                    });
+                }
             }
         }
 
         if (eventObj.data.target && !!eventObj.data.target.unitId) {
             const tUnitId = eventObj.data.target.unitId;
             const tUnit = await ddcsControllers.unitActionRead({unitId: tUnitId});
-            curTarget = {
-                unit: tUnit[0],
-                player: (!!tUnit[0].playername) ? _.find(playerArray, {name: tUnit[0].playername}) : undefined,
-                playerOwner: (!!tUnit[0].playerOwnerId) ? _.find(playerArray, {_id: tUnit[0].playerOwnerId}) : undefined,
-                isGroundTarget: (ddcsControllers.UNIT_CATEGORY[tUnit[0].unitCategory] === "GROUND_UNIT")
-            };
-            targetSide = eventObj.data.target.side;
+            if (tUnit.length > 0) {
+                curTarget = {
+                    unit: tUnit[0],
+                    player: (!!tUnit[0].playername) ? _.find(playerArray, {name: tUnit[0].playername}) : undefined,
+                    playerOwner: (!!tUnit[0].playerOwnerId) ? _.find(playerArray, {_id: tUnit[0].playerOwnerId}) : undefined,
+                    isGroundTarget: (ddcsControllers.UNIT_CATEGORY[tUnit[0].unitCategory] === "GROUND_UNIT")
+                };
+                targetSide = eventObj.data.target.side;
+            }
         }
 
         let initMesg: string = "";
