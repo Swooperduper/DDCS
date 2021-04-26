@@ -276,6 +276,7 @@ export async function syncCheck(serverCount: number): Promise<void> {
                 });
                 console.log("Server:", serverCount, " Db", dbCount);
                 if (serverCount !== dbCount) {
+                    console.log("Resync Server Objects, in Db to Server: ", serverCount, dbCount);
                     await reSyncServerObjs(serverCount, dbCount);
                 } else {
                     // normal synced operation
