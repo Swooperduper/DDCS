@@ -1628,6 +1628,9 @@ export async function destroyUnit(unitName: string, type: string): Promise<void>
 
     const actionObj = {actionObj: {action: "destroyObj", unitName, type, reqID: ""}};
     await ddcsControllers.sendUDPPacket("frontEnd", actionObj);
+
+    // manually mark as dead because server is being unreliable with dead unit packets
+    await ddcsControllers.unitActionUpdate({_id: unitName, dead: true});
 }
 
 export async function healBase(baseName: string, curPlayerUnit: any, init: boolean): Promise<boolean> {
