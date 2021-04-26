@@ -44,5 +44,7 @@ export async function processFiveSecActions(fullySynced: boolean): Promise<void>
         await ddcsControllers.killEnemyWithinSightOfConvoy();
 
         await ddcsControllers.aiDefendBase();
+
+        await ddcsControllers.baseAWACSUpkeep();
     }
 }
