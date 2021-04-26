@@ -130,6 +130,10 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
                 // await ddcsControllers.setUnitMark(curData);
             }
 
+            if (unitObj.action === "C" && (_.includes(curData.name, "AI|baseAWACS|"))) {
+                console.log("unitObj IS: ", unitObj);
+            }
+
             if (unitObj.action === "C" && unitObj.data.groupId > 0 && (_.includes(curData.name, "AI|baseAWACS|"))) {
                 console.log("Spawn AWACS Escort: ", unitObj);
                 await ddcsControllers.spawnEscortFighters(unitObj.data.groupId);
