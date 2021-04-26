@@ -153,6 +153,10 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
                 }
 
                 await ddcsControllers.unitActionUpdate(iCurObj.data);
+
+                if (_.includes(curData.name, "AI|baseAWACS|")) {
+                    console.log("AWACS1: ", unitObj, unit);
+                }
                 /*
                 iCurObj.data.coalition = iCurObj.data.coalition || curUnit.coalition;
                 if (iCurObj.data.coalition) {
@@ -184,6 +188,10 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
                     // console.log("ShelterProcess3: ", iCurObj);
                 }
                 await ddcsControllers.unitActionSave(iCurObj.data);
+
+                if (_.includes(curData.name, "AI|baseAWACS|")) {
+                    console.log("AWACS2: ", unitObj, unit);
+                }
 
                 // if unit is AWACS spawn support escort
                 if (unitObj.action === "C" && unitObj.data.groupId > 0 && (_.includes(curData.name, "AI|baseAWACS|"))) {
