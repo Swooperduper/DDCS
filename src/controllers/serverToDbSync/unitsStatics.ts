@@ -130,7 +130,7 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
                 // await ddcsControllers.setUnitMark(curData);
             }
 
-            if (_.includes(curData.name, "AI|baseAWACS|")) {
+            if (_.includes(curData.name, "AI|baseAWACS|") && unitObj.action === "C") {
                 console.log("AWACS1: ", unitObj, unit);
             }
         } else if (unitObj.action === "D") {
