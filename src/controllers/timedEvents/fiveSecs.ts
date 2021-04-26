@@ -46,15 +46,15 @@ export async function processFiveSecActions(fullySynced: boolean): Promise<void>
         await ddcsControllers.aiDefendBase();
 
         await ddcsControllers.baseAWACSUpkeep();
-		
-		// preliminary carrier spawn on new sync
+
+        // preliminary carrier spawn on new sync
         const westCarrierGroupName = "~Carrier|West|Lincoln|Red|";
         const eastCarrierGroupName = "~Carrier|East|Roosevelt|Blue|";
 
         const westCarrier = await ddcsControllers.unitActionRead({_id: westCarrierGroupName + "1|", isActive: false, dead: false});
         const eastCarrier = await ddcsControllers.unitActionRead({_id: eastCarrierGroupName + "1|", isActive: false, dead: false});
-		
-		// console.log("carrer: ", westCarrier.length, eastCarrier.length);
+
+        // console.log("carrer: ", westCarrier.length, eastCarrier.length);
         if (westCarrier.length > 0) {
             await ddcsControllers.sendUDPPacket("frontEnd", {
                 actionObj: {
