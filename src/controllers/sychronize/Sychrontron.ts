@@ -129,7 +129,7 @@ export async function populateNewCampaignUnits(): Promise<void> {
 
 export async function syncByName(incomingObj: any, curReqJobIndex: number): Promise<void> {
     const curReqJob = requestJobObj["REQ" + curReqJobIndex];
-    console.log("server: ", curReqJob.reqArgs.serverCount, "db: ", curReqJob.reqArgs.dbCount);
+    console.log("syncByName server: ", curReqJob.reqArgs.serverCount, "db: ", curReqJob.reqArgs.dbCount);
 
     const aliveNamesObj =
         await ddcsControllers.actionAliveNames({dead: false});
