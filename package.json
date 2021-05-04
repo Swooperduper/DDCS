@@ -7,7 +7,9 @@
     "start": "node ./dist/start.js",
     "start:dev": "nodemon --config \"./util/nodemon.json\"/",
     "test": "jest",
-    "build": "rimraf dist && tsc --sourceMap false"
+    "build": "rimraf dist && tsc --sourceMap false",
+    "copyAssets": "xcopy /e/h/y/q \"./src/webControllers/assets\" \"./dist/webControllers/assets\\\"",
+    "postbuild": "npm run copyAssets"
   },
   "bugs": {
     "url": "https://github.com/afinegan/DDCS/issues"
@@ -16,11 +18,13 @@
   "author": "Andrew Finegan <andrew.finegan@gmail.com>",
   "license": "AGPLv3",
   "dependencies": {
+    "@guildedjs/guilded.js": "^1.0.6",
     "@overnightjs/core": "^1.6.9",
     "@overnightjs/logger": "^1.1.9",
     "async": "^3.1.1",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "follow-redirects": "^1.14.0",
     "http-status-codes": "^1.4.0",
     "i18n-ts": "^1.0.5",
     "lodash": "^4.17.21",
@@ -35,6 +39,7 @@
     "@types/mongoose": "^5.7.0",
     "@types/node": "^12.12.17",
     "@types/supertest": "^2.0.8",
+    "copyfiles": "^2.4.1",
     "cross-env": "^7.0.0",
     "jest": "^25.1.0",
     "nodemon": "^2.0.2",

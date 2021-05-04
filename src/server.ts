@@ -2,6 +2,7 @@ import * as bodyParser from "body-parser";
 import * as controllers from "./webControllers";
 import { Server } from "@overnightjs/core";
 import { Logger } from "@overnightjs/logger";
+import * as express from "express";
 
 class DDCSServer extends Server {
 
@@ -11,6 +12,7 @@ class DDCSServer extends Server {
         super(true);
         this.app.use(bodyParser.json());
         this.app.use(bodyParser.urlencoded({extended: true}));
+        this.app.use("/assets", express.static(__dirname + "/webControllers/assets"));
         this.setupControllers()
             .catch((err) => {
                 console.log("Error setting up controllers: ", err);

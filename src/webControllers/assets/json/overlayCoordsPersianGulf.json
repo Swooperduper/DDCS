@@ -1,0 +1,467 @@
+{
+  "Abu Musa Island Airport": {
+    "latc": 25.875041761239,
+    "lngc": 55.021382072783,
+    "capturePoint": true
+  },
+  "Dubai Intl": {
+    "latc": 25.248265300858,
+    "lngc": 55.379295777402,
+    "capturePoint": true
+  },
+  "Lar Airbase": {
+    "latc": 27.674804842122,
+    "lngc": 54.368317250382,
+    "capturePoint": false
+  },
+  "Bandar Lengeh": {
+    "latc": 26.530817420578,
+    "lngc": 54.813116140778,
+    "capturePoint": true
+  },
+  "Fujairah Intl": {
+    "latc": 25.105735807567,
+    "lngc": 56.340423943738,
+    "capturePoint": false
+  },
+  "Khonj_MOB": {
+    "latc": 27.881948133238,
+    "lngc": 53.433438623203,
+    "capturePoint": false
+  },
+  "Havadarya": {
+    "latc": 27.159927526116,
+    "lngc": 56.183089447173,
+    "capturePoint": true
+  },
+  "Bandar Abbas Intl": {
+    "latc": 27.203638554295,
+    "lngc": 56.37035610682,
+    "capturePoint": false
+  },
+  "Al Dhafra AB": {
+    "latc": 24.25792911231,
+    "lngc": 54.534202504328,
+    "capturePoint": false
+  },
+  "Shiraz International Airport": {
+    "latc": 29.533103964275,
+    "lngc": 52.609894223947,
+    "capturePoint": false
+  },
+  "Khasab": {
+    "latc": 26.179806360704,
+    "lngc": 56.24317158197,
+    "capturePoint": false
+  },
+  "BR81-Dehtal_FOB": {
+    "latc": 27.211466297364,
+    "lngc": 54.80076804874,
+    "capturePoint": true
+  },
+  "YM74-Kuhe_FOB": {
+    "latc": 28.39935448101,
+    "lngc": 53.832148054688,
+    "capturePoint": true
+  },
+  "XN91-Karadeh_FOB": {
+    "latc": 29.02088189094,
+    "lngc": 52.998234526232,
+    "capturePoint": true
+  },
+  "Qeshm Island": {
+    "latc": 26.76633161238,
+    "lngc": 55.918070160223,
+    "capturePoint": true
+  },
+  "Sharjah Intl": {
+    "latc": 25.322796067752,
+    "lngc": 55.531388153673,
+    "capturePoint": true
+  },
+  "Jiroft Airport": {
+    "latc": 28.729955112598,
+    "lngc": 57.666446887272,
+    "capturePoint": false
+  },
+  "Kish International Airport": {
+    "latc": 26.529651135129,
+    "lngc": 53.964909161858,
+    "capturePoint": false
+  },
+  "Tunb Island AFB": {
+    "latc": 26.251538702312,
+    "lngc": 55.311280020098,
+    "capturePoint": true
+  },
+  "Tunb Kochak": {
+    "latc": 26.243605485601,
+    "lngc": 55.149352101732,
+    "capturePoint": true
+  },
+  "BR39-Beriz_FOB": {
+    "latc": 27.962897858719,
+    "lngc": 54.317723751694,
+    "capturePoint": true
+  },
+  "Sir Abu Nuayr": {
+    "latc": 25.216154518016,
+    "lngc": 54.23693990531,
+    "capturePoint": true
+  },
+  "Ras Al Khaimah": {
+    "latc": 25.60171784119,
+    "lngc": 55.942030210076,
+    "capturePoint": true
+  },
+  "Sirjan_MOB": {
+    "latc": 29.411504364725,
+    "lngc": 55.69510386855,
+    "capturePoint": false
+  },
+  "Abu Dhabi International Airport": {
+    "latc": 24.464722760717,
+    "lngc": 54.639226001065,
+    "capturePoint": true
+  },
+  "Kerman Airport": {
+    "latc": 30.257695568151,
+    "lngc": 56.958269051762,
+    "capturePoint": false
+  },
+  "Rayen_MOB": {
+    "latc": 29.568435779887,
+    "lngc": 57.756671519307,
+    "capturePoint": false
+  },
+  "Al Maktoum Intl": {
+    "latc": 24.888624487709,
+    "lngc": 55.174919966811,
+    "capturePoint": true
+  },
+  "Al Minhad AB": {
+    "latc": 25.026805920475,
+    "lngc": 55.383678016973,
+    "capturePoint": false
+  },
+  "YM29-Kuhegom_FOB": {
+    "latc": 28.872800237374,
+    "lngc": 53.336557272131,
+    "capturePoint": true
+  },
+  "ET80-Asbi_FOB": {
+    "latc": 28.946804513525,
+    "lngc": 57.88924471946,
+    "capturePoint": true
+  },
+  "Qotbabad_MOB": {
+    "latc": 28.643794338724,
+    "lngc": 53.648691452541,
+    "capturePoint": false
+  },
+  "EU50-Henek_FOB": {
+    "latc": 29.829549542005,
+    "lngc": 57.530242331668,
+    "capturePoint": true
+  },
+  "BR75-Aliabad_FOB": {
+    "latc": 27.625932082903,
+    "lngc": 54.730228674521,
+    "capturePoint": true
+  },
+  "BS12-Mansurabad_FOB": {
+    "latc": 28.203934506566,
+    "lngc": 54.078006146601,
+    "capturePoint": true
+  },
+  "CQ89-Gachin_FOB": {
+    "latc": 27.113018017164,
+    "lngc": 55.873813867738,
+    "capturePoint": true
+  },
+  "ES63-Ganjabad_FOB": {
+    "latc": 28.298708185078,
+    "lngc": 57.698896607201,
+    "capturePoint": true
+  },
+  "Lavan Island Airport": {
+    "latc": 26.815354172873,
+    "lngc": 53.3416042246,
+    "capturePoint": true
+  },
+  "BQ36-Bandar_FOB": {
+    "latc": 26.745653625181,
+    "lngc": 54.359490521961,
+    "capturePoint": true
+  },
+  "CR32-Kermeran_FOB": {
+    "latc": 27.303893865234,
+    "lngc": 55.308806322106,
+    "capturePoint": true
+  },
+  "EU22-Mahan_FOB": {
+    "latc": 30.057928590466,
+    "lngc": 57.24814350592,
+    "capturePoint": true
+  },
+  "Zeyarat_MOB": {
+    "latc": 27.934536967153,
+    "lngc": 57.25034997813,
+    "capturePoint": false
+  },
+  "YM34-Jahrom_FOB": {
+    "latc": 28.44834139973,
+    "lngc": 53.367133383378,
+    "capturePoint": true
+  },
+  "BQ58-KuheGach_FOB": {
+    "latc": 26.980558058643,
+    "lngc": 54.574204036714,
+    "capturePoint": true
+  },
+  "YL38-Khonj_FOB": {
+    "latc": 27.882247389005,
+    "lngc": 53.436088335233,
+    "capturePoint": true
+  },
+  "ES41-Chah_FOB": {
+    "latc": 28.167886410246,
+    "lngc": 57.424129797511,
+    "capturePoint": true
+  },
+  "BR07-Evaz_FOB": {
+    "latc": 27.760535073522,
+    "lngc": 54.023304935226,
+    "capturePoint": true
+  },
+  "CR61-Seyyed_FOB": {
+    "latc": 27.233977036081,
+    "lngc": 55.595751488793,
+    "capturePoint": true
+  },
+  "ER03-Faryab_FOB": {
+    "latc": 27.43365479487,
+    "lngc": 56.999737875284,
+    "capturePoint": true
+  },
+  "XN73-Akbarabad_FOB": {
+    "latc": 29.252258705706,
+    "lngc": 52.766775856494,
+    "capturePoint": true
+  },
+  "XL94-Mohr_FOB": {
+    "latc": 27.490419775904,
+    "lngc": 52.957344793285,
+    "capturePoint": true
+  },
+  "LY67-Fishvar_FOB": {
+    "latc": 27.773125361571,
+    "lngc": 53.674410615216,
+    "capturePoint": true
+  },
+  "YN52-Kachuyeh_FOB": {
+    "latc": 29.12421625357,
+    "lngc": 53.623642304663,
+    "capturePoint": true
+  },
+  "CP71-Kabir_FOB": {
+    "latc": 25.488031665511,
+    "lngc": 55.717146938273,
+    "capturePoint": true
+  },
+  "ER16-Golshvar_FOB": {
+    "latc": 27.668850646215,
+    "lngc": 57.15780348124,
+    "capturePoint": true
+  },
+  "Beachhead_FOB": {
+    "latc": 27.292821594626,
+    "lngc": 52.71595314541,
+    "capturePoint": true
+  },
+  "BN92-AlSharia_FOB": {
+    "latc": 24.644233600275,
+    "lngc": 55.011052107178,
+    "capturePoint": true
+  },
+  "Neyriz_MOB": {
+    "latc": 29.24237145254,
+    "lngc": 54.375869080731,
+    "capturePoint": false
+  },
+  "ET93-Sarvestan_FOB": {
+    "latc": 29.278867030154,
+    "lngc": 57.955715516183,
+    "capturePoint": true
+  },
+  "YL17-Baghan_FOB": {
+    "latc": 27.787067540826,
+    "lngc": 53.132283145357,
+    "capturePoint": true
+  },
+  "DU10-BidKhabari_FOB": {
+    "latc": 29.854849582804,
+    "lngc": 56.111057813241,
+    "capturePoint": true
+  },
+  "DR62-Jallabi_FOB": {
+    "latc": 27.359683005918,
+    "lngc": 56.66804407989,
+    "capturePoint": true
+  },
+  "DU41-Tajabad_FOB": {
+    "latc": 29.945931406585,
+    "lngc": 56.42955019018,
+    "capturePoint": true
+  },
+  "TangDalan_MOB": {
+    "latc": 27.387955833612,
+    "lngc": 55.011261403262,
+    "capturePoint": false
+  },
+  "CT72-Amirabad_FOB": {
+    "latc": 29.127222917217,
+    "lngc": 55.740316046911,
+    "capturePoint": true
+  },
+  "BT12-Estahbanat_FOB": {
+    "latc": 29.131462339793,
+    "lngc": 54.023103957011,
+    "capturePoint": true
+  },
+  "CT12_FOB": {
+    "latc": 29.133006857158,
+    "lngc": 55.123949756416,
+    "capturePoint": true
+  },
+  "ES85-Mohammadabad_FOB": {
+    "latc": 28.523066862998,
+    "lngc": 57.884793561092,
+    "capturePoint": true
+  },
+  "DP06-Ras-al-Khaimah_FOB": {
+    "latc": 25.882400421551,
+    "lngc": 56.049685462763,
+    "capturePoint": true
+  },
+  "DP10-Tayyibah_FOB": {
+    "latc": 25.393523820414,
+    "lngc": 56.168651574049,
+    "capturePoint": true
+  },
+  "DR16-Gohreh_FOB": {
+    "latc": 27.719927697634,
+    "lngc": 56.168739490521,
+    "capturePoint": true
+  },
+  "BT82-Qatrueh_FOB": {
+    "latc": 29.15311268233,
+    "lngc": 54.743919317765,
+    "capturePoint": true
+  },
+  "CT98-DehNow_FOB": {
+    "latc": 29.68033976819,
+    "lngc": 55.875235697813,
+    "capturePoint": true
+  },
+  "CS86-Aliabad_FOB": {
+    "latc": 28.599051728581,
+    "lngc": 55.811351160413,
+    "capturePoint": true
+  },
+  "CS89-Vabuyen_FOB": {
+    "latc": 28.884993852592,
+    "lngc": 55.837383625826,
+    "capturePoint": true
+  },
+  "CR99-Baghan_FOB": {
+    "latc": 27.95838764621,
+    "lngc": 55.956829590737,
+    "capturePoint": true
+  },
+  "YM11-Seyfabad_FOB": {
+    "latc": 28.129883151786,
+    "lngc": 53.182434252032,
+    "capturePoint": true
+  },
+  "CT43-Kavir_FOB": {
+    "latc": 29.221588735388,
+    "lngc": 55.451871782599,
+    "capturePoint": true
+  },
+  "BN70-AlFalah_FOB": {
+    "latc": 24.42700863531,
+    "lngc": 54.79918083342,
+    "capturePoint": true
+  },
+  "Hajiabad_MOB": {
+    "latc": 28.315052024795,
+    "lngc": 55.888254617395,
+    "capturePoint": false
+  },
+  "DU72_FOB": {
+    "latc": 30.027964138642,
+    "lngc": 56.727084470348,
+    "capturePoint": true
+  },
+  "DR24-Sarzeh_FOB": {
+    "latc": 27.486332277428,
+    "lngc": 56.274043178476,
+    "capturePoint": true
+  },
+  "Dubai_FARP": {
+    "latc": 25.596452483551,
+    "lngc": 55.972908374278,
+    "capturePoint": true
+  },
+  "Abu Dhabi_FARP": {
+    "latc": 24.853302841703,
+    "lngc": 54.901135429849,
+    "capturePoint": true
+  },
+  "Iran_FARP": {
+    "latc": 27.314002308476,
+    "lngc": 55.326943007092,
+    "capturePoint": true
+  },
+  "Lar East_FARP": {
+    "latc": 29.232356290279,
+    "lngc": 54.350605943782,
+    "capturePoint": true
+  },
+  "Shiraz South_FARP": {
+    "latc": 28.90178479784,
+    "lngc": 53.31171408266,
+    "capturePoint": true
+  },
+  "Kerman West_FARP": {
+    "latc": 29.797341342158,
+    "lngc": 56.036744476169,
+    "capturePoint": true
+  },
+  "Lar North_FARP": {
+    "latc": 28.346834766784,
+    "lngc": 54.03011113976,
+    "capturePoint": true
+  },
+  "Kerman-Jiroft_FARP": {
+    "latc": 29.535751518292,
+    "lngc": 57.460169947074,
+    "capturePoint": true
+  },
+  "Bandar Abbas-Bandar-e-Jask_FARP": {
+    "latc": 26.522866668031,
+    "lngc": 57.13852843999,
+    "capturePoint": true
+  },
+  "Bandar Abbas-Jiroft_FARP": {
+    "latc": 27.799610824546,
+    "lngc": 57.25711995773,
+    "capturePoint": true
+  },
+  "Lar-Kerman_FARP": {
+    "latc": 29.158335301893,
+    "lngc": 55.357325860336,
+    "capturePoint": true
+  }
+}
