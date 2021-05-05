@@ -12,7 +12,7 @@ class DDCSServer extends Server {
         super(true);
         this.app.use(bodyParser.json());
         this.app.use(bodyParser.urlencoded({extended: true}));
-        this.app.use("/assets", express.static(__dirname + "/webControllers/assets"));
+        this.app.use( express.static(__dirname + "/../frontend/dist/frontend" ) );
         this.setupControllers()
             .catch((err) => {
                 console.log("Error setting up controllers: ", err);
