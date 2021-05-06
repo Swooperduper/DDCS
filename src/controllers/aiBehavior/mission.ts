@@ -5,20 +5,21 @@ import {getNextUniqueId, setRequestJobArray} from "../";
 const detectEnemyDistance = 10; // in km
 
 export async function continueRoadRoute(
+    incomingObj: any,
+    reqId: any,
     reqArgs: any
 ): Promise<void> {
     // console.log("RR2: ", incomingObj.returnObj, incomingObj.returnObj.length, reqId, reqArgs);
 
-    if (reqArgs.unitStartLonLat.length === 2) {
+    if (incomingObj.returnObj.length === 2) {
 
         const curRouteLocs = [{
-            lon: reqArgs.unitStartLonLat[0][0],
-            lat: reqArgs.unitStartLonLat[0][1]
+            lon: reqArgs.unitStartLonLat[0],
+            lat: reqArgs.unitStartLonLat[1]
         },
-        {
-            lon: reqArgs.unitStartLonLat[1][0],
-            lat: reqArgs.unitStartLonLat[1][1]
-        }];
+            incomingObj.returnObj[0],
+            incomingObj.returnObj[1]
+        ];
         // console.log("CRL: ", curRouteLocs);
 
         const routes: any = {
@@ -27,8 +28,8 @@ export async function continueRoadRoute(
         };
         const spawnTemplate = await ddcsController.templateRead({_id: "missionGround2Route"});
         const compiled = _.template(spawnTemplate[0].template);
-        /*
-		console.log("addTask: ", "frontEnd", {
+
+        console.log("addTask: ", "frontEnd", {
             actionObj: {
                 action: "addTask",
                 groupName: reqArgs.groupName,
@@ -36,7 +37,8 @@ export async function continueRoadRoute(
                 reqID: 0
             }
         });
-		*/
+
+        /*
         await ddcsController.sendUDPPacket("frontEnd", {
             actionObj: {
                 action: "addTask",
@@ -45,6 +47,7 @@ export async function continueRoadRoute(
                 reqID: 0
             }
         });
+         */
     }
 }
 
@@ -240,16 +243,8 @@ export async function killEnemyWithinSightOfConvoy(): Promise<void> {
                         pursuedByEnemyUnit: null
                     }).catch((err: any) => { console.log("209", err); });
 
-                    await ddcsController.continueRoadRoute({
-                        groupName: unit.groupName,
-                        unitStartLonLat: [
-                            unit.lonLatLoc,
-                            destBase[0].centerLoc
-                        ]
-                    });
-
                     // send back to aiConvoy Route
-                    /*
+
                     const curNextUniqueId = getNextUniqueId();
                     setRequestJobArray({
                         reqId: curNextUniqueId,
@@ -280,7 +275,6 @@ export async function killEnemyWithinSightOfConvoy(): Promise<void> {
                             time: new Date()
                         }
                     });
-                     */
                 }
             } else {
                 if (!unit.pursuingUnit) {
