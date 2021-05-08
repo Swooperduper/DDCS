@@ -1,0 +1,32 @@
+<!--
+  ~ DDCS Licensed under AGPL-3.0 by Andrew "Drex" Finegan https://github.com/afinegan/DynamicDCS
+  -->
+
+<div class="modal-header">
+	<h3 class="modal-title" id="modal-title">User Settings</h3>
+</div>
+<div class="modal-body" id="modal-body">
+	<div class="panel">
+		<h3>Beta User Info:</h3>
+		<div class="row" ng-if="setCtrl.userAccountService.localAccount.picture">
+			<div class="col-xs-2"></div>
+			<img class="col-xs-10">
+			<img src="{{setCtrl.userAccountService.localAccount.picture}}">
+		</div>
+	</div>
+	<div ng-repeat="(key, value) in setCtrl.userAccountService.localAccount">
+		<div class="row" ng-if="value">
+			<div class="col-xs-2">
+				<strong ng-bind="key"></strong>
+			</div>
+			<div class="col-xs-10">
+				<div ng-bind="value"></div>
+			</div>
+		</div>
+	</div>
+	</div>
+</div>
+<div class="modal-footer">
+	<button class="btn btn-sm btn-default" type="button" ng-click="setCtrl.cancel()">Cancel</button>
+	<!-- <button class="btn btn-sm btn-primary" type="button" ng-click="setCtrl.save()">Save</button> -->
+</div>

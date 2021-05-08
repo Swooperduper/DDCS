@@ -1,0 +1,13 @@
+{
+    "app": {
+        "options": {
+            "banner": "<%= banner %>"
+        },
+        "src": "<%= src %>/<%= appFileName %>.less",
+        "dest": "<%= dest %>/<%= appFileName %>.css"
+    },
+	"demo": {
+        "src": "<%= demoSrc %>/*.less",
+        "dest": "<%= demoDest %>/demo.css"
+    }
+}

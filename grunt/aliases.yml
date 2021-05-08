@@ -1,0 +1,67 @@
+---
+build:
+#- checkDependencies
+- clean
+- pre-test
+- test
+- compile
+- minify
+
+compile:
+- compile-index
+- compile-tpl
+- compile-js
+- compile-vendor-js
+- compile-css
+- copy:locales
+
+compile-css:
+- less:app
+- concat:css
+- postcss
+
+compile-index:
+- copy:index
+
+compile-js:
+- concat:app
+
+compile-tpl:
+- ngtemplates:app
+
+compile-vendor-js:
+- concat:vendor
+
+default:
+- checkDependencies
+- clean
+- force:pre-test
+- test
+- compile
+- dev
+
+demo:
+- eslint:demo
+- ngtemplates:demo
+- concat:demo
+- less:demo
+- copy:indexDemo
+
+dev:
+- connect:coverage
+- connect:server
+- watch
+
+minify:
+- cssmin
+- uglify
+
+pre-test:
+- ddescribe-iit
+- retire
+
+test:
+- eslint:app
+- eslint:spec
+
+

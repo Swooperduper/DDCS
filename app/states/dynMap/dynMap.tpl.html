@@ -1,0 +1,32 @@
+<!--
+  ~ DDCS Licensed under AGPL-3.0 by Andrew "Drex" Finegan https://github.com/afinegan/DynamicDCS
+  -->
+
+<base href="/DynamicMap">
+<ui-gmap-google-map
+		id="dynamicmap"
+		center="map.center"
+		zoom="map.zoom"
+		options="map.options"
+		draggable="true"
+		events="map.events">
+	<ui-gmap-markers
+			models="map.markers"
+			coords="'self'"
+			icon="'icon'"
+			idKey="'id'",
+			options="'options'"
+			events="map.markersEvents">
+	</ui-gmap-markers>
+	<ui-gmap-window
+			show="false"
+			coords="map.window.coords"
+			options="map.window.options"
+			templateUrl="'/apps/ddcs/states/dynMap/infoWindow.tpl.html'"
+			templateParameter="map.window.model" >
+	</ui-gmap-window>
+</ui-gmap-google-map>
+
+
+
+

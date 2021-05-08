@@ -1,0 +1,26 @@
+<!--
+  ~ DDCS Licensed under AGPL-3.0 by Andrew "Drex" Finegan https://github.com/afinegan/DynamicDCS
+  -->
+
+<div class="chatBoxArea">
+	<ul class="messages" >
+		<li ng-if="mesg.name && mesg.side == 1" ng-repeat="mesg in cbCtrl.msgs"><span class="redText">{{mesg.name}}</span>: {{mesg.message}}</li>
+		<li ng-if="mesg.name && mesg.side == 2" ng-repeat="mesg in cbCtrl.msgs"><span class="blueText">{{mesg.name}}</span>: {{mesg.message}}</li>
+		<li ng-if="!mesg.name" ng-repeat="mesg in cbCtrl.msgs">{{mesg.message}}</li>
+	</ul>
+</div>
+<div class="row row-no-padding">
+	<div class="col-xs-10 text-right">
+		<input ng-if="cbCtrl.chatTo" class="chatInput" placeholder="Type here..."/>
+	</div>
+	<div class="col-xs-2">
+		<div class="btn-group-xs" ng-if="cbCtrl.socketSub == 'chatMsgs'">
+			<label class="btn btn-primary" ng-model="cbCtrl.chatTo" uib-btn-radio="'Allies'">Allies</label>
+			<label class="btn btn-primary" ng-model="cbCtrl.chatTo" uib-btn-radio="'All'">All</label>
+		</div>
+		<div class="btn-group-xs" ng-if="cbCtrl.socketSub == 'cmds'">
+			<label class="btn btn-primary" ng-model="cbCtrl.chatTo" uib-btn-radio="'Msn'">Msn</label>
+			<label class="btn btn-primary" ng-model="cbCtrl.chatTo" uib-btn-radio="'Srv'">Srv</label>
+		</div>
+	</div>
+</div>

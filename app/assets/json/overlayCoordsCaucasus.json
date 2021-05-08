@@ -1,0 +1,523 @@
+{
+  "Batumi": {
+    "latc": 41.6093667,
+    "lngc": 41.6005667,
+    "lat1": 41.59686292770675,
+    "lat2": 41.623214308500614,
+    "lng1": 41.582153256560105,
+    "lng2": 41.619510878323354,
+    "capturePoint": false
+  },
+  "Kobuleti": {
+    "latc": 41.92995,
+    "lngc": 41.8634834,
+    "lat1": 41.92258854840492,
+    "lat2": 41.939836901591,
+    "lng1": 41.84140485110356,
+    "lng2": 41.88532852053527,
+    "capturePoint": true
+  },
+  "Kutaisi": {
+    "latc": 42.1776167,
+    "lngc": 42.4812334,
+    "lat1": 42.16839754819557,
+    "lat2": 42.18726461595267,
+    "lng1": 42.45938580813481,
+    "lng2": 42.50369571566466,
+    "capturePoint": true
+  },
+  "Senaki-Kolkhi": {
+    "latc": 42.2409,
+    "lngc": 42.047683333333333,
+    "lat1": 42.234014735291076,
+    "lat2": 42.25877028085459,
+    "lng1": 42.02122014346196,
+    "lng2": 42.06956409335021,
+    "capturePoint": false
+  },
+  "Sukhumi-Babushara": {
+    "latc": 42.8612834,
+    "lngc": 41.1245667,
+    "lat1": 42.84648891153208,
+    "lat2": 42.88163265161509,
+    "lng1": 41.09656613650395,
+    "lng2": 41.15435146212462,
+    "capturePoint": false
+  },
+  "Gudauta": {
+    "latc": 43.11426666666667,
+    "lngc": 40.56978333333333,
+    "lat1": 43.095875217080405,
+    "lat2": 43.13172231515356,
+    "lng1": 40.5466274577625,
+    "lng2": 40.58842681765441,
+    "capturePoint": true
+  },
+  "Sochi-Adler": {
+    "latc": 43.4444834,
+    "lngc": 39.9414834,
+    "lat1": 43.43085797468276,
+    "lat2": 43.46090158959244,
+    "lng1": 39.91806786837651,
+    "lng2": 39.96598266482238,
+    "capturePoint": false
+  },
+  "Gelendzhik": {
+    "latc": 44.57273333333333,
+    "lngc": 38.0114,
+    "lat1": 44.564239295048246,
+    "lat2": 44.586898996733524,
+    "lng1": 37.99374383273198,
+    "lng2": 38.02603744387511,
+    "capturePoint": false
+  },
+  "Novorossiysk": {
+    "latc": 44.66806666666667,
+    "lngc": 37.77823333333333,
+    "lat1": 44.65946551029406,
+    "lat2": 44.682667837390085,
+    "lng1": 37.75831025424077,
+    "lng2": 37.797212828396596,
+    "capturePoint": true
+  },
+  "Anapa-Vityazevo": {
+    "latc": 45.0049666666666667,
+    "lngc": 37.34783333333333,
+    "lat1": 44.98802207064853,
+    "lat2": 45.02410683024014,
+    "lng1": 37.316925938750046,
+    "lng2": 37.38204978823546,
+    "capturePoint": false
+  },
+  "Krymsk": {
+    "latc": 44.96788333333333,
+    "lngc": 37.99495,
+    "lat1": 44.95178542324294,
+    "lat2": 44.98277843085539,
+    "lng1": 37.97449630084111,
+    "lng2": 38.01625274538878,
+    "capturePoint": true
+  },
+  "Krasnodar-Center": {
+    "latc": 45.086933333333333,
+    "lngc": 38.94025,
+    "lat1": 45.073672240834206,
+    "lat2": 45.09713229664018,
+    "lng1": 38.91084473910405,
+    "lng2": 38.97159122347716,
+    "capturePoint": false
+  },
+  "Krasnodar-Pashkovsky": {
+    "latc": 45.037933333333333,
+    "lngc": 39.18803333333333,
+    "lat1": 45.01800207558803,
+    "lat2": 45.06407171254051,
+    "lng1": 39.121945317412155,
+    "lng2": 39.21552204012755,
+    "capturePoint": true
+  },
+  "Maykop-Khanskaya": {
+    "latc": 44.68123333333333,
+    "lngc": 40.0352,
+    "lat1": 44.66416625475839,
+    "lat2": 44.699218956276106,
+    "lng1": 40.01123708071782,
+    "lng2": 40.056705702542104,
+    "capturePoint": false
+  },
+  "Mineralnye Vody": {
+    "latc": 44.22786666666667,
+    "lngc": 43.081166666666667,
+    "lat1": 44.206173499676396,
+    "lat2": 44.248034996864774,
+    "lng1": 43.045351918364304,
+    "lng2": 43.11249278902892,
+    "capturePoint": false
+  },
+  "Nalchik": {
+    "latc": 43.51403333333333,
+    "lngc": 43.63655,
+    "lat1": 43.50448793968717,
+    "lat2": 43.52640533341203,
+    "lng1": 43.61672681155278,
+    "lng2": 43.65897678255919,
+    "capturePoint": false
+  },
+  "Mozdok": {
+    "latc": 43.79173333333333,
+    "lngc": 44.59968333333333,
+    "lat1": 43.770536105643764,
+    "lat2": 43.80524233902007,
+    "lng1": 44.56631463351323,
+    "lng2": 44.63126682162169,
+    "capturePoint": false
+  },
+  "Beslan": {
+    "latc": 43.2057,
+    "lngc": 44.60576666666667,
+    "lat1": 43.1945706434561,
+    "lat2": 43.21813273562955,
+    "lng1": 44.57884591403081,
+    "lng2": 44.63478587984923,
+    "capturePoint": true
+  },
+  "Vaziani": {
+    "latc": 41.62905,
+    "lngc": 45.0272,
+    "lat1": 41.61521784035104,
+    "lat2": 41.64541016910355,
+    "lng1": 45.00821393313481,
+    "lng2": 45.04831813692931,
+    "capturePoint": false
+  },
+  "Soganlug": {
+    "latc": 41.641163266787,
+    "lngc": 44.947183065317,
+    "capturePoint": true
+  },
+  "Tbilisi-Lochini": {
+    "latc": 41.674719358734,
+    "lngc": 44.946876591924,
+    "capturePoint": true
+  },
+  "Maykop-Khanskaya_MOB": {
+    "latc": 44.371849533834,
+    "lngc": 40.835395956664,
+    "capturePoint": true
+  },
+  "Sochi-Adler_MOB": {
+    "latc": 43.912536014514,
+    "lngc": 39.342575180364,
+    "capturePoint": true
+  },
+  "Beslan_MOB": {
+    "latc": 42.622308055654,
+    "lngc": 44.616506333045,
+    "capturePoint": false
+  },
+  "Mineralnye-Vody_MOB": {
+    "latc": 44.258716756425,
+    "lngc": 42.1710568357,
+    "capturePoint": true
+  },
+  "Vaziani-West_MOB": {
+    "latc": 41.98421698528,
+    "lngc": 44.434927890071,
+    "capturePoint": true
+  },
+  "Gelendzhik_MOB": {
+    "latc": 44.362891946409,
+    "lngc": 38.705707533186,
+    "capturePoint": true
+  },
+  "Vaziani_MOB": {
+    "latc": 42.102413970137,
+    "lngc": 44.773098621073,
+    "capturePoint": true
+  },
+  "Sukhumi-Babushara_MOB": {
+    "latc": 42.667126702101,
+    "lngc": 41.683406447167,
+    "capturePoint": true
+  },
+  "Mozdok_MOB": {
+    "latc": 43.986970815008,
+    "lngc": 43.60906600927,
+    "capturePoint": true
+  },
+  "Kutaisi-Vaziani_MOB": {
+    "latc": 42.007702818227,
+    "lngc": 43.69666137329,
+    "capturePoint": false
+  },
+  "Maykop-Vody_MOB": {
+    "latc": 43.913762592298,
+    "lngc": 41.476000803622,
+    "capturePoint": false
+  },
+  "Kutaisi_MOB": {
+    "latc": 42.190086543235,
+    "lngc": 42.909192041491,
+    "capturePoint": true
+  },
+  "Tuapse_MOB": {
+    "latc": 44.093780792789,
+    "lngc": 39.114031274415,
+    "capturePoint": false
+  },
+  "Otra_FOB": {
+    "latc": 43.286839199025,
+    "lngc": 40.268153967638,
+    "capturePoint": true
+  },
+  "Lazar_FOB": {
+    "latc": 43.895417327352,
+    "lngc": 39.35317602268,
+    "capturePoint": true
+  },
+  "Novo_FOB": {
+    "latc": 44.254124314773,
+    "lngc": 38.855307601189,
+    "capturePoint": true
+  },
+  "Natuh_FOB": {
+    "latc": 44.879801087836,
+    "lngc": 37.613046565954,
+    "capturePoint": true
+  },
+  "Mihay_FOB": {
+    "latc": 44.508525051194,
+    "lngc": 38.319263692018,
+    "capturePoint": true
+  },
+  "Sabu_FOB": {
+    "latc": 42.668379170607,
+    "lngc": 41.673645340463,
+    "capturePoint": true
+  },
+  "Arhipo_FOB": {
+    "latc": 44.371107933662,
+    "lngc": 38.54683295001,
+    "capturePoint": true
+  },
+  "Shahe_FOB": {
+    "latc": 43.777407116801,
+    "lngc": 39.485624810027,
+    "capturePoint": true
+  },
+  "Chit_FOB": {
+    "latc": 42.468663943935,
+    "lngc": 41.835991153531,
+    "capturePoint": true
+  },
+  "Shochi_FOB": {
+    "latc": 43.608769715464,
+    "lngc": 39.723817210996,
+    "capturePoint": true
+  },
+  "Tsag_FOB": {
+    "latc": 42.771539647626,
+    "lngc": 41.430460893537,
+    "capturePoint": true
+  },
+  "Psy_FOB": {
+    "latc": 43.079210576041,
+    "lngc": 40.8800663606,
+    "capturePoint": true
+  },
+  "EJ97_FOB": {
+    "latc": 44.003334734227,
+    "lngc": 40.141849946168,
+    "capturePoint": true
+  },
+  "DK68-Mihaylovskoe_FOB": {
+    "latc": 45.009553633357,
+    "lngc": 38.493701110604,
+    "capturePoint": true
+  },
+  "LP16-Kislovodsk_FOB": {
+    "latc": 43.951896620538,
+    "lngc": 42.743796054343,
+    "capturePoint": true
+  },
+  "LM63-Khashuri-East_FOB": {
+    "latc": 41.833958227339,
+    "lngc": 43.398853703106,
+    "capturePoint": true
+  },
+  "LM31-Khashuri-West_FOB": {
+    "latc": 41.667132679423,
+    "lngc": 43.043310780048,
+    "capturePoint": true
+  },
+  "KM71-Batumi-East_FOB": {
+    "latc": 41.62371382621,
+    "lngc": 42.257528681342,
+    "capturePoint": true
+  },
+  "MN21-Zemo_FOB": {
+    "latc": 42.572407885625,
+    "lngc": 44.117939713251,
+    "capturePoint": true
+  },
+  "GG40-Batumi_West_FOB": {
+    "latc": 41.590948868344,
+    "lngc": 41.89808637451,
+    "capturePoint": true
+  },
+  "EJ44-Verhne_FOB": {
+    "latc": 43.733396413678,
+    "lngc": 39.615137248411,
+    "capturePoint": true
+  },
+  "MM17-Tskhinvali_FOB": {
+    "latc": 42.262303484377,
+    "lngc": 43.958844500862,
+    "capturePoint": true
+  },
+  "EK92-Shuntuk_FOB": {
+    "latc": 44.4353318047,
+    "lngc": 40.174564316905,
+    "capturePoint": true
+  },
+  "LM01-Batumi-Khashuri_FOB": {
+    "latc": 41.677985876291,
+    "lngc": 42.647448842426,
+    "capturePoint": true
+  },
+  "DK80-Novomihay_FOB": {
+    "latc": 44.29108168701,
+    "lngc": 38.818620423967,
+    "capturePoint": true
+  },
+  "MN34-Nigniy_FOB": {
+    "latc": 42.875391434575,
+    "lngc": 44.157063768535,
+    "capturePoint": true
+  },
+  "EJ36-Soloniki_FOB": {
+    "latc": 43.899696644431,
+    "lngc": 39.389716450307,
+    "capturePoint": true
+  },
+  "EJ99-Dahovskaya_FOB": {
+    "latc": 44.221120654487,
+    "lngc": 40.206111250426,
+    "capturePoint": true
+  },
+  "FJ66-Pregradnaya_FOB": {
+    "latc": 43.948041265487,
+    "lngc": 41.118095099459,
+    "capturePoint": true
+  },
+  "FJ03-Esto_FOB": {
+    "latc": 43.688114399558,
+    "lngc": 40.274992498996,
+    "capturePoint": true
+  },
+  "LP88-Georgievsk_FOB": {
+    "latc": 44.108884756488,
+    "lngc": 43.52997264592,
+    "capturePoint": true
+  },
+  "DK52-Pshada_FOB": {
+    "latc": 44.437728707946,
+    "lngc": 38.462371961245,
+    "capturePoint": true
+  },
+  "MM69-Nigniy_FOB": {
+    "latc": 42.426384764934,
+    "lngc": 44.55053977157,
+    "capturePoint": true
+  },
+  "MM76-Zhinvali_FOB": {
+    "latc": 42.179987529294,
+    "lngc": 44.691751994311,
+    "capturePoint": true
+  },
+  "MN75-Datchnoe_FOB": {
+    "latc": 42.968767040687,
+    "lngc": 44.66461577196,
+    "capturePoint": true
+  },
+  "GH13-Achigvara_FOB": {
+    "latc": 42.697962594665,
+    "lngc": 41.577512457263,
+    "capturePoint": true
+  },
+  "MM54-Kaspi_FOB": {
+    "latc": 41.909032333719,
+    "lngc": 44.441241479026,
+    "capturePoint": true
+  },
+  "FK30-Gubskaya_FOB": {
+    "latc": 44.329319839581,
+    "lngc": 40.665164019951,
+    "capturePoint": true
+  },
+  "MM24-Gori_FOB": {
+    "latc": 41.983162189028,
+    "lngc": 44.129123869276,
+    "capturePoint": true
+  },
+  "MP30-Planovskoye_FOB": {
+    "latc": 43.397099283847,
+    "lngc": 44.185120941911,
+    "capturePoint": true
+  },
+  "MM73-Saguramo_FOB": {
+    "latc": 41.89499123828,
+    "lngc": 44.751279077668,
+    "capturePoint": true
+  },
+  "GH30-Zugdidi_FOB": {
+    "latc": 42.47864405264,
+    "lngc": 41.806698148864,
+    "capturePoint": true
+  },
+  "GJ36-Sary_FOB": {
+    "latc": 43.894292128586,
+    "lngc": 41.868094627435,
+    "capturePoint": true
+  },
+  "MP05-Soldatskaya_FOB": {
+    "latc": 43.864066023694,
+    "lngc": 43.785382122856,
+    "capturePoint": true
+  },
+  "FJ48-Psebay_FOB": {
+    "latc": 44.120044889107,
+    "lngc": 40.825401291687,
+    "capturePoint": true
+  },
+  "GH37-Zemo-Azhara_FOB": {
+    "latc": 43.108995755419,
+    "lngc": 41.836460630589,
+    "capturePoint": true
+  },
+  "MP23-Mayskiy_FOB": {
+    "latc": 43.632120753471,
+    "lngc": 44.126578908437,
+    "capturePoint": true
+  },
+  "KP87-Krasnovo_FOB": {
+    "latc": 43.957958563758,
+    "lngc": 42.27825689181,
+    "capturePoint": true
+  },
+  "GJ10-Teberda_FOB": {
+    "latc": 43.387572839996,
+    "lngc": 41.701050271375,
+    "capturePoint": true
+  },
+  "LM56-Makatubani_FOB": {
+    "latc": 42.111193355186,
+    "lngc": 43.26009192172,
+    "capturePoint": true
+  },
+  "LM26-Tshentaro_FOB": {
+    "latc": 42.154371355951,
+    "lngc": 42.826665455409,
+    "capturePoint": true
+  },
+  "EK46-Oktyabr_FOB": {
+    "latc": 44.847877188395,
+    "lngc": 39.631014974653,
+    "capturePoint": true
+  },
+  "GH06-Amtkel_FOB": {
+    "latc": 43.029535893768,
+    "lngc": 41.453708991932,
+    "capturePoint": true
+  },
+  "MN37-Alagir_FOB": {
+    "latc": 43.13653448672,
+    "lngc": 44.260337352576,
+    "capturePoint": true
+  },
+  "GJ33-Nizh_FOB": {
+    "latc": 43.619505313106,
+    "lngc": 41.868762007759,
+    "capturePoint": true
+  }
+}
