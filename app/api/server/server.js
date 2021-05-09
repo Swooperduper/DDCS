@@ -6,7 +6,7 @@
 	'use strict';
 
 	function serverFactory($resource){
-		var resourceUrl = '/api';
+		var resourceUrl = '/api/v3';
 		return $resource(
 			resourceUrl,
 			{name: '@name'},

@@ -6,7 +6,7 @@
 	'use strict';
 
 	function srvPlayerFactory($resource){
-		var resourceUrl = '/api/srvPlayers';
+		var resourceUrl = '/api/v3/srvPlayers';
 		return $resource(
 			resourceUrl,
 			{name: '@name'},

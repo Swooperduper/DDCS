@@ -7,6 +7,20 @@ export let localConnection: mongoose.Connection;
 export let remoteConnection: mongoose.Connection;
 export const dbModels: any = {};
 
+export async function getDbConnection(
+    host: string = "",
+    database: string = "",
+    user: string = "",
+    password: string = ""
+): Promise<mongoose.Connection> {
+    const login = (!!user && !!password) ? user + ":" + password + "@" : "";
+    const authSource = (!!user && !!password) ? "?authSource=admin" : "";
+    return mongoose.createConnection(
+        "mongodb://" + login + host + ":27017/" + database + authSource,
+        { useCreateIndex: true, useNewUrlParser: true, useFindAndModify: false, useUnifiedTopology: true }
+    );
+}
+/*
 export async function getDbConnection(dbType: string): Promise<mongoose.Connection> {
 
     const user = (!!process.env.DB_USER && !!process.env.DB_PASSWORD) ? process.env.DB_USER + ":" + process.env.DB_PASSWORD + "@" : "";
@@ -19,7 +33,7 @@ export async function getDbConnection(dbType: string): Promise<mongoose.Connecti
         { useCreateIndex: true, useNewUrlParser: true, useFindAndModify: false, useUnifiedTopology: true }
     );
 }
-
+*/
 export async function updateBases(): Promise<void> {
     const curBases = await ddcsController.baseActionRead({});
     if (curBases.length) {
@@ -59,18 +73,43 @@ export async function updateMenuCommands(): Promise<void> {
     ddcsController.setMenuCommands(await ddcsController.menuCommandsRead({}));
 }
 
+export function updateDBModels(dbConnection: mongoose.Connection, modelsLibrary: any) {
+    for (const [key, value] of Object.entries(modelsLibrary)) {
+        // @ts-ignore
+        dbModels[key] = value(dbConnection);
+    }
+}
+
+export async function initV3EngineMaster(): Promise<void> {
+    remoteConnection = await getDbConnection(
+        process.env.DB_REMOTE_HOST,
+        process.env.DB_REMOTE_DATABASE,
+        process.env.DB_USER,
+        process.env.DB_PASSWORD
+    );
+
+    updateDBModels(remoteConnection, remoteModels);
+}
+
 export async function initV3Engine(): Promise<void> {
 
-    localConnection = await getDbConnection("localConnection");
-    remoteConnection = await getDbConnection("remoteConnection");
+    localConnection = await getDbConnection(
+        process.env.DB_LOCAL_HOST,
+        process.env.DB_LOCAL_DATABASE,
+        process.env.DB_USER,
+        process.env.DB_PASSWORD
+    );
 
-    for (const [key, value] of Object.entries(localModels)) {
-        dbModels[key] = value(localConnection);
-    }
-    for (const [key, value] of Object.entries(remoteModels)) {
-        dbModels[key] = value(remoteConnection);
-    }
+    updateDBModels(localConnection, localModels);
 
+    remoteConnection = await getDbConnection(
+        process.env.DB_REMOTE_HOST,
+        process.env.DB_REMOTE_DATABASE,
+        process.env.DB_USER,
+        process.env.DB_PASSWORD
+    );
+
+    updateDBModels(remoteConnection, remoteModels);
 
     await updateConfig();
     await updateI18n();

@@ -4,9 +4,7 @@ import * as cors from "cors";
 import { Server } from "@overnightjs/core";
 import { Logger } from "@overnightjs/logger";
 import * as express from "express";
-
-const router = express.Router();
-const protectedRouter = express.Router();
+import { initV3EngineMaster } from "./controllers";
 
 class DDCSServer extends Server {
 
@@ -18,8 +16,6 @@ class DDCSServer extends Server {
         this.app.use(bodyParser.urlencoded({extended: true}));
         this.app.use(cors());
         this.app.disable("x-powered-by");
-        this.app.use("/api", router);
-        this.app.use("/api/protected", protectedRouter);
         this.app.use("/", express.static(__dirname + "/"));
         this.app.use("/json", express.static(__dirname + "/../app/assets/json"));
         this.app.use("/css", express.static(__dirname + "/../app/assets/css"));
@@ -37,6 +33,12 @@ class DDCSServer extends Server {
 
     private async setupControllers(): Promise<void> {
         const ctlrInstances = [];
+
+        await initV3EngineMaster()
+            .catch((err) => {
+                console.log("Engine Error: ", err);
+            });
+
         for (const name in controllers) {
             if (controllers.hasOwnProperty(name)) {
                 const controller = (controllers as any)[name];

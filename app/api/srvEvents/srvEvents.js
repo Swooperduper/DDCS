@@ -6,7 +6,7 @@
 	'use strict';
 
 	function srvEventFactory($resource){
-		var resourceUrl = '/api/srvEvents';
+		var resourceUrl = '/api/v3/srvEvents';
 		return $resource(
 			resourceUrl,
 			{name: '@serverName'},

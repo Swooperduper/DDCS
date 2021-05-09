@@ -6,7 +6,7 @@
 	'use strict';
 
 	function basesFactory($resource){
-		var resourceUrl = '/api/bases';
+		var resourceUrl = '/api/v3/bases';
 		return $resource(
 			resourceUrl,
 			{name: '@serverName'},

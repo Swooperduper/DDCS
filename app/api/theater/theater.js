@@ -6,7 +6,7 @@
 	'use strict';
 
 	function theaterFactory($resource){
-		var resourceUrl = '/api/theaters';
+		var resourceUrl = '/api/v3/theaters';
 		return $resource(
 			resourceUrl,
 			{},

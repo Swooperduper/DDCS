@@ -6,7 +6,7 @@
 	'use strict';
 
 	function userAccountFactory($resource){
-		var resourceUrl = '/api';
+		var resourceUrl = '/api/v3';
 		return $resource(
 			resourceUrl,
 			{_id: '@_id'},

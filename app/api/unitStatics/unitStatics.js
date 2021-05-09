@@ -6,7 +6,7 @@
 	'use strict';
 
 	function unitStaticsFactory($resource){
-		var resourceUrl = '/api/unitStatics';
+		var resourceUrl = '/api/v3/unitStatics';
 		return $resource(
 			resourceUrl,
 			{name: '@serverName'},
