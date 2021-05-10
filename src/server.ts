@@ -49,8 +49,24 @@ class DDCSServer extends Server {
     }
 
     public start(port: number): void {
-        this.app.listen(port, () => {
+        const server = this.app.listen(port, () => {
             Logger.Imp(this.SERVER_START_MSG + port);
+        });
+        const io = require("socket.io")(server);
+
+        io.on("connection", (socket: any) => {
+            console.log(socket.id + " user Connected");
+
+            socket.on("disconnect", () => {
+                console.log(socket.id + " user disconnected");
+            });
+            socket.on("error", (err: any) => {
+                if (err === "handshake error") {
+                    console.log("handshake error", err);
+                } else {
+                    console.log("io error", err);
+                }
+            });
         });
     }
 }
