@@ -381,6 +381,7 @@ export interface ITheater {
 }
 
 export interface IUserAccount {
+    _id: any;
     authId: string;
     permLvl: number;
     gameName: string;

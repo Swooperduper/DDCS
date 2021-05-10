@@ -1,3 +1,4 @@
+import * as _ from "lodash";
 import * as serverCodes from "http-status-codes";
 import { Controller, Get } from "@overnightjs/core";
 import { Logger } from "@overnightjs/logger";
@@ -12,7 +13,22 @@ export class V3Controller {
         try {
             ddcsController.userAccountActionsRead({})
                 .then((resp) => {
-                    return res.status(serverCodes.OK).json(resp);
+                    const cleanAccounts: any[] = [];
+                    resp.forEach((account) => {
+                        cleanAccounts.push({
+                            _id: account._id,
+                            authId: account.authId,
+                            locale: account.locale,
+                            nickName: account.nickName,
+                            curSocket: account.curSocket,
+                            gameName: account.gameName,
+                            ucid: account.ucid,
+                            lastServer: account.lastServer,
+                            lastIp: account.lastIp,
+                            permLvl: account.permLvl
+                        });
+                    });
+                    return res.status(serverCodes.OK).json(cleanAccounts);
                 })
                 .catch((err) => {
                     return res.status(serverCodes.BAD_REQUEST).json(err);
