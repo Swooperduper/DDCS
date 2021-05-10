@@ -10,6 +10,12 @@
 	}
 	getTheaters.$inject=['theaterService'];
 
+	// forces load because we have some bad async loading path
+	function getServers (srvService) {
+		return srvService.readServer();
+	}
+	getServers.$inject=['srvService'];
+
 	function dynMapController($scope, $stateParams, gmapService, mySocket, srvService, theaters) {
 		var dmCtrl = this;
 		var serverName = $stateParams.name;
@@ -59,6 +65,7 @@
 				templateUrl: '/apps/ddcs/states/dynMap/dynMap.tpl.html',
 				url: '/DynamicMap?name',
 				resolve: {
+					servers: getServers,
 					theaters: getTheaters
 				}
 			})

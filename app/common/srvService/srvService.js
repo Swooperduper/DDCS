@@ -8,7 +8,7 @@
 	function srvService(DCSServerAPI, alertService) {
 		var dSrv = this;
 
-		_.set(dSrv, 'createServer', function (server) {
+		dSrv.createServer = (server) => {
 			var dsave = DCSServerAPI.save(server);
 			dsave.$promise
 				.then(function(data) {
@@ -23,9 +23,9 @@
 					/* eslint-enable no-console */
 				})
 			;
-		});
+		}
 
-		_.set(dSrv, 'readServer', function () {
+		dSrv.readServer = () => {
 			var dread = DCSServerAPI.query();
 			dread.$promise
 				.then(function(data) {
@@ -38,9 +38,9 @@
 					/* eslint-enable no-console */
 				})
 			;
-		});
+		};
 
-		_.set(dSrv, 'updateServer', function (server) {
+		dSrv.updateServer = (server) => {
 			var dupdate = DCSServerAPI.updateOne(server);
 			dupdate.$promise
 				.then(function(data) {
@@ -54,9 +54,9 @@
 					/* eslint-enable no-console */
 				})
 			;
-		});
+		};
 
-		_.set(dSrv, 'deleteServer', function (server) {
+		dSrv.deleteServer = (server) => {
 			var ddelete = DCSServerAPI.delete(server);
 			ddelete.$promise
 				.then(function(data) {
@@ -71,11 +71,11 @@
 					/* eslint-enable no-console */
 				})
 			;
-		});
+		};
 
-		_.set(dSrv, 'init', function () {
+		dSrv.init = () => {
 			dSrv.readServer();
-		});
+		};
 	}
 	srvService.$inject = ['ddcs.api.server', 'alertService'];
 
