@@ -8,7 +8,7 @@
 	function srvService(DCSServerAPI, alertService) {
 		var dSrv = this;
 
-		dSrv.createServer = (server) => {
+		dSrv.createServer = function (server) {
 			var dsave = DCSServerAPI.save(server);
 			dsave.$promise
 				.then(function(data) {
@@ -25,7 +25,7 @@
 			;
 		}
 
-		dSrv.readServer = () => {
+		dSrv.readServer = function() {
 			var dread = DCSServerAPI.query();
 			dread.$promise
 				.then(function(data) {
@@ -40,7 +40,7 @@
 			;
 		};
 
-		dSrv.updateServer = (server) => {
+		dSrv.updateServer = function (server) {
 			var dupdate = DCSServerAPI.updateOne(server);
 			dupdate.$promise
 				.then(function(data) {
@@ -56,7 +56,7 @@
 			;
 		};
 
-		dSrv.deleteServer = (server) => {
+		dSrv.deleteServer = function (server) {
 			var ddelete = DCSServerAPI.delete(server);
 			ddelete.$promise
 				.then(function(data) {
@@ -73,7 +73,7 @@
 			;
 		};
 
-		dSrv.init = () => {
+		dSrv.init = function () {
 			dSrv.readServer();
 		};
 	}
