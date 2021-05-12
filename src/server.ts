@@ -41,7 +41,7 @@ class DDCSServer extends Server {
                     // keep this very slow or guilded might block our calls
                     await ddcsControllers.updateCampaignPlayers([process.env.GUILDED_BOT_USER, process.env.GUILDED_BOT_PASSWORD]);
 
-                }, ddcsControllers.time.fiveSecs);
+                }, ddcsControllers.time.oneMin);
             })
             .catch((err) => {
                 console.log("Engine Error: ", err);
