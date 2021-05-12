@@ -76,7 +76,7 @@ export async function updateCampaignPlayers( credentials: any[] ) {
                                                 if ( lockedUsernames[1].indexOf(member.name) !== -1 ||
                                                     lockedUsernames[1].indexOf(member.nickname) !== -1 ) {
                                                     if (!member.roleIds || member.roleIds.indexOf(redRoleId) === -1) {
-                                                        console.log("Adding Red to: ", member.name, "/api/teams/" +
+                                                        console.log("Adding Red to: ", member.name, member.nickname, "/api/teams/" +
                                                             process.env.GUILDED_TEAM_ID + "/roles/" + redRoleId + "/users/" +
                                                             member.id, redEnemyRoleId);
                                                         const onRed1 = https.request({
@@ -122,7 +122,9 @@ export async function updateCampaignPlayers( credentials: any[] ) {
                                                 if ( lockedUsernames[2].indexOf(member.name) !== -1 ||
                                                     lockedUsernames[2].indexOf(member.nickname) !== -1 ) {
                                                     if (!member.roleIds || member.roleIds.indexOf(blueRoleId) === -1) {
-                                                        console.log("Adding Blue to: ", member.name, "/api/teams/" + process.env.GUILDED_TEAM_ID + "/roles/" + blueRoleId + "/users/" + member.id, blueEnemyRoleId);
+                                                        console.log("Adding Blue to: ", member.name, member.nickname, "/api/teams/" +
+                                                            process.env.GUILDED_TEAM_ID + "/roles/" + blueRoleId + "/users/" +
+                                                            member.id, blueEnemyRoleId);
                                                         const onBlue1 = https.request({
                                                             method: "PUT",
                                                             hostname: "www.guilded.gg",
@@ -166,6 +168,7 @@ export async function updateCampaignPlayers( credentials: any[] ) {
 
                                                     // no team lock remove both
                                                     if (member.roleIds && member.roleIds.indexOf(redRoleId) !== -1) {
+                                                        console.log("DEL from red: ", member.name, member.nickname);
                                                         const onRed2 = https.request({
                                                             method: "DELETE",
                                                             hostname: "www.guilded.gg",
@@ -184,6 +187,7 @@ export async function updateCampaignPlayers( credentials: any[] ) {
                                                         onRed2.end();
                                                     }
                                                     if (member.roleIds && member.roleIds.indexOf(blueRoleId) !== -1) {
+                                                        console.log("DEL from BLUE: ", member.name, member.nickname);
                                                         const onBlue2 = https.request({
                                                             method: "DELETE",
                                                             hostname: "www.guilded.gg",
