@@ -122,7 +122,7 @@ export async function updateCampaignPlayers( credentials: any[] ) {
                                                 if ( lockedUsernames[2].indexOf(member.name) !== -1 ||
                                                     lockedUsernames[2].indexOf(member.nickname) !== -1 ) {
                                                     if (!member.roleIds || member.roleIds.indexOf(blueRoleId) === -1) {
-                                                        console.log("Adding Blue to: ", member.name, "/api/teams/" + process.env.TEAM_ID + "/roles/" + blueRoleId + "/users/" + member.id, blueEnemyRoleId);
+                                                        console.log("Adding Blue to: ", member.name, "/api/teams/" + process.env.GUILDED_TEAM_ID + "/roles/" + blueRoleId + "/users/" + member.id, blueEnemyRoleId);
                                                         const onBlue1 = https.request({
                                                             method: "PUT",
                                                             hostname: "www.guilded.gg",
