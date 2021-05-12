@@ -4,7 +4,7 @@ import * as cors from "cors";
 import { Server } from "@overnightjs/core";
 import { Logger } from "@overnightjs/logger";
 import * as express from "express";
-import { initV3EngineMaster } from "./controllers";
+import * as ddcsControllers from "./controllers";
 
 class DDCSServer extends Server {
 
@@ -34,7 +34,15 @@ class DDCSServer extends Server {
     private async setupControllers(): Promise<void> {
         const ctlrInstances = [];
 
-        await initV3EngineMaster()
+        await ddcsControllers.initV3EngineMaster()
+            .then(() => {
+                setInterval( async () => {
+
+                    // keep this very slow or guilded might block our calls
+                    await ddcsControllers.updateCampaignPlayers([process.env.GUILDED_BOT_USER, process.env.GUILDED_BOT_PASSWORD]);
+
+                }, ddcsControllers.time.fiveSecs);
+            })
             .catch((err) => {
                 console.log("Engine Error: ", err);
             });

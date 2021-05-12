@@ -14,3 +14,4 @@ export * from "./spawn";
 export * from "./sychronize";
 export * from "./timedEvents";
 export * from "./aiBehavior";
+export * from "./guilded";

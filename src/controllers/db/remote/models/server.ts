@@ -182,6 +182,16 @@ export function serverModel(dbconn: mongoose.Connection): mongoose.Document | {}
                 type: Array,
                 required: true,
                 default: []
+            },
+            guildedSubGroups: {
+                type: Array,
+                required: true,
+                default: []
+            },
+            lockedUsernames: {
+                type: Array,
+                required: true,
+                default: []
             }
         },
         {

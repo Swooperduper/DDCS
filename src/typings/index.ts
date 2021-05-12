@@ -21,6 +21,7 @@ export interface IBase {
 }
 
 export interface IServer {
+    guildedSubGroups: string[];
     countrySides: string[][];
     _id: string;
     updatedAt: Date;
