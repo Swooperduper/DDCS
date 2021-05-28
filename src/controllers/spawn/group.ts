@@ -1500,7 +1500,8 @@ export async function spawnUnitGroup(spawnArray: typing.IUnitSpawnMin[], init: b
 }
 
 export async function spawnNewMapObjs(): Promise<void> {
-    const bases = await ddcsControllers.baseActionRead({name: {$not: /#/}, enabled: true});
+    const bases = await ddcsControllers.baseActionRead({name: {$not: /#/}, enabled: true, "defaultStartSide" : { $ne : 0 } });
+    //console.log("bases",bases);
     for (const base of bases) {
         if (!_.includes(base.name, "Carrier")) {
             const baseStartSide = base.defaultStartSide || 0;
@@ -1639,7 +1640,7 @@ export async function healBase(baseName: string, curPlayerUnit: any, init: boole
     const engineCache = ddcsControllers.getEngineCache();
     const i18n = new I18nResolver(engineCache.i18n, curPly.lang).translation as any;
     const baseUnit = await ddcsControllers.baseActionRead({name: baseName});
-    // console.log("healBase: ", baseName, baseUnit);
+    //console.log("healBase: ", baseName, baseUnit);
     if (baseUnit.length > 0) {
         const curBase = baseUnit[0];
         // console.log("CB: ", curBase);

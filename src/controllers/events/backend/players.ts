@@ -31,14 +31,17 @@ export async function processPlayerEvent(playerArray: any): Promise<void> {
     if (curPlayerArray.length === 1) {
         // server just timed out everyone, give all those users their in air their life points back
         const pastPlayerArray = getRTPlayerArray();
-        for (const player of pastPlayerArray) {
-            console.log("Giving Player Back LP and award RS: ", player);
-            await ddcsControllers.srvPlayerActionsApplyTempToRealScore({
-                _id: player.ucid
-            });
-            await ddcsControllers.srvPlayerActionsAddLifePoints({
-                _id: player.ucid
-            });
+        //console.log("pastPlayerArray:",pastPlayerArray);
+        if (pastPlayerArray !== undefined){
+            for (const player of pastPlayerArray) {
+                //console.log("Giving Player Back LP and award RS: ", player);
+                await ddcsControllers.srvPlayerActionsApplyTempToRealScore({
+                    _id: player.ucid
+                });
+                await ddcsControllers.srvPlayerActionsAddLifePoints({
+                    _id: player.ucid
+                });
+            }
         }
     }
 

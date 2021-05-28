@@ -142,6 +142,9 @@ export function getRandomLatLonFromBase(baseName: string, polytype: string, zone
         let pickedPoly;
         if (zoneNum) {
             pickedPoly = pGroups[zoneNum];
+            if (pickedPoly === undefined){
+                pickedPoly = _.sample(pGroups);
+            }
         } else {
             pickedPoly = _.sample(pGroups);
         }
