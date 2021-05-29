@@ -7,18 +7,18 @@ import * as typings from "../../typings";
 import * as ddcsControllers from "../";
 import {getNextUniqueId, setRequestJobArray} from "../";
 
-const jtacDistance = 10;
 let curLaserCode = 1688;
 const redLaserCode = 1686;
 const blueLaserCode = 1687;
 const fiveMins = 5 * 60 * 1000;
 
 export async function baseDefenseDetectSmoke() {
+    const engineCache = ddcsControllers.getEngineCache();
     const mainBaseMOBs = await ddcsControllers.baseActionRead({baseType: "MOB", _id: { $not: /~/ }, enabled: true});
     for (const base of mainBaseMOBs) {
         const enemyUnits = await ddcsControllers.getCoalitionGroundUnitsInProximity(
             base.centerLoc,
-            jtacDistance,
+            engineCache.config.baseSpotDistance,
             ddcsControllers.enemyCountry[base.side]
         );
         console.log("Enemy Near MOB: ", base.name, enemyUnits.map((un) => un._id));
@@ -42,9 +42,10 @@ export async function processJtacLos(incomingObj: any): Promise<void> {
 }
 
 export async function lookupJtacLOS(jtacUnit: typings.IUnit) {
+    const engineCache = ddcsControllers.getEngineCache();
     const enemySide = (jtacUnit.coalition === 1) ? 2 : 1;
     // const enemySide = (jtacUnit.coalition === 1) ? 1 : 2; marking friendlys
-    const enemyUnits = await ddcsControllers.getCoalitionGroundUnitsInProximity(jtacUnit.lonLatLoc, jtacDistance, enemySide);
+    const enemyUnits = await ddcsControllers.getCoalitionGroundUnitsInProximity(jtacUnit.lonLatLoc, engineCache.config.jtacSpotDistance, enemySide);
     const enemyUnitNameArray = _.map(enemyUnits, "name");
     // console.log("CHECK123: ", jtacUnit.name, enemyUnits);
     if (enemyUnitNameArray.length > 0) {

@@ -1252,6 +1252,7 @@ export async function spawnEscortFighters(escortGroupId: number) {
 }
 
 export async function spawnSupportPlane(baseObj: typing.IBase, side: number): Promise<void> {
+    const engineCache = ddcsControllers.getEngineCache()
     let curBaseName;
     let curUnitName;
     let curUnitSpawn;
@@ -1274,9 +1275,15 @@ export async function spawnSupportPlane(baseObj: typing.IBase, side: number): Pr
         curSpwnUnit = _.cloneDeep(getRndFromSpawnCat("transportHeli", side, true, true)[0]);
         remoteLoc = ddcsControllers.getLonLatFromDistanceDirection(baseLoc, randomDir, 40);
     } else {
-        curSpwnUnit = _.cloneDeep(getRndFromSpawnCat("transportAircraft", side, true, true)[0]);
-        remoteLoc = ddcsControllers.getLonLatFromDistanceDirection(baseLoc, randomDir, 70);
+        if (engineCache.config.heliOnlyResupply){
+            curSpwnUnit = _.cloneDeep(getRndFromSpawnCat("transportHeli", side, true, true)[0]);
+            remoteLoc = ddcsControllers.getLonLatFromDistanceDirection(baseLoc, randomDir, 40);
+        }else{
+            curSpwnUnit = _.cloneDeep(getRndFromSpawnCat("transportAircraft", side, true, true)[0]);
+            remoteLoc = ddcsControllers.getLonLatFromDistanceDirection(baseLoc, randomDir, 70);
+        }
     }
+
     curGrpObj = {
         ...curSpwnUnit,
         groupId: grpNum,

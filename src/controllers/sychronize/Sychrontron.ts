@@ -90,7 +90,7 @@ export async function reSyncAllUnitsFromDbToServer(serverCount: number, dbCount:
         const remappedObjs: any = {};
         for (const unitObj of unitObjs) {
             unitObj.lateActivation = true;
-            if (ddcsControllers.UNIT_CATEGORY[unitObj.unitCategory] === "GROUND_UNIT" && !unitObj.isTroop) {
+            if (ddcsControllers.UNIT_CATEGORY[unitObj.unitCategory] === "GROUND_UNIT") {
                 const curName = unitObj.groupName;
                 remappedObjs[curName] = remappedObjs[curName] || [];
                 remappedObjs[curName].push(unitObj);

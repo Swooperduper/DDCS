@@ -50,7 +50,7 @@ export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: 
                 const playerProx: any [] = [];
                 const bases = await ddcsControllers.baseActionRead({});
                 for (const base of bases) {
-                    const curCheckAllBase = await ddcsControllers.isPlayerInProximity(base.centerLoc, 3.4, curUnit.playername);
+                    const curCheckAllBase = await ddcsControllers.isPlayerInProximity(base.centerLoc, engineCache.config.intCargoUnloadDistance, curUnit.playername);
                     playerProx.push(curCheckAllBase);
                     if (curCheckAllBase) {
                         curBaseObj = base;
@@ -148,7 +148,7 @@ export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: 
             const bases = await ddcsControllers.baseActionRead({});
             const playerProx: any [] = [];
             for (const base of bases) {
-                const curCheckAllBase = await ddcsControllers.isPlayerInProximity(base.centerLoc, 3.4, curUnit.playername);
+                const curCheckAllBase = await ddcsControllers.isPlayerInProximity(base.centerLoc, engineCache.config.intCargoLoadDistance, curUnit.playername);
                 playerProx.push(curCheckAllBase);
                 if (curCheckAllBase) {
                     curBaseObj = base;
@@ -294,7 +294,7 @@ export async function loadTroops(unitId: string, troopType: string) {
         const playerProx: any [] = [];
         const bases = await ddcsControllers.baseActionRead({baseType: "MOB", side: curUnit.coalition});
         for (const base of bases) {
-            const curCheckAllBase = await ddcsControllers.isPlayerInProximity(base.centerLoc, 3.4, curUnit.playername);
+            const curCheckAllBase = await ddcsControllers.isPlayerInProximity(base.centerLoc, engineCache.config.troopLoadDistance, curUnit.playername);
             playerProx.push(curCheckAllBase);
         }
         if (_.some(playerProx)) {
@@ -503,7 +503,7 @@ export async function menuCmdProcess(pObj: any) {
                             for (const base of bases) {
                                 playerProx.push(await ddcsControllers.isPlayerInProximity(
                                     base.centerLoc,
-                                    3.4,
+                                    engineCache.config.troopUnloadDistance,
                                     curUnit.playername
                                 ));
                             }
@@ -523,19 +523,24 @@ export async function menuCmdProcess(pObj: any) {
                                 const randInc = _.random(1000000, 9999999);
                                 const genName = "TU|" + curPlayer.ucid + "|" + curUnit.troopType + "|" +
                                     curUnit.playername + "|";
-                                const delUnits = await ddcsControllers.unitActionRead({
+                                const delUnits = await ddcsControllers.unitActionReadStd({
                                     playerOwnerId: curPlayer.ucid,
                                     isTroop: true,
                                     dead: false
                                 });
-                                for (const unit of delUnits) {
-                                    await ddcsControllers.unitActionUpdateByUnitId({
-                                        unitId: unit.unitId,
-                                        dead: true
-                                    });
-                                    await ddcsControllers.destroyUnit(unit.name, "unit");
+                                let curUnits = 0;
+                                const grpGroups = _.groupBy(delUnits, "groupName");
+                                const tRem = Object.keys(grpGroups).length - engineCache.config.maxTroops;
+                        
+                                for (const gUnitKey of Object.keys(grpGroups)) {
+                                    if (curUnits <= tRem) {
+                                        for (const unit of grpGroups[gUnitKey]) {
+                                            await ddcsControllers.unitActionUpdateByUnitId({unitId: unit.unitId, dead: true});
+                                            await ddcsControllers.destroyUnit(unit.name, "unit");
+                                        }
+                                        curUnits++;
+                                    }
                                 }
-
                                 curSpawnUnit = _.cloneDeep(await ddcsControllers.getRndFromSpawnCat(
                                     curUnit.troopType,
                                     curUnit.coalition,
@@ -626,12 +631,12 @@ export async function menuCmdProcess(pObj: any) {
                     await isCrateOnboard(curUnit, true);
                     break;
                 case "unpackCrate":
-                    const logiProx = await ddcsControllers.getLogiTowersProximity(curUnit.lonLatLoc, 0.8, curUnit.coalition);
+                    const logiProx = await ddcsControllers.getLogiTowersProximity(curUnit.lonLatLoc, engineCache.config.crateUnpackDistance, curUnit.coalition);
                     if (logiProx.length) {
                         await ddcsControllers.sendMesgToGroup(
                             curPlayer,
                             curUnit.groupId,
-                            "G: " + i18n.YOUNEEDTOMOVEFARTHERAWAY.replace("#1", "Command Towers (800m)"),
+                            "G: " + i18n.YOUNEEDTOMOVEFARTHERAWAY.replace("#1", "Command Towers ("+ engineCache.config.crateUnpackDistance * 1000 +"m)"),
                             5
                         );
                     } else {

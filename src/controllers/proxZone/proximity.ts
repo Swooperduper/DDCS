@@ -9,10 +9,10 @@ import * as ddcsControllers from "../";
 export async function checkUnitsToBaseForCapture(): Promise<void> {
     // console.log("CHECK BASE CAPTURE");
     let sideArray = {};
-
+    const engineCache = ddcsControllers.getEngineCache();
     const bases = await ddcsControllers.baseActionRead({baseType: "MOB"});
     for (const base of bases) {
-        const unitsInRange = await getGroundUnitsInProximity(base.centerLoc, 3, true);
+        const unitsInRange = await getGroundUnitsInProximity(base.centerLoc, engineCache.config.baseCaptureProximity, true);
         sideArray = _.transform(unitsInRange, (result: any[], value) => {
             (result[value.coalition] || (result[value.coalition] = [])).push(value);
         });
@@ -74,31 +74,36 @@ export async function checkUnitsToBaseForCapture(): Promise<void> {
             if (_.get(sideArray, [2], []).length > 0) {
                 unitSide = 2;
             }
-            if (!_.includes(base.name, "#")) {
-                console.log("BASE HAS BEEN CAPTURED: ", base.name, " is now ", unitSide);
-                await ddcsControllers.sendMesgToAll(
-                    "HASBEENCAPTUREDBY",
-                    [base.name],
-                    60
-                );
+            if (_.get(sideArray, [1], []).length > 0 && _.get(sideArray, [2], []).length > 0) {
+                unitSide = 0;
+                console.log("BA");
             }
+            if(unitSide !== 0){
+                if (!_.includes(base.name, "#")) {
+                    console.log("BASE HAS BEEN CAPTURED: ", base.name, " is now ", unitSide);
+                    await ddcsControllers.sendMesgToAll(
+                        "HASBEENCAPTUREDBY",
+                        [base.name],
+                        60
+                    );
+                }
 
-            // console.log('Spawning Support Units', base, unitSide);
-            await ddcsControllers.spawnSupportBaseGrp(base.name, unitSide, false);
-            await ddcsControllers.baseActionUpdateSide({name: base.name, side: unitSide});
-            // await ddcsControllers.setbaseSides();
-            const aliveLogistics = await ddcsControllers.unitActionRead({name: base.name + " Shelter", dead: false});
-            if (aliveLogistics.length > 0) {
-                await ddcsControllers.spawnStaticBuilding({} as typing.IStaticSpawnMin, true, base, unitSide, "Shelter");
-            }
-            const aliveComms = await ddcsControllers.unitActionRead({name: base.name + " Comms tower M", dead: false});
-            if (aliveComms.length > 0) {
-                await ddcsControllers.spawnStaticBuilding({} as typing.IStaticSpawnMin, true, base, unitSide, "Comms tower M");
+                // console.log('Spawning Support Units', base, unitSide);
+                await ddcsControllers.spawnSupportBaseGrp(base.name, unitSide, false);
+                await ddcsControllers.baseActionUpdateSide({name: base.name, side: unitSide});
+                // await ddcsControllers.setbaseSides();
+                const aliveLogistics = await ddcsControllers.unitActionRead({name: base.name + " Shelter", dead: false});
+                if (aliveLogistics.length > 0) {
+                    await ddcsControllers.spawnStaticBuilding({} as typing.IStaticSpawnMin, true, base, unitSide, "Shelter");
+                }
+                const aliveComms = await ddcsControllers.unitActionRead({name: base.name + " Comms tower M", dead: false});
+                if (aliveComms.length > 0) {
+                    await ddcsControllers.spawnStaticBuilding({} as typing.IStaticSpawnMin, true, base, unitSide, "Comms tower M");
+                }
             }
         }
     }
 
-    const engineCache = ddcsControllers.getEngineCache();
     const baseWinCondition = engineCache.config.mainCampaignBases;
     const warWon = await ddcsControllers.baseActionRead({_id: {$in: baseWinCondition}});
 

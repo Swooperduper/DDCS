@@ -44,6 +44,42 @@ export function serverModel(dbconn: mongoose.Connection): mongoose.Document | {}
             maxUnits: {
                 type: Number
             },
+            jtacSpotDistance: {
+                type: Number,
+                default: 10
+            },
+            baseSpotDistance: {
+                type: Number,
+                default: 10
+            },
+            troopUnloadDistance:{
+                type: Number,
+                default: 3.4
+            },
+            troopLoadDistance:{
+                type: Number,
+                default: 3.4
+            },
+            crateUnpackDistance:{
+                type: Number,
+                default: 0.8
+            },
+            intCargoUnloadDistance:{
+                type: Number,
+                default: 3.4
+            },
+            intCargoLoadDistance:{
+                type: Number,
+                default: 3.4
+            },
+            baseCaptureProximity:{
+                type: Number,
+                default: 3
+            },
+            heliOnlyResupply:{
+                type: Boolean,
+                default: false
+            },
             spwnLimitsPerTick: {
                 type: Object
             },
