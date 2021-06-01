@@ -77,9 +77,8 @@ export async function processPlayerEvent(playerArray: any): Promise<void> {
                 if (isInGameMasterSlot && !localPlayer.isGameMaster) {
                     await ddcsControllers.forcePlayerSpectator(player.id, "You are not allowed to use Game Master slot.");
                 }
-
                 if (engineCache.config.isJtacLocked && isArtilleryCmdr &&
-                    !localPlayer.gciAllowed && localPlayer.sideLock !== player.side) {
+                    !localPlayer.gciAllowed && localPlayer.sideLock == player.side) {
                     await ddcsControllers.forcePlayerSpectator(player.id, "You are not allowed to use " +
                         "GCI/Tac Commander slot. Please contact a Mod for more information.");
                 }
