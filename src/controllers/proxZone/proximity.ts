@@ -76,7 +76,6 @@ export async function checkUnitsToBaseForCapture(): Promise<void> {
             }
             if (_.get(sideArray, [1], []).length > 0 && _.get(sideArray, [2], []).length > 0) {
                 unitSide = 0;
-                console.log("BA");
             }
             if(unitSide !== 0){
                 if (!_.includes(base.name, "#")) {
