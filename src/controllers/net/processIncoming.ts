@@ -127,7 +127,8 @@ export async function processingIncomingData(incomingObj: any) {
                 } else if (incomingObj.message === "-joinrandom") {
                     const randSide = _.random(1, 2);
                     await ddcsController.lockUserToSide(incomingObj, randSide);
-
+                } else if (incomingObj.message === "-redrawf10") {
+                    await ddcsController.setFarpMarks();
                 } else if (incomingObj.message === "-refreshmenu") {
                     const unit = await ddcsController.unitActionRead({playername: curPly.name});
                     if (unit.length > 0) {
