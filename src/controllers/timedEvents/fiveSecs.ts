@@ -69,6 +69,7 @@ export async function processFiveSecActions(fullySynced: boolean): Promise<void>
         }
 
         if (eastCarrier.length > 0) {
+			await ddcsControllers.setFarpMarks();
             await ddcsControllers.sendUDPPacket("frontEnd", {
                 actionObj: {
                     action: "CMD",

@@ -5,7 +5,7 @@
 import * as mongoose from "mongoose";
 
 export function userAccountModel(dbconn: mongoose.Connection): mongoose.Document | {} {
-    return dbconn.model("useraccounts", new mongoose.Schema({
+    const userAccountSchema = new mongoose.Schema({
             authId: {
                 type: String,
                 required: true,
@@ -56,5 +56,8 @@ export function userAccountModel(dbconn: mongoose.Connection): mongoose.Document
         {
             timestamps: true
         }
-    ));
+    );
+    userAccountSchema.index({ authId: 1 });
+
+    return dbconn.model("useraccount", userAccountSchema);
 }
