@@ -434,7 +434,18 @@ function runRequest(request)
                 end
             end
         end
-
+        if request.action == "setFlagValue" then
+            if request.flagID ~= nil then
+                trigger.action.setUserFlag(request.flagID, request.flagValue)
+            end
+        end
+        if request.action == "getFlagValue" then
+            local flagValueNew = trigger.misc.getUserFlag(request.flagID)
+            outObj.flagID = request.flagID
+            outObj.flagValue = flagValueNew
+            outObj.action = "FlagValue"
+            sendUDPPacket(outObj)
+        end
         if request.action == "processLOS" then
             if request.jtacUnitName ~= nil then
                 local jtacUnit = Unit.getByName(request.jtacUnitName)

@@ -125,9 +125,11 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
                     }
                 }});
              */
-            if (ddcsControllers.UNIT_CATEGORY[curData.unitCategory] === "STRUCTURE") {
-                // tracking everything on a carrier deck, dont turn on until fixed
-                // await ddcsControllers.setUnitMark(curData);
+            if (ddcsControllers.UNIT_CATEGORY[curData.unitCategory] === "STRUCTURE" && _.includes(curData.name, "Shelter") ) {
+                await ddcsControllers.setCircleMark(curData);
+            }
+            if (ddcsControllers.UNIT_CATEGORY[curData.unitCategory] === "STRUCTURE" && _.includes(curData.name, "Comms Tower") ) {
+                await ddcsControllers.setUnitMark(curData);
             }
 
             if (unitObj.action === "C" && (_.includes(curData.name, "AI|baseAWACS|"))) {
@@ -154,6 +156,9 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
                         isResync: true
                     }
                 };
+                if (_.includes(curData.name, "Shelter")) {
+                    curData.type = "Shelter"
+                    await ddcsControllers.setNeutralCircleMark(curData);}
 
                 if (curData.coalition) {
                     iCurObj.data.coalition = curData.coalition;
@@ -161,7 +166,6 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
                 if (curData.country) {
                     iCurObj.data.country = curData.country;
                 }
-
                 await ddcsControllers.unitActionUpdate(iCurObj.data);
                 /*
                 iCurObj.data.coalition = iCurObj.data.coalition || curUnit.coalition;

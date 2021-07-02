@@ -8,7 +8,7 @@ import * as ddcsControllers from "../";
 
 const checkMenuLevels = 2;
 const startLightCrateWeight = 500;
-const startHeavyCrateWeight = 4900;
+const startHeavyCrateWeight = 2500;
 
 export async function spawnNewMenuCategory(
     playerUnit: any,

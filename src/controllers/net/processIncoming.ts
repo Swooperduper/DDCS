@@ -32,6 +32,10 @@ export async function processingIncomingData(incomingObj: any) {
         case "S_EVENT_SHOT":
             await ddcsController.processEventShot(incomingObj);
             break;
+        case "FlagValue":
+            await ddcsController.flagsActionUpdate({_id: incomingObj.flagID, value: incomingObj.flagValue});
+            console.log("Got Flag ID:",incomingObj.flagID,"with value", incomingObj.flagValue);
+            break;
         case "S_EVENT_HIT":
             // not using hit anymore for kills
             // await ddcsController.processEventHit(incomingObj);

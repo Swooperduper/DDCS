@@ -7,3 +7,4 @@ export * from "./srvPlayer";
 export * from "./staticCrates";
 export * from "./unit";
 export * from "./webPush";
+export * from "./flags";

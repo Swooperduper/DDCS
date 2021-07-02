@@ -831,7 +831,7 @@ export async function baseAWACSUpkeep() {
     const getBaseAwacs = engineCache.config.baseAwacs;
 
     for ( const baseName of getBaseAwacs) {
-        console.log("chkBase: ", baseName);
+        //console.log("chkBase: ", baseName);
         await spawnBaseAWACS(baseName);
     }
 }
@@ -849,7 +849,7 @@ export async function spawnBaseAWACS(baseName: string) {
 
         }
 
-        console.log("replenEpoc: ", replenEpoc, " < ", new Date().getTime());
+        //console.log("replenEpoc: ", replenEpoc, " < ", new Date().getTime());
         if (replenEpoc < new Date().getTime()) {
             await ddcsControllers.baseActionUpdateAwacsTimer({
                 name: baseName,

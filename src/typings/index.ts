@@ -272,6 +272,11 @@ export interface IAmmo {
     typeName: string;
 }
 
+export interface IFlags {
+    _id: number;
+    value: number;
+}
+
 export interface IUnit {
     pursuedByEnemyUnit: string;
     pursuingUnit: boolean;

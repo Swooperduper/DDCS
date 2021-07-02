@@ -12,7 +12,17 @@ export async function processThirtySecActions(fullySynced: boolean) {
     const engineCache = ddcsControllers.getEngineCache();
     if (fullySynced) {
         ddcsControllers.jobArrayCleanup();
-
+        const knownFlags = await ddcsControllers.flagsActionRead({});
+        for (const flag in knownFlags){
+            console.log("Getting Flag Value for _ID:",knownFlags[flag]._id);
+            await ddcsControllers.sendUDPPacket("frontEnd", {
+                actionObj: {
+                    action: "getFlagValue",
+                    flagID: knownFlags[flag]._id,
+                    reqID: 0
+                }
+            });
+        }
         await ddcsControllers.unitActionRemoveAllDead();
         await ddcsControllers.checkTimeToRestart();
         if (engineCache.config.lifePointsEnabled) {

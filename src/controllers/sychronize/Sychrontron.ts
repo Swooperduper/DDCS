@@ -112,6 +112,20 @@ export async function reSyncAllUnitsFromDbToServer(serverCount: number, dbCount:
     } else {
         setServerSynced(true);
         setMissionStartupReSync(false);
+        const knownFlags = await ddcsControllers.flagsActionRead({});
+        for (const flag in knownFlags){
+            console.log("Setting Flag ID:",knownFlags[flag]._id,"to value:",knownFlags[flag].value)
+            await ddcsControllers.sendUDPPacket("frontEnd", {
+                actionObj: {
+                    action: "setFlagValue",
+                    flagID: knownFlags[flag]._id,
+                    flagValue: knownFlags[flag].value,
+                    reqID: 0
+                }
+            });
+        }
+        await ddcsControllers.setFarpMarks();
+        await ddcsControllers.setCircleMarkers();
         console.log("ReSync Que Complete");
     }
 }
@@ -263,11 +277,24 @@ export async function syncCheck(serverCount: number): Promise<void> {
                 } else {
                     // unlock server port
                     // send message to discord
-                    await ddcsControllers.setFarpMarks();
                     await activateInactiveSpawn();
                     setMissionStartupReSync(false);
                     setServerSynced(true);
                     console.log("Server Is Synchronized");
+                    const knownFlags = await ddcsControllers.flagsActionRead({});
+                    for (const flag in knownFlags){
+                        console.log("Setting Flag ID:",knownFlags[flag]._id,"to value:",knownFlags[flag].value)
+                        await ddcsControllers.sendUDPPacket("frontEnd", {
+                            actionObj: {
+                                action: "setFlagValue",
+                                flagID: knownFlags[flag]._id,
+                                flagValue: knownFlags[flag].value,
+                                reqID: 0
+                            }
+                        });
+                    }
+                    await ddcsControllers.setCircleMarkers();
+                    await ddcsControllers.setFarpMarks();
                 }
             } else {
                 // normal named sync system
