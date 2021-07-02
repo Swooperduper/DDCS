@@ -133,6 +133,7 @@ export async function processingIncomingData(incomingObj: any) {
                     await ddcsController.lockUserToSide(incomingObj, randSide);
                 } else if (incomingObj.message === "-redrawf10") {
                     await ddcsController.setFarpMarks();
+                    await ddcsController.setCircleMarkers();
                 } else if (incomingObj.message === "-refreshmenu") {
                     const unit = await ddcsController.unitActionRead({playername: curPly.name});
                     if (unit.length > 0) {
