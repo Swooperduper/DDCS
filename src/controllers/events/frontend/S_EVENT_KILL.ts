@@ -30,7 +30,9 @@ export async function processEventKill(eventObj: any): Promise<void> {
                     isGroundTarget: (ddcsControllers.UNIT_CATEGORY[iUnit[0].unitCategory] === "GROUND_UNIT")
                 };
                 initSide = eventObj.data.initiator.side;
-
+                if (ddcsControllers.UNIT_CATEGORY[iUnit[0].unitCategory] === "GROUND_UNIT") {
+                    await ddcsControllers.baseUnitUnderAttack(iUnit[0]);
+                }
                 // console.log("playerOwner: ", !!curInitiator.playerOwner,
                 // curInitiator.playerOwner, curInitiator.player, curInitiator.unit);
                 if (!!curInitiator.playerOwner && !!curInitiator.unit.playerOwnerId) {
@@ -102,6 +104,8 @@ export async function processEventKill(eventObj: any): Promise<void> {
         } else if (eventObj.data.weapon_name && eventObj.data.weapon_name !== "") {
             weaponMesg += eventObj.data.weapon_name;
         }
+        
+
 
         await ddcsControllers.sendMesgToAll(
             "HASKILLED",
