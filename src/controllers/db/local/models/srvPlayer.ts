@@ -104,6 +104,10 @@ export function srvPlayerModel(dbconn: mongoose.Connection): mongoose.Document |
                 type: Number,
                 default: 0
             },
+            acquisitionsUnpacked: {
+                type: Number,
+                default: 0
+            },
             displayAllMessages: {
                 type: Boolean,
                 default: true

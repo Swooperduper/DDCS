@@ -1397,6 +1397,7 @@ export async function unpackCrate(
         );
         return false;
     } else {
+        await ddcsControllers.srvPlayerActionsUpdateacquisitionsUnpacked(curPlayer);
         const delUnits = await ddcsControllers.unitActionReadStd({
             playerOwnerId: curPlayer.ucid,
             playerCanDrive: mobile || false,

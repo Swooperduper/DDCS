@@ -80,6 +80,10 @@ export function serverModel(dbconn: mongoose.Connection): mongoose.Document | {}
                 type: Boolean,
                 default: false
             },
+            tacCommAccessAcqCount:{
+                type: Number,
+                default:8
+            },
             spwnLimitsPerTick: {
                 type: Object
             },

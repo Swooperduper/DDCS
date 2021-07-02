@@ -12,7 +12,6 @@ export async function processFiveSecActions(fullySynced: boolean): Promise<void>
     const replenThreshold = 1; // percentage under max
     const replenBase = engineCache.config.replenThresholdBase * replenThreshold;
     const replenTimer = _.random(engineCache.config.replenTimer / 2, engineCache.config.replenTimer);
-
     await ddcsControllers.syncCheck(ddcsControllers.getCurServerCnt());
     console.log("SYNCED: ", fullySynced);
     if (fullySynced) {

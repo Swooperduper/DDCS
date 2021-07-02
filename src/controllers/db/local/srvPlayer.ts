@@ -7,6 +7,7 @@ import * as typings from "../../../typings";
 import { dbModels } from "../common";
 import * as ddcsController from "../../";
 import {I18nResolver} from "i18n-ts";
+import { engineCache } from "src/controllers/constants";
 
 export async function srvPlayerActionsRead(obj: any): Promise<typings.ISrvPlayers[]> {
     return new Promise((resolve, reject) => {
@@ -35,6 +36,31 @@ export async function srvPlayerActionsUnsetGicTimeLeft(obj: any): Promise<void> 
         dbModels.srvPlayerModel.updateOne(
             {_id: obj._id},
             {$unset: { gicTimeLeft: "" }},
+            (err: any) => {
+                if (err) { reject(err); }
+                resolve();
+            }
+        );
+    });
+}
+
+export async function srvPlayerActionsUpdateacquisitionsUnpacked(obj: any): Promise<void> {
+    return new Promise((resolve, reject) => {
+        const engineCache = ddcsController.getEngineCache();
+        if (!obj.gciAllowed && obj.acquisitionsUnpacked >= (engineCache.config.tacCommAccessAcqCount - 1)){
+            dbModels.srvPlayerModel.updateOne(
+                {_id: obj._id},
+                {$set: { gciAllowed: true}},
+                (err: any) => {
+                    if (err) { reject(err); }
+                    resolve();
+                }
+            );
+        }
+        
+        dbModels.srvPlayerModel.updateOne(
+            {_id: obj._id},
+            {$inc: { acquisitionsUnpacked: 1}},
             (err: any) => {
                 if (err) { reject(err); }
                 resolve();
@@ -409,10 +435,10 @@ export async function srvPlayerActionsUnsetCampaign(): Promise<void> {
             {},
             {$set: {
                 curLifePoints: serverCache.config.startLifePoints,
-                sideLock: 0,
-                redRSPoints: 0,
-                blueRSPoints: 0,
-                tmpRSPoints: 0
+                sideLock: 0
+               // redRSPoints: 0,
+                //blueRSPoints: 0,
+                //tmpRSPoints: 0
             }},
             (err: any) => {
                 if (err) { reject(err); }
