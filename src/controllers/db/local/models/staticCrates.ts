@@ -20,7 +20,7 @@ export function staticCratesModel(dbconn: mongoose.Connection): mongoose.Documen
             },
             shapeName: {
                 type: String,
-                default: "iso_container_small_cargo"
+                default: "bw_container_cargo"
             },
             category: {
                 type: String,
@@ -28,7 +28,7 @@ export function staticCratesModel(dbconn: mongoose.Connection): mongoose.Documen
             },
             type: {
                 type: String,
-                default: "iso_container_small"
+                default: "container_cargo"
             },
             heading: {
                 type: Number,

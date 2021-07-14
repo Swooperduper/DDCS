@@ -100,9 +100,9 @@ export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: 
                         crateObj = {
                             name: curUnit.intCargoType + "|#" + _.random(1000000, 9999999),
                             unitLonLatLoc: curUnit.lonLatLoc,
-                            shape_name: "iso_container_small_cargo",
+                            shape_name: "bw_container_cargo",
                             category: "Cargo",
-                            type: "iso_container_small",
+                            type: "container_cargo",
                             heading: curUnit.hdg,
                             canCargo: true,
                             mass: 500,
@@ -461,7 +461,7 @@ export async function processReceiveRoadPath(incomingObj: any): Promise<void> {
 export async function menuCmdProcess(pObj: any) {
     // console.log("MENU COMMAND: ", pObj);
     const engineCache = ddcsControllers.getEngineCache();
-    const defCrate = "iso_container_small";
+    const defCrate = "container_cargo";
 
     const units = await ddcsControllers.unitActionRead({unitId: pObj.unitId});
     if (units.length > 0) {
@@ -1097,7 +1097,7 @@ export async function spawnCrateFromLogi(
             if (curCrate) {
                 curShapeName = curCrate.shape_name;
             } else {
-                curShapeName = "iso_container_small_cargo";
+                curShapeName = "bw_container_cargo";
             }
             const curName = "CU|" + curPlayer.ucid + "|" + crates + "|" + isCombo + "|" +
                 ((spc) ? spc : type) + "|" + mobile + "|" + closeLogi + "|#" + _.random(1000000, 9999999);

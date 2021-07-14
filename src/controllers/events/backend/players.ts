@@ -80,7 +80,7 @@ export async function processPlayerEvent(playerArray: any): Promise<void> {
                 if (engineCache.config.isJtacLocked && isArtilleryCmdr &&
                     !localPlayer.gciAllowed && localPlayer.sideLock == player.side) {
                     await ddcsControllers.forcePlayerSpectator(player.id, "You are not allowed to use " +
-                        "GCI/Tac Commander slot. Please look at at the relevant forum thread on the Guilded to gain access.");
+                        "GCI/Tac Commander slot. Please look at the server information channel in discord to gain access.");
                 }
 
                 if (curPlyrName === "") {

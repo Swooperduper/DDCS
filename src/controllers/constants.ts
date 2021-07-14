@@ -303,7 +303,7 @@ export const time: any = {
 };
 
 export const crateTypes: string[] = [
-    "iso_container_small",
+    "container_cargo",
     "iso_container",
     "ammo_cargo",
     "barrels_cargo",
