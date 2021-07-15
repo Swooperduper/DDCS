@@ -898,7 +898,7 @@ export async function spawnBaseAWACS(baseName: string) {
                     name: awacsCallsign.name[awacsCallsign.one] + awacsCallsign.two + 1
                 },
                 onboard_num: "010",
-                frequency: 251
+                frequency: curBase.polygonLoc.AICapTemplate.units[0].frequency
             };
 
             const unitTemplate = await ddcsControllers.templateRead({_id: "awacsTemplateFull"});

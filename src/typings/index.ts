@@ -351,6 +351,7 @@ export interface IUnit {
     skill: string;
     parking_id: number;
     parking: number;
+    frequency: number;
     payload: string;
     callsign: {
         name: string;
@@ -581,6 +582,7 @@ export interface ICapTemplate {
     lonLat: number[];
     parking: number;
     parking_id: number;
+    frequency: number;
     type: string;
 }
 

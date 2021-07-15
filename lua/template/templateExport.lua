@@ -182,6 +182,7 @@ do
 													["type"] = group.units[pIndex].type,
 													["parking"] = group.units[pIndex].parking,
 													["parking_id"] = group.units[pIndex].parking_id,
+													["frequency"] = group.units[pIndex].frequency,
 												})
 											end
 										end
