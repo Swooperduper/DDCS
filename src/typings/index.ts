@@ -182,6 +182,7 @@ export interface ISrvPlayers {
     virtualCrates: true;
     banned?: boolean;
     gciAllowed?: boolean;
+    gciBlockedReason: string;
     isGameMaster?: boolean;
     ipaddr?: string;
     lang?: string;

@@ -47,7 +47,7 @@ export async function srvPlayerActionsUnsetGicTimeLeft(obj: any): Promise<void> 
 export async function srvPlayerActionsUpdateacquisitionsUnpacked(obj: any): Promise<void> {
     return new Promise((resolve, reject) => {
         const engineCache = ddcsController.getEngineCache();
-        if (!obj.gciAllowed && obj.acquisitionsUnpacked >= (engineCache.config.tacCommAccessAcqCount - 1)){
+        if (!obj.gciAllowed && obj.acquisitionsUnpacked == (engineCache.config.tacCommAccessAcqCount - 1)){
             dbModels.srvPlayerModel.updateOne(
                 {_id: obj._id},
                 {$set: { gciAllowed: true}},

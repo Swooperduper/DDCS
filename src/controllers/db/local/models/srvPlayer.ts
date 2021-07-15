@@ -88,6 +88,10 @@ export function srvPlayerModel(dbconn: mongoose.Connection): mongoose.Document |
                 type: Boolean,
                 default: false
             },
+            gciBlockedReason: {
+                type: String,
+                default: "Check the discord #server-information section for instructions on how you can get yourself access to Tactical Commmander"
+            },
             isGameMaster: {
                 type: Boolean,
                 default: false

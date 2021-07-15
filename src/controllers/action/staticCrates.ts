@@ -52,7 +52,7 @@ export async function unpackStaticCrate(curPlayerUnit: any): Promise<void> {
         localCrateNum = grpTypes[curCrateType].length;
 
         if ( localCrateNum >=  numCrate) {
-            if (curCrateSpecial === "reloadGroup") {
+            if (curCrateSpecial === "reloadGroup" || curCrateType === "reloadGroup") {
                 const response = await ddcsControllers.reloadSAM(curPlayerUnit);
                 if (response) {
                     await destroyCrates(grpTypes, curCrateType, numCrate);
