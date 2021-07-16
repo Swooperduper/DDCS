@@ -1428,7 +1428,7 @@ export async function spawnStaticBuilding(
                 lonLatLoc: ddcsControllers.getRandomLatLonFromBase(baseObj.name, "buildingPoly"),
                 isActive: true
             };
-            // console.log("STATIC1: ", curStaticObj);
+            console.log("STATIC1: ", curStaticObj);
             await ddcsControllers.sendUDPPacket("frontEnd", {
                 actionObj: {
                     action: "CMD",
@@ -1439,7 +1439,7 @@ export async function spawnStaticBuilding(
                 }
             });
             // initial spawn, spawn in DB and sync over - doesnt work as of yet
-            // await ddcsControllers.unitActionSave(curStaticObj);
+            await ddcsControllers.unitActionSave(curStaticObj);
         } else {
             console.log("country not found: ", side, staticType);
         }
@@ -1647,10 +1647,10 @@ export async function healBase(baseName: string, curPlayerUnit: any, init: boole
     const engineCache = ddcsControllers.getEngineCache();
     const i18n = new I18nResolver(engineCache.i18n, curPly.lang).translation as any;
     const baseUnit = await ddcsControllers.baseActionRead({name: baseName});
-    //console.log("healBase: ", baseName, baseUnit);
+    console.log("healBase: ", baseName, baseUnit);
     if (baseUnit.length > 0) {
         const curBase = baseUnit[0];
-        // console.log("CB: ", curBase);
+        console.log("CB: ", curBase);
         if (curBase.side !== 0 && curBase.side !== curPlayerUnit.coalition) {
             await ddcsControllers.sendMesgToGroup(
                 curPly,

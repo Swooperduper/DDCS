@@ -68,7 +68,7 @@ export async function processingIncomingData(incomingObj: any) {
             // await ddcsController.processEventRefuelingStop(incomingObj);
             break;
         case "S_EVENT_BIRTH":
-            // console.log("player unit birth: ", incomingObj);
+            console.log("unit birth: ", incomingObj);
             await ddcsController.processEventBirth(incomingObj);
             break;
         case "S_EVENT_PLAYER_ENTER_UNIT":
