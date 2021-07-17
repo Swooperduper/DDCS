@@ -203,6 +203,10 @@ export function serverModel(dbconn: mongoose.Connection): mongoose.Document | {}
                 type: Boolean,
                 default: true
             },
+            aiConvoysEnabled: {
+                type: Boolean,
+                default: true
+            },
             GCIDetectTypes: {
                 type: Array,
                 required: true,

@@ -72,6 +72,7 @@ export interface IServer {
     fullServerResetOnCampaign: boolean;
     resetFullCampaign: boolean;
     lifePointsEnabled: boolean;
+    aiConvoysEnabled: boolean;
     spwnLimitsPerTick: number;
     fullServerRestartOnCampaignWin: boolean;
     isJtacLocked: boolean;
