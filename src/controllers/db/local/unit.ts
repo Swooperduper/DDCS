@@ -43,6 +43,15 @@ export async function unitActionReadFirst5(obj: any): Promise<typings.IUnit[]> {
     });
 }
 
+export async function unitActionReadOldest(obj: any): Promise<typings.IUnit[]> {
+    return new Promise((resolve, reject) => {
+        dbModels.unitModel.find(obj).sort( { createdAt: -1 } ).limit(1).exec((err: any, dbUnits: typings.IUnit[]) => {
+            if (err) { reject(err); }
+            resolve(dbUnits);
+        });
+    });
+}
+
 export async function unitActionReadStd(obj: any): Promise<typings.IUnit[]> {
     return new Promise((resolve, reject) => {
         dbModels.unitModel.find(obj).exec((err: any, dbUnits: typings.IUnit[]) => {

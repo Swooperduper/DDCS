@@ -17,7 +17,7 @@ export async function baseUnitUnderAttack(unit: typings.IUnit): Promise<void> {
                 const curBase = _.find(engineCache.bases, {_id: curDBBase._id});
                 if (curBase) {
                     curBase.underAttack += 1;
-                    console.log(curBase.name + " is under attack " + curBase.underAttack + " times");
+                    console.log(curBase.name + " is under attack");
                 }
             }
         }

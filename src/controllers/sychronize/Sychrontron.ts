@@ -102,6 +102,7 @@ export async function reSyncAllUnitsFromDbToServer(serverCount: number, dbCount:
                     dead: true
                 });
                 console.log("Resync Server Objects, in Db to Server: ", serverCount, dbCount);
+                await ddcsControllers.correctPlayerAircraftDuplicates();
                 await reSyncServerObjs(serverCount, dbCount);
             }
         }
@@ -304,6 +305,7 @@ export async function syncCheck(serverCount: number): Promise<void> {
                 console.log("Server:", serverCount, " Db", dbCount);
                 if (serverCount !== dbCount) {
                     console.log("Resync Server Objects, in Db to Server: ", serverCount, dbCount);
+                    await ddcsControllers.correctPlayerAircraftDuplicates();
                     await reSyncServerObjs(serverCount, dbCount);
                 } else {
                     // normal synced operation
