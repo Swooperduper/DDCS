@@ -1439,7 +1439,7 @@ export async function spawnStaticBuilding(
                 }
             });
             // initial spawn, spawn in DB and sync over - doesnt work as of yet
-            await ddcsControllers.unitActionSave(curStaticObj);
+            // await ddcsControllers.unitActionSave(curStaticObj);
         } else {
             console.log("country not found: ", side, staticType);
         }
