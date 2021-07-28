@@ -7,10 +7,24 @@ import * as ddcsControllers from "../";
 
 let randomMarkId: number;
 
+export async function getUniqueMarkerID(){
+    let genMarkID: number = await ddcsControllers.getUniqueMarkerID();
+    let baseMarkID = await ddcsControllers.baseActionRead({enabled: true, randomMarkId: genMarkID});
+    let unitMarkID = await ddcsControllers.unitActionRead({randomMarkId: genMarkID});
+    while (baseMarkID.length != 0 && unitMarkID.length !=0){
+        console.log("Marker ID already in Database with ID:",genMarkID);
+        console.log("Trying a new ID",genMarkID);
+        genMarkID = await ddcsControllers.getUniqueMarkerID();
+        baseMarkID = await ddcsControllers.baseActionRead({enabled: true, randomMarkId: genMarkID});
+        unitMarkID = await ddcsControllers.unitActionRead({randomMarkId: genMarkID});
+    }
+    return genMarkID
+}
+
 export async function setFarpMarks() {
     const bases = await ddcsControllers.baseActionRead({enabled: true, _id: {$not: /#/}});
     for (const base of bases) {
-        randomMarkId = _.random(1000, 9999);
+        randomMarkId = await ddcsControllers.getUniqueMarkerID();
         if (base.baseMarkId) {
             await ddcsControllers.sendUDPPacket("frontEnd", {
                 actionObj: {
@@ -51,7 +65,7 @@ export async function setUnitMark(
                 },
                 queName: "clientArray"
             });
-            randomMarkId = _.random(1000, 9999);
+            randomMarkId = await ddcsControllers.getUniqueMarkerID();
             ddcsControllers.sendUDPPacket("frontEnd", {
                 actionObj: {
                     action: "CMD",
@@ -70,7 +84,7 @@ export async function setUnitMark(
                     console.log("82", err);
                 });
         } else {
-            randomMarkId = _.random(1000, 9999);
+            randomMarkId = await ddcsControllers.getUniqueMarkerID();
             ddcsControllers.sendUDPPacket("frontEnd", {
                 actionObj: {
                     action: "CMD",
@@ -109,7 +123,7 @@ export async function setCircleMark(
                 },
                 queName: "clientArray"
             });
-            randomMarkId = _.random(1000, 9999);
+            randomMarkId = await ddcsControllers.getUniqueMarkerID();
             const circleRadius = 2000
             let circleOutlineColour = "{128,128,128,0.8}"
             let circleShadeColour = "{128,128,128,0.5}"
@@ -141,7 +155,7 @@ export async function setCircleMark(
                     console.log("82", err);
                 });
         } else {
-            randomMarkId = _.random(1000, 9999);
+            randomMarkId = await ddcsControllers.getUniqueMarkerID();
             const circleRadius = 2000
             let circleOutlineColour = "{128,128,128,0.8}"
             let circleShadeColour = "{128,128,128,0.2}"
@@ -196,7 +210,7 @@ export async function setNeutralCircleMark(
                     },
                     queName: "clientArray"
                 });
-                randomMarkId = _.random(1000, 9999);
+                randomMarkId = await ddcsControllers.getUniqueMarkerID();
                 const circleRadius = 2000
                 let circleOutlineColour = "{128,128,128,0.8}"
                 let circleShadeColour = "{128,128,128,0.5}"
@@ -221,7 +235,7 @@ export async function setNeutralCircleMark(
                         console.log("82", err);
                     });
             } else {
-                randomMarkId = _.random(1000, 9999);
+                randomMarkId = await ddcsControllers.getUniqueMarkerID();
                 const circleRadius = 2000
                 let circleOutlineColour = "{128,128,128,0.8}"
                 let circleShadeColour = "{128,128,128,0.2}"
@@ -269,7 +283,7 @@ export async function setCircleMarkers() {
                     },
                     queName: "clientArray"
                 });
-                randomMarkId = _.random(1000, 9999);
+                randomMarkId = await ddcsControllers.getUniqueMarkerID();
                 const circleRadius = 2000
                 let circleOutlineColour = "{128,128,128,0.8}"
                 let circleShadeColour = "{128,128,128,0.5}"
@@ -302,7 +316,7 @@ export async function setCircleMarkers() {
                         console.log("82", err);
                     });
             } else {
-                randomMarkId = _.random(1000, 9999);
+                randomMarkId = await ddcsControllers.getUniqueMarkerID();
                 const circleRadius = 2000
                 let circleOutlineColour = "{128,128,128,0.8}"
                 let circleShadeColour = "{128,128,128,0.2}"
@@ -355,7 +369,7 @@ export async function setBaseCircleMark( baseName: any, baseSide: any) {
                 },
                 queName: "clientArray"
             });
-            randomMarkId = _.random(1000, 9999);
+            randomMarkId = await ddcsControllers.getUniqueMarkerID();
             const circleRadius = 2000
             let circleOutlineColour = "{128,128,128,0.8}"
             let circleShadeColour = "{128,128,128,0.5}"
@@ -387,7 +401,7 @@ export async function setBaseCircleMark( baseName: any, baseSide: any) {
                     console.log("82", err);
                 });
         } else {
-            randomMarkId = _.random(1000, 9999);
+            randomMarkId = await ddcsControllers.getUniqueMarkerID();
             const circleRadius = 2000
             let circleOutlineColour = "{128,128,128,0.8}"
             let circleShadeColour = "{128,128,128,0.2}"
