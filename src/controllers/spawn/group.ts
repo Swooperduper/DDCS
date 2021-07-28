@@ -1508,8 +1508,9 @@ export async function spawnUnitGroup(spawnArray: typing.IUnitSpawnMin[], init: b
 
 export async function spawnNewMapObjs(): Promise<void> {
     const bases = await ddcsControllers.baseActionRead({name: {$not: /#/}, enabled: true, "defaultStartSide" : { $ne : 0 } });
-    //console.log("bases",bases);
+    console.log("bases",bases.map(x => x._id));
     for (const base of bases) {
+		console.log("BASE: ", base._id);
         if (!_.includes(base.name, "Carrier")) {
             const baseStartSide = base.defaultStartSide || 0;
 
