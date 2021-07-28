@@ -831,7 +831,7 @@ export async function baseAWACSUpkeep() {
     const getBaseAwacs = engineCache.config.baseAwacs;
 
     for ( const baseName of getBaseAwacs) {
-        //console.log("chkBase: ", baseName);
+        console.log("Awacs chkBase: ", baseName);
         await spawnBaseAWACS(baseName);
     }
 }
@@ -839,13 +839,14 @@ export async function baseAWACSUpkeep() {
 export async function spawnBaseAWACS(baseName: string) {
     const awacsName = "AI|baseAWACS|" + baseName + "|";
     const isAwacsAlive = await ddcsControllers.unitActionRead({name: awacsName, dead: false});
-    // console.log("IAA: ", isAwacsAlive);
+    console.log("IAA: ", isAwacsAlive);
     if (isAwacsAlive.length === 0) {
         const bases = await ddcsControllers.baseActionRead({_id: baseName});
         const curBase = bases[0];
         let replenEpoc = new Date(curBase.awacsReplenTime).getTime();
         if (_.isNaN(replenEpoc)) {
             replenEpoc = new Date().getTime() - 1000;
+            console.log("For base:",baseName,"Replen Epoc isNAN so setting it to", replenEpoc);
 
         }
 
@@ -920,6 +921,7 @@ export async function spawnBaseAWACS(baseName: string) {
             });
         }
     } else {
+        console.log("Updating Base Awacs Replen Timer for",baseName)
         await ddcsControllers.baseActionUpdateAwacsTimer({
             name: baseName,
             awacsReplenTime: new Date().getTime() + ddcsControllers.time.oneHour
