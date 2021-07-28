@@ -207,6 +207,14 @@ export function serverModel(dbconn: mongoose.Connection): mongoose.Document | {}
                 type: Boolean,
                 default: true
             },
+            reactiveConvoyAI: {
+                type: Boolean,
+                default: true
+            },
+            reactiveBaseAI: {
+                type: Boolean,
+                default: true
+            },
             GCIDetectTypes: {
                 type: Array,
                 required: true,

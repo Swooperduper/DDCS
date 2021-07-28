@@ -39,6 +39,7 @@ export async function checkUnitsToBaseForCapture(): Promise<void> {
                 if (aliveComms.length > 0) {
                     await ddcsControllers.spawnStaticBuilding({} as typing.IStaticSpawnMin, true, base, 2, "Comms tower M");
                 }
+                await ddcsControllers.setBaseCircleMark(base.name, 2);        
             }
         }
         if (base.side === 2 && _.get(sideArray, [1], []).length > 0) {
@@ -64,6 +65,7 @@ export async function checkUnitsToBaseForCapture(): Promise<void> {
                 if (aliveComms.length > 0) {
                     await ddcsControllers.spawnStaticBuilding({} as typing.IStaticSpawnMin, true, base, 1, "Comms tower M");
                 }
+                await ddcsControllers.setBaseCircleMark(base.name, 1);
             }
         }
         if (base.side === 0 && (_.get(sideArray, [1], []).length > 0 || _.get(sideArray, [2], []).length > 0)) {

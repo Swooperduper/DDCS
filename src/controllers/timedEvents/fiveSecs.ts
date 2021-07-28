@@ -39,10 +39,12 @@ export async function processFiveSecActions(fullySynced: boolean): Promise<void>
         await ddcsControllers.checkUnitsToBaseForCapture();
 
         await ddcsControllers.processCommandQue();
-
-        await ddcsControllers.killEnemyWithinSightOfConvoy();
-
-        await ddcsControllers.aiDefendBase();
+        
+        if (engineCache.config.reactiveConvoyAI)
+            await ddcsControllers.killEnemyWithinSightOfConvoy();
+        
+        if (engineCache.config.reactiveBaseAI)
+            await ddcsControllers.aiDefendBase();
 
         await ddcsControllers.baseAWACSUpkeep();
 

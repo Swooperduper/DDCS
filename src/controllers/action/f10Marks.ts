@@ -339,3 +339,85 @@ export async function setCircleMarkers() {
        
     }
 }
+
+export async function setBaseCircleMark( baseName: any, baseSide: any) {
+        const cUnit = await ddcsControllers.unitActionRead({_id: baseName + " Shelter"});
+        const curUnit = cUnit[0];
+        const baseInfo = await ddcsControllers.baseActionRead({_id : curUnit.name.replace(' Shelter','')})
+        if (_.get(curUnit, "markId")) {
+            ddcsControllers.sendUDPPacket("frontEnd", {
+                actionObj: {
+                    action: "CMD",
+                    cmd: [
+                        "trigger.action.removeMark(" + _.get(curUnit, "markId") + ")"
+                    ],
+                    reqID: 0
+                },
+                queName: "clientArray"
+            });
+            randomMarkId = _.random(1000, 9999);
+            const circleRadius = 2000
+            let circleOutlineColour = "{128,128,128,0.8}"
+            let circleShadeColour = "{128,128,128,0.5}"
+            if (baseSide === 1){
+                circleOutlineColour = "{255,0,0,5}"
+                circleShadeColour = "{255,0,0,0.2}"
+            }   else if (baseSide === 2){
+                circleOutlineColour = "{0,0,180,0.5}"
+                circleShadeColour = "{0,0,120,0.2}"
+            }
+            ddcsControllers.sendUDPPacket("frontEnd", {
+                actionObj: {
+                    action: "CMD",
+                    cmd: [
+                        "trigger.action.circleToAll(-1," + randomMarkId + ", " +
+                        "coord.LLtoLO(" + _.get(baseInfo[0], ["centerLoc", 1]) + ", " +
+                        _.get(baseInfo[0], ["centerLoc", 0]) + "), " + circleRadius + ", " +
+                        circleOutlineColour + ", " +
+                        circleShadeColour + ", " +
+                        "1, " +
+                        "true"+", [[" + _.get(curUnit, "name") + "]])"
+                    ],
+                    reqID: 0
+                },
+                queName: "clientArray"
+            });
+            await ddcsControllers.unitActionUpdate({_id: _.get(curUnit, "_id"), markId: randomMarkId})
+                .catch((err) => {
+                    console.log("82", err);
+                });
+        } else {
+            randomMarkId = _.random(1000, 9999);
+            const circleRadius = 2000
+            let circleOutlineColour = "{128,128,128,0.8}"
+            let circleShadeColour = "{128,128,128,0.2}"
+            if (baseSide === 1){
+                circleOutlineColour = "{180,0,0,0.5}"
+                circleShadeColour = "{120,0,0,0.2}"
+            }   else if (baseSide === 2){
+                circleOutlineColour = "{0,0,180,0.5}"
+                circleShadeColour = "{0,0,120,0.2}"
+            }
+            ddcsControllers.sendUDPPacket("frontEnd", {
+                actionObj: {
+                    action: "CMD",
+                    cmd: [
+                        "trigger.action.circleToAll(-1," + randomMarkId + ", " +
+                        "coord.LLtoLO(" + _.get(baseInfo[0], ["centerLoc", 1]) + ", " +
+                        _.get(baseInfo[0], ["centerLoc", 0]) + "), " + circleRadius + ", " +
+                        circleOutlineColour + ", " +
+                        circleShadeColour + ", " +
+                        "1, " +
+                        "true"+", [[" + _.get(curUnit, "name") + "]])"
+                    ],
+                    reqID: 0
+                },
+                queName: "clientArray"
+            });
+            await ddcsControllers.unitActionUpdate({_id: curUnit._id, markId: randomMarkId})
+                .catch((err) => {
+                    console.log("103", err);
+                });
+        }
+    
+}
