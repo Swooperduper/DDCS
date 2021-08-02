@@ -831,7 +831,7 @@ export async function baseAWACSUpkeep() {
     const getBaseAwacs = engineCache.config.baseAwacs;
 
     for ( const baseName of getBaseAwacs) {
-        console.log("Awacs chkBase: ", baseName);
+        //console.log("Awacs chkBase: ", baseName);
         await spawnBaseAWACS(baseName);
     }
 }
@@ -839,7 +839,7 @@ export async function baseAWACSUpkeep() {
 export async function spawnBaseAWACS(baseName: string) {
     const awacsName = "AI|baseAWACS|" + baseName + "|";
     const isAwacsAlive = await ddcsControllers.unitActionRead({name: awacsName, dead: false});
-    console.log("IAA: ", isAwacsAlive);
+    //console.log("IAA: ", isAwacsAlive);
     if (isAwacsAlive.length === 0) {
         const bases = await ddcsControllers.baseActionRead({_id: baseName});
         const curBase = bases[0];
