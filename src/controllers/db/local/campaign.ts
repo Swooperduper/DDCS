@@ -36,6 +36,14 @@ export async function campaignsActionsUpdate(obj: any): Promise<typings.ICampaig
         );
     });
 }
+export async function campaignsActionsReset(){
+    const latestCampaign = await campaignsActionsReadLatest();
+    await campaignsActionsUpdate({
+        _id: latestCampaign._id,
+        totalMinutesPlayed_blue: 0,
+        totalMinutesPlayed_red: 0
+    });
+}
 
 export async function campaignsActionsSave(obj: {
     _id: string,
