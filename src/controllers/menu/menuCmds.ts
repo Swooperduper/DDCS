@@ -65,6 +65,7 @@ export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: 
                     );
                 } else {
                     if (curIntCrateType === "JTAC") {
+                        await ddcsControllers.correctPlayerAircraftDuplicates();
                         await unpackCrate(curUnit, curUnit.country, crateType, "jtac", false, true);
                         await ddcsControllers.unitActionUpdateByUnitId({unitId: curUnit.unitId, intCargoType: ""});
                         await ddcsControllers.sendMesgToGroup(
@@ -75,6 +76,7 @@ export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: 
                         );
                     }
                     if (curIntCrateType === "BaseRepair") {
+                        await ddcsControllers.correctPlayerAircraftDuplicates();
                         if (_.some(playerProx)) {
                             await ddcsControllers.repairBase(curBaseObj, curUnit);
                         } else {
