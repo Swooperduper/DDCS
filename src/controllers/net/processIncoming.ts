@@ -149,7 +149,17 @@ export async function processingIncomingData(incomingObj: any) {
                 } else if (incomingObj.message === "-") {
                     const mesg = i18n.COMMANDDEFAULTRESPONSE;
                     await ddcsController.sendMesgToPlayerChatWindow(mesg, curPly.playerId);
-                }
+                } 
+                // GameMaster
+                else if (incomingObj.message.startsWith("-admin")) {
+                    const curPlayerDb = await ddcsController.srvPlayerActionsRead({_id: curPly.ucid});
+                    if (curPlayerDb[0].isGameMaster) {
+                        await ddcsController.sendMesgToPlayerChatWindow("Admin Command", curPly.playerId);
+                    } else {
+                        await ddcsController.sendMesgToPlayerChatWindow("You do not have access to these commmands!", curPly.playerId);
+                    }
+
+                } 
             });
 
             /*
