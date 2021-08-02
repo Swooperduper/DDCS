@@ -923,7 +923,7 @@ export async function spawnBaseAWACS(baseName: string) {
             });
         }
     } else {
-        console.log("Updating Base Awacs Replen Timer for",baseName)
+        //console.log("Updating Base Awacs Replen Timer for",baseName)
         await ddcsControllers.baseActionUpdateAwacsTimer({
             name: baseName,
             awacsReplenTime: new Date().getTime() + ddcsControllers.time.oneHour
