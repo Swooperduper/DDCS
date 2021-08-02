@@ -72,13 +72,13 @@ export async function swapUserToLosingSide(incomingObj: any): Promise<void> {
                 enabled: true
             });
 
-            let lockToSide = 0
-            if (currentRedBases.length < 10){
+            let lockToSide = 0;
+            if (currentRedBases.length< 10){
                 lockToSide = 1
             } else if (currentBlueBases.length < 10) {
                 lockToSide = 2
             }
-            if(lockToSide = 0){
+            if(lockToSide == 0){
                 const mesg = "You cannot swap teams right now, the other team isn't losing that badly just yet, they still have more than 10 bases.";
                 await ddcsController.sendMesgToPlayerChatWindow(mesg, curPly.playerId);
             } else {
