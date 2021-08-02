@@ -155,6 +155,20 @@ export async function processingIncomingData(incomingObj: any) {
                     const curPlayerDb = await ddcsController.srvPlayerActionsRead({_id: curPly.ucid});
                     if (curPlayerDb[0].isGameMaster) {
                         await ddcsController.sendMesgToPlayerChatWindow("Admin Command", curPly.playerId);
+                        const adminCMDArray = incomingObj.message.split(" ");
+                        if (adminCMDArray[1] === "setFlag"){
+                            console.log("Setting Flag ID:",adminCMDArray[2],"to value:",adminCMDArray[3])
+                            await ddcsController.sendUDPPacket("frontEnd", {
+                                actionObj: {
+                                    action: "setFlagValue",
+                                    flagID: adminCMDArray[2],
+                                    flagValue: adminCMDArray[3],
+                                    reqID: 0
+                                }
+                            });
+                            await ddcsController.sendMesgToPlayerChatWindow("Setting Flag ID:" + adminCMDArray[2] +"to value:" + adminCMDArray[3], curPly.playerId);
+                        }
+
                     } else {
                         await ddcsController.sendMesgToPlayerChatWindow("You do not have access to these commmands!", curPly.playerId);
                     }
