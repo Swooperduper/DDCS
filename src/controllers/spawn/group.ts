@@ -664,6 +664,18 @@ export async function spawnLayer2Reinforcements(
             type: curUnarmedAmmo[0].type,
             lonLatLoc: randLatLonInBase
         });
+        const layer2Guard = getRndFromSpawnCat("tank", side, false, true);
+        groupedL2Units.push({
+            hdg: _.random(0, 359),
+            alt: 0,
+            coalition: side,
+            country: ddcsControllers.countryId.indexOf(curCountry[0]),
+            unitCategory: layer2Guard[0].unitCategory,
+            objectCategory: layer2Guard[0].objectCategory,
+            playerCanDrive: false,
+            type: layer2Guard[0].type,
+            lonLatLoc: ddcsControllers.getLonLatFromDistanceDirection(randLatLonInBase, curAngle, 0.02)
+        });
         // launchers
         for (let j = 0; j < curSpokeNum; j++) {
             curAngle += curSpokeDeg;
