@@ -1422,7 +1422,7 @@ export async function unpackCrate(
             }
         }
 
-        const newSpawnArray: any[] = [];
+        let newSpawnArray: any[] = [];
         if (combo) {
             console.log("Is Combo Unit");
             const addHdg = 30;
@@ -1472,8 +1472,8 @@ export async function unpackCrate(
                     pCountry = 1;
                 }
                 for (let x = 0; x < spawnUnitCount; x++) {
-                    const randInc = _.random(1000000, 9999999);
-                    const genName = "DU|" + curPlayer.ucid + "|" + type + "|" + special +
+                    let randInc = _.random(1000000, 9999999);
+                    let genName = "DU|" + curPlayer.ucid + "|" + type + "|" + special +
                         "|true|" + mobile + "|" + curPlayer.name + "|";
                     const unitStart = _.cloneDeep(findUnit);
                     if (curUnitHdg > 359) {
@@ -1490,6 +1490,7 @@ export async function unpackCrate(
                     newSpawnArray.push(unitStart);
                     curUnitHdg = curUnitHdg + addHdg;
                     await ddcsControllers.spawnUnitGroup(newSpawnArray, false);
+                    newSpawnArray = [];
                 }
                 return true;
             } else {
