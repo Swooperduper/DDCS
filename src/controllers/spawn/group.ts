@@ -1473,7 +1473,7 @@ export async function spawnUnitGroup(spawnArray: typing.IUnitSpawnMin[], init: b
         let groupTemplate: string = "";
         let groupNum = _.random(1000000, 9999999);
         let alreadySpawned = false
-        const grpObj = spawnArray[0];
+        let grpObj = spawnArray[0];
         const curBaseName = baseName || "";
         let curGroupName = (grpObj.groupName) ? grpObj.groupName : baseName + " #" + groupNum;
         grpObj.groupName = (grpObj.groupName) ? grpObj.groupName : baseName + " #" + groupNum;
@@ -1485,10 +1485,13 @@ export async function spawnUnitGroup(spawnArray: typing.IUnitSpawnMin[], init: b
         let unitTemplate = "";
         let unitNum = groupNum;
         for (const curUnit of spawnArray) {
-            console.log("spawnArray:",spawnArray)
+            let grpint = 0
+            
             const unitObj = curUnit;
             let spawnCat = await ddcsControllers.unitDictionaryActionsRead({ type : curUnit.type});
             if(!_.includes(spawnCat[0].spawnCat,"samRadar")){
+                grpObj = spawnArray[grpint];
+                grpint = grpint + 1 
                 console.log("spawnCat does not include samRadar:",spawnCat[0].spawnCat,spawnCat[0].type);
                 unitNum = _.random(1000000, 9999999);
                 groupNum = unitNum
@@ -1510,7 +1513,7 @@ export async function spawnUnitGroup(spawnArray: typing.IUnitSpawnMin[], init: b
             unitObj.groupName = curGroupName;
             unitObj.type = curUnit.type;
             unitObj.virtualGrpName = curGroupName;
-
+            console.log("spawnArray:",spawnArray)
             if (init) {
                 unitObj.isActive = false;
                 await ddcsControllers.unitActionSave(unitObj);
@@ -1539,7 +1542,7 @@ export async function spawnUnitGroup(spawnArray: typing.IUnitSpawnMin[], init: b
                 grpObj.country,
                 grpObj.unitCategory
             );
-            // console.log("spawnUnitGroup: ", curCMD);
+            console.log("spawnUnitGroup: ", curCMD);
             const sendClient = {actionObj: {action: "CMD", cmd: [curCMD], reqID: 0}};
             await ddcsControllers.sendUDPPacket("frontEnd", sendClient);
         }
