@@ -198,7 +198,8 @@ do
 													["sourceBase"] = sourceName,
 													["baseType"] = nArry[4],
 													["defaultStartSide"] = nArry[5],
-													["enabled"] = nArry[6]
+													["enabled"] = nArry[6],
+													["initSide"] = nArry[5]
 												}
 											end
 										end

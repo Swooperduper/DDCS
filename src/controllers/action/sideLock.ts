@@ -59,7 +59,7 @@ export async function swapUserToLosingSide(incomingObj: any): Promise<void> {
         const engineCache = ddcsController.getEngineCache();
         const i18n = new I18nResolver(engineCache.i18n, curPly.lang).translation as any;
         if (curPly && curPly.sideLock == 0) {
-            const mesg = "You are not currently locked to any side, please use -balance, -red or -blue";
+            const mesg = "You are not currently locked to any side, please use -help, -balance, -red or -blue";
             await ddcsController.sendMesgToPlayerChatWindow(mesg, curPly.playerId);
             resolve();
         } else {
