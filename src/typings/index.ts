@@ -326,6 +326,7 @@ export interface IUnit {
     country: number;
     groupId: number;
     groupName: string;
+    virtualGrpName: string;
     hdg: number;
     inAir: boolean;
     lonLatLoc: number[];
@@ -602,6 +603,7 @@ export interface IUnitSpawnMin {
     skill?: string;
     lonLatLoc?: number[];
     groupName?: string;
+    virtualGrpName?: string,
     name?: string;
     _id?: string;
 }

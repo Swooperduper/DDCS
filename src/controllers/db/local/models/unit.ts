@@ -77,6 +77,10 @@ export function unitModel(dbconn: mongoose.Connection): mongoose.Document | {} {
                 type: String,
                 require: true
             },
+            virtualGrpName: {
+                type: String,
+                require: true
+            },
             playername: {
                 type: String
             },

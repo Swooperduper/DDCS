@@ -1492,9 +1492,13 @@ export async function spawnUnitGroup(spawnArray: typing.IUnitSpawnMin[], init: b
             unitObj.countryName = ddcsControllers.countryId[grpObj.country];
             unitObj.skill = grpObj.skill || "Excellent";
             unitObj.playerCanDrive = curUnit.playerCanDrive || false;
-            unitObj.groupName = curGroupName;
+            if(unitObj.playerCanDrive && !_.includes(unitObj.name,"HQ-7")){
+                unitObj.groupName = curGroupName + _.random(1000000, 9999999);
+            }else{
+                unitObj.groupName = curGroupName;
+            }
             unitObj.type = curUnit.type;
-
+            unitObj.virtualGrpName = curGroupName;
 
             if (init) {
                 unitObj.isActive = false;
