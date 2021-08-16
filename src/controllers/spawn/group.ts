@@ -1491,8 +1491,11 @@ export async function spawnUnitGroup(spawnArray: typing.IUnitSpawnMin[], init: b
             unitObj.country = grpObj.country;
             unitObj.countryName = ddcsControllers.countryId[grpObj.country];
             unitObj.skill = grpObj.skill || "Excellent";
+            if (_.includes(curUnit.type,"HQ-7_STR_SP"))
+                curUnit.playerCanDrive = false
             unitObj.playerCanDrive = curUnit.playerCanDrive || false;
-            if(unitObj.playerCanDrive && !_.includes(unitObj.name,"HQ-7")){
+            let spawnCat = await ddcsControllers.unitDictionaryActionsRead({ type : curUnit.type});
+            if(!_.includes(spawnCat[0].spawnCat,"samRadar")){
                 unitObj.groupName = curGroupName + _.random(1000000, 9999999);
             }else{
                 unitObj.groupName = curGroupName;
