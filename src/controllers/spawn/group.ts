@@ -1472,9 +1472,10 @@ export async function spawnUnitGroup(spawnArray: typing.IUnitSpawnMin[], init: b
     if (spawnArray.length > 0) {
         let groupTemplate: string = "";
         let groupNum = _.random(1000000, 9999999);
+        let alreadySpawned = false
         const grpObj = spawnArray[0];
         const curBaseName = baseName || "";
-        const curGroupName = (grpObj.groupName) ? grpObj.groupName : baseName + " #" + groupNum;
+        let curGroupName = (grpObj.groupName) ? grpObj.groupName : baseName + " #" + groupNum;
         grpObj.groupName = (grpObj.groupName) ? grpObj.groupName : baseName + " #" + groupNum;
         grpObj.coalition = (side) ? side : spawnArray[0].coalition;
         if (!init) {
@@ -1490,8 +1491,10 @@ export async function spawnUnitGroup(spawnArray: typing.IUnitSpawnMin[], init: b
                 console.log("spawnCat does not include samRadar:",spawnCat[0].spawnCat,spawnCat[0].type);
                 unitNum = _.random(1000000, 9999999);
                 groupNum = unitNum
-            }
-            
+                curGroupName = (grpObj.groupName) ? grpObj.groupName : baseName + " #" + groupNum;
+                grpObj.groupName = (grpObj.groupName) ? grpObj.groupName : baseName + " #" + groupNum;
+                groupTemplate = await grndUnitGroup(grpObj);
+            }            
             unitObj.lonLatLoc = (curUnit.lonLatLoc) ? curUnit.lonLatLoc : ddcsControllers.getRandomLatLonFromBase(curBaseName, "unitPoly");
             unitObj.name = (curUnit.name) ? curUnit.name : baseName + " #" + unitNum;
             unitObj._id = unitObj.name;
@@ -1522,12 +1525,12 @@ export async function spawnUnitGroup(spawnArray: typing.IUnitSpawnMin[], init: b
                 // console.log("spawnUnitGroup: ", curCMD);
                 const sendClient = {actionObj: {action: "CMD", cmd: [curCMD], reqID: 0}};
                 await ddcsControllers.sendUDPPacket("frontEnd", sendClient);
-                init = true
+                alreadySpawned = true
             }
             unitNum++;
         }
 
-        if (!init) {
+        if (!init && alreadySpawned === false) {
             const curCMD = await spawnGrp(
                 _.replace(groupTemplate, "#UNITS", unitTemplate),
                 grpObj.country,
