@@ -1496,9 +1496,11 @@ export async function spawnUnitGroup(spawnArray: typing.IUnitSpawnMin[], init: b
             unitObj.playerCanDrive = curUnit.playerCanDrive || false;
             let spawnCat = await ddcsControllers.unitDictionaryActionsRead({ type : curUnit.type});
             if(!_.includes(spawnCat[0].spawnCat,"samRadar")){
+                console.log("spawnCat includes samRadar:",spawnCat[0].spawnCat,spawnCat[0].type);
                 unitObj.groupName = curGroupName + _.random(1000000, 9999999);
             }else{
                 unitObj.groupName = curGroupName;
+                console.log("spawnCat does not include samRadar:",spawnCat[0].spawnCat,spawnCat[0].type);
             }
             unitObj.type = curUnit.type;
             unitObj.virtualGrpName = curGroupName;
