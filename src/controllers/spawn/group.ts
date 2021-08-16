@@ -1471,7 +1471,7 @@ export async function spawnStaticBuilding(
 export async function spawnUnitGroup(spawnArray: typing.IUnitSpawnMin[], init: boolean, baseName?: string, side?: number): Promise<void> {
     if (spawnArray.length > 0) {
         let groupTemplate: string = "";
-        const groupNum = _.random(1000000, 9999999);
+        let groupNum = _.random(1000000, 9999999);
         const grpObj = spawnArray[0];
         const curBaseName = baseName || "";
         const curGroupName = (grpObj.groupName) ? grpObj.groupName : baseName + " #" + groupNum;
@@ -1485,6 +1485,13 @@ export async function spawnUnitGroup(spawnArray: typing.IUnitSpawnMin[], init: b
         let unitNum = groupNum;
         for (const curUnit of spawnArray) {
             const unitObj = curUnit;
+            let spawnCat = await ddcsControllers.unitDictionaryActionsRead({ type : curUnit.type});
+            if(!_.includes(spawnCat[0].spawnCat,"samRadar")){
+                console.log("spawnCat does not include samRadar:",spawnCat[0].spawnCat,spawnCat[0].type);
+                unitNum = _.random(1000000, 9999999);
+                groupNum = unitNum
+            }
+            
             unitObj.lonLatLoc = (curUnit.lonLatLoc) ? curUnit.lonLatLoc : ddcsControllers.getRandomLatLonFromBase(curBaseName, "unitPoly");
             unitObj.name = (curUnit.name) ? curUnit.name : baseName + " #" + unitNum;
             unitObj._id = unitObj.name;
@@ -1494,14 +1501,7 @@ export async function spawnUnitGroup(spawnArray: typing.IUnitSpawnMin[], init: b
             if (_.includes(curUnit.type,"HQ-7_STR_SP"))
                 curUnit.playerCanDrive = false
             unitObj.playerCanDrive = curUnit.playerCanDrive || false;
-            let spawnCat = await ddcsControllers.unitDictionaryActionsRead({ type : curUnit.type});
-            if(!_.includes(spawnCat[0].spawnCat,"samRadar")){
-                console.log("spawnCat includes samRadar:",spawnCat[0].spawnCat,spawnCat[0].type);
-                unitObj.groupName = curGroupName + _.random(1000000, 9999999);
-            }else{
-                unitObj.groupName = curGroupName;
-                console.log("spawnCat does not include samRadar:",spawnCat[0].spawnCat,spawnCat[0].type);
-            }
+            unitObj.groupName = curGroupName;
             unitObj.type = curUnit.type;
             unitObj.virtualGrpName = curGroupName;
 
@@ -1511,6 +1511,19 @@ export async function spawnUnitGroup(spawnArray: typing.IUnitSpawnMin[], init: b
             }
 
             unitTemplate += await grndUnitTemplate(unitObj as IGroundUnitTemp);
+            
+            if(!_.includes(spawnCat[0].spawnCat,"samRadar")){
+                console.log("spawnCat does not include samRadar:",spawnCat[0].spawnCat,spawnCat[0].type);
+                const curCMD = await spawnGrp(
+                    _.replace(groupTemplate, "#UNITS", unitTemplate),
+                    grpObj.country,
+                    grpObj.unitCategory
+                );
+                // console.log("spawnUnitGroup: ", curCMD);
+                const sendClient = {actionObj: {action: "CMD", cmd: [curCMD], reqID: 0}};
+                await ddcsControllers.sendUDPPacket("frontEnd", sendClient);
+                init = true
+            }
             unitNum++;
         }
 
