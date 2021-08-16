@@ -1471,11 +1471,10 @@ export async function spawnStaticBuilding(
 export async function spawnUnitGroup(spawnArray: typing.IUnitSpawnMin[], init: boolean, baseName?: string, side?: number): Promise<void> {
     if (spawnArray.length > 0) {
         let groupTemplate: string = "";
-        let groupNum = _.random(1000000, 9999999);
-        let alreadySpawned = false
-        let grpObj = spawnArray[0];
+        const groupNum = _.random(1000000, 9999999);
+        const grpObj = spawnArray[0];
         const curBaseName = baseName || "";
-        let curGroupName = (grpObj.groupName) ? grpObj.groupName : baseName + " #" + groupNum;
+        const curGroupName = (grpObj.groupName) ? grpObj.groupName : baseName + " #" + groupNum;
         grpObj.groupName = (grpObj.groupName) ? grpObj.groupName : baseName + " #" + groupNum;
         grpObj.coalition = (side) ? side : spawnArray[0].coalition;
         if (!init) {
@@ -1485,22 +1484,7 @@ export async function spawnUnitGroup(spawnArray: typing.IUnitSpawnMin[], init: b
         let unitTemplate = "";
         let unitNum = groupNum;
         for (const curUnit of spawnArray) {
-            let grpint = 0
-            
             const unitObj = curUnit;
-            let spawnCat = await ddcsControllers.unitDictionaryActionsRead({ type : curUnit.type});
-            if(!_.includes(spawnCat[0].spawnCat,"samRadar")){
-                grpObj = spawnArray[grpint];
-                grpint = grpint + 1 
-                console.log("spawnCat does not include samRadar:",spawnCat[0].spawnCat,spawnCat[0].type);
-                unitNum = _.random(1000000, 9999999);
-                groupNum = unitNum
-                curGroupName = (grpObj.groupName) ? grpObj.groupName : baseName + " #" + groupNum;
-                grpObj.groupName = (grpObj.groupName) ? grpObj.groupName : baseName + " #" + groupNum;
-                if (!init) {
-                    groupTemplate = await grndUnitGroup(grpObj);
-                }
-            }            
             unitObj.lonLatLoc = (curUnit.lonLatLoc) ? curUnit.lonLatLoc : ddcsControllers.getRandomLatLonFromBase(curBaseName, "unitPoly");
             unitObj.name = (curUnit.name) ? curUnit.name : baseName + " #" + unitNum;
             unitObj._id = unitObj.name;
@@ -1513,36 +1497,23 @@ export async function spawnUnitGroup(spawnArray: typing.IUnitSpawnMin[], init: b
             unitObj.groupName = curGroupName;
             unitObj.type = curUnit.type;
             unitObj.virtualGrpName = curGroupName;
-            console.log("spawnArray:",spawnArray)
+
             if (init) {
                 unitObj.isActive = false;
                 await ddcsControllers.unitActionSave(unitObj);
             }
 
             unitTemplate += await grndUnitTemplate(unitObj as IGroundUnitTemp);
-            
-            if(!_.includes(spawnCat[0].spawnCat,"samRadar")){
-                console.log("spawnCat does not include samRadar:",spawnCat[0].spawnCat,spawnCat[0].type);
-                const curCMD = await spawnGrp(
-                    _.replace(groupTemplate, "#UNITS", unitTemplate),
-                    grpObj.country,
-                    grpObj.unitCategory
-                );
-                console.log("spawnUnitGroup: ", curCMD);
-                const sendClient = {actionObj: {action: "CMD", cmd: [curCMD], reqID: 0}};
-                await ddcsControllers.sendUDPPacket("frontEnd", sendClient);
-                alreadySpawned = true
-            }
             unitNum++;
         }
 
-        if (!init && alreadySpawned === false) {
+        if (!init) {
             const curCMD = await spawnGrp(
                 _.replace(groupTemplate, "#UNITS", unitTemplate),
                 grpObj.country,
                 grpObj.unitCategory
             );
-            console.log("spawnUnitGroup: ", curCMD);
+            // console.log("spawnUnitGroup: ", curCMD);
             const sendClient = {actionObj: {action: "CMD", cmd: [curCMD], reqID: 0}};
             await ddcsControllers.sendUDPPacket("frontEnd", sendClient);
         }
