@@ -1485,6 +1485,7 @@ export async function spawnUnitGroup(spawnArray: typing.IUnitSpawnMin[], init: b
         let unitTemplate = "";
         let unitNum = groupNum;
         for (const curUnit of spawnArray) {
+            console.log("spawnArray:",spawnArray)
             const unitObj = curUnit;
             let spawnCat = await ddcsControllers.unitDictionaryActionsRead({ type : curUnit.type});
             if(!_.includes(spawnCat[0].spawnCat,"samRadar")){
@@ -1493,7 +1494,9 @@ export async function spawnUnitGroup(spawnArray: typing.IUnitSpawnMin[], init: b
                 groupNum = unitNum
                 curGroupName = (grpObj.groupName) ? grpObj.groupName : baseName + " #" + groupNum;
                 grpObj.groupName = (grpObj.groupName) ? grpObj.groupName : baseName + " #" + groupNum;
-                groupTemplate = await grndUnitGroup(grpObj);
+                if (!init) {
+                    groupTemplate = await grndUnitGroup(grpObj);
+                }
             }            
             unitObj.lonLatLoc = (curUnit.lonLatLoc) ? curUnit.lonLatLoc : ddcsControllers.getRandomLatLonFromBase(curBaseName, "unitPoly");
             unitObj.name = (curUnit.name) ? curUnit.name : baseName + " #" + unitNum;
@@ -1522,7 +1525,7 @@ export async function spawnUnitGroup(spawnArray: typing.IUnitSpawnMin[], init: b
                     grpObj.country,
                     grpObj.unitCategory
                 );
-                // console.log("spawnUnitGroup: ", curCMD);
+                console.log("spawnUnitGroup: ", curCMD);
                 const sendClient = {actionObj: {action: "CMD", cmd: [curCMD], reqID: 0}};
                 await ddcsControllers.sendUDPPacket("frontEnd", sendClient);
                 alreadySpawned = true
