@@ -1445,7 +1445,11 @@ export async function unpackCrate(
                     curUnitStart.lonLatLoc = ddcsControllers.getLonLatFromDistanceDirection(playerUnit.lonLatLoc, curUnitHdg, 0.08);
                     curUnitStart.hdg = curUnitHdg;
                     curUnitStart.country = country;
-                    curUnitStart.playerCanDrive = mobile || false;
+                    if (_.includes(cbUnit.type,"HQ-7_STR_SP")){
+                        curUnitStart.playerCanDrive = false;
+                    }else{
+                        curUnitStart.playerCanDrive = mobile || false;
+                    }                    
                     curUnitStart.coalition = playerUnit.coalition;
 
                     newSpawnArray.push(curUnitStart);
@@ -1458,9 +1462,6 @@ export async function unpackCrate(
             const addHdg = 30;
             let curUnitHdg = playerUnit.hdg;
             let pCountry = country;
-            const randInc = _.random(1000000, 9999999);
-            const genName = "DU|" + curPlayer.ucid + "|" + type + "|" + special +
-                "|true|" + mobile + "|" + curPlayer.name + "|";
             const findUnit = _.find(engineCache.unitDictionary, {_id: type});
             if (findUnit) {
                 const spawnUnitCount = findUnit.config[curTimePeriod].spawnCount;
@@ -1469,6 +1470,9 @@ export async function unpackCrate(
                     pCountry = 1;
                 }
                 for (let x = 0; x < spawnUnitCount; x++) {
+                    const randInc = _.random(1000000, 9999999);
+                    const genName = "DU|" + curPlayer.ucid + "|" + type + "|" + special +
+                        "|true|" + mobile + "|" + curPlayer.name + "|";
                     const unitStart = _.cloneDeep(findUnit);
                     if (curUnitHdg > 359) {
                         curUnitHdg = 30;
@@ -1483,8 +1487,8 @@ export async function unpackCrate(
                     unitStart.coalition = playerUnit.coalition;
                     newSpawnArray.push(unitStart);
                     curUnitHdg = curUnitHdg + addHdg;
+                    await ddcsControllers.spawnUnitGroup(newSpawnArray, false);
                 }
-                await ddcsControllers.spawnUnitGroup(newSpawnArray, false);
                 return true;
             } else {
                 console.log("Count not find unit: line 1172: ", type);
