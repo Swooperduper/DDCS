@@ -1424,6 +1424,7 @@ export async function unpackCrate(
 
         const newSpawnArray: any[] = [];
         if (combo) {
+            console.log("Is Combo Unit");
             const addHdg = 30;
             let curUnitHdg = playerUnit.hdg;
             let randInc = _.random(1000000, 9999999);
@@ -1459,6 +1460,7 @@ export async function unpackCrate(
             await ddcsControllers.spawnUnitGroup(newSpawnArray, false);
             return true;
         } else {
+            console.log("Is not Combo Unit");
             const addHdg = 30;
             let curUnitHdg = playerUnit.hdg;
             let pCountry = country;
