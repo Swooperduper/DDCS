@@ -1491,6 +1491,25 @@ export async function unpackCrate(
                     curUnitHdg = curUnitHdg + addHdg;
                     await ddcsControllers.spawnUnitGroup(newSpawnArray, false);
                     newSpawnArray = [];
+                    const delUnits = await ddcsControllers.unitActionReadStd({
+                        playerOwnerId: curPlayer.ucid,
+                        playerCanDrive: mobile || false,
+                        isCrate: false,
+                        dead: false
+                    });
+                    let curUnit = 0;
+                    const grpGroups = _.groupBy(delUnits, "groupName");
+                    const tRem = Object.keys(grpGroups).length - engineCache.config.maxUnitsMoving;
+            
+                    for (const gUnitKey of Object.keys(grpGroups)) {
+                        if (curUnit <= tRem) {
+                            for (const unit of grpGroups[gUnitKey]) {
+                                await ddcsControllers.unitActionUpdateByUnitId({unitId: unit.unitId, dead: true});
+                                await ddcsControllers.destroyUnit(unit.name, "unit");
+                            }
+                            curUnit++;
+                        }
+                    }
                 }
                 return true;
             } else {
