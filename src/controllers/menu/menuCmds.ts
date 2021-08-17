@@ -1417,6 +1417,7 @@ export async function unpackCrate(
                 for (const unit of grpGroups[gUnitKey]) {
                     await ddcsControllers.unitActionUpdateByUnitId({unitId: unit.unitId, dead: true});
                     await ddcsControllers.destroyUnit(unit.name, "unit");
+                    console.log("Player has too many units, removing:",unit.name)
                 }
                 curUnit++;
             }
@@ -1464,6 +1465,8 @@ export async function unpackCrate(
             const addHdg = 30;
             let curUnitHdg = playerUnit.hdg;
             let pCountry = country;
+            const virtualGroupID = "DU|" + curPlayer.ucid + "|" + type + "|" + special +
+            "|true|" + mobile + "|" + curPlayer.name + "|";
             const findUnit = _.find(engineCache.unitDictionary, {_id: type});
             if (findUnit) {
                 const spawnUnitCount = findUnit.config[curTimePeriod].spawnCount;
@@ -1487,6 +1490,7 @@ export async function unpackCrate(
                     unitStart.playerCanDrive = mobile || false;
                     unitStart.special = special;
                     unitStart.coalition = playerUnit.coalition;
+                    unitStart.virtualGrpName = virtualGroupID
                     newSpawnArray.push(unitStart);
                     curUnitHdg = curUnitHdg + addHdg;
                     await ddcsControllers.spawnUnitGroup(newSpawnArray, false);
@@ -1506,6 +1510,7 @@ export async function unpackCrate(
                             for (const unit of grpGroups[gUnitKey]) {
                                 await ddcsControllers.unitActionUpdateByUnitId({unitId: unit.unitId, dead: true});
                                 await ddcsControllers.destroyUnit(unit.name, "unit");
+                                console.log("Player has too many units, removing:",unit.name)
                             }
                             curUnit++;
                         }

@@ -1496,7 +1496,8 @@ export async function spawnUnitGroup(spawnArray: typing.IUnitSpawnMin[], init: b
             unitObj.playerCanDrive = curUnit.playerCanDrive || false;
             unitObj.groupName = curGroupName;
             unitObj.type = curUnit.type;
-            unitObj.virtualGrpName = curGroupName;
+            unitObj.virtualGrpName = unitObj.virtualGrpName;
+            console.log("unitObj.virtualGrpName:",unitObj.virtualGrpName)
 
             if (init) {
                 unitObj.isActive = false;
