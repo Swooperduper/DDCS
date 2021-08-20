@@ -1426,7 +1426,7 @@ export async function unpackCrate(
         let newSpawnArray: any[] = [];
         if (combo) {
             console.log("Is Combo Unit");
-            const addHdg = 119;
+            const addHdg = 30;
             let curUnitHdg = playerUnit.hdg;
             let randInc = _.random(1000000, 9999999);
             const findUnits = _.filter(engineCache.unitDictionary, (curUnitDict) => {
@@ -1439,7 +1439,7 @@ export async function unpackCrate(
                 const spawnUnitCount = cbUnit.config[curTimePeriod].spawnCount;
                 for (let x = 0; x < spawnUnitCount; x++) {
                     if (curUnitHdg > 359) {
-                        curUnitHdg = 1;
+                        curUnitHdg = 30;
                     }
                     const curUnitStart = _.cloneDeep(cbUnit) as any;
                     curUnitStart.groupName = genName + randInc;
@@ -1462,7 +1462,7 @@ export async function unpackCrate(
             return true;
         } else {
             console.log("Is not Combo Unit");
-            const addHdg = 119;
+            const addHdg = 30;
             let curUnitHdg = playerUnit.hdg;
             let pCountry = country;
             const virtualGroupID = "DU|" + curPlayer.ucid + "|" + type + "|" + special +
@@ -1480,7 +1480,7 @@ export async function unpackCrate(
                         "|true|" + mobile + "|" + curPlayer.name + "|";
                     const unitStart = _.cloneDeep(findUnit);
                     if (curUnitHdg > 359) {
-                        curUnitHdg = 1;
+                        curUnitHdg = 30;
                     }
                     unitStart.name = genName + (randInc + x);
                     unitStart.groupName = genName + randInc;
