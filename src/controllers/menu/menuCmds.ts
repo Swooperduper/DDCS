@@ -1444,7 +1444,7 @@ export async function unpackCrate(
                         curUnitHdg = 30;
                     }
                     if (SpawnHeading > 359) {
-                        SpawnHeading = 1;
+                        SpawnHeading = SpawnHeading - 359;
                     }
                     const curUnitStart = _.cloneDeep(cbUnit) as any;
                     curUnitStart.groupName = genName + randInc;
@@ -1491,7 +1491,7 @@ export async function unpackCrate(
                         curUnitHdg = 30;
                     }
                     if (SpawnHeading > 359) {
-                        SpawnHeading = 1;
+                        SpawnHeading = SpawnHeading - 359;
                     }
                     unitStart.name = genName + (randInc + x);
                     unitStart.groupName = genName + randInc;
