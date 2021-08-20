@@ -1427,6 +1427,8 @@ export async function unpackCrate(
         if (combo) {
             console.log("Is Combo Unit");
             const addHdg = 30;
+            const addSpawnHeading = 119;
+            let SpawnHeading = playerUnit.hdg
             let curUnitHdg = playerUnit.hdg;
             let randInc = _.random(1000000, 9999999);
             const findUnits = _.filter(engineCache.unitDictionary, (curUnitDict) => {
@@ -1441,11 +1443,14 @@ export async function unpackCrate(
                     if (curUnitHdg > 359) {
                         curUnitHdg = 30;
                     }
+                    if (SpawnHeading > 359) {
+                        SpawnHeading = 1;
+                    }
                     const curUnitStart = _.cloneDeep(cbUnit) as any;
                     curUnitStart.groupName = genName + randInc;
                     curUnitStart.name = genName + (randInc + x);
                     curUnitStart.lonLatLoc = ddcsControllers.getLonLatFromDistanceDirection(playerUnit.lonLatLoc, curUnitHdg, 0.08);
-                    curUnitStart.hdg = curUnitHdg;
+                    curUnitStart.hdg = SpawnHeading;
                     curUnitStart.country = country;
                     if (_.includes(cbUnit.type,"HQ-7_STR_SP")){
                         curUnitStart.playerCanDrive = false;
@@ -1456,6 +1461,7 @@ export async function unpackCrate(
 
                     newSpawnArray.push(curUnitStart);
                     curUnitHdg = curUnitHdg + addHdg;
+                    SpawnHeading = SpawnHeading +addSpawnHeading;
                 }
             }
             await ddcsControllers.spawnUnitGroup(newSpawnArray, false);
@@ -1463,6 +1469,8 @@ export async function unpackCrate(
         } else {
             console.log("Is not Combo Unit");
             const addHdg = 30;
+            const addSpawnHeading = 119;
+            let SpawnHeading = playerUnit.hdg
             let curUnitHdg = playerUnit.hdg;
             let pCountry = country;
             const virtualGroupID = "DU|" + curPlayer.ucid + "|" + type + "|" + special +
@@ -1482,10 +1490,13 @@ export async function unpackCrate(
                     if (curUnitHdg > 359) {
                         curUnitHdg = 30;
                     }
+                    if (SpawnHeading > 359) {
+                        SpawnHeading = 1;
+                    }
                     unitStart.name = genName + (randInc + x);
                     unitStart.groupName = genName + randInc;
                     unitStart.lonLatLoc = ddcsControllers.getLonLatFromDistanceDirection(playerUnit.lonLatLoc, curUnitHdg, 0.08);
-                    unitStart.hdg = curUnitHdg;
+                    unitStart.hdg = SpawnHeading;
                     unitStart.country = pCountry;
                     unitStart.playerCanDrive = mobile || false;
                     unitStart.special = special;
@@ -1493,6 +1504,7 @@ export async function unpackCrate(
                     unitStart.virtualGrpName = virtualGroupID
                     newSpawnArray.push(unitStart);
                     curUnitHdg = curUnitHdg + addHdg;
+                    SpawnHeading = SpawnHeading +addSpawnHeading;
                     await ddcsControllers.spawnUnitGroup(newSpawnArray, false);
                     newSpawnArray = [];
                     const delUnits = await ddcsControllers.unitActionReadStd({
