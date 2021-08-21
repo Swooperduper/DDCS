@@ -1449,8 +1449,10 @@ export async function unpackCrate(
                     const curUnitStart = _.cloneDeep(cbUnit) as any;
                     curUnitStart.groupName = genName + randInc;
                     curUnitStart.name = genName + (randInc + x);
+                    console.log("curUnitStart.name:",curUnitStart.name);
                     curUnitStart.lonLatLoc = ddcsControllers.getLonLatFromDistanceDirection(playerUnit.lonLatLoc, curUnitHdg, 0.08);
                     curUnitStart.hdg = SpawnHeading;
+                    console.log("curUnitStart.hdg:",curUnitStart.hdg);
                     curUnitStart.country = country;
                     if (_.includes(cbUnit.type,"HQ-7_STR_SP")){
                         curUnitStart.playerCanDrive = false;

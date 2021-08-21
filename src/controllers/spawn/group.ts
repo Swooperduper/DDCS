@@ -1469,6 +1469,7 @@ export async function spawnStaticBuilding(
 }
 
 export async function spawnUnitGroup(spawnArray: typing.IUnitSpawnMin[], init: boolean, baseName?: string, side?: number): Promise<void> {
+    console.log("spawnArray:",spawnArray);
     if (spawnArray.length > 0) {
         let groupTemplate: string = "";
         const groupNum = _.random(1000000, 9999999);
