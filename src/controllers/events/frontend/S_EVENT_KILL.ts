@@ -40,7 +40,7 @@ export async function processEventKill(eventObj: any): Promise<void> {
                     if (playerOwnerUnit.length > 0) {
                         await ddcsControllers.srvPlayerActionsUnitAddToRealScore({
                             _id: curInitiator.unit.playerOwnerId,
-                            score: 5,
+                            score: 30,
                             groupId: (playerOwnerUnit[0].groupId) ? playerOwnerUnit[0].groupId : undefined,
                             unitType: iUnit[0].type,
                             unitCoalition: iUnit[0].coalition
