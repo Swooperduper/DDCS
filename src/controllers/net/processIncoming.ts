@@ -271,7 +271,7 @@ export async function processSlotLock(curPlayer: ISrvPlayers, baseSide: number, 
         if (baseSide !== curSlotSide) {
             // message = "You must capture this base before you can occupy slot";
             // TODO: need to get this translation into every language...^^^^ using locked to side for now
-            await ddcsController.forcePlayerSpectator(playerId, "Your team must capture base this base before you can occupy slot");
+            await ddcsController.forcePlayerSpectator(playerId, "Your team must capture base this base before you can occupy this slot");
         }
     }
 }

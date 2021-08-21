@@ -1451,7 +1451,7 @@ export async function unpackCrate(
                     curUnitStart.name = genName + (randInc + x);
                     console.log("curUnitStart.name:",curUnitStart.name);
                     curUnitStart.lonLatLoc = ddcsControllers.getLonLatFromDistanceDirection(playerUnit.lonLatLoc, curUnitHdg, 0.08);
-                    curUnitStart.hdg = SpawnHeading;
+                    curUnitStart.hdg = SpawnHeading * 0.0174533;
                     console.log("curUnitStart.hdg:",curUnitStart.hdg);
                     curUnitStart.country = country;
                     if (_.includes(cbUnit.type,"HQ-7_STR_SP")){
@@ -1498,7 +1498,7 @@ export async function unpackCrate(
                     unitStart.name = genName + (randInc + x);
                     unitStart.groupName = genName + randInc;
                     unitStart.lonLatLoc = ddcsControllers.getLonLatFromDistanceDirection(playerUnit.lonLatLoc, curUnitHdg, 0.08);
-                    unitStart.hdg = SpawnHeading;
+                    unitStart.hdg = SpawnHeading * 0.0174533;
                     unitStart.country = pCountry;
                     unitStart.playerCanDrive = mobile || false;
                     unitStart.special = special;
