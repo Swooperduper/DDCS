@@ -619,7 +619,7 @@ export async function menuCmdProcess(pObj: any) {
                                 await ddcsControllers.sendMesgToGroup(
                                     curPlayer,
                                     curUnit.groupId,
-                                    "G:" + i18n.NOTROOPSTOEXTRACTORUNLOAD,
+                                    "G:" + i18n.NOTROOPSTOEXTRACTor 9A331UNLOAD,
                                     5
                                 );
                             }
@@ -1595,9 +1595,9 @@ export async function spawnReinforcementGroup(
     } else {
         if (reinforcementType === "SAM Brigade(12LP)"){
             if (curPlayer.sideLock === 2){
-                reinforcementArray = ["Patriot str","NASAMS_Radar_MPQ64F1","Tor 9A331","Gepard","M6 Linebacker"];
+                reinforcementArray = ["Patriot","NASAMS-C","Tor 9A331","Gepard","M6 Linebacker"];
             }else{
-                reinforcementArray = ["S-300PS 40B6M tr","Tor 9A331","2S6 Tunguska","Strela-10M3","Strela-10M3"];
+                reinforcementArray = ["SA-10","Tor 9A331","2S6 Tunguska","Strela-10M3","Strela-10M3"];
             }
         }
         if (reinforcementType === "Armoured Company(12LP)"){
