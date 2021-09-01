@@ -619,7 +619,7 @@ export async function menuCmdProcess(pObj: any) {
                                 await ddcsControllers.sendMesgToGroup(
                                     curPlayer,
                                     curUnit.groupId,
-                                    "G:" + i18n.NOTROOPSTOEXTRACTor 9A331UNLOAD,
+                                    "G:" + i18n.NOTROOPSTOEXTRACTORUNLOAD,
                                     5
                                 );
                             }
