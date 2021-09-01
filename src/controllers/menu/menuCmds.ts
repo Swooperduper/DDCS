@@ -1572,10 +1572,12 @@ export async function spawnReinforcementGroup(
     special: string,
     mobile: boolean
 ) {
+    console.log("sRG:Starting Function");
     var reinforcementArray: string[];
     reinforcementArray = [""];
     const curPlayerArray = await ddcsControllers.srvPlayerActionsRead({name: playerUnit.playername});
     const curPlayer = curPlayerArray[0];
+    console.log("sRG:curPlayer",curPlayer);
     const engineCache = ddcsControllers.getEngineCache();
     const i18n = new I18nResolver(engineCache.i18n, curPlayer.lang).translation as any;
     const curTimePeriod = engineCache.config.timePeriod || "modern";
@@ -1609,12 +1611,14 @@ export async function spawnReinforcementGroup(
                 reinforcementArray = ["T-80UD","BMP-3","BMP-3","Strela-10M3","Strela-10M3"];
             }
         }
+        console.log("sRG:reinforcementType",reinforcementType);
+        console.log("sRG:reinforcementArray",reinforcementArray);
         let spawnDistance = 0.06;
         for (let type of reinforcementArray){
+            console.log("sRG:type of reinforcementArray",type);
             spawnDistance = spawnDistance + 0.02;
             const curUnitDict = _.find(engineCache.unitDictionary, (uD) => _.includes(uD.comboName, type) );
             const combo = !!curUnitDict;
-            await ddcsControllers.srvPlayerActionsUpdateacquisitionsUnpacked(curPlayer);
             const delUnits = await ddcsControllers.unitActionReadStd({
                 playerOwnerId: curPlayer.ucid,
                 playerCanDrive: mobile || false,
