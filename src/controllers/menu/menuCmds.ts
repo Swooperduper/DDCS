@@ -1578,7 +1578,7 @@ export async function spawnReinforcementGroup(
     const curPlayerArray = await ddcsControllers.srvPlayerActionsRead({name: playerUnit.playername});
     const curPlayer = curPlayerArray[0];
     console.log("sRG:curPlayer",curPlayer);
-    const engineCache = ddcsControllers.getEngineCache();
+    const engineCache = await ddcsControllers.getEngineCache();
     const i18n = new I18nResolver(engineCache.i18n, curPlayer.lang).translation as any;
     const curTimePeriod = engineCache.config.timePeriod || "modern";
     if (playerUnit.inAir) {
