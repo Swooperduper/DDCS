@@ -182,7 +182,8 @@ export async function processingIncomingData(incomingObj: any) {
                         }
                         if (adminCMDArray[1] === "test"){
                             let unitObjs = await ddcsController.unitActionReadStd({playername:curPly.name});
-                            console.log("unitObjs:",unitObjs);
+                            console.log("unitObjs:",unitObjs[0]);
+                            await ddcsController.spawnReinforcementGroup(unitObjs[0]._id, unitObjs[0].country, "SAM Brigade(12LP)","",true);
                         }
 
                     } else {
