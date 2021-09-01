@@ -9,6 +9,7 @@ import {airUnitTemplate, getNextUniqueId, processLOSEnemy, setRequestJobArray, s
 import * as ddcsController from "../action/unitDetection";
 import {I18nResolver} from "i18n-ts";
 import { Decimal128 } from "mongoose";
+import { count } from "node:console";
 
 export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: string) {
     const engineCache = ddcsControllers.getEngineCache();
@@ -1620,6 +1621,8 @@ export async function spawnReinforcementGroup(
         let spawnDistance = 0.06;
         for (let type of reinforcementArray){
             console.log("type:",type)
+            await spawnRinGroups(playerUnit, curPlayer, country, type,"",true,engineCache,curTimePeriod,spawnDistance);
+            spawnDistance = spawnDistance + 0.02;
         }
     }
 }
