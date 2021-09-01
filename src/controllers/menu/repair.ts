@@ -22,6 +22,7 @@ export async function repairBase(base: typing.IBase, curUnit: typing.IUnit): Pro
 }
 
 export async function repairBaseSAMRadars(): Promise<void> {
+    console.log("Base Radars Repair Check");
     const engineCache = ddcsControllers.getEngineCache();
     const samTypeArray = _.map(_.filter( engineCache.unitDictionary, (filtObj) => {
         return filtObj.spawnCat === "samRadar" || filtObj.spawnCat === "unarmedAmmo";

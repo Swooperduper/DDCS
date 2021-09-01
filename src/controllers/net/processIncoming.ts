@@ -142,8 +142,9 @@ export async function processingIncomingData(incomingObj: any) {
                 } else if (incomingObj.message === "-swap") {
                     await ddcsController.swapUserToLosingSide(incomingObj);
                 } else if (incomingObj.message === "-redrawf10") {
-                    await ddcsController.setFarpMarks();
-                    await ddcsController.setCircleMarkers();
+                    await ddcsController.sendMesgToPlayerChatWindow("This command has been disabled due to abuse causing issues", curPly.playerId);
+                    //await ddcsController.setFarpMarks();
+                    //await ddcsController.setCircleMarkers();
                 } else if (incomingObj.message === "-refreshmenu") {
                     const unit = await ddcsController.unitActionRead({playername: curPly.name});
                     if (unit.length > 0) {
@@ -178,6 +179,10 @@ export async function processingIncomingData(incomingObj: any) {
                                 }
                             });
                             await ddcsController.sendMesgToPlayerChatWindow("Setting Flag ID:" + adminCMDArray[2] +"to value:" + adminCMDArray[3], curPly.playerId);
+                        }
+                        if (adminCMDArray[1] === "test"){
+                            let unitObjs = await ddcsController.unitActionReadStd({playername:curPly.name});
+                            console.log("unitObjs:",unitObjs);
                         }
 
                     } else {

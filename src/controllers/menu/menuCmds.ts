@@ -788,6 +788,9 @@ export async function menuCmdProcess(pObj: any) {
                 case "spawnTanker":
                     await spawnTanker(curUnit, curPlayer, pObj.type, pObj.rsCost);
                     break;
+                case "spawnReinforcements":
+                    await spawnReinforcements(curUnit, curPlayer, pObj.type, pObj.rsCost);
+                    break;
                 case "InternalCargo":
                     await internalCargo(curUnit, curPlayer, pObj.type);
                     break;
@@ -1180,6 +1183,29 @@ export async function spawnDefHeli(curUnit: any, curPlayer: any, heliType: strin
     }
 }
 
+export async function spawnReinforcements(curUnit: any, curPlayer: any, reinforcementType: string, lpCost: number) {
+    const engineCache = ddcsControllers.getEngineCache();
+    const spawnDistance = engineCache.config.intCargoUnloadDistance;
+    const i18n = new I18nResolver(engineCache.i18n, curPlayer.lang).translation as any;
+    const closeMOBs2 = await ddcsControllers.getMOBsInProximity(
+        curUnit.lonLatLoc,
+        spawnDistance,
+        ddcsControllers.enemyCountry[curUnit.coalition]
+    );
+    if (closeMOBs2.length = 0) {
+        console.log(curPlayer," can't spawn reinforcments as they are too far away from base")
+        await ddcsControllers.sendMesgToGroup(
+            curPlayer,
+            curUnit.groupId,
+            "G: You are too far away from a base to spawn any reinforcement groups, you must be within " + spawnDistance + "km of the base",
+            5
+        );
+    } else {
+        spawnReinforcementGroup(curUnit, curUnit.country, reinforcementType, "", true);
+        console.log("Attempt spawnReinforcements:", reinforcementType, lpCost);
+    }
+}
+
 export async function spawnTanker(curUnit: any, curPlayer: any, tankerType: string, rsCost: number) {
     let tankerObj: any;
     const safeSpawnDistance: number = 100;
@@ -1538,3 +1564,192 @@ export async function unpackCrate(
         }
     }
 }
+
+export async function spawnReinforcementGroup(
+    playerUnit: any,
+    country: number,
+    reinforcementType: string,
+    special: string,
+    mobile: boolean
+) {
+    var reinforcementArray: string[];
+    reinforcementArray = [""];
+    const curPlayerArray = await ddcsControllers.srvPlayerActionsRead({name: playerUnit.playername});
+    const curPlayer = curPlayerArray[0];
+    const engineCache = ddcsControllers.getEngineCache();
+    const i18n = new I18nResolver(engineCache.i18n, curPlayer.lang).translation as any;
+    const curTimePeriod = engineCache.config.timePeriod || "modern";
+    if (playerUnit.inAir) {
+        await ddcsControllers.sendMesgToGroup(
+            curPlayer,
+            playerUnit.groupId,
+            "G: " + i18n.LANDBEFORECARGOCOMMAND,
+            5
+        );
+        return false;
+    } else {
+        if (reinforcementType === "SAM Brigade(12LP)"){
+            if (curPlayer.sideLock === 2){
+                reinforcementArray = ["Patriot str","NASAMS_Radar_MPQ64F1","Tor 9A331","Gepard","M6 Linebacker"];
+            }else{
+                reinforcementArray = ["S-300PS 40B6M tr","Tor 9A331","2S6 Tunguska","Strela-10M3","Strela-10M3"];
+            }
+        }
+        if (reinforcementType === "Armoured Company(12LP)"){
+            if (curPlayer.sideLock === 2){
+                reinforcementArray = ["M-1 Abrams","Leopard-2","Merkava_Mk4","M-2 Bradley","M-2 Bradley"];
+            }else{
+                reinforcementArray = ["Leclerc","T-90","T-72B","BMP-3","BMP-3"];
+            }
+        }
+        if (reinforcementType === "Mixed Brigade(12LP)"){
+            if (curPlayer.sideLock === 2){
+                reinforcementArray = ["Challenger2","M1128 Stryker MGS","M-2 Bradley","Gepard","M6 Linebacker"];
+            }else{
+                reinforcementArray = ["T-80UD","BMP-3","BMP-3","Strela-10M3","Strela-10M3"];
+            }
+        }
+        let spawnDistance = 0.06;
+        for (let type of reinforcementArray){
+            spawnDistance = spawnDistance + 0.02;
+            const curUnitDict = _.find(engineCache.unitDictionary, (uD) => _.includes(uD.comboName, type) );
+            const combo = !!curUnitDict;
+            await ddcsControllers.srvPlayerActionsUpdateacquisitionsUnpacked(curPlayer);
+            const delUnits = await ddcsControllers.unitActionReadStd({
+                playerOwnerId: curPlayer.ucid,
+                playerCanDrive: mobile || false,
+                isCrate: false,
+                dead: false
+            });
+            let curUnit = 0;
+            const grpGroups = _.groupBy(delUnits, "groupName");
+            const tRem = Object.keys(grpGroups).length - engineCache.config.maxUnitsMoving;
+
+            for (const gUnitKey of Object.keys(grpGroups)) {
+                if (curUnit <= tRem) {
+                    for (const unit of grpGroups[gUnitKey]) {
+                        await ddcsControllers.unitActionUpdateByUnitId({unitId: unit.unitId, dead: true});
+                        await ddcsControllers.destroyUnit(unit.name, "unit");
+                        console.log("Player has too many units, removing:",unit.name)
+                    }
+                    curUnit++;
+                }
+            }
+
+            let newSpawnArray: any[] = [];
+            if (combo) {
+                console.log("Is Combo Unit");
+                const addHdg = 30;
+                const addSpawnHeading = 119;
+                let SpawnHeading = playerUnit.hdg
+                let curUnitHdg = playerUnit.hdg;
+                let randInc = _.random(1000000, 9999999);
+                const findUnits = _.filter(engineCache.unitDictionary, (curUnitDict) => {
+                    return _.includes(curUnitDict.comboName, type);
+                });
+                for (const cbUnit of findUnits) {
+                    randInc += 1;
+                    const genName = "DU|" + curPlayer.ucid + "|" + cbUnit.type + "|" + special + "|true|" + mobile + "|" +
+                        curPlayer.name + "|";
+                    const spawnUnitCount = cbUnit.config[curTimePeriod].spawnCount;
+                    for (let x = 0; x < spawnUnitCount; x++) {
+                        if (curUnitHdg > 359) {
+                            curUnitHdg = 30;
+                        }
+                        if (SpawnHeading > 359) {
+                            SpawnHeading = SpawnHeading - 359;
+                        }
+                        const curUnitStart = _.cloneDeep(cbUnit) as any;
+                        curUnitStart.groupName = genName + randInc;
+                        curUnitStart.name = genName + (randInc + x);
+                        console.log("curUnitStart.name:",curUnitStart.name);
+                        curUnitStart.lonLatLoc = ddcsControllers.getLonLatFromDistanceDirection(playerUnit.lonLatLoc, curUnitHdg, spawnDistance);
+                        curUnitStart.hdg = SpawnHeading * 0.0174533;
+                        console.log("curUnitStart.hdg:",curUnitStart.hdg);
+                        curUnitStart.country = country;
+                        if (_.includes(cbUnit.type,"HQ-7_STR_SP")){
+                            curUnitStart.playerCanDrive = false;
+                        }else{
+                            curUnitStart.playerCanDrive = mobile || false;
+                        }                    
+                        curUnitStart.coalition = playerUnit.coalition;
+
+                        newSpawnArray.push(curUnitStart);
+                        curUnitHdg = curUnitHdg + addHdg;
+                        SpawnHeading = SpawnHeading +addSpawnHeading;
+                    }
+                }
+                await ddcsControllers.spawnUnitGroup(newSpawnArray, false);
+                return true;
+            } else {
+                console.log("Is not Combo Unit");
+                const addHdg = 30;
+                const addSpawnHeading = 119;
+                let SpawnHeading = playerUnit.hdg
+                let curUnitHdg = playerUnit.hdg;
+                let pCountry = country;
+                const virtualGroupID = "DU|" + curPlayer.ucid + "|" + type + "|" + special +
+                "|true|" + mobile + "|" + curPlayer.name + "|";
+                const findUnit = _.find(engineCache.unitDictionary, {_id: type});
+                if (findUnit) {
+                    const spawnUnitCount = findUnit.config[curTimePeriod].spawnCount;
+                    if ((type === "1L13 EWR" || type === "55G6 EWR" || type === "Dog Ear radar") && playerUnit.coalition === 2) {
+                        console.log("EWR: UKRAINE");
+                        pCountry = 1;
+                    }
+                    for (let x = 0; x < spawnUnitCount; x++) {
+                        let randInc = _.random(1000000, 9999999);
+                        let genName = "DU|" + curPlayer.ucid + "|" + type + "|" + special +
+                            "|true|" + mobile + "|" + curPlayer.name + "|";
+                        const unitStart = _.cloneDeep(findUnit);
+                        if (curUnitHdg > 359) {
+                            curUnitHdg = 30;
+                        }
+                        if (SpawnHeading > 359) {
+                            SpawnHeading = SpawnHeading - 359;
+                        }
+                        unitStart.name = genName + (randInc + x);
+                        unitStart.groupName = genName + randInc;
+                        unitStart.lonLatLoc = ddcsControllers.getLonLatFromDistanceDirection(playerUnit.lonLatLoc, curUnitHdg, 0.08);
+                        unitStart.hdg = SpawnHeading * 0.0174533;
+                        unitStart.country = pCountry;
+                        unitStart.playerCanDrive = mobile || false;
+                        unitStart.special = special;
+                        unitStart.coalition = playerUnit.coalition;
+                        unitStart.virtualGrpName = virtualGroupID
+                        newSpawnArray.push(unitStart);
+                        curUnitHdg = curUnitHdg + addHdg;
+                        SpawnHeading = SpawnHeading +addSpawnHeading;
+                        await ddcsControllers.spawnUnitGroup(newSpawnArray, false);
+                        newSpawnArray = [];
+                        const delUnits = await ddcsControllers.unitActionReadStd({
+                            playerOwnerId: curPlayer.ucid,
+                            playerCanDrive: mobile || false,
+                            isCrate: false,
+                            dead: false
+                        });
+                        let curUnit = 0;
+                        const grpGroups = _.groupBy(delUnits, "groupName");
+                        const tRem = Object.keys(grpGroups).length - engineCache.config.maxUnitsMoving;
+                
+                        for (const gUnitKey of Object.keys(grpGroups)) {
+                            if (curUnit <= tRem) {
+                                for (const unit of grpGroups[gUnitKey]) {
+                                    await ddcsControllers.unitActionUpdateByUnitId({unitId: unit.unitId, dead: true});
+                                    await ddcsControllers.destroyUnit(unit.name, "unit");
+                                    console.log("Player has too many units, removing:",unit.name)
+                                }
+                                curUnit++;
+                            }
+                        }
+                    }
+                    return true;
+                } else {
+                    console.log("Count not find unit: line 1172: ", type);
+                    return false;
+                }
+            }                    
+        }
+    }
+}
+
