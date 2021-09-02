@@ -85,6 +85,7 @@ export async function campaignStatusMessage(){
     for (let player of blueplayerArray){
         discordMessage = discordMessage + player.name + "\n"
     }
+    sendMessageToDiscord(discordMessage);
 }
 
 export function getName(vcUser: any) {
