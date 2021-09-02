@@ -237,6 +237,45 @@ export async function srvPlayerActionsRemoveLifePoints(obj: {
     });
 }
 
+export async function srvPlayerSpendLifePoints(
+    _id: string,
+    groupId: number,
+    removeLifePoints: number,
+    execAction?: string
+    ): Promise<void> {
+    return new Promise((resolve, reject) => {
+        dbModels.srvPlayerModel.find({_id: _id}, (err: any, serverObj: typings.ISrvPlayers[]) => {
+            const engineCache = ddcsController.getEngineCache();
+            const i18n = new I18nResolver(engineCache.i18n, serverObj[0].lang).translation as any;
+            const removePoints = removeLifePoints;
+            const curAction = "removeLifePoints";
+            const curPlayerLifePoints = serverObj[0].curLifePoints || 0;
+            const curTotalPoints = curPlayerLifePoints - removePoints;
+            if (err) { reject(err); }
+            if (serverObj.length > 0 && serverObj[0].playerId) {
+                    const setObj = {
+                        lastLifeAction: curAction,
+                        safeLifeActionTime: new Date().getTime() + ddcsController.time.fifteenSecs
+                    };
+                    dbModels.srvPlayerModel.findOneAndUpdate(
+                        {_id: _id},
+                        { $set: setObj },
+                        (updateErr: any) => {
+                            if (updateErr) { reject(updateErr); }
+                            const message = i18n.PLAYERHASJUSTUSEDLIFEPOINTS.replace("#1", serverObj[0].name)
+                                .replace("#2", removePoints).replace("#3", execAction).replace("#4", curTotalPoints.toFixed(2));
+                            ddcsController.sendMesgToGroup(serverObj[0], groupId, message, 5);
+                            resolve();
+                        }
+                    );
+                
+            } else {
+                resolve();
+            }
+        });
+    });
+}
+
 export async function srvPlayerActionsClearTempScore(obj: {
     _id: string,
     groupId: number

@@ -7,5 +7,6 @@ import * as ddcsControllers from "../";
 export async function processOneHourActions(fullySynced: boolean) {
     if (fullySynced) {
         await ddcsControllers.repairBaseSAMRadars();
+        await ddcsControllers.campaignStatusMessage();
     }
 }

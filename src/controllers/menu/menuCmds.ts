@@ -1188,7 +1188,6 @@ export async function spawnDefHeli(curUnit: any, curPlayer: any, heliType: strin
 export async function spawnReinforcements(curUnit: any, curPlayer: any, reinforcementType: string, lpCost: number) {
     const engineCache = ddcsControllers.getEngineCache();
     const spawnDistance = engineCache.config.intCargoUnloadDistance;
-    const i18n = new I18nResolver(engineCache.i18n, curPlayer.lang).translation as any;
     const closeMOBs2 = await ddcsControllers.getMOBsInProximity(
         curUnit.lonLatLoc,
         spawnDistance,
@@ -1203,8 +1202,19 @@ export async function spawnReinforcements(curUnit: any, curPlayer: any, reinforc
             5
         );
     } else {
-        spawnReinforcementGroup(curUnit, curUnit.country, reinforcementType, "", true);
-        console.log("Attempt spawnReinforcements:", reinforcementType, lpCost);
+        const curPlayerArray = await ddcsControllers.srvPlayerActionsRead({name: curUnit.playername});
+        const curPlayer = curPlayerArray[0];
+        if (curPlayer.curLifePoints >= 12){            
+            spawnReinforcementGroup(curUnit, curUnit.country, reinforcementType,curPlayer);
+            console.log("Attempt spawnReinforcements:", reinforcementType, lpCost);
+        } else {
+            await ddcsControllers.sendMesgToGroup(
+                curPlayer,
+                curUnit.groupId,
+                "G: You are too far away from a base to spawn any reinforcement groups, you must be within " + spawnDistance + "km of the base",
+                5
+            );
+        }
     }
 }
 
@@ -1571,14 +1581,11 @@ export async function spawnReinforcementGroup(
     playerUnit: any,
     country: number,
     reinforcementType: string,
-    special: string,
-    mobile: boolean
+    curPlayer:any
 ) {
     console.log("sRG:Starting Function");
     var reinforcementArray: string[];
     reinforcementArray = [""];
-    const curPlayerArray = await ddcsControllers.srvPlayerActionsRead({name: playerUnit.playername});
-    const curPlayer = curPlayerArray[0];
     console.log("sRG:curPlayer",curPlayer);
     const engineCache = await ddcsControllers.getEngineCache();
     console.log("sRG:getEngineCache");
@@ -1619,6 +1626,7 @@ export async function spawnReinforcementGroup(
         console.log("sRG:reinforcementType",reinforcementType);
         console.log("sRG:reinforcementArray",reinforcementArray);
         let spawnDistance = 0.06;
+        ddcsControllers.srvPlayerSpendLifePoints(curPlayer._id, playerUnit.groupId, 12, "LP Removed for Spawning Rinforcement Group");
         for (let type of reinforcementArray){
             console.log("type:",type)
             await spawnRinGroups(playerUnit, curPlayer, country, type,"",true,engineCache,curTimePeriod,spawnDistance);

@@ -13,7 +13,7 @@ const srsFilePaths = [
     { name: "DDCS1978ColdWar", path: "C:/Users/MegaServer/Desktop/SRS/DDCS-Standard/clients-list.json" },
     { name: "DDCSModern", path: "C:/Users/MegaServer/Desktop/SRS/DDCS-Hardcore/clients-list.json" }
 ];
-
+const webHookURL = "https://discord.com/api/webhooks/882974220290760725/xoDxB7fhuH6KNaF6-uGTumjUTudxmGMw2-SbzSVwIpnXAPYxxnaVB5RFJn3vSpFgcNON"
 /*
 fs.readFileAsyncArray(fileObj) {
     return new Promise((resolve: any, reject: any) => {
@@ -28,6 +28,64 @@ fs.readFileAsyncArray(fileObj) {
     });
 }
 */
+export async function sendMessageToDiscord(MSG: string){
+    var request = require('request');
+    var today = new Date();
+    var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+    var options = {
+    'method': 'POST',
+    'url': 'https://discord.com/api/webhooks/882974220290760725/xoDxB7fhuH6KNaF6-uGTumjUTudxmGMw2-SbzSVwIpnXAPYxxnaVB5RFJn3vSpFgcNON?wait=true',
+    'headers': {
+        'Content-Type': 'application/json',
+        'Cookie': '__dcfduid=2c634e490bef11ec8f2e42010a0a051e; __sdcfduid=2c634e490bef11ec8f2e42010a0a051e0669c9af189f129d4f3434040e29b3b15f6c37206fd8b1473c26474961022577; __cfruid=de531a260997a81c9a4baa383f422a3888a8faa4-1630588241'
+    },
+    body: JSON.stringify({"content": "["+time+" UTC]:"+MSG+""})
+
+    };
+    request(options, function (error: any, response: any) { 
+    if (error) throw new Error(error);
+    console.log(response.body);
+    });
+}
+
+export async function campaignStatusMessage(){
+    let campaignStats = await ddcsControllers.campaignsActionsRead()
+    let registeredRedPlayers = await ddcsControllers.srvPlayerActionsRead({sideLock : 1});
+    let registeredBluePlayers = await ddcsControllers.srvPlayerActionsRead({sideLock : 2});
+    let redMobs = await ddcsControllers.baseActionRead({baseType: "MOB", side: 1});
+    let blueMobs = await ddcsControllers.baseActionRead({baseType: "MOB", side: 2});
+    const latestSession = await ddcsControllers.sessionsActionsReadLatest();
+    const unitsNewThan = new Date().getTime() - ddcsControllers.time.fourMins;
+    const redplayerArray = await ddcsControllers.srvPlayerActionsRead({
+        sessionName: latestSession.name,
+        side: 1,
+        updatedAt: {$gt: unitsNewThan}
+    });
+    const blueplayerArray = await ddcsControllers.srvPlayerActionsRead({
+        sessionName: latestSession.name,
+        side: 2,
+        updatedAt: {$gt: unitsNewThan}
+    });
+    let discordMessage = "__**Current Campaign Hourly Stats**__\n"
+    discordMessage = discordMessage + "**:red_circle: Red Minutes Played: **" + campaignStats[0].totalMinutesPlayed_red + "** | :blue_circle: Blue Minutes Played:**"+campaignStats[0].totalMinutesPlayed_blue+"\n";
+    discordMessage = discordMessage + "**:red_circle: Red Registered Players: **" + registeredRedPlayers.length + "** | :blue_circle: Blue Registered Players: **"+ registeredBluePlayers.length +"\n";
+    discordMessage = discordMessage + "\n**:red_circle: Red Controlled Mob's: **\n"
+    for (let mob of redMobs){
+        discordMessage = discordMessage + mob._id + "\n"
+    }
+    discordMessage = discordMessage + "**:blue_circle: Blue Controlled Mob's: **\n"
+    for (let mob of blueMobs){
+        discordMessage = discordMessage + mob._id + "\n"
+    }
+    discordMessage = discordMessage + "\n**:red_circle: Red Players Online: **\n"
+    for (let player of redplayerArray){
+        discordMessage = discordMessage + player.name + "\n"
+    }
+    discordMessage = discordMessage + "**:blue_circle: Blue Players Online: **\n"
+    for (let player of blueplayerArray){
+        discordMessage = discordMessage + player.name + "\n"
+    }
+}
 
 export function getName(vcUser: any) {
     if (vcUser.nickname) {
@@ -62,6 +120,7 @@ export function clientLogin(cObj: any, token: string) {
             }, 5 + 1000);
         });
 }
+
 
 
 /*

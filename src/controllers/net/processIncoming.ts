@@ -181,8 +181,9 @@ export async function processingIncomingData(incomingObj: any) {
                             await ddcsController.sendMesgToPlayerChatWindow("Setting Flag ID:" + adminCMDArray[2] +"to value:" + adminCMDArray[3], curPly.playerId);
                         }
                         if (adminCMDArray[1] === "test"){
-                            let unitObjs = await ddcsController.unitActionReadStd({playername:curPly.name});
-                            await ddcsController.spawnReinforcementGroup(unitObjs[0], unitObjs[0].country, "SAM Brigade(12LP)","",true);
+                            //let unitObjs = await ddcsController.unitActionReadStd({playername:curPly.name});
+                            //await ddcsController.spawnReinforcementGroup(unitObjs[0], unitObjs[0].country, "SAM Brigade(12LP)","");
+                            await ddcsController.campaignStatusMessage();
                         }
 
                     } else {

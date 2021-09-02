@@ -136,7 +136,9 @@ export async function populateNewCampaignUnits(): Promise<void> {
     missionStartupReSync = true;
     console.log("Spawn New Objs for Campaign: ", missionStartupReSync);
     console.log("Clear Units");
+    await ddcsControllers.sendMessageToDiscord("@everyone Campaign has been Won and has been Reset");
     await ddcsControllers.unitActionRemoveall(); // clear unit table
+    await ddcsControllers.sessionsActionsEndLastCampaign();//update old sessions to end date
     await ddcsControllers.campaignsActionsReset();// clear campaign playtime table
     await ddcsControllers.unitActionRemoveall(); // clear unit table
     await ddcsControllers.srvPlayerActionsUnsetCampaign(); // reset all campaign locks

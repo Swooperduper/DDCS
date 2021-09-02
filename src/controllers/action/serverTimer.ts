@@ -61,60 +61,74 @@ export async function processTimer(serverSecs: number): Promise<void> {
         if (getCurSeconds() > (getMaxTime() - (ddcsController.time.oneHour * 10)) && !timerObj.tenHours) {
             messageTemplate = "SERVERRESTARTINGINLESSTHAN";
             args = ["10", "#HOURS"];
+            await ddcsController.sendMessageToDiscord("Server Restarting In Less Than " +args[0]+" hours");
             timerObj.tenHours = true;
         }
         // 9 hours
         if (getCurSeconds() > (getMaxTime() - (ddcsController.time.oneHour * 9)) && !timerObj.nineHours) {
             messageTemplate = "SERVERRESTARTINGINLESSTHAN";
             args = ["9", "#HOURS"];
+            await ddcsController.sendMessageToDiscord("Server Restarting In Less Than " +args[0]+" hours");
             timerObj.nineHours = true;
         }
         // 8 hours
         if (getCurSeconds() > (getMaxTime() - (ddcsController.time.oneHour * 8)) && !timerObj.eightHours) {
             messageTemplate = "SERVERRESTARTINGINLESSTHAN";
             args = ["8", "#HOURS"];
+            await ddcsController.sendMessageToDiscord("Server Restarting In Less Than " +args[0]+" hours");
             timerObj.eightHours = true;
         }
         // 7 hours
         if (getCurSeconds() > (getMaxTime() - (ddcsController.time.oneHour * 7)) && !timerObj.sevenHours) {
             messageTemplate = "SERVERRESTARTINGINLESSTHAN";
             args = ["7", "#HOURS"];
+            await ddcsController.sendMessageToDiscord("Server Restarting In Less Than " +args[0]+" hours");
             timerObj.sevenHours = true;
+            await ddcsController.setCircleMarkers();
+            await ddcsController.setFarpMarks();
         }
         // 6 hours
         if (getCurSeconds() > (getMaxTime() - (ddcsController.time.oneHour * 6)) && !timerObj.sixHours) {
             messageTemplate = "SERVERRESTARTINGINLESSTHAN";
             args = ["6", "#HOURS"];
+            await ddcsController.sendMessageToDiscord("Server Restarting In Less Than " +args[0]+" hours");
             timerObj.sixHours = true;
+            await ddcsController.setCircleMarkers();
+            await ddcsController.setFarpMarks();
         }
         // 5 hours
         if (getCurSeconds() > (getMaxTime() - (ddcsController.time.oneHour * 5)) && !timerObj.fiveHours) {
             messageTemplate = "SERVERRESTARTINGINLESSTHAN";
             args = ["5", "#HOURS"];
+            await ddcsController.sendMessageToDiscord("Server Restarting In Less Than " +args[0]+" hours");
             timerObj.fiveHours = true;
         }
         // 4 hours
         if (getCurSeconds() > (getMaxTime() - (ddcsController.time.oneHour * 4)) && !timerObj.fourHours) {
             messageTemplate = "SERVERRESTARTINGINLESSTHAN";
             args = ["4", "#HOURS"];
+            await ddcsController.sendMessageToDiscord("Server Restarting In Less Than " +args[0]+" hours");
             timerObj.fourHours = true;
         }
         // 3 hours
         if (getCurSeconds() > (getMaxTime() - (ddcsController.time.oneHour * 3)) && !timerObj.threeHours) {
             messageTemplate = "SERVERRESTARTINGINLESSTHAN";
             args = ["3", "#HOURS"];
+            await ddcsController.sendMessageToDiscord("Server Restarting In Less Than " +args[0]+" hours");
             timerObj.threeHours = true;
         }
         // 2 hours
         if (getCurSeconds() > (getMaxTime() - (ddcsController.time.oneHour * 2)) && !timerObj.twoHours) {
             messageTemplate = "SERVERRESTARTINGINLESSTHAN";
             args = ["2", "#HOURS"];
+            await ddcsController.sendMessageToDiscord("Server Restarting In Less Than " +args[0]+" hours");
             timerObj.twoHours = true;
         }
         // 1 hour
         if (getCurSeconds() > (getMaxTime() - ddcsController.time.oneHour) && !timerObj.oneHour) {
             messageTemplate = "SERVERRESTARTINGINLESSTHAN";
             args = ["1", "#HOUR"];
+            await ddcsController.sendMessageToDiscord("Server Restarting In Less Than " +args[0]+" hours");
             timerObj.oneHour = true;
         }
         // 30 mins
@@ -131,12 +145,14 @@ export async function processTimer(serverSecs: number): Promise<void> {
         }
         // 10 mins
         if (getCurSeconds() > (getMaxTime() - ddcsController.time.tenMinutes) && !timerObj.tenMinutes) {
+            await ddcsController.sendMessageToDiscord("Server Restarting In Less Than 10 Minutes");
             messageTemplate = "SERVERRESTARTINGINLESSTHAN";
             args = ["10", "#MINUTES"];
             timerObj.tenMinutes = true;
         }
         // 5 mins
         if (getCurSeconds() > (getMaxTime() - ddcsController.time.fiveMins) && !timerObj.fiveMinutes) {
+            await ddcsController.sendMessageToDiscord("Server Restarting In Less Than 5 Minutes");
             messageTemplate = "SERVERRESTARTINGINLESSTHAN";
             args = ["5", "#MINUTES"];
             timerObj.fiveMinutes = true;
@@ -163,6 +179,7 @@ export async function processTimer(serverSecs: number): Promise<void> {
         // console.log("SECONDS: ", getCurSeconds(), " > ", getMaxTime(), " - ", 60);
         if (getCurSeconds() > (getMaxTime() - ddcsController.time.oneMin) && !timerObj.oneMinute) {
             messageTemplate = "SERVERRESTARTINGINLESSTHAN";
+            await ddcsController.sendMessageToDiscord("Server Restarting In Less Than 1 Minute");
             args = ["1", "#MINUTE"];
             timerObj.oneMinute = true;
             const latestSession = await ddcsController.sessionsActionsReadLatest();
