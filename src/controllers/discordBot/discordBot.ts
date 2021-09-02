@@ -13,7 +13,7 @@ const srsFilePaths = [
     { name: "DDCS1978ColdWar", path: "C:/Users/MegaServer/Desktop/SRS/DDCS-Standard/clients-list.json" },
     { name: "DDCSModern", path: "C:/Users/MegaServer/Desktop/SRS/DDCS-Hardcore/clients-list.json" }
 ];
-const webHookURL = "https://discord.com/api/webhooks/882974220290760725/xoDxB7fhuH6KNaF6-uGTumjUTudxmGMw2-SbzSVwIpnXAPYxxnaVB5RFJn3vSpFgcNON"
+const webHookURL = "https://discord.com/api/webhooks/"
 /*
 fs.readFileAsyncArray(fileObj) {
     return new Promise((resolve: any, reject: any) => {
