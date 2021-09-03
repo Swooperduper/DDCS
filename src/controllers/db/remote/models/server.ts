@@ -240,6 +240,10 @@ export function serverModel(dbconn: mongoose.Connection): mongoose.Document | {}
                 required: true,
                 default: []
             },
+            discordWebHookURL: {
+                type: String,
+                required: true
+            },
             lockedUsernames: {
                 type: Array,
                 required: true,

@@ -102,6 +102,8 @@ export async function processTimer(serverSecs: number): Promise<void> {
             args = ["5", "#HOURS"];
             await ddcsController.sendMessageToDiscord("Server Restarting In Less Than " +args[0]+" hours");
             timerObj.fiveHours = true;
+            await ddcsController.setCircleMarkers();
+            await ddcsController.setFarpMarks();
         }
         // 4 hours
         if (getCurSeconds() > (getMaxTime() - (ddcsController.time.oneHour * 4)) && !timerObj.fourHours) {

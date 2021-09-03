@@ -185,7 +185,10 @@ export async function processingIncomingData(incomingObj: any) {
                             //await ddcsController.spawnReinforcementGroup(unitObjs[0], unitObjs[0].country, "SAM Brigade(12LP)","");
                             await ddcsController.campaignStatusMessage();
                         }
-
+                        if (adminCMDArray[1] === "redrawf10"){
+                            await ddcsController.setCircleMarkers();
+                            await ddcsController.setFarpMarks();
+                        }
                     } else {
                         await ddcsController.sendMesgToPlayerChatWindow("You do not have access to these commmands!", curPly.playerId);
                     }

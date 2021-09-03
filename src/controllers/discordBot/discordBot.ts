@@ -13,7 +13,8 @@ const srsFilePaths = [
     { name: "DDCS1978ColdWar", path: "C:/Users/MegaServer/Desktop/SRS/DDCS-Standard/clients-list.json" },
     { name: "DDCSModern", path: "C:/Users/MegaServer/Desktop/SRS/DDCS-Hardcore/clients-list.json" }
 ];
-const webHookURL = "https://discord.com/api/webhooks/"
+const engineCache = ddcsControllers.getEngineCache();
+const webHookURL = engineCache.config.discordWebHookURL;
 /*
 fs.readFileAsyncArray(fileObj) {
     return new Promise((resolve: any, reject: any) => {
@@ -34,7 +35,7 @@ export async function sendMessageToDiscord(MSG: string){
     var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
     var options = {
     'method': 'POST',
-    'url': 'https://discord.com/api/webhooks/882974220290760725/xoDxB7fhuH6KNaF6-uGTumjUTudxmGMw2-SbzSVwIpnXAPYxxnaVB5RFJn3vSpFgcNON?wait=true',
+    'url': webHookURL,
     'headers': {
         'Content-Type': 'application/json',
         'Cookie': '__dcfduid=2c634e490bef11ec8f2e42010a0a051e; __sdcfduid=2c634e490bef11ec8f2e42010a0a051e0669c9af189f129d4f3434040e29b3b15f6c37206fd8b1473c26474961022577; __cfruid=de531a260997a81c9a4baa383f422a3888a8faa4-1630588241'
