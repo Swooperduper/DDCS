@@ -13,8 +13,6 @@ const srsFilePaths = [
     { name: "DDCS1978ColdWar", path: "C:/Users/MegaServer/Desktop/SRS/DDCS-Standard/clients-list.json" },
     { name: "DDCSModern", path: "C:/Users/MegaServer/Desktop/SRS/DDCS-Hardcore/clients-list.json" }
 ];
-const engineCache = ddcsControllers.getEngineCache();
-const webHookURL = engineCache.config.discordWebHookURL;
 /*
 fs.readFileAsyncArray(fileObj) {
     return new Promise((resolve: any, reject: any) => {
@@ -30,9 +28,11 @@ fs.readFileAsyncArray(fileObj) {
 }
 */
 export async function sendMessageToDiscord(MSG: string){
+    const engineCache = ddcsControllers.getEngineCache();
+    const webHookURL = engineCache.config.discordWebHookURL;
     var request = require('request');
     var today = new Date();
-    var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+    var time = today.getUTCHours() + ":" + today.getUTCMinutes() + ":" + today.getUTCSeconds();
     var options = {
     'method': 'POST',
     'url': webHookURL,
