@@ -115,8 +115,6 @@ export async function srvPlayerActionsUpdateFromServer(obj: {
                     obj.curLifePoints = engineCache.config.startLifePoints;
                     obj.currentSessionMinutesPlayed_blue = 0;
                     obj.currentSessionMinutesPlayed_red = 0;
-                    obj.redRSPoints = 0;
-                    obj.blueRSPoints = 0;
                     obj.tmpRSPoints = 0;
                 }
                 if (obj.ipaddr === ":10308") {

@@ -1233,7 +1233,7 @@ export async function spawnTanker(curUnit: any, curPlayer: any, tankerType: stri
             type: "KC-135",
             country: "USA",
             alt: "7620",
-            speed: "265",
+            speed: "244",
             tacan: {
                 enabled: true,
                 channel: 33,
@@ -1277,7 +1277,7 @@ export async function spawnTanker(curUnit: any, curPlayer: any, tankerType: stri
             type: "KC-135",
             country: "USA",
             alt: "4572",
-            speed: "118.19444444444",
+            speed: "239",
             tacan: {
                 enabled: true,
                 channel: 35,
@@ -1303,7 +1303,7 @@ export async function spawnTanker(curUnit: any, curPlayer: any, tankerType: stri
             type: "KC130",
             country: "USA",
             alt: "4572",
-            speed: "169.58333333333",
+            speed: "239",
             tacan: {
                 enabled: true,
                 channel: 36,
@@ -1329,7 +1329,7 @@ export async function spawnTanker(curUnit: any, curPlayer: any, tankerType: stri
             type: "IL-78M",
             country: "RUSSIA",
             alt: "7620",
-            speed: "265",
+            speed: "239",
             tacan: {
                 enabled: false
             },
@@ -1347,7 +1347,7 @@ export async function spawnTanker(curUnit: any, curPlayer: any, tankerType: stri
             type: "KC-135",
             country: "AGGRESSORS",
             alt: "4572",
-            speed: "118.19444444444",
+            speed: "239.217",
             tacan: {
                 enabled: true,
                 channel: 43,
@@ -1373,7 +1373,7 @@ export async function spawnTanker(curUnit: any, curPlayer: any, tankerType: stri
             type: "KC130",
             country: "RUSSIA",
             alt: "4572",
-            speed: "169.58333333333",
+            speed: "239.217",
             tacan: {
                 enabled: true,
                 channel: 44,
