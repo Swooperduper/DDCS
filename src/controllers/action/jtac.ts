@@ -21,7 +21,7 @@ export async function baseDefenseDetectSmoke() {
             engineCache.config.baseSpotDistance,
             ddcsControllers.enemyCountry[base.side]
         );
-        console.log("Enemy Near MOB: ", base.name, enemyUnits.map((un) => un._id));
+        //console.log("Enemy Near MOB: ", base.name, enemyUnits.map((un) => un._id));
         if (enemyUnits.length > 0) {
             for (const unit of enemyUnits) {
                 await ddcsControllers.sendUDPPacket("frontEnd", {

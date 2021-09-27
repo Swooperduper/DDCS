@@ -139,6 +139,7 @@ export async function populateNewCampaignUnits(): Promise<void> {
     await ddcsControllers.sendMessageToDiscord("@everyone Campaign has been Won and has been Reset");
     await ddcsControllers.unitActionRemoveall(); // clear unit table
     await ddcsControllers.sessionsActionsEndLastCampaign();//update old sessions to end date
+    await ddcsControllers.sendMessageToDiscord("Campaign playtime has been reset");
     await ddcsControllers.campaignsActionsReset();// clear campaign playtime table
     await ddcsControllers.unitActionRemoveall(); // clear unit table
     await ddcsControllers.srvPlayerActionsUnsetCampaign(); // reset all campaign locks
@@ -315,7 +316,7 @@ export async function syncCheck(serverCount: number): Promise<void> {
                     // normal synced operation
                     await activateInactiveSpawn();
                     setServerSynced(true);
-                    console.log("NORMAL SYNC CHECK LOOP");
+                    //console.log("NORMAL SYNC CHECK LOOP");
                 }
             }
         }

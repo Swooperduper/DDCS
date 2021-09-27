@@ -56,8 +56,11 @@ export async function sessionsActionsEndLastCampaign(){
     const allSessions = await sessionsActionsRead({campaignName:"DDCSModern_1590280980000"});
     allSessions.pop()
     const date = new Date().toJSON().slice(0,10).replace(/-/g,'/');
-    for(const obj of allSessions){
-        obj.campaignName = "Ended On:" + date;
-        sessionsActionsUpdate(obj);
+    for(const session of allSessions){
+        session.campaignName = "Ended On:" + date;
+        await sessionsActionsUpdate({
+            _id: session._id,
+            campaignName: session.campaignName
+        });
     }
 }

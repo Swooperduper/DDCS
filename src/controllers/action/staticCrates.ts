@@ -60,7 +60,7 @@ export async function unpackStaticCrate(curPlayerUnit: any): Promise<void> {
             } else if (_.includes(curCrateSpecial, "CCBuild|")) {
                 console.log("trying to build cc on empty base");
                 const response = await ddcsControllers.spawnCCAtNeutralBase(curPlayerUnit);
-                console.log("spawn response1: ", response);
+                //console.log("spawn response1: ", response);
                 if (response) {
                     await destroyCrates(grpTypes, curCrateType, numCrate);
                 }
@@ -78,7 +78,7 @@ export async function unpackStaticCrate(curPlayerUnit: any): Promise<void> {
                     isMobile
                 )
                     .then((response: any) => {
-                        console.log("unpacking response2: ", response);
+                        //console.log("unpacking response2: ", response);
                         if (response) {
                             destroyCrates(grpTypes, curCrateType, numCrate);
                         }

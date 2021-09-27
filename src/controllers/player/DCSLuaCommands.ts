@@ -67,11 +67,14 @@ export async function sendMesgToAll(
                 const playerUnits = await ddcsController.unitActionRead({dead: false, playername: playersInfo[0].name});
                 const curPlayerUnit = playerUnits[0] || {};
                 const i18n = new I18nResolver(engineCache.i18n, player.lang).translation as any;
-                let message = "A: " + i18n[messageTemplate];
-                for (const [i, v] of argArray.entries()) {
-                    const templateReplace = "#" + (i + 1);
-                    const templateVal = (_.includes(v, "#")) ? i18n[v.split("#")[1]] : v;
-                    message = message.replace(templateReplace, templateVal);
+                let message = "A: " + messageTemplate;
+                if (argArray.length > 0){
+                    message = "A: " + i18n[messageTemplate];
+                    for (const [i, v] of argArray.entries()) {
+                        const templateReplace = "#" + (i + 1);
+                        const templateVal = (_.includes(v, "#")) ? i18n[v.split("#")[1]] : v;
+                        message = message.replace(templateReplace, templateVal);
+                    }
                 }
                 await sendMesgToGroup(
                     playersInfo[0],

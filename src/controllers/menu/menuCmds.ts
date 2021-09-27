@@ -791,7 +791,7 @@ export async function menuCmdProcess(pObj: any) {
                     await spawnTanker(curUnit, curPlayer, pObj.type, pObj.rsCost);
                     break;
                 case "spawnReinforcements":
-                    await spawnReinforcements(curUnit, curPlayer, pObj.type, pObj.rsCost);
+                    await spawnReinforcements(curUnit, curPlayer, pObj.type, pObj.cost, pObj.costType);
                     break;
                 case "InternalCargo":
                     await internalCargo(curUnit, curPlayer, pObj.type);
@@ -1185,16 +1185,16 @@ export async function spawnDefHeli(curUnit: any, curPlayer: any, heliType: strin
     }
 }
 
-export async function spawnReinforcements(curUnit: any, curPlayer: any, reinforcementType: string, lpCost: number) {
+export async function spawnReinforcements(curUnit: any, curPlayer: any, reinforcementType: string, cost: number, costType: string) {
     const engineCache = ddcsControllers.getEngineCache();
     const spawnDistance = engineCache.config.intCargoUnloadDistance;
+    const i18n = new I18nResolver(engineCache.i18n, curPlayer.lang).translation as any;
     const closeMOBs2 = await ddcsControllers.getMOBsInProximity(
         curUnit.lonLatLoc,
         spawnDistance,
         ddcsControllers.enemyCountry[curUnit.coalition]
     );
     if (closeMOBs2.length = 0) {
-        console.log(curPlayer," can't spawn reinforcments as they are too far away from base")
         await ddcsControllers.sendMesgToGroup(
             curPlayer,
             curUnit.groupId,
@@ -1204,16 +1204,66 @@ export async function spawnReinforcements(curUnit: any, curPlayer: any, reinforc
     } else {
         const curPlayerArray = await ddcsControllers.srvPlayerActionsRead({name: curUnit.playername});
         const curPlayer = curPlayerArray[0];
-        if (curPlayer.curLifePoints >= 12){            
-            spawnReinforcementGroup(curUnit, curUnit.country, reinforcementType,curPlayer);
-            console.log("Attempt spawnReinforcements:", reinforcementType, lpCost);
-        } else {
-            await ddcsControllers.sendMesgToGroup(
-                curPlayer,
-                curUnit.groupId,
-                "G: You are too far away from a base to spawn any reinforcement groups, you must be within " + spawnDistance + "km of the base",
-                5
-            );
+        if (costType = "LP"){
+            if (curPlayer.curLifePoints >= cost){  
+                if (curUnit.inAir) {
+                    await ddcsControllers.sendMesgToGroup(
+                        curPlayer,
+                        curUnit.groupId,
+                        "G: " + i18n.LANDBEFORECARGOCOMMAND,
+                        5
+                    );
+                } else {          
+                    spawnReinforcementGroup(curUnit, curUnit.country, reinforcementType, curPlayer);
+
+                }
+            } else {
+                await ddcsControllers.sendMesgToGroup(
+                    curPlayer,
+                    curUnit.groupId,
+                    "G: You do not have the require lifepoints to spawn this.",
+                    5
+                );
+            }
+        } else if (costType = "RS"){
+            let RSPoints = 0
+            if (curUnit.side = 1){
+                RSPoints = curPlayer.redRSPoints
+            }else{
+                RSPoints = curPlayer.blueRSPoints
+            }
+            if (RSPoints >= cost){  
+                if (curUnit.inAir) {
+                    await ddcsControllers.sendMesgToGroup(
+                        curPlayer,
+                        curUnit.groupId,
+                        "G: " + i18n.LANDBEFORECARGOCOMMAND,
+                        5
+                    );
+                } else {          
+                    spawnReinforcementGroup(curUnit, curUnit.country, reinforcementType, curPlayer);
+
+                }
+            } else {
+                await ddcsControllers.sendMesgToGroup(
+                    curPlayer,
+                    curUnit.groupId,
+                    "G: You do not have the require resource points to spawn this.",
+                    5
+                );
+            }
+        }else{
+            if (curUnit.inAir) {
+                await ddcsControllers.sendMesgToGroup(
+                    curPlayer,
+                    curUnit.groupId,
+                    "G: " + i18n.LANDBEFORECARGOCOMMAND,
+                    5
+                );
+            } else {          
+                spawnReinforcementGroup(curUnit, curUnit.country, reinforcementType, curPlayer);
+
+            }
         }
     }
 }
@@ -1589,49 +1639,38 @@ export async function spawnReinforcementGroup(
     console.log("sRG:curPlayer",curPlayer);
     const engineCache = await ddcsControllers.getEngineCache();
     console.log("sRG:getEngineCache");
-    const i18n = new I18nResolver(engineCache.i18n, curPlayer.lang).translation as any;
     const curTimePeriod = engineCache.config.timePeriod || "modern";
     console.log("sRG:curTimePeriod",curTimePeriod);
     console.log("sRG:playerUnit.inAir",playerUnit.inAir);
-    if (playerUnit.inAir) {
-        await ddcsControllers.sendMesgToGroup(
-            curPlayer,
-            playerUnit.groupId,
-            "G: " + i18n.LANDBEFORECARGOCOMMAND,
-            5
-        );
-        return false;
-    } else {
-        if (reinforcementType === "SAM Brigade(12LP)"){
-            if (curPlayer.sideLock === 2){
-                reinforcementArray = ["Patriot","NASAMS-C","Tor 9A331","Gepard","M6 Linebacker"];
-            }else{
-                reinforcementArray = ["SA-10","Tor 9A331","2S6 Tunguska","Strela-10M3","Strela-10M3"];
-            }
+    if (reinforcementType === "SAM Brigade(12LP)"){
+        if (curPlayer.sideLock === 2){
+            reinforcementArray = ["Patriot","NASAMS-C","Tor 9A331","Gepard","M6 Linebacker"];
+        }else{
+            reinforcementArray = ["SA-10","Tor 9A331","2S6 Tunguska","Strela-10M3","Strela-10M3"];
         }
-        if (reinforcementType === "Armoured Company(12LP)"){
-            if (curPlayer.sideLock === 2){
-                reinforcementArray = ["M-1 Abrams","Leopard-2","Merkava_Mk4","M-2 Bradley","M-2 Bradley"];
-            }else{
-                reinforcementArray = ["Leclerc","T-90","T-72B","BMP-3","BMP-3"];
-            }
+    }
+    if (reinforcementType === "Armoured Company(12LP)"){
+        if (curPlayer.sideLock === 2){
+            reinforcementArray = ["M-1 Abrams","Leopard-2","Merkava_Mk4","M-2 Bradley","M-2 Bradley"];
+        }else{
+            reinforcementArray = ["Leclerc","T-90","T-72B","BMP-3","BMP-3"];
         }
-        if (reinforcementType === "Mixed Brigade(12LP)"){
-            if (curPlayer.sideLock === 2){
-                reinforcementArray = ["Challenger2","M1128 Stryker MGS","M-2 Bradley","Gepard","M6 Linebacker"];
-            }else{
-                reinforcementArray = ["T-80UD","BMP-3","BMP-3","Strela-10M3","Strela-10M3"];
-            }
+    }
+    if (reinforcementType === "Mixed Brigade(12LP)"){
+        if (curPlayer.sideLock === 2){
+            reinforcementArray = ["Challenger2","M1128 Stryker MGS","M-2 Bradley","Gepard","M6 Linebacker"];
+        }else{
+            reinforcementArray = ["T-80UD","BMP-3","BMP-3","Strela-10M3","Strela-10M3"];
         }
-        console.log("sRG:reinforcementType",reinforcementType);
-        console.log("sRG:reinforcementArray",reinforcementArray);
-        let spawnDistance = 0.06;
-        ddcsControllers.srvPlayerSpendLifePoints(curPlayer._id, playerUnit.groupId, 12, "LP Removed for Spawning Rinforcement Group");
-        for (let type of reinforcementArray){
-            console.log("type:",type)
-            await spawnRinGroups(playerUnit, curPlayer, country, type,"",true,engineCache,curTimePeriod,spawnDistance);
-            spawnDistance = spawnDistance + 0.02;
-        }
+    }
+    console.log("sRG:reinforcementType",reinforcementType);
+    console.log("sRG:reinforcementArray",reinforcementArray);
+    let spawnDistance = 0.06;
+    ddcsControllers.srvPlayerSpendLifePoints(curPlayer._id, playerUnit.groupId, 12, "LP Removed for Spawning Rinforcement Group");
+    for (let type of reinforcementArray){
+        console.log("type:",type)
+        await spawnRinGroups(playerUnit, curPlayer, country, type,"",true,engineCache,curTimePeriod,spawnDistance);
+        spawnDistance = spawnDistance + 0.02;
     }
 }
 

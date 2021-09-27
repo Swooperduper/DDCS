@@ -17,7 +17,15 @@ export async function baseUnitUnderAttack(unit: typings.IUnit): Promise<void> {
                 const curBase = _.find(engineCache.bases, {_id: curDBBase._id});
                 if (curBase) {
                     curBase.underAttack += 1;
-                    console.log(curBase.name + " is under attack");
+                    
+                    const msg = curBase.name + " is under attack";
+                    await ddcsControllers.sendMesgToAll(
+                        msg,
+                        [],
+                        20,
+                        5
+                    );
+                    await ddcsControllers.sendMesgChatWindow(msg);
                 }
             }
         }

@@ -133,7 +133,7 @@ export async function recordFiveMinutesPlayed() {
         });
         await Promise.all(processPromise);
         await updateSession(latestSession.name);
-        console.log("PlayerFiveMinCount: ", totalMinsPerSide);
+        //console.log("PlayerFiveMinCount: ", totalMinsPerSide);
     }
 }
 

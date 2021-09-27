@@ -8,14 +8,15 @@ import * as ddcsControllers from "../";
 import * as ddcsController from "../action/unitDetection";
 import { side } from "../constants";
 
+
+
 export async function processFiveSecActions(fullySynced: boolean): Promise<void> {
 
     const engineCache = ddcsControllers.getEngineCache();
     const replenThreshold = 1; // percentage under max
     const replenBase = engineCache.config.replenThresholdBase * replenThreshold;
     const replenTimer = _.random(engineCache.config.replenTimer / 2, engineCache.config.replenTimer);
-    await ddcsControllers.syncCheck(ddcsControllers.getCurServerCnt());
-    console.log("SYNCED: ", fullySynced);
+    await ddcsControllers.syncCheck(ddcsControllers.getCurServerCnt());  
     if (fullySynced) {
         // resetCampaignController.checkTimeToRestart(serverName); //for testing base capture quickly
         // spawn support planes to replenish base units
@@ -83,5 +84,7 @@ export async function processFiveSecActions(fullySynced: boolean): Promise<void>
                 }
             });
         }
+    }else{
+         console.log("SYNCED: ", fullySynced);
     }
 }
