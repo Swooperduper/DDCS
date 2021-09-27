@@ -1469,7 +1469,7 @@ export async function spawnStaticBuilding(
 }
 
 export async function spawnUnitGroup(spawnArray: typing.IUnitSpawnMin[], init: boolean, baseName?: string, side?: number): Promise<void> {
-    console.log("spawnArray:",spawnArray);
+    //console.log("spawnArray:",spawnArray);
     if (spawnArray.length > 0) {
         let groupTemplate: string = "";
         const groupNum = _.random(1000000, 9999999);
@@ -1516,7 +1516,7 @@ export async function spawnUnitGroup(spawnArray: typing.IUnitSpawnMin[], init: b
                 grpObj.country,
                 grpObj.unitCategory
             );
-            console.log("spawnUnitGroup: ", curCMD);
+            //console.log("spawnUnitGroup: ", curCMD);
             const sendClient = {actionObj: {action: "CMD", cmd: [curCMD], reqID: 0}};
             await ddcsControllers.sendUDPPacket("frontEnd", sendClient);
         }
@@ -1665,10 +1665,10 @@ export async function healBase(baseName: string, curPlayerUnit: any, init: boole
     const engineCache = ddcsControllers.getEngineCache();
     const i18n = new I18nResolver(engineCache.i18n, curPly.lang).translation as any;
     const baseUnit = await ddcsControllers.baseActionRead({name: baseName});
-    console.log("healBase: ", baseName, baseUnit);
+    //console.log("healBase: ", baseName, baseUnit);
     if (baseUnit.length > 0) {
         const curBase = baseUnit[0];
-        console.log("CB: ", curBase);
+        //console.log("CB: ", curBase);
         if (curBase.side !== 0 && curBase.side !== curPlayerUnit.coalition) {
             await ddcsControllers.sendMesgToGroup(
                 curPly,
