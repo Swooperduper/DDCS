@@ -183,7 +183,7 @@ export async function processingIncomingData(incomingObj: any) {
                         if (adminCMDArray[1] === "test"){
                             //let unitObjs = await ddcsController.unitActionReadStd({playername:curPly.name});
                             //await ddcsController.spawnReinforcementGroup(unitObjs[0], unitObjs[0].country, "SAM Brigade(12LP)","");
-                            await ddcsController.campaignStatusMessage();
+                            await ddcsController.baseDefenseDetectSmoke();
                         }
                         if (adminCMDArray[1] === "redrawf10"){
                             await ddcsController.setCircleMarkers();

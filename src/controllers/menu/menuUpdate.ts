@@ -49,9 +49,11 @@ export async function spawnNewMenuCategory(
                     }
                 );
                 if (curUnitDictionary.length > 1) {
-
-                    const launcher = curUnitDictionary.find((rec: any) => rec.launcher);
-                    spawnAmount = launcher.config[ddcsControllers.getEngineCache().config.timePeriod].spawnCount;
+                    spawnAmount = 0
+                    for (const unit of curUnitDictionary){
+                        spawnAmount = spawnAmount + unit.config[ddcsControllers.getEngineCache().config.timePeriod].spawnCount;
+                        
+                    }
                 }
             }
 

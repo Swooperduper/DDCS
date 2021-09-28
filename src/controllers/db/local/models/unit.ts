@@ -140,6 +140,9 @@ export function unitModel(dbconn: mongoose.Connection): mongoose.Document | {} {
             intCargoType: {
                 type: String
             },
+            intMass: {
+                type: String
+            },
             spawnCat: {
                 type: String
             },

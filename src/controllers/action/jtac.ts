@@ -23,7 +23,7 @@ export async function baseDefenseDetectSmoke() {
         );
         //console.log("Enemy Near MOB: ", base.name, enemyUnits.map((un) => un._id));
         if (enemyUnits.length > 0) {
-            for (const unit of enemyUnits) {
+            for (const unit of enemyUnits.slice(0,_.random(2,6))) {
                 await ddcsControllers.sendUDPPacket("frontEnd", {
                     actionObj: {
                         action: "setSmoke",

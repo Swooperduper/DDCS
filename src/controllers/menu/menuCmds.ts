@@ -76,6 +76,11 @@ export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: 
                             "G: " + i18n.SPAWNJTACFROMINTERNALCARGO,
                             5
                         );
+                        if (await isTroopOnboard(curUnit)){
+                            await setInternalCargoMass(curUnit.name,1000);
+                        }else{
+                            await setInternalCargoMass(curUnit.name,0);
+                        }
                     }
                     if (curIntCrateType === "BaseRepair") {
                         await ddcsControllers.correctPlayerAircraftDuplicates();
@@ -88,6 +93,11 @@ export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: 
                                 "G: " + i18n.YOUARENOTNEARANYFRIENDLYBASES,
                                 5
                             );
+                            if (await isTroopOnboard(curUnit)){
+                                await setInternalCargoMass(curUnit.name,1000);
+                            }else{
+                                await setInternalCargoMass(curUnit.name,0);
+                            }
                         }
                     }
                     if (curIntCrateType === "CCBuild") {  // serverName, curUnit, curPlayer, intCargoType
@@ -128,6 +138,11 @@ export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: 
                             "G: " + i18n.COMMANDCENTERBUILDCRATESPAWNED,
                             5
                         );
+                        if (await isTroopOnboard(curUnit)){
+                            await setInternalCargoMass(curUnit.name,1000);
+                        }else{
+                            await setInternalCargoMass(curUnit.name,0);
+                        }
                     }
                 }
             } else {
@@ -174,6 +189,11 @@ export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: 
                             "G: " + i18n.PICKEDUPJTACINTERNALCRATE.replace("#1", curBaseName),
                             5
                         );
+                        if (await isTroopOnboard(curUnit)){
+                            await setInternalCargoMass(curUnit.name,2000);
+                        }else{
+                            await setInternalCargoMass(curUnit.name,1000);
+                        }
                     }
                     if (intCargoType === "loadBaseRepair") {
                         const intCargo = _.split(curUnit.intCargoType, "|");
@@ -193,6 +213,11 @@ export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: 
                             "G: " + i18n.PICKEDUPBASEREPAIRINTERNALCRATES.replace("#1", curBaseName),
                             5
                         );
+                        if (await isTroopOnboard(curUnit)){
+                            await setInternalCargoMass(curUnit.name,2000);
+                        }else{
+                            await setInternalCargoMass(curUnit.name,1000);
+                        }
                     }
                     if (intCargoType === "loadCCBuild") {
                         await ddcsControllers.unitActionUpdateByUnitId({
@@ -205,6 +230,11 @@ export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: 
                             "G: " + i18n.PICKEDUPBASEREPAIRBUILDCRATE.replace("#1", curBaseName),
                             5
                         );
+                        if (await isTroopOnboard(curUnit)){
+                            await setInternalCargoMass(curUnit.name,2000);
+                        }else{
+                            await setInternalCargoMass(curUnit.name,1000);
+                        }
                     }
                 } else {
                     await ddcsControllers.sendMesgToGroup(
@@ -309,6 +339,11 @@ export async function loadTroops(unitId: string, troopType: string) {
                 "G: " + i18n.HASBEENLOADED.replace("#1", troopType),
                 5
             );
+            let currentMass = 0;
+            if (curUnit.intCargoType){
+                currentMass = 1000 ;
+            }
+            await setInternalCargoMass(curUnit.name, currentMass + 1000);
         } else {
             // secondary check for second base distance
             const secondBases = await ddcsControllers.baseActionRead({});
@@ -338,6 +373,11 @@ export async function loadTroops(unitId: string, troopType: string) {
                             "G: " + i18n.HASBEENLOADED.replace("#1", troopType),
                             5
                         );
+                        let currentMass = 0;
+                        if (curUnit.intCargoType){
+                            currentMass = 1000 ;
+                        }
+                        await setInternalCargoMass(curUnit.name, currentMass + 1000);
                     })
                     .catch((err) => {
                         console.log("line 13: ", err);
@@ -467,9 +507,9 @@ export async function menuCmdProcess(pObj: any) {
     const engineCache = ddcsControllers.getEngineCache();
     const defCrate = "container_cargo";
 
-    const units = await ddcsControllers.unitActionRead({unitId: pObj.unitId});
+    let units = await ddcsControllers.unitActionRead({unitId: pObj.unitId});
     if (units.length > 0) {
-        const curUnit = units[0];
+        let curUnit = units[0];
         const player = await ddcsControllers.srvPlayerActionsRead({name: curUnit.playername});
         if (player.length > 0) {
             const curPlayer = player[0];
@@ -501,123 +541,27 @@ export async function menuCmdProcess(pObj: any) {
                             5
                         );
                     } else {
-                        if (await isTroopOnboard(curUnit)) {
-                            const playerProx: any[] = [];
-                            const bases = await ddcsControllers.baseActionRead({baseType: "MOB", side: curUnit.coalition});
-                            for (const base of bases) {
-                                playerProx.push(await ddcsControllers.isPlayerInProximity(
-                                    base.centerLoc,
-                                    engineCache.config.troopUnloadDistance,
-                                    curUnit.playername
-                                ));
-                            }
-                            if (_.some(playerProx)) {
-                                await ddcsControllers.unitActionUpdateByUnitId({
-                                    unitId: pObj.unitId,
-                                    troopType: null
-                                });
-                                await ddcsControllers.sendMesgToGroup(
-                                    curPlayer,
-                                    curUnit.groupId,
-                                    "G: " + i18n.HASBEENDROPPEDOFFATBASE.replace("#1", curUnit.troopType),
-                                    5
-                                );
-                            } else {
-                                const curTroops: any[] = [];
-                                const randInc = _.random(1000000, 9999999);
-                                const genName = "TU|" + curPlayer.ucid + "|" + curUnit.troopType + "|" +
-                                    curUnit.playername + "|";
-                                const delUnits = await ddcsControllers.unitActionReadStd({
-                                    playerOwnerId: curPlayer.ucid,
-                                    isTroop: true,
-                                    dead: false
-                                });
-                                let curUnits = 0;
-                                const grpGroups = _.groupBy(delUnits, "groupName");
-                                const tRem = Object.keys(grpGroups).length - engineCache.config.maxTroops;
-                        
-                                for (const gUnitKey of Object.keys(grpGroups)) {
-                                    if (curUnits <= tRem) {
-                                        for (const unit of grpGroups[gUnitKey]) {
-                                            await ddcsControllers.unitActionUpdateByUnitId({unitId: unit.unitId, dead: true});
-                                            await ddcsControllers.destroyUnit(unit.name, "unit");
-                                        }
-                                        curUnits++;
-                                    }
-                                }
-                                curSpawnUnit = _.cloneDeep(await ddcsControllers.getRndFromSpawnCat(
-                                    curUnit.troopType,
-                                    curUnit.coalition,
-                                    false,
-                                    true
-                                )[0]);
-
-                                for (
-                                    let x = 0;
-                                    x < curSpawnUnit.config[engineCache.config.timePeriod].spawnCount;
-                                    x++
-                                ) {
-                                    const spawnArray = {
-                                        name: genName + (randInc + x),
-                                        groupName: genName + randInc,
-                                        type: curSpawnUnit.type,
-                                        lonLatLoc: ddcsControllers.getLonLatFromDistanceDirection(
-                                            curUnit.lonLatLoc,
-                                            curUnit.hdg + (x * 10),
-                                            0.05
-                                        ),
-                                        hdg: curUnit.hdg,
-                                        country: curUnit.country,
-                                        unitCategory: curSpawnUnit.unitCategory,
-                                        playerCanDrive: true,
-                                        coalition: curUnit.coalition
-                                    };
-                                    curTroops.push(spawnArray);
-                                }
-                                await ddcsControllers.unitActionUpdateByUnitId({
-                                    unitId: pObj.unitId,
-                                    troopType: null
-                                })
-                                    .catch((err) => {
-                                        console.log("erroring line73: ", err);
-                                    })
-                                ;
-                                await ddcsControllers.spawnUnitGroup(curTroops, false);
-                                await ddcsControllers.sendMesgToGroup(
-                                    curPlayer,
-                                    curUnit.groupId,
-                                    "G: " + i18n.HASBEENDEPLOYED.replace("#1", curSpawnUnit.type),
-                                    5
-                                );
-                            }
-                        } else {
+                        if(await isTroopOnboard(curUnit)){
+                            await ddcsControllers.sendMesgToGroup(
+                                curPlayer,
+                                curUnit.groupId,
+                                "G: Troops are disembarking the aircraft, wait for them to finish",
+                                5
+                            );
+                            setTimeout(() => {unloadExtractTroops(curUnit,curPlayer,i18n,pObj,engineCache);}, _.random(10,20)*1000);
+                        }else{
                             const troopUnits = await ddcsControllers.getTroopsInProximity(curUnit.lonLatLoc, 0.2, curUnit.coalition);
                             const curTroop = troopUnits[0];
                             if (curTroop) {
-                                // pickup troop
-                                const grpUnits = await ddcsControllers.unitActionRead({
-                                    groupName: curTroop.groupName,
-                                    isCrate: false,
-                                    dead: false
-                                });
-                                for (const curTroopUnit of grpUnits) {
-                                    await ddcsControllers.destroyUnit(curTroopUnit.name, "unit");
-                                }
-                                await ddcsControllers.unitActionUpdateByUnitId({
-                                    unitId: pObj.unitId,
-                                    troopType: curTroop.spawnCat
-                                })
-                                    .catch((err) => {
-                                        console.log("erroring line57: ", err);
-                                    });
                                 await ddcsControllers.sendMesgToGroup(
                                     curPlayer,
                                     curUnit.groupId,
-                                    "G: " + i18n.PICKEDUP.replace("#1", curTroop.type),
+                                    "G: Troops are boarding the aircraft, wait for them to finish",
                                     5
                                 );
-                            } else {
-                                // no troops
+                                setTimeout(() => {unloadExtractTroops(curUnit,curPlayer,i18n,pObj,engineCache);}, _.random(10,20)*1000);
+                                
+                            }else{
                                 await ddcsControllers.sendMesgToGroup(
                                     curPlayer,
                                     curUnit.groupId,
@@ -628,6 +572,91 @@ export async function menuCmdProcess(pObj: any) {
                         }
                     }
                     break;
+                case "fastRopeTroops":
+                    if (!curUnit.inAir) {
+                        await ddcsControllers.sendMesgToGroup(
+                            curPlayer,
+                            curUnit.groupId,
+                            "G:You must be in the air to deploy troops via fast rope",
+                            5
+                        );
+                    } else {
+                        if(curUnit.agl < 19.68){
+                            if(curUnit.speed < 5){
+                                if (await isTroopOnboard(curUnit)) {
+                                    const playerProx: any[] = [];
+                                    const bases = await ddcsControllers.baseActionRead({baseType: "MOB", side: curUnit.coalition});
+                                    for (const base of bases) {
+                                        playerProx.push(await ddcsControllers.isPlayerInProximity(
+                                            base.centerLoc,
+                                            engineCache.config.troopUnloadDistance,
+                                            curUnit.playername
+                                        ));
+                                    }
+                                    if (_.some(playerProx)) {
+                                        await ddcsControllers.sendMesgToGroup(
+                                            curPlayer,
+                                            curUnit.groupId,
+                                            "G:Troops are deploying! Hold it steady, at this height this will take around " + Math.round(curUnit.agl) + " seconds",
+                                            Math.round(curUnit.agl)
+                                        );
+                                        await ddcsControllers.unitActionUpdateByUnitId({
+                                            unitId: pObj.unitId,
+                                            troopType: null
+                                        });
+                                        let currentMass = 1000;
+                                        if (curUnit.intCargoType){
+                                            currentMass = 2000 ;
+                                        }
+                                        setTimeout(() => {setInternalCargoMass(curUnit.name, currentMass - 500); }, curUnit.agl*500);
+                                        setTimeout(() => {setInternalCargoMass(curUnit.name, currentMass - 1000); 
+                                            deployTroops(pObj.unitId,curPlayer,i18n, _.some(playerProx), engineCache, curUnit.troopType);}, curUnit.agl*1000);                                        
+                                        } else {
+                                            await ddcsControllers.sendMesgToGroup(
+                                                curPlayer,
+                                                curUnit.groupId,
+                                                "G:Troops are deploying! Hold it steady, at this height this will take around " + Math.round(curUnit.agl) + " seconds",
+                                                Math.round(curUnit.agl)
+                                            );
+                                            await ddcsControllers.unitActionUpdateByUnitId({
+                                                unitId: pObj.unitId,
+                                                troopType: null
+                                            });
+                                            let currentMass = 1000;
+                                            if (curUnit.intCargoType){
+                                                currentMass = 2000 ;
+                                            }
+                                        setTimeout(() => {setInternalCargoMass(curUnit.name, currentMass - 500); }, curUnit.agl*500);
+                                        setTimeout(() => {setInternalCargoMass(curUnit.name, currentMass - 1000);  
+                                                deployTroops(pObj.unitId,curPlayer,i18n, _.some(playerProx), engineCache, curUnit.troopType);}, curUnit.agl*1000);
+                                            }                            
+                                } else {
+                                    // no troops
+                                    await ddcsControllers.sendMesgToGroup(
+                                        curPlayer,
+                                        curUnit.groupId,
+                                        "G:No troops are onboard to deploy",
+                                        5
+                                    );
+                                }   
+                            }else{
+                                await ddcsControllers.sendMesgToGroup(
+                                    curPlayer,
+                                    curUnit.groupId,
+                                    "G:Reduce airspeed, you must be in a hover the troops to deploy",
+                                    5
+                                ); 
+                            }
+                        }else{
+                            await ddcsControllers.sendMesgToGroup(
+                                curPlayer,
+                                curUnit.groupId,
+                                "G:You are too high, you must decent to 60 feet/18 meters for troops to be able to fast rope",
+                                5
+                            );
+                        }
+                    }
+                    break;    
                 case "isTroopOnboard":
                     await isTroopOnboard(curUnit, true);
                     break;
@@ -683,7 +712,7 @@ export async function menuCmdProcess(pObj: any) {
                         dead: false
                     });
                     const grpGroups = _.transform(unitsOwned, (result: any, value: any) => {
-                        (result[value.groupName] || (result[value.groupName] = [])).push(value);
+                        (result[value.name] || (result[value.name] = [])).push(value);
                     }, {});
 
                     await ddcsControllers.sendMesgToGroup(
@@ -1497,19 +1526,7 @@ export async function unpackCrate(
             dead: false
         });
         let curUnit = 0;
-        const grpGroups = _.groupBy(delUnits, "groupName");
-        const tRem = Object.keys(grpGroups).length - engineCache.config.maxUnitsMoving;
-
-        for (const gUnitKey of Object.keys(grpGroups)) {
-            if (curUnit <= tRem) {
-                for (const unit of grpGroups[gUnitKey]) {
-                    await ddcsControllers.unitActionUpdateByUnitId({unitId: unit.unitId, dead: true});
-                    await ddcsControllers.destroyUnit(unit.name, "unit");
-                    console.log("Player has too many units, removing:",unit.name)
-                }
-                curUnit++;
-            }
-        }
+        const grpGroups = _.groupBy(delUnits, "name");
 
         let newSpawnArray: any[] = [];
         if (combo) {
@@ -1552,6 +1569,18 @@ export async function unpackCrate(
                     newSpawnArray.push(curUnitStart);
                     curUnitHdg = curUnitHdg + addHdg;
                     SpawnHeading = SpawnHeading +addSpawnHeading;
+                }
+            }
+            const tRem = (Object.keys(grpGroups).length + (newSpawnArray.length -1)) - engineCache.config.maxUnitsMoving;
+            console.log(newSpawnArray.length);
+            for (const gUnitKey of Object.keys(grpGroups)) {
+                if (curUnit <= tRem) {
+                    for (const unit of grpGroups[gUnitKey]) {
+                        await ddcsControllers.unitActionUpdateByUnitId({unitId: unit.unitId, dead: true});
+                        await ddcsControllers.destroyUnit(unit.name, "unit");
+                        console.log("Player has too many units, removing:",unit.name)
+                    }
+                    curUnit++;
                 }
             }
             await ddcsControllers.spawnUnitGroup(newSpawnArray, false);
@@ -1604,8 +1633,8 @@ export async function unpackCrate(
                         dead: false
                     });
                     let curUnit = 0;
-                    const grpGroups = _.groupBy(delUnits, "groupName");
-                    const tRem = Object.keys(grpGroups).length - engineCache.config.maxUnitsMoving;
+                    const grpGroups = _.groupBy(delUnits, "name");
+                    const tRem = (Object.keys(grpGroups).length + (spawnUnitCount - 1)) - engineCache.config.maxUnitsMoving;
             
                     for (const gUnitKey of Object.keys(grpGroups)) {
                         if (curUnit <= tRem) {
@@ -1695,19 +1724,7 @@ export async function spawnRinGroups(
         dead: false
     });
     let curUnit = 0;
-    const grpGroups = _.groupBy(delUnits, "groupName");
-    const tRem = Object.keys(grpGroups).length - engineCache.config.maxUnitsMoving;
-
-    for (const gUnitKey of Object.keys(grpGroups)) {
-        if (curUnit <= tRem) {
-            for (const unit of grpGroups[gUnitKey]) {
-                await ddcsControllers.unitActionUpdateByUnitId({unitId: unit.unitId, dead: true});
-                await ddcsControllers.destroyUnit(unit.name, "unit");
-                console.log("Player has too many units, removing:",unit.name)
-            }
-            curUnit++;
-        }
-    }
+    const grpGroups = _.groupBy(delUnits, "name");
 
     let newSpawnArray: any[] = [];
     if (combo) {
@@ -1752,6 +1769,18 @@ export async function spawnRinGroups(
                 SpawnHeading = SpawnHeading +addSpawnHeading;
             }
         }
+        const tRem = (Object.keys(grpGroups).length + (newSpawnArray.length -1)) - engineCache.config.maxUnitsMoving;
+            console.log(newSpawnArray.length);
+            for (const gUnitKey of Object.keys(grpGroups)) {
+                if (curUnit <= tRem) {
+                    for (const unit of grpGroups[gUnitKey]) {
+                        await ddcsControllers.unitActionUpdateByUnitId({unitId: unit.unitId, dead: true});
+                        await ddcsControllers.destroyUnit(unit.name, "unit");
+                        console.log("Player has too many units, removing:",unit.name)
+                    }
+                    curUnit++;
+                }
+            }
         await ddcsControllers.spawnUnitGroup(newSpawnArray, false);
         return true;
     } else {
@@ -1802,9 +1831,10 @@ export async function spawnRinGroups(
                     dead: false
                 });
                 let curUnit = 0;
-                const grpGroups = _.groupBy(delUnits, "groupName");
-                const tRem = Object.keys(grpGroups).length - engineCache.config.maxUnitsMoving;
-        
+                
+                const grpGroups = _.groupBy(delUnits, "name");
+                const tRem = (Object.keys(grpGroups).length + (spawnUnitCount - 1)) - engineCache.config.maxUnitsMoving;
+            
                 for (const gUnitKey of Object.keys(grpGroups)) {
                     if (curUnit <= tRem) {
                         for (const unit of grpGroups[gUnitKey]) {
@@ -1822,4 +1852,296 @@ export async function spawnRinGroups(
             return false;
         }
     }                    
+}
+
+export async function setInternalCargoMass(
+    playerUnit: any,
+    massKG: number
+) {
+    console.log(playerUnit, massKG)
+    await ddcsControllers.sendUDPPacket("frontEnd", {
+        actionObj: {
+            action: "CMD",
+            cmd: ["trigger.action.setUnitInternalCargo( \""+ playerUnit + "\", " + massKG + ")"],
+            reqID: 0,
+            verbose: true
+        }
+    });
+    //console.log("aircraft mass is", massKG);
+}
+
+
+export async function deployTroops(unitId:string, curPlayer:any, i18n:any, proxyPlayer:boolean, engineCache:any, troopType:string) {
+    const units = await ddcsControllers.unitActionRead({unitId: unitId})
+    const curUnit = units[0]
+    if(proxyPlayer){
+        if(curUnit.agl > 19.68 ||curUnit.speed > 5){
+            await ddcsControllers.sendMesgToGroup(
+                curPlayer,
+                curUnit.groupId,
+                "G: You moved too much while the troops were disembarking, none survived",
+                5
+            );
+        }else{
+            await ddcsControllers.sendMesgToGroup(
+                curPlayer,
+                curUnit.groupId,
+                "G: " + i18n.HASBEENDROPPEDOFFATBASE.replace("#1", troopType),
+                5
+            );
+        }
+    }else{
+        if(curUnit.agl > 19.68 ||curUnit.speed > 5){
+            await ddcsControllers.sendMesgToGroup(
+                curPlayer,
+                curUnit.groupId,
+                "G: You moved too much while the troops were disembarking, none survived",
+                5
+            );
+        }else{
+            const curTroops: any[] = [];
+            const randInc = _.random(1000000, 9999999);
+            const genName = "TU|" + curPlayer.ucid + "|" + troopType + "|" +
+                curUnit.playername + "|";
+            const delUnits = await ddcsControllers.unitActionReadStd({
+                playerOwnerId: curPlayer.ucid,
+                isTroop: true,
+                dead: false
+            });
+            if (curUnit.troopType == "MANPAD"){
+                for (const unit of delUnits){
+                    if (unit.type == "Stinger manpad"){
+                        await ddcsControllers.unitActionUpdateByUnitId({unitId: unit.unitId, dead: true});
+                        await ddcsControllers.destroyUnit(unit.name, "unit");
+                    }
+
+                }
+
+            }
+            let curUnits = 0;
+            const grpGroups = _.groupBy(delUnits, "groupName");
+            const tRem = Object.keys(grpGroups).length - engineCache.config.maxTroops;
+    
+            for (const gUnitKey of Object.keys(grpGroups)) {
+                if (curUnits <= tRem) {
+                    for (const unit of grpGroups[gUnitKey]) {
+                        await ddcsControllers.unitActionUpdateByUnitId({unitId: unit.unitId, dead: true});
+                        await ddcsControllers.destroyUnit(unit.name, "unit");
+                    }
+                    curUnits++;
+                }
+            }
+            let curSpawnUnit = _.cloneDeep(await ddcsControllers.getRndFromSpawnCat(
+                troopType,
+                curUnit.coalition,
+                false,
+                true
+            )[0]);
+
+            for (
+                let x = 0;
+                x < curSpawnUnit.config[engineCache.config.timePeriod].spawnCount;
+                x++
+            ) {
+                const spawnArray = {
+                    name: genName + (randInc + x),
+                    groupName: genName + randInc,
+                    type: curSpawnUnit.type,
+                    lonLatLoc: ddcsControllers.getLonLatFromDistanceDirection(
+                        curUnit.lonLatLoc,
+                        curUnit.hdg + (x * 10),
+                        0.05
+                    ),
+                    hdg: curUnit.hdg,
+                    country: curUnit.country,
+                    unitCategory: curSpawnUnit.unitCategory,
+                    playerCanDrive: true,
+                    coalition: curUnit.coalition
+                };
+                curTroops.push(spawnArray);
+            }
+            await ddcsControllers.unitActionUpdateByUnitId({
+                unitId: unitId,
+                troopType: null
+            })
+                .catch((err) => {
+                    console.log("erroring line73: ", err);
+                })
+            ;
+            await ddcsControllers.spawnUnitGroup(curTroops, false);
+            await ddcsControllers.sendMesgToGroup(
+                curPlayer,
+                curUnit.groupId,
+                "G: " + i18n.HASBEENDEPLOYED.replace("#1", curSpawnUnit.type),
+                5
+            );
+            let currentMass = 1000;
+            if (curUnit.intCargoType){
+                currentMass = 2000 ;
+            }
+            await setInternalCargoMass(curUnit.name, currentMass - 1000);
+        }
+    } 
+}
+
+export async function unloadExtractTroops(curUnit:any, curPlayer:any, i18n:any, pObj:any, engineCache:any) {
+    if (curUnit.inAir || curUnit.speed > 1){
+        await ddcsControllers.sendMesgToGroup(
+            curPlayer,
+            curUnit.groupId,
+            "G: Troops were unable to embark/disembark because you were moving",
+            5
+        );
+    }else{
+        if (await isTroopOnboard(curUnit)) {
+            const playerProx: any[] = [];
+            const bases = await ddcsControllers.baseActionRead({baseType: "MOB", side: curUnit.coalition});
+            for (const base of bases) {
+                playerProx.push(await ddcsControllers.isPlayerInProximity(
+                    base.centerLoc,
+                    engineCache.config.troopUnloadDistance,
+                    curUnit.playername
+                ));
+            }
+            if (_.some(playerProx)) {
+                await ddcsControllers.unitActionUpdateByUnitId({
+                    unitId: pObj.unitId,
+                    troopType: null
+                });
+                await ddcsControllers.sendMesgToGroup(
+                    curPlayer,
+                    curUnit.groupId,
+                    "G: " + i18n.HASBEENDROPPEDOFFATBASE.replace("#1", curUnit.troopType),
+                    5
+                );
+                let currentMass = 1000;
+                if (curUnit.intCargoType){
+                    currentMass = 2000 ;
+                }
+                await setInternalCargoMass(curUnit.name, currentMass - 1000);
+            } else {
+                const curTroops: any[] = [];
+                const randInc = _.random(1000000, 9999999);
+                const genName = "TU|" + curPlayer.ucid + "|" + curUnit.troopType + "|" +
+                    curUnit.playername + "|";
+                const delUnits = await ddcsControllers.unitActionReadStd({
+                    playerOwnerId: curPlayer.ucid,
+                    isTroop: true,
+                    dead: false
+                });
+                if (curUnit.troopType == "MANPAD"){
+                    for (const unit of delUnits){
+                        if (unit.type == "Stinger manpad"){
+                            await ddcsControllers.unitActionUpdateByUnitId({unitId: unit.unitId, dead: true});
+                            await ddcsControllers.destroyUnit(unit.name, "unit");
+                        }
+
+                    }
+
+                }
+                let curUnits = 0;
+                const grpGroups = _.groupBy(delUnits, "groupName");
+                const tRem = Object.keys(grpGroups).length - engineCache.config.maxTroops;
+
+                for (const gUnitKey of Object.keys(grpGroups)) {
+                    if (curUnits <= tRem) {
+                        for (const unit of grpGroups[gUnitKey]) {
+                            await ddcsControllers.unitActionUpdateByUnitId({unitId: unit.unitId, dead: true});
+                            await ddcsControllers.destroyUnit(unit.name, "unit");
+                        }
+                        curUnits++;
+                    }
+                }
+                const curSpawnUnit = _.cloneDeep(await ddcsControllers.getRndFromSpawnCat(
+                    curUnit.troopType,
+                    curUnit.coalition,
+                    false,
+                    true
+                )[0]);
+
+                for (
+                    let x = 0;
+                    x < curSpawnUnit.config[engineCache.config.timePeriod].spawnCount;
+                    x++
+                ) {
+                    const spawnArray = {
+                        name: genName + (randInc + x),
+                        groupName: genName + randInc,
+                        type: curSpawnUnit.type,
+                        lonLatLoc: ddcsControllers.getLonLatFromDistanceDirection(
+                            curUnit.lonLatLoc,
+                            curUnit.hdg + (x * 10),
+                            0.05
+                        ),
+                        hdg: curUnit.hdg,
+                        country: curUnit.country,
+                        unitCategory: curSpawnUnit.unitCategory,
+                        playerCanDrive: true,
+                        coalition: curUnit.coalition
+                    };
+                    curTroops.push(spawnArray);
+                }
+                await ddcsControllers.unitActionUpdateByUnitId({
+                    unitId: pObj.unitId,
+                    troopType: null
+                })
+                    .catch((err) => {
+                        console.log("erroring line73: ", err);
+                    })
+                ;
+                await ddcsControllers.spawnUnitGroup(curTroops, false);
+                await ddcsControllers.sendMesgToGroup(
+                    curPlayer,
+                    curUnit.groupId,
+                    "G: " + i18n.HASBEENDEPLOYED.replace("#1", curSpawnUnit.type),
+                    5
+                );
+                let currentMass = 1000;
+                if (curUnit.intCargoType){
+                    currentMass = 2000 ;
+                }
+                await setInternalCargoMass(curUnit.name, currentMass - 1000);
+            }
+        } else {
+            const troopUnits = await ddcsControllers.getTroopsInProximity(curUnit.lonLatLoc, 0.2, curUnit.coalition);
+            const curTroop = troopUnits[0];
+            if (curTroop) {
+                // pickup troop
+                const grpUnits = await ddcsControllers.unitActionRead({
+                    groupName: curTroop.groupName,
+                    isCrate: false,
+                    dead: false
+                });
+                for (const curTroopUnit of grpUnits) {
+                    await ddcsControllers.destroyUnit(curTroopUnit.name, "unit");
+                }
+                await ddcsControllers.unitActionUpdateByUnitId({
+                    unitId: pObj.unitId,
+                    troopType: curTroop.spawnCat
+                })
+                    .catch((err) => {
+                        console.log("erroring line57: ", err);
+                    });
+                await ddcsControllers.sendMesgToGroup(
+                    curPlayer,
+                    curUnit.groupId,
+                    "G: " + i18n.PICKEDUP.replace("#1", curTroop.type),
+                    5
+                );
+                let currentMass = 0;
+                if (curUnit.intCargoType){
+                    currentMass = 1000 ;
+                }
+                await setInternalCargoMass(curUnit.name, currentMass + 1000);
+            } else {
+                // no troops
+                await ddcsControllers.sendMesgToGroup(
+                    curPlayer,
+                    curUnit.groupId,
+                    "G:" + i18n.NOTROOPSTOEXTRACTORUNLOAD,
+                    5
+                );
+            }
+        }
+    }
 }
