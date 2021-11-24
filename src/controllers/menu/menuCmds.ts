@@ -712,7 +712,7 @@ export async function menuCmdProcess(pObj: any) {
                         dead: false
                     });
                     const grpGroups = _.transform(unitsOwned, (result: any, value: any) => {
-                        (result[value.name] || (result[value.name] = [])).push(value);
+                        (result[value.groupName] || (result[value.groupName] = [])).push(value);
                     }, {});
 
                     await ddcsControllers.sendMesgToGroup(
@@ -1526,7 +1526,7 @@ export async function unpackCrate(
             dead: false
         });
         let curUnit = 0;
-        const grpGroups = _.groupBy(delUnits, "name");
+        const grpGroups = _.groupBy(delUnits, "groupName");
 
         let newSpawnArray: any[] = [];
         if (combo) {
@@ -1633,8 +1633,8 @@ export async function unpackCrate(
                         dead: false
                     });
                     let curUnit = 0;
-                    const grpGroups = _.groupBy(delUnits, "name");
-                    const tRem = (Object.keys(grpGroups).length + (spawnUnitCount - 1)) - engineCache.config.maxUnitsMoving;
+                    const grpGroups = _.groupBy(delUnits, "groupName");
+                    const tRem = Object.keys(grpGroups).length - engineCache.config.maxUnitsMoving;
             
                     for (const gUnitKey of Object.keys(grpGroups)) {
                         if (curUnit <= tRem) {
@@ -1724,7 +1724,7 @@ export async function spawnRinGroups(
         dead: false
     });
     let curUnit = 0;
-    const grpGroups = _.groupBy(delUnits, "name");
+    const grpGroups = _.groupBy(delUnits, "groupName");
 
     let newSpawnArray: any[] = [];
     if (combo) {
@@ -1832,7 +1832,7 @@ export async function spawnRinGroups(
                 });
                 let curUnit = 0;
                 
-                const grpGroups = _.groupBy(delUnits, "name");
+                const grpGroups = _.groupBy(delUnits, "groupName");
                 const tRem = (Object.keys(grpGroups).length + (spawnUnitCount - 1)) - engineCache.config.maxUnitsMoving;
             
                 for (const gUnitKey of Object.keys(grpGroups)) {
