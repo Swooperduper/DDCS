@@ -1908,11 +1908,8 @@ export async function deployTroops(unitId:string, curPlayer:any, i18n:any, proxy
                 isTroop: true,
                 dead: false
             });
-            console.log("Fastroping Troop");
             if (troopType == "MANPAD"){
-                console.log("curUnit.troopType == MANPAD");
                 for (const unit of delUnits){
-                    console.log("unit=",unit);
                     if (unit.type == "Stinger manpad"){
                         console.log("unit.type is Stinger manpad");
                         await ddcsControllers.unitActionUpdateByUnitId({unitId: unit.unitId, dead: true});
@@ -1989,9 +1986,7 @@ export async function deployTroops(unitId:string, curPlayer:any, i18n:any, proxy
 }
 
 export async function unloadExtractTroops(curUnit:any, curPlayer:any, i18n:any, pObj:any, engineCache:any) {
-    console.log("curPlayer.name",curPlayer.name);
     const units = await ddcsControllers.unitActionRead({playername: curPlayer.name})
-    console.log("curPlayer.name",units);
     if (units[0].inAir || units[0].speed > 1 || units[0].dead == true){
         await ddcsControllers.sendMesgToGroup(
             curPlayer,
