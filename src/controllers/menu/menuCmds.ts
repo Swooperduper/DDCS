@@ -1991,8 +1991,8 @@ export async function deployTroops(unitId:string, curPlayer:any, i18n:any, proxy
 export async function unloadExtractTroops(curUnit:any, curPlayer:any, i18n:any, pObj:any, engineCache:any) {
     console.log("curPlayer.name",curPlayer.name);
     const units = await ddcsControllers.unitActionRead({playername: curPlayer.name})
-    console.log("units",units);
-    if (curUnit.inAir || curUnit.speed > 1){
+    console.log("curPlayer.name",units);
+    if (units[0].inAir || units[0].speed > 1 || units[0].dead == true){
         await ddcsControllers.sendMesgToGroup(
             curPlayer,
             curUnit.groupId,
