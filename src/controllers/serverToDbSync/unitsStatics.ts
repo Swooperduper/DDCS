@@ -27,7 +27,7 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
     if (_.includes(curData.name, "TU|")) {
         stParse = _.split(curData.name, "|");
         curData.playerOwnerId = stParse[1];
-        curData.playerCanDrive = false;
+        curData.playerCanDrive = true;
         curData.isTroop = true;
         curData.spawnCat = stParse[2];
     }
