@@ -86,6 +86,11 @@ export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: 
                         await ddcsControllers.correctPlayerAircraftDuplicates();
                         if (_.some(playerProx)) {
                             await ddcsControllers.repairBase(curBaseObj, curUnit);
+                            if (await isTroopOnboard(curUnit)){
+                                await setInternalCargoMass(curUnit.name,1000);
+                            }else{
+                                await setInternalCargoMass(curUnit.name,0);
+                            }
                         } else {
                             await ddcsControllers.sendMesgToGroup(
                                 curPlayer,
@@ -93,11 +98,6 @@ export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: 
                                 "G: " + i18n.YOUARENOTNEARANYFRIENDLYBASES,
                                 5
                             );
-                            if (await isTroopOnboard(curUnit)){
-                                await setInternalCargoMass(curUnit.name,1000);
-                            }else{
-                                await setInternalCargoMass(curUnit.name,0);
-                            }
                         }
                     }
                     if (curIntCrateType === "CCBuild") {  // serverName, curUnit, curPlayer, intCargoType
