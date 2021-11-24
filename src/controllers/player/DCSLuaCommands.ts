@@ -58,7 +58,8 @@ export async function sendMesgToAll(
 ): Promise<void> {
     // send to everyone individually
     const engineCache = ddcsController.getEngineCache();
-    const playerArray = ddcsController.getRTPlayerArray();
+    let playerArray = [];
+    playerArray = ddcsController.getRTPlayerArray();
     // console.log("PA: ", playerArray);
     if (playerArray.length > 0) {
         for (const player of playerArray) {
@@ -96,8 +97,9 @@ export async function sendMesgToCoalition(
     delayTime?: number
 ): Promise<void> {
     // send to everyone individually
+    let playerArray = [];
     const engineCache = ddcsController.getEngineCache();
-    const playerArray = ddcsController.getRTPlayerArray();
+    playerArray = ddcsController.getRTPlayerArray();
     if (playerArray.length > 0) {
         for (const player of playerArray) {
             const playersInfo = await ddcsController.srvPlayerActionsRead({_id: player._id});
