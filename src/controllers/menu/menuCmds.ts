@@ -1909,7 +1909,7 @@ export async function deployTroops(unitId:string, curPlayer:any, i18n:any, proxy
                 dead: false
             });
             console.log("Fastroping Troop");
-            if (curUnit.troopType == "MANPAD"){
+            if (troopType == "MANPAD"){
                 console.log("curUnit.troopType == MANPAD");
                 for (const unit of delUnits){
                     console.log("unit=",unit);
