@@ -1990,7 +1990,7 @@ export async function deployTroops(unitId:string, curPlayer:any, i18n:any, proxy
 
 export async function unloadExtractTroops(curUnit:any, curPlayer:any, i18n:any, pObj:any, engineCache:any) {
     console.log(curPlayer);
-    const units = await ddcsControllers.unitActionRead({unitId: curPlayer.unitId})
+    const units = await ddcsControllers.unitActionRead({playername: curPlayer.name})
     curUnit = units[0]
     console.log("curUnit",curUnit);
     if (curUnit.inAir || curUnit.speed > 1){
