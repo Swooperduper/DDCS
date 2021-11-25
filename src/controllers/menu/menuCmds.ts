@@ -68,29 +68,25 @@ export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: 
                 } else {
                     if (curIntCrateType === "JTAC") {
                         await ddcsControllers.correctPlayerAircraftDuplicates();
-                        await unpackCrate(curUnit, curUnit.country, crateType, "jtac", false, true);
-                        await ddcsControllers.unitActionUpdateByUnitId({unitId: curUnit.unitId, intCargoType: ""});
                         await ddcsControllers.sendMesgToGroup(
                             curPlayer,
                             curUnit.groupId,
-                            "G: " + i18n.SPAWNJTACFROMINTERNALCARGO,
+                            "G: Unloading JTAC, please remain still until it is unloaded",
                             5
                         );
-                        if (await isTroopOnboard(curUnit)){
-                            await setInternalCargoMass(curUnit.name,1000);
-                        }else{
-                            await setInternalCargoMass(curUnit.name,0);
-                        }
+                        setTimeout(() => {unpackInternalCargo(curUnit,curPlayer,curIntCrateType,curBaseObj,i18n,crateType);}, _.random(10,20)*1000);
                     }
                     if (curIntCrateType === "BaseRepair") {
                         await ddcsControllers.correctPlayerAircraftDuplicates();
                         if (_.some(playerProx)) {
-                            await ddcsControllers.repairBase(curBaseObj, curUnit);
-                            if (await isTroopOnboard(curUnit)){
-                                await setInternalCargoMass(curUnit.name,1000);
-                            }else{
-                                await setInternalCargoMass(curUnit.name,0);
-                            }
+                            await ddcsControllers.sendMesgToGroup(
+                                curPlayer,
+                                curUnit.groupId,
+                                "G: Unloading base repair, please remain still until it is complete",
+                                5
+                            );
+                            setTimeout(() => {unpackInternalCargo(curUnit,curPlayer,curIntCrateType,curBaseObj,i18n,crateType);}, _.random(10,20)*1000);
+                            
                         } else {
                             await ddcsControllers.sendMesgToGroup(
                                 curPlayer,
@@ -2144,6 +2140,36 @@ export async function unloadExtractTroops(curUnit:any, curPlayer:any, i18n:any, 
                     5
                 );
             }
+        }
+    }
+}
+
+export async function unpackInternalCargo(curUnit:any, curPlayer:any, internalCargo:any, curBaseObj:any, i18n:any, crateType:any) {
+    const units = await ddcsControllers.unitActionRead({playername: curPlayer.name});
+    if (units[0].inAir || units[0].speed > 1 || units[0].dead == true){
+        await ddcsControllers.sendMesgToGroup(
+            curPlayer,
+            curUnit.groupId,
+            "G: You were unable to unload your internal cargo, please remain still until has unloaded.",
+            5
+        );
+    }else{
+        if (await isTroopOnboard(curUnit)){
+            await setInternalCargoMass(curUnit.name,1000);
+        }else{
+            await setInternalCargoMass(curUnit.name,0);
+        }
+        if(internalCargo == "BaseRepair"){
+            await ddcsControllers.repairBase(curBaseObj, curUnit);
+        }else if(internalCargo == "JTAC"){
+            await unpackCrate(curUnit, curUnit.country, crateType, "jtac", false, true);
+            await ddcsControllers.unitActionUpdateByUnitId({unitId: curUnit.unitId, intCargoType: ""});
+            await ddcsControllers.sendMesgToGroup(
+                curPlayer,
+                curUnit.groupId,
+                "G: " + i18n.SPAWNJTACFROMINTERNALCARGO,
+                5
+            );
         }
     }
 }
