@@ -254,25 +254,6 @@ export async function getGroundUnitsInProximity(lonLat: number[], kmDistance: nu
     });
 }
 
-export async function getCoalitionGroundUnitsInProximity(lonLat: number[], kmDistance: number, coalition: boolean): Promise<typing.IUnit[]> {
-    const catNum = ddcsControllers.UNIT_CATEGORY.indexOf("GROUND_UNIT");
-    return await ddcsControllers.unitActionReadStd({
-        coalition: coalition,
-        dead: false,
-        lonLatLoc: {
-            $near: {
-                $geometry: {
-                    type: "Point",
-                    coordinates: (lonLat) ? lonLat : [0, 0]
-                },
-                $maxDistance: kmDistance * 1000
-            }
-        },
-        unitCategory: catNum,
-        isCrate: false
-    });
-}
-
 export async function getLogiTowersProximity(lonLat: number[], kmDistance: number, coalition: number): Promise<typing.IUnit[]> {
     return await ddcsControllers.unitActionRead({
             dead: false,
