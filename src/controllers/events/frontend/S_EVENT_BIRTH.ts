@@ -29,6 +29,21 @@ export async function processEventBirth(eventObj: any): Promise<void> {
                         groupId: curIUnit.groupId
                     };
                     console.log(iCurObj.msg)
+                    let enemyCoalition = 0
+                    if (curIUnit.coalition = 1){
+                        enemyCoalition = 2
+                    } else {
+                        enemyCoalition = 1
+                    }
+                    const enemiesNearby = await ddcsControllers.getCoalitionGroundUnitsInProximity(curIUnit.lonLatLoc, 0.1, enemyCoalition);
+                    console.log("enemiesNearby.length:",enemiesNearby.length);
+                    if (enemiesNearby.length >> 0){
+                        console.log("There were enemies nearby");
+                        await ddcsControllers.forcePlayerSpectator(
+                            iPlayer.playerId,
+                            "There are enemy ground units near the aircraft you attempted to spawn in, you were unable to reach the aircraft"
+                        );
+                    }
                     /*
                     if (iCurObj.iucid) {
                         await ddcsControllers.sendToCoalition({payload: {action: eventObj.action, data: _.cloneDeep(iCurObj)}});
