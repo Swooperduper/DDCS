@@ -13,10 +13,10 @@ export async function processEventBirth(eventObj: any): Promise<void> {
         const curIUnit = iUnit[0];
         if (curIUnit && curIUnit.playername && curIUnit.playername !== "") {
             const playerArray = await ddcsControllers.srvPlayerActionsRead({sessionName: ddcsControllers.getSessionName()});
-            console.log("PA: ", playerArray);
+            //console.log("PA: ", playerArray);
             if (curIUnit) {
                 const iPlayer = _.find(playerArray, {name: curIUnit.playername});
-                console.log("playerarray: ", iPlayer, curIUnit);
+                //console.log("playerarray: ", iPlayer, curIUnit);
                 if (iPlayer) {
                     const iCurObj = {
                         sessionName: ddcsControllers.getSessionName(),
@@ -28,20 +28,20 @@ export async function processEventBirth(eventObj: any): Promise<void> {
                         msg: "C: " + curIUnit.playername + " enters a brand new " + curIUnit.type,
                         groupId: curIUnit.groupId
                     };
-                    console.log(iCurObj.msg)
+                    //console.log(iCurObj.msg)
                     let enemyCoalition = 0
                     if (curIUnit.coalition = 1){
                         enemyCoalition = 2
                     } else {
                         enemyCoalition = 1
                     }
-                    const enemiesNearby = await ddcsControllers.getCoalitionGroundUnitsInProximity(curIUnit.lonLatLoc, 0.1, enemyCoalition);
-                    console.log("enemiesNearby.length:",enemiesNearby.length);
+                    const enemiesNearby = await ddcsControllers.getCoalitionGroundUnitsInProximity(curIUnit.lonLatLoc, 0.5, enemyCoalition);
+                    //console.log("enemiesNearby.length:",enemiesNearby.length);
                     if (enemiesNearby.length >> 0){
                         console.log("There were enemies nearby");
                         await ddcsControllers.forcePlayerSpectator(
                             iPlayer.playerId,
-                            "There are enemy ground units near the aircraft you attempted to spawn in, you were unable to reach the aircraft"
+                            "There are enemy ground units near(<500m) the aircraft you attempted to spawn in, you were unable to reach the aircraft."
                         );
                     }
                     /*
