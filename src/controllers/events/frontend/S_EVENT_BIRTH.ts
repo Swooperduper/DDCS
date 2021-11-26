@@ -12,10 +12,10 @@ export async function processEventBirth(eventObj: any): Promise<void> {
         const curIUnit = iUnit[0];
         if (curIUnit && curIUnit.playername && curIUnit.playername !== "") {
             const playerArray = await ddcsControllers.srvPlayerActionsRead({sessionName: ddcsControllers.getSessionName()});
-            // console.log("PA: ", playerArray);
+            console.log("PA: ", playerArray);
             if (curIUnit) {
                 const iPlayer = _.find(playerArray, {name: curIUnit.playername});
-                // console.log("playerarray: ", iPlayer, curIUnit);
+                console.log("playerarray: ", iPlayer, curIUnit);
                 if (iPlayer) {
                     const iCurObj = {
                         sessionName: ddcsControllers.getSessionName(),
@@ -27,6 +27,7 @@ export async function processEventBirth(eventObj: any): Promise<void> {
                         msg: "C: " + curIUnit.playername + " enters a brand new " + curIUnit.type,
                         groupId: curIUnit.groupId
                     };
+                    console.log(iCurObj.msg)
                     /*
                     if (iCurObj.iucid) {
                         await ddcsControllers.sendToCoalition({payload: {action: eventObj.action, data: _.cloneDeep(iCurObj)}});

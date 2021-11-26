@@ -2150,7 +2150,7 @@ export async function unpackInternalCargo(curUnit:any, curPlayer:any, internalCa
         await ddcsControllers.sendMesgToGroup(
             curPlayer,
             curUnit.groupId,
-            "G: You were unable to unload your internal cargo, please remain still until has unloaded.",
+            "G: You were unable to unload your internal cargo, please remain still until it has unloaded.",
             5
         );
     }else{
