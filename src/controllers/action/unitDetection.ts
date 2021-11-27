@@ -103,17 +103,17 @@ export async function gciUpdatePilots(detectedUnits: any, friendlySide: number) 
                     unit.lonLatLoc[0]);
 
                 let curEnemyAspect: string = "";
-
-                if ( unit.hdg > 340 || unit.hdg <= 20 ) {
-                    curEnemyAspect = i18n.HOT;
-                } else if ((unit.hdg > 20 && unit.hdg <= 60) || (unit.hdg > 300 && unit.hdg <= 340 )) {
-                    curEnemyAspect = i18n.FLANK;
-                } else if ((unit.hdg > 60 && unit.hdg <= 110) || (unit.hdg > 250 && unit.hdg <= 300 )) {
-                    curEnemyAspect = i18n.BEAM;
-                } else if (unit.hdg > 110 && unit.hdg <= 250) {
-                    curEnemyAspect = i18n.DRAG;
-                }
-
+                //Enemy aspect, does not simply equal their heading, its their relative heading to the player. Disabled for now, will display targets heading.
+                //if ( unit.hdg > 340 || unit.hdg <= 20 ) {
+                    //curEnemyAspect = i18n.HOT;
+                //} else if ((unit.hdg > 20 && unit.hdg <= 60) || (unit.hdg > 300 && unit.hdg <= 340 )) {
+                    //curEnemyAspect = i18n.FLANK;
+                //} else if ((unit.hdg > 60 && unit.hdg <= 110) || (unit.hdg > 250 && unit.hdg <= 300 )) {
+                    //curEnemyAspect = i18n.BEAM;
+                //} else if (unit.hdg > 110 && unit.hdg <= 250) {
+                //    curEnemyAspect = i18n.DRAG;
+                //}
+                curEnemyAspect = "ON HEADING "+ unit.heading;
                 // console.log("DT: ", distanceTo, " <= ", maxKMDistanceToRead, unit.name);
                 if (distanceTo <= maxKMDistanceToRead) {
                     // console.log("autoGCI: ", unit.type, unit.name, unit.coalition, distanceTo, " <= ", maxKMDistanceToRead);
