@@ -306,7 +306,6 @@ export function spawnSupportVehiclesOnFarp(baseName: string, side: number): typi
     if (curBase) {
         const curFarpArray: any[] = [];
         const sptArray = [
-            "unarmedAmmo",
             "unarmedFuel",
             "farpDefence"
         ];

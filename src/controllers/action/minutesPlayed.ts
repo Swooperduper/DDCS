@@ -27,12 +27,12 @@ export function checkRealtimeSideBalance(): IPlayerBalance {
     const redUnderdog = sideArray[2].length / sideArray[1].length;
     const blueUnderdog = sideArray[1].length / sideArray[2].length;
 
-    if (redUnderdog > 1 && isFinite(redUnderdog)) {
+    if (redUnderdog > 1.35 && isFinite(redUnderdog)) {
         sideState = {
             underdog: 1,
             ratio: redUnderdog
         };
-    } else if (blueUnderdog > 1 && isFinite(blueUnderdog)) {
+    } else if (blueUnderdog > 1.35 && isFinite(blueUnderdog)) {
         sideState = {
             underdog: 2,
             ratio: blueUnderdog
