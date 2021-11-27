@@ -113,7 +113,7 @@ export async function gciUpdatePilots(detectedUnits: any, friendlySide: number) 
                 //} else if (unit.hdg > 110 && unit.hdg <= 250) {
                 //    curEnemyAspect = i18n.DRAG;
                 //}
-                curEnemyAspect = "ON HEADING "+ unit.heading;
+                curEnemyAspect = "ON HEADING "+ unit.hdg;
                 // console.log("DT: ", distanceTo, " <= ", maxKMDistanceToRead, unit.name);
                 if (distanceTo <= maxKMDistanceToRead) {
                     // console.log("autoGCI: ", unit.type, unit.name, unit.coalition, distanceTo, " <= ", maxKMDistanceToRead);
