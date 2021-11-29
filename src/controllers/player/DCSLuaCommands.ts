@@ -60,7 +60,7 @@ export async function sendMesgToAll(
     const engineCache = ddcsController.getEngineCache();
     const playerArray = ddcsController.getRTPlayerArray();
     // console.log("PA: ", playerArray);
-    if (playerArray.length > 0) {
+    if (undefined != playerArray && playerArray.length > 0) {
         for (const player of playerArray) {
             const playersInfo = await ddcsController.srvPlayerActionsRead({_id: player._id});
             if (playersInfo[0] && playersInfo[0].displayAllMessages) {
@@ -98,7 +98,7 @@ export async function sendMesgToCoalition(
     // send to everyone individually
     const engineCache = ddcsController.getEngineCache();
     const playerArray = ddcsController.getRTPlayerArray();
-    if (playerArray.length > 0) {
+    if (undefined != playerArray && playerArray.length > 0) {
         for (const player of playerArray) {
             const playersInfo = await ddcsController.srvPlayerActionsRead({_id: player._id});
             if (playersInfo[0] && playersInfo[0].displayCoalitionMessages) {

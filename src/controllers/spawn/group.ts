@@ -306,8 +306,8 @@ export function spawnSupportVehiclesOnFarp(baseName: string, side: number): typi
     if (curBase) {
         const curFarpArray: any[] = [];
         const sptArray = [
-            "unarmedAmmo",
-            "unarmedFuel"
+            "unarmedFuel",
+            "farpDefence"
         ];
         let curAng = _.cloneDeep(curBase.hdg);
         if (curAng > 180) {
