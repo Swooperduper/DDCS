@@ -9,7 +9,11 @@ export async function processEventBirth(eventObj: any): Promise<void> {
     const curUnitId = eventObj.data.initiator.unitId;
     console.log(eventObj);
     if (curUnitId) {
-        const iUnit = await ddcsControllers.unitActionRead({unitId: curUnitId});
+        let iUnit = await ddcsControllers.unitActionRead({unitId: curUnitId});
+        if (iUnit.length > 1){
+            console.log("More than one, Refining further, iUnit:",iUnit);
+            iUnit = await ddcsControllers.unitActionRead({unitId: curUnitId, dead: false});
+        }
         const curIUnit = iUnit[0];
         if (curIUnit && curIUnit.playername && curIUnit.playername !== "") {
             const playerArray = await ddcsControllers.srvPlayerActionsRead({sessionName: ddcsControllers.getSessionName()});
