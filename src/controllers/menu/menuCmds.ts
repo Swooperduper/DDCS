@@ -2212,6 +2212,12 @@ export async function unpackInternalCargo(curUnit:any, curPlayer:any, internalCa
         } else if (internalCargo == "LightAAA"){
             await unpackIntCrate(curUnit, curUnit.country, crateType, "", false);
             await ddcsControllers.unitActionUpdateByUnitId({unitId: curUnit.unitId, intCargoType: ""});
+            await ddcsControllers.sendMesgToGroup(
+                curPlayer,
+                curUnit.groupId,
+                "G:Spawned "+crateType+" from internal cargo.",
+                5
+            );
         }
         
     }
@@ -2231,7 +2237,7 @@ export async function unpackIntCrate(
     let newSpawnArray: any[] = [];
     const addHdg = 30;
     const addSpawnHeading = 119;
-    let SpawnHeading = playerUnit.hdg + 180
+    let SpawnHeading = playerUnit.hdg
     let curUnitHdg = playerUnit.hdg + 180;
     let pCountry = country;
     const virtualGroupID = "DU|" + curPlayer.ucid + "|" + type + "|" + special +
@@ -2256,7 +2262,7 @@ export async function unpackIntCrate(
             }
             unitStart.name = genName + (randInc + x);
             unitStart.groupName = genName + randInc;
-            unitStart.lonLatLoc = ddcsControllers.getLonLatFromDistanceDirection(playerUnit.lonLatLoc, curUnitHdg, 0.003);
+            unitStart.lonLatLoc = ddcsControllers.getLonLatFromDistanceDirection(playerUnit.lonLatLoc, curUnitHdg, 0.007);
             unitStart.hdg = SpawnHeading * 0.0174533;
             unitStart.country = pCountry;
             unitStart.playerCanDrive = mobile || false;
