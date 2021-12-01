@@ -1873,7 +1873,7 @@ export async function deployTroops(unitId:string, curPlayer:any, i18n:any, proxy
     const units = await ddcsControllers.unitActionRead({unitId: unitId});
     const curUnit = units[0];
     const lonLatEnd = curUnit.lonLatLoc;
-    const distanceMovedXZ = await ddcsControllers.calcDirectDistanceInKm(lonLatStart[1], lonLatStart[0], lonLatEnd[1], lonLatEnd[0]);
+    const distanceMovedXZ = await ddcsControllers.calcDirectDistanceInKm(lonLatStart[1], lonLatStart[0], lonLatEnd[1], lonLatEnd[0]) * 1000;
     const distanceMovedY = Math.abs(aglStart - curUnit.agl);
     const distanceXYZ = Math.sqrt((distanceMovedXZ*distanceMovedXZ)+(distanceMovedY*distanceMovedY))
     const AVGvelocity = distanceXYZ/timeTaken
