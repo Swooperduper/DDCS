@@ -7,12 +7,19 @@ import * as ddcsControllers from "../../";
 
 export async function processEventBirth(eventObj: any): Promise<void> {
     const curUnitId = eventObj.data.initiator.unitId;
-    console.log(eventObj);
+    console.log("Birth Event Object",eventObj);
     if (curUnitId) {
         let iUnit = await ddcsControllers.unitActionRead({unitId: curUnitId});
+        console.log("Player with name")
         if (iUnit.length > 1){
-            console.log("More than one, Refining further, iUnit:",iUnit);
+            console.log("More than one, a total of",iUnit.length,"units with that unit ID in the database | Refining further for only non-dead units. Units found with that unitId",iUnit);
             iUnit = await ddcsControllers.unitActionRead({unitId: curUnitId, dead: false});
+            console.log("Refined search returned,",iUnit.length,"entries with iUnit returning:",iUnit);
+            if (iUnit.length > 1){
+                console.log("Look for UnitID of non-Dead units, with isAI false and unitCatergory 0 (Aircraft)")
+                iUnit = await ddcsControllers.unitActionRead({unitId: curUnitId, dead: false, isAI : false, unitCategory: 0});
+                console.log("Found a total of:",iUnit.length, "units. iUnit:",iUnit)
+            }
         }
         const curIUnit = iUnit[0];
         if (curIUnit && curIUnit.playername && curIUnit.playername !== "") {
