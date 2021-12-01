@@ -1958,7 +1958,7 @@ export async function deployTroops(unitId:string, curPlayer:any, i18n:any, proxy
                     lonLatLoc: ddcsControllers.getLonLatFromDistanceDirection(
                         curUnit.lonLatLoc,
                         curUnit.hdg + 30 + (x * 60),
-                        0.03
+                        0.003
                     ),
                     hdg: curUnit.hdg,
                     country: curUnit.country,
