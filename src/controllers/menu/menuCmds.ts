@@ -577,7 +577,7 @@ export async function menuCmdProcess(pObj: any) {
                             5
                         );
                     } else {
-                        if(curUnit.agl < 19.68){
+                        if(curUnit.agl < 300){
                             if(curUnit.speed < 5){
                                 if (await isTroopOnboard(curUnit)) {
                                     const playerProx: any[] = [];
@@ -589,6 +589,7 @@ export async function menuCmdProcess(pObj: any) {
                                             curUnit.playername
                                         ));
                                     }
+                                    const timeTaken = _.random(10,20);
                                     if (_.some(playerProx)) {
                                         await ddcsControllers.sendMesgToGroup(
                                             curPlayer,
@@ -603,15 +604,15 @@ export async function menuCmdProcess(pObj: any) {
                                         let currentMass = 1000;
                                         if (curUnit.intCargoType){
                                             currentMass = 2000 ;
-                                        }
+                                        }                                        
                                         setTimeout(() => {setInternalCargoMass(curUnit.name, currentMass - 500); }, curUnit.agl*500);
                                         setTimeout(() => {setInternalCargoMass(curUnit.name, currentMass - 1000); 
-                                            deployTroops(pObj.unitId,curPlayer,i18n, _.some(playerProx), engineCache, curUnit.troopType);}, curUnit.agl*1000);                                        
+                                            deployTroops(pObj.unitId,curPlayer,i18n, _.some(playerProx), engineCache, curUnit.troopType, curUnit.lonLatLoc, curUnit.agl, timeTaken);}, curUnit.agl*1000);                                        
                                         } else {
                                             await ddcsControllers.sendMesgToGroup(
                                                 curPlayer,
                                                 curUnit.groupId,
-                                                "G:Troops are deploying! Hold it steady, at this height this will take around " + Math.round(curUnit.agl) + " seconds",
+                                                "G:Troops are deploying! Hold it steady, at this height this will take around " + timeTaken + " seconds",
                                                 Math.round(curUnit.agl)
                                             );
                                             await ddcsControllers.unitActionUpdateByUnitId({
@@ -622,9 +623,10 @@ export async function menuCmdProcess(pObj: any) {
                                             if (curUnit.intCargoType){
                                                 currentMass = 2000 ;
                                             }
-                                        setTimeout(() => {setInternalCargoMass(curUnit.name, currentMass - 500); }, curUnit.agl*500);
+                                        
+                                        setTimeout(() => {setInternalCargoMass(curUnit.name, currentMass - 500); }, timeTaken*500);
                                         setTimeout(() => {setInternalCargoMass(curUnit.name, currentMass - 1000);  
-                                                deployTroops(pObj.unitId,curPlayer,i18n, _.some(playerProx), engineCache, curUnit.troopType);}, curUnit.agl*1000);
+                                                deployTroops(pObj.unitId,curPlayer,i18n, _.some(playerProx), engineCache, curUnit.troopType, curUnit.lonLatLoc, curUnit.agl, timeTaken);}, timeTaken*1000);
                                             }                            
                                 } else {
                                     // no troops
@@ -1867,11 +1869,16 @@ export async function setInternalCargoMass(
 }
 
 
-export async function deployTroops(unitId:string, curPlayer:any, i18n:any, proxyPlayer:boolean, engineCache:any, troopType:string) {
-    const units = await ddcsControllers.unitActionRead({unitId: unitId})
-    const curUnit = units[0]
+export async function deployTroops(unitId:string, curPlayer:any, i18n:any, proxyPlayer:boolean, engineCache:any, troopType:string, lonLatStart:number[], aglStart:number, timeTaken:number) {
+    const units = await ddcsControllers.unitActionRead({unitId: unitId});
+    const curUnit = units[0];
+    const lonLatEnd = curUnit.lonLatLoc;
+    const distanceMovedXZ = await ddcsControllers.calcDirectDistanceInKm(lonLatStart[1], lonLatStart[0], lonLatEnd[1], lonLatEnd[0]);
+    const distanceMovedY = Math.abs(aglStart - curUnit.agl);
+    const distanceXYZ = Math.sqrt((distanceMovedXZ*distanceMovedXZ)+(distanceMovedY*distanceMovedY))
+    const AVGvelocity = distanceXYZ/timeTaken
     if(proxyPlayer){
-        if(curUnit.agl > 19.68 ||curUnit.speed > 5){
+        if(AVGvelocity > 7.5){
             await ddcsControllers.sendMesgToGroup(
                 curPlayer,
                 curUnit.groupId,
@@ -1885,9 +1892,13 @@ export async function deployTroops(unitId:string, curPlayer:any, i18n:any, proxy
                 "G: " + i18n.HASBEENDROPPEDOFFATBASE.replace("#1", troopType),
                 5
             );
+            await ddcsControllers.unitActionUpdateByUnitId({
+                unitId: unitId,
+                troopType: null
+            })
         }
     }else{
-        if(curUnit.agl > 19.68 ||curUnit.speed > 5){
+        if(AVGvelocity > 7.5){
             await ddcsControllers.sendMesgToGroup(
                 curPlayer,
                 curUnit.groupId,
@@ -1946,8 +1957,8 @@ export async function deployTroops(unitId:string, curPlayer:any, i18n:any, proxy
                     type: curSpawnUnit.type,
                     lonLatLoc: ddcsControllers.getLonLatFromDistanceDirection(
                         curUnit.lonLatLoc,
-                        curUnit.hdg + (x * 10),
-                        0.05
+                        curUnit.hdg + 30 + (x * 60),
+                        0.03
                     ),
                     hdg: curUnit.hdg,
                     country: curUnit.country,
