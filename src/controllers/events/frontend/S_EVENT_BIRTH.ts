@@ -41,7 +41,8 @@ export async function processEventBirth(eventObj: any): Promise<void> {
                     };
                     //console.log(iCurObj.msg)
                     let enemyCoalition = 0
-                    if (curIUnit.coalition = 1){
+                    console.log("Spawning Unit Coalition:",iPlayer.sideLock)
+                    if (iPlayer.sideLock = 1){
                         enemyCoalition = 2
                     } else {
                         enemyCoalition = 1
