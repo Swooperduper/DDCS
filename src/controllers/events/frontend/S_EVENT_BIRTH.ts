@@ -7,7 +7,7 @@ import * as ddcsControllers from "../../";
 
 export async function processEventBirth(eventObj: any): Promise<void> {
     const curUnitId = eventObj.data.initiator.unitId;
-    console.log("Birth Event Object",eventObj);
+    //console.log("Birth Event Object",eventObj);
     if (curUnitId) {
         let iUnit = await ddcsControllers.unitActionRead({unitId: curUnitId});
         if (iUnit.length > 1){
