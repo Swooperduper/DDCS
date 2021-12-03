@@ -7,10 +7,9 @@ import * as ddcsControllers from "../../";
 
 export async function processEventBirth(eventObj: any): Promise<void> {
     const curUnitId = eventObj.data.initiator.unitId;
-    console.log("Birth Event Object",eventObj);
+    //console.log("Birth Event Object",eventObj);
     if (curUnitId) {
         let iUnit = await ddcsControllers.unitActionRead({unitId: curUnitId});
-        console.log("Player with name")
         if (iUnit.length > 1){
             console.log("More than one, a total of",iUnit.length,"units with that unit ID in the database | Refining further for only non-dead units. Units found with that unitId",iUnit);
             iUnit = await ddcsControllers.unitActionRead({unitId: curUnitId, dead: false});
@@ -26,6 +25,7 @@ export async function processEventBirth(eventObj: any): Promise<void> {
             const playerArray = await ddcsControllers.srvPlayerActionsRead({sessionName: ddcsControllers.getSessionName()});
             //console.log("PA: ", playerArray);
             if (curIUnit) {
+                console.log("Player with name",curIUnit.playername,"tried to spawn");
                 const iPlayer = _.find(playerArray, {name: curIUnit.playername});
                 //console.log("playerarray: ", iPlayer, curIUnit);
                 if (iPlayer) {
@@ -49,7 +49,7 @@ export async function processEventBirth(eventObj: any): Promise<void> {
                     const enemiesNearby = await ddcsControllers.getCoalitionGroundUnitsInProximity(curIUnit.lonLatLoc, 0.5, enemyCoalition);
                     //console.log("enemiesNearby.length:",enemiesNearby.length);
                     if (enemiesNearby.length >> 0){
-                        console.log("There were enemies nearby to",iPlayer.playerId,". Units were:",enemiesNearby);
+                        console.log("There were enemies nearby to",iPlayer.name,". Units were:",enemiesNearby);
                         await ddcsControllers.forcePlayerSpectator(
                             iPlayer.playerId,
                             "There are enemy ground units near(<500m) the aircraft you attempted to spawn in, you were unable to reach the aircraft."
