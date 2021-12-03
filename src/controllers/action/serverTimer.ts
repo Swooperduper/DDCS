@@ -17,6 +17,7 @@ export let timerObj = {
     eightHours: false,
     sevenHours: false,
     sixHours: false,
+    fivePointEight: false,
     fiveHours: false,
     fourHours: false,
     threeHours: false,
@@ -61,31 +62,31 @@ export async function processTimer(serverSecs: number): Promise<void> {
         if (getCurSeconds() > (getMaxTime() - (ddcsController.time.oneHour * 10)) && !timerObj.tenHours) {
             messageTemplate = "SERVERRESTARTINGINLESSTHAN";
             args = ["10", "#HOURS"];
-            await ddcsController.sendMessageToDiscord("Server Restarting In Less Than " +args[0]+" hours");
+            //await ddcsController.sendMessageToDiscord("Server Restarting In Less Than " +args[0]+" hours");
             timerObj.tenHours = true;
         }
         // 9 hours
         if (getCurSeconds() > (getMaxTime() - (ddcsController.time.oneHour * 9)) && !timerObj.nineHours) {
             messageTemplate = "SERVERRESTARTINGINLESSTHAN";
             args = ["9", "#HOURS"];
-            await ddcsController.sendMessageToDiscord("Server Restarting In Less Than " +args[0]+" hours");
+            //await ddcsController.sendMessageToDiscord("Server Restarting In Less Than " +args[0]+" hours");
             timerObj.nineHours = true;
         }
         // 8 hours
         if (getCurSeconds() > (getMaxTime() - (ddcsController.time.oneHour * 8)) && !timerObj.eightHours) {
             messageTemplate = "SERVERRESTARTINGINLESSTHAN";
             args = ["8", "#HOURS"];
-            await ddcsController.sendMessageToDiscord("Server Restarting In Less Than " +args[0]+" hours");
+            //await ddcsController.sendMessageToDiscord("Server Restarting In Less Than " +args[0]+" hours");
             timerObj.eightHours = true;
         }
         // 7 hours
         if (getCurSeconds() > (getMaxTime() - (ddcsController.time.oneHour * 7)) && !timerObj.sevenHours) {
             messageTemplate = "SERVERRESTARTINGINLESSTHAN";
             args = ["7", "#HOURS"];
-            await ddcsController.sendMessageToDiscord("Server Restarting In Less Than " +args[0]+" hours");
+            //await ddcsController.sendMessageToDiscord("Server Restarting In Less Than " +args[0]+" hours");
             timerObj.sevenHours = true;
-            await ddcsController.setCircleMarkers();
-            await ddcsController.setFarpMarks();
+            //await ddcsController.setCircleMarkers();
+            //await ddcsController.setFarpMarks();
         }
         // 6 hours
         if (getCurSeconds() > (getMaxTime() - (ddcsController.time.oneHour * 6)) && !timerObj.sixHours) {
@@ -93,6 +94,14 @@ export async function processTimer(serverSecs: number): Promise<void> {
             args = ["6", "#HOURS"];
             await ddcsController.sendMessageToDiscord("Server Restarting In Less Than " +args[0]+" hours");
             timerObj.sixHours = true;
+            //await ddcsController.setCircleMarkers();
+            //await ddcsController.setFarpMarks();
+        }
+        if (getCurSeconds() > (getMaxTime() - (ddcsController.time.oneHour * 5.8)) && !timerObj.fivePointEight) {
+            messageTemplate = "SERVERRESTARTINGINLESSTHAN";
+            args = ["6", "#HOURS"];
+            //await ddcsController.sendMessageToDiscord("Server Restarting In Less Than " +args[0]+" hours");
+            timerObj.fivePointEight = true;
             await ddcsController.setCircleMarkers();
             await ddcsController.setFarpMarks();
         }
@@ -102,8 +111,8 @@ export async function processTimer(serverSecs: number): Promise<void> {
             args = ["5", "#HOURS"];
             await ddcsController.sendMessageToDiscord("Server Restarting In Less Than " +args[0]+" hours");
             timerObj.fiveHours = true;
-            await ddcsController.setCircleMarkers();
-            await ddcsController.setFarpMarks();
+            //await ddcsController.setCircleMarkers();
+            //await ddcsController.setFarpMarks();
         }
         // 4 hours
         if (getCurSeconds() > (getMaxTime() - (ddcsController.time.oneHour * 4)) && !timerObj.fourHours) {
