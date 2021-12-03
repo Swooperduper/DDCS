@@ -10,7 +10,6 @@ export async function processEventBirth(eventObj: any): Promise<void> {
     console.log("Birth Event Object",eventObj);
     if (curUnitId) {
         let iUnit = await ddcsControllers.unitActionRead({unitId: curUnitId});
-        console.log("Player with name")
         if (iUnit.length > 1){
             console.log("More than one, a total of",iUnit.length,"units with that unit ID in the database | Refining further for only non-dead units. Units found with that unitId",iUnit);
             iUnit = await ddcsControllers.unitActionRead({unitId: curUnitId, dead: false});
@@ -26,6 +25,7 @@ export async function processEventBirth(eventObj: any): Promise<void> {
             const playerArray = await ddcsControllers.srvPlayerActionsRead({sessionName: ddcsControllers.getSessionName()});
             //console.log("PA: ", playerArray);
             if (curIUnit) {
+                console.log("Player with name",curIUnit.playername,"tried to spawn");
                 const iPlayer = _.find(playerArray, {name: curIUnit.playername});
                 //console.log("playerarray: ", iPlayer, curIUnit);
                 if (iPlayer) {

@@ -40,7 +40,7 @@ export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: 
         const curIntCrateType = intCargo[1];
         const curIntCrateBaseOrigin = intCargo[2];
         let crateType = (curUnit.coalition === 1) ? "UAZ-469" : "Hummer";
-        if (curUnit.inAir) {
+        if (curUnit.speed > 0.3) {
             await ddcsControllers.sendMesgToGroup(
                 curPlayer,
                 curUnit.groupId,
@@ -2185,7 +2185,11 @@ export async function unloadExtractTroops(curUnit:any, curPlayer:any, i18n:any, 
 
 export async function unpackInternalCargo(curUnit:any, curPlayer:any, internalCargo:any, curBaseObj:any, i18n:any, crateType:any) {
     const units = await ddcsControllers.unitActionRead({playername: curPlayer.name});
-    if (units[0].inAir || units[0].speed > 1 || units[0].dead == true){
+    const deltaAGL = Math.abs(curUnit.agl - units[0].agl);
+    const lonLatStart = curUnit.lonLatLoc;
+    const lonLatEnd = units[0].lonLatLoc;
+    const distanceMovedXZ = await ddcsControllers.calcDirectDistanceInKm(lonLatStart[1], lonLatStart[0], lonLatEnd[1], lonLatEnd[0]) * 1000; 
+    if (distanceMovedXZ > 1 || deltaAGL > 1 || units[0].dead == true){
         await ddcsControllers.sendMesgToGroup(
             curPlayer,
             curUnit.groupId,
@@ -2201,8 +2205,8 @@ export async function unpackInternalCargo(curUnit:any, curPlayer:any, internalCa
         if(internalCargo == "BaseRepair"){
             await ddcsControllers.repairBase(curBaseObj, curUnit);
         }else if(internalCargo == "JTAC"){
-            await unpackCrate(curUnit, curUnit.country, crateType, "jtac", false, true);
             await ddcsControllers.unitActionUpdateByUnitId({unitId: curUnit.unitId, intCargoType: ""});
+            await unpackCrate(curUnit, curUnit.country, crateType, "jtac", false, true);
             await ddcsControllers.sendMesgToGroup(
                 curPlayer,
                 curUnit.groupId,
@@ -2210,8 +2214,8 @@ export async function unpackInternalCargo(curUnit:any, curPlayer:any, internalCa
                 5
             );
         } else if (internalCargo == "LightAAA"){
-            await unpackIntCrate(curUnit, curUnit.country, crateType, "", false);
             await ddcsControllers.unitActionUpdateByUnitId({unitId: curUnit.unitId, intCargoType: ""});
+            await unpackIntCrate(curUnit, curUnit.country, crateType, "", false);
             await ddcsControllers.sendMesgToGroup(
                 curPlayer,
                 curUnit.groupId,
