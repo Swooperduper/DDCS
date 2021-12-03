@@ -49,7 +49,7 @@ export async function processEventBirth(eventObj: any): Promise<void> {
                     const enemiesNearby = await ddcsControllers.getCoalitionGroundUnitsInProximity(curIUnit.lonLatLoc, 0.5, enemyCoalition);
                     //console.log("enemiesNearby.length:",enemiesNearby.length);
                     if (enemiesNearby.length >> 0){
-                        console.log("There were enemies nearby to",iPlayer.playerId,". Units were:",enemiesNearby);
+                        console.log("There were enemies nearby to",iPlayer.name,". Units were:",enemiesNearby);
                         await ddcsControllers.forcePlayerSpectator(
                             iPlayer.playerId,
                             "There are enemy ground units near(<500m) the aircraft you attempted to spawn in, you were unable to reach the aircraft."
