@@ -14,6 +14,14 @@ export function unitDictionaryModel(dbconn: mongoose.Connection): mongoose.Docum
                 type: String,
                 required: true
             },
+            warbondCost: {
+                type: Number,
+                default: 250
+            },
+            warbondKillMultiplier: {
+                type: Number,
+                default: 1.0
+            },
             objectCategory: {
                 type: Number
             },
