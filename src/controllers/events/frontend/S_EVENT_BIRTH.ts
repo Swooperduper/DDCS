@@ -6,7 +6,9 @@ import * as _ from "lodash";
 import * as ddcsControllers from "../../";
 
 export async function processEventBirth(eventObj: any): Promise<void> {
+    await new Promise(f => setTimeout(f, 1000));
     const curUnitId = eventObj.data.initiator.unitId;
+    console.log("Welcome to Birf!");
     //console.log("Birth Event Object",eventObj);
     if (curUnitId) {
         let iUnit = await ddcsControllers.unitActionRead({unitId: curUnitId});
@@ -38,13 +40,15 @@ export async function processEventBirth(eventObj: any): Promise<void> {
                         roleCode: "I",
                         msg: "C: " + curIUnit.playername + " enters a brand new " + curIUnit.type,
                         groupId: curIUnit.groupId
-                    };
+                    };                    
                     //console.log(iCurObj.msg)
                     let enemyCoalition = 0
                     console.log("Spawning Unit Coalition:",iPlayer.sideLock)
-                    if (iPlayer.sideLock = 1){
-                        enemyCoalition = 2
+                    if (iPlayer.sideLock == 1 || iPlayer.side == 1){
+                        console.log("I'm sidelocked to 1")
+                        enemyCoalition = 2                        
                     } else {
+                        console.log("I'm sidelocked to 2")
                         enemyCoalition = 1
                     }
                     const enemiesNearby = await ddcsControllers.getCoalitionGroundUnitsInProximity(curIUnit.lonLatLoc, 0.5, enemyCoalition);
