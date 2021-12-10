@@ -8,7 +8,6 @@ import * as ddcsControllers from "../../";
 
 export async function processEventBirth(eventObj: any): Promise<void> {
     console.log('Im starting my wait')
-    await new Promise(f => setTimeout(f, 1000));
     console.log('My wait is over')
     const curUnitId = eventObj.data.initiator.unitId;
     console.log("Welcome to Birf!");
@@ -45,6 +44,7 @@ export async function processEventBirth(eventObj: any): Promise<void> {
                         groupId: curIUnit.groupId
                     };                    
                     //console.log(iCurObj.msg)
+                    await new Promise(f => setTimeout(f, 100));
                     let enemyCoalition = 0
                     console.log("Spawning Unit Coalition:",iPlayer.sideLock)
                     if (iPlayer.sideLock == 1 || iPlayer.side == 1){
