@@ -7,7 +7,7 @@ export * from "./minutesPlayed";
 export * from "./neutralCC";
 export * from "./radioTower";
 export * from "./resetCampaign";
-export * from "./resourcePoints";
+export * from "./warBonds";
 export * from "./serverTimer";
 export * from "./sideLock";
 export * from "./staticCrates";

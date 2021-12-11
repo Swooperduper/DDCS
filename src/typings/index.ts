@@ -175,6 +175,9 @@ export interface ISrvPlayers {
     redRSPoints: number;
     blueRSPoints: number;
     tmpRSPoints: number;
+    redWarBonds: number;
+    blueWarBonds: number;
+    tmpWarBonds: number;
     sideLock: number;
     curLifePoints: number;
     gicTimeLeft: number;

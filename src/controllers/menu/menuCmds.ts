@@ -1281,13 +1281,13 @@ export async function spawnReinforcements(curUnit: any, curPlayer: any, reinforc
                 );
             }
         } else if (costType = "RS"){
-            let RSPoints = 0
+            let WarBonds = 0
             if (curUnit.side = 1){
-                RSPoints = curPlayer.redRSPoints
+                WarBonds = curPlayer.redWarBonds
             }else{
-                RSPoints = curPlayer.blueRSPoints
+                WarBonds = curPlayer.blueWarBonds
             }
-            if (RSPoints >= cost){  
+            if (WarBonds >= cost){  
                 if (curUnit.inAir) {
                     await ddcsControllers.sendMesgToGroup(
                         curPlayer,

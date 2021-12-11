@@ -70,9 +70,9 @@ export async function srvPlayerActionsUpdateacquisitionsUnpacked(obj: any): Prom
 }
 
 export async function srvPlayerActionsUpdateFromServer(obj: {
-    redRSPoints: number;
-    blueRSPoints: number;
-    tmpRSPoints: number;
+    redWarBonds: number;
+    blueWarBonds: number;
+    tmpWarBonds: number;
     _id: string,
     sessionName: string,
     side: number,
@@ -115,7 +115,7 @@ export async function srvPlayerActionsUpdateFromServer(obj: {
                     obj.curLifePoints = engineCache.config.startLifePoints;
                     obj.currentSessionMinutesPlayed_blue = 0;
                     obj.currentSessionMinutesPlayed_red = 0;
-                    obj.tmpRSPoints = 0;
+                    obj.tmpWarBonds = 0;
                 }
                 if (obj.ipaddr === ":10308") {
                     obj.ipaddr = "127.0.0.1";
@@ -286,7 +286,7 @@ export async function srvPlayerActionsClearTempScore(obj: {
                 const i18n = new I18nResolver(engineCache.i18n, serverObj[0].lang).translation as any;
                 dbModels.srvPlayerModel.updateOne(
                     {_id: obj._id},
-                    {$set: {tmpRSPoints: 0}},
+                    {$set: {tmpWarBonds: 0}},
                     (updateErr: any) => {
                         if (updateErr) { reject(updateErr); }
                         ddcsController.sendMesgToGroup(serverObj[0], obj.groupId, i18n.YOURTEMPSCOREHASBEENCLEARED, 15);
@@ -311,10 +311,10 @@ export async function srvPlayerActionsAddTempScore(obj: {
             if (err) { reject(err); }
             if (serverObj.length !== 0) {
                 const i18n = new I18nResolver(engineCache.i18n, serverObj[0].lang).translation as any;
-                const newTmpScore = (serverObj[0].tmpRSPoints || 0) + (obj.score || 0);
+                const newTmpScore = (serverObj[0].tmpWarBonds || 0) + (obj.score || 0);
                 dbModels.srvPlayerModel.updateOne(
                     {_id: obj._id},
-                    {$set: {tmpRSPoints: newTmpScore}},
+                    {$set: {tmpWarBonds: newTmpScore}},
                     (updateErr: any) => {
                         if (updateErr) { reject(updateErr); }
                         if (engineCache.config.inGameHitMessages) {
@@ -343,21 +343,21 @@ export async function srvPlayerActionsApplyTempToRealScore(obj: {
                 let message: string;
                 const curPly = serverObj[0];
                 const rsTotals = {
-                    redRSPoints: curPly.redRSPoints || 0,
-                    blueRSPoints: curPly.blueRSPoints || 0,
-                    tmpRSPoints: curPly.tmpRSPoints || 0
+                    redWarBonds: curPly.redWarBonds || 0,
+                    blueWarBonds: curPly.blueWarBonds || 0,
+                    tmpWarBonds: curPly.tmpWarBonds || 0
                 };
                 if (curPly.side === 1) {
-                    rsTotals.redRSPoints = rsTotals.redRSPoints + rsTotals.tmpRSPoints;
-                    message = i18n.AWARDEDRSPOINTS.replace("#1", rsTotals.tmpRSPoints)
-                        .replace("#2", "Red").replace("#3", rsTotals.redRSPoints);
-                    rsTotals.tmpRSPoints = 0;
+                    rsTotals.redWarBonds = rsTotals.redWarBonds + rsTotals.tmpWarBonds;
+                    message = i18n.AWARDEDRSPOINTS.replace("#1", rsTotals.tmpWarBonds)
+                        .replace("#2", "Red").replace("#3", rsTotals.redWarBonds);
+                    rsTotals.tmpWarBonds = 0;
                 }
                 if (curPly.side === 2) {
-                    rsTotals.blueRSPoints = rsTotals.blueRSPoints + rsTotals.tmpRSPoints;
-                    message = i18n.AWARDEDRSPOINTS.replace("#1", rsTotals.tmpRSPoints)
-                        .replace("#2", "Blue").replace("#3", rsTotals.blueRSPoints);
-                    rsTotals.tmpRSPoints = 0;
+                    rsTotals.blueWarBonds = rsTotals.blueWarBonds + rsTotals.tmpWarBonds;
+                    message = i18n.AWARDEDRSPOINTS.replace("#1", rsTotals.tmpWarBonds)
+                        .replace("#2", "Blue").replace("#3", rsTotals.blueWarBonds);
+                    rsTotals.tmpWarBonds = 0;
                 }
                 dbModels.srvPlayerModel.updateOne(
                     {_id: obj._id},
@@ -399,11 +399,11 @@ export async function srvPlayerActionsUnitAddToRealScore(obj: {
                 if (obj.unitCoalition === curPly.side) {
                     if (curPly.side === 1) {
                         message = i18n.AWARDEDRSPOINTSFROMUNIT.replace("#1", addScore).replace("#2", curType).replace("#3", "red");
-                        tObj.redRSPoints = (curPly.redRSPoints || 0) + addScore;
+                        tObj.redWarBonds = (curPly.redWarBonds || 0) + addScore;
                     }
                     if (curPly.side === 2) {
                         message = i18n.AWARDEDRSPOINTSFROMUNIT.replace("#1", addScore).replace("#2", curType).replace("#3", "blue");
-                        tObj.blueRSPoints = (curPly.blueRSPoints || 0) + addScore;
+                        tObj.blueWarBonds = (curPly.blueWarBonds || 0) + addScore;
                     }
                     dbModels.srvPlayerModel.updateOne(
                         {_id: obj._id},
@@ -473,9 +473,9 @@ export async function srvPlayerActionsUnsetCampaign(): Promise<void> {
             {$set: {
                 curLifePoints: serverCache.config.startLifePoints,
                 sideLock: 0
-               // redRSPoints: 0,
-                //blueRSPoints: 0,
-                //tmpRSPoints: 0
+               // redWarBonds: 0,
+                //blueWarBonds: 0,
+                //tmpWarBonds: 0
             }},
             (err: any) => {
                 if (err) { reject(err); }
