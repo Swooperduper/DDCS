@@ -24,7 +24,7 @@ export function getRTPlayerArray() {
     return rtPlayerArray;
 }
 
-/* export async function processPlayerEvent(playerArray: any): Promise<void> {
+export async function processPlayerEvent(playerArray: any): Promise<void> {
     const curPlayerArray = playerArray.players;
     const engineCache = ddcsControllers.getEngineCache();
 
@@ -43,7 +43,7 @@ export function getRTPlayerArray() {
                 });
             }
         }
-    } */
+    }
 
     if (curPlayerArray.length > 0) {
         setRTPlayerArray(curPlayerArray);

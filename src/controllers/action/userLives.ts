@@ -54,7 +54,7 @@ export async function getPlayerBalance(): Promise<typings.ISrvPlayerBalance> {
     };
 }
 
-/* export async function updateServerLifePoints(): Promise<void> {
+export async function updateServerLifePoints(): Promise<void> {
     let addFracPoint;
     const playerBalance = await getPlayerBalance();
 
@@ -81,8 +81,8 @@ export async function getPlayerBalance(): Promise<typings.ISrvPlayerBalance> {
         }
     }
 }
- */
-/* export async function lookupWarBonds(playerUcid: string): Promise<void> {
+
+export async function lookupWarBonds(playerUcid: string): Promise<void> {
     const srvPlayer = await ddcsControllers.srvPlayerActionsRead({_id: playerUcid});
     const curPlayer = srvPlayer[0];
     if (curPlayer) {
@@ -97,7 +97,7 @@ export async function getPlayerBalance(): Promise<typings.ISrvPlayerBalance> {
         }
     }
 }
- */
+
 export async function lookupAircraftCosts(playerUcid: string): Promise<void> {
     const engineCache = ddcsControllers.getEngineCache();
     const srvPlayer = await ddcsControllers.srvPlayerActionsRead({_id: playerUcid});
@@ -139,7 +139,7 @@ export async function lookupAircraftCosts(playerUcid: string): Promise<void> {
     }
 }
 
-/* export async function checkAircraftCosts(): Promise<void> {
+export async function checkAircraftCosts(): Promise<void> {
     const engineCache = ddcsControllers.getEngineCache();
     const latestSession = await ddcsControllers.sessionsActionsReadLatest();
     let message: string;
@@ -172,8 +172,8 @@ export async function lookupAircraftCosts(playerUcid: string): Promise<void> {
         }
     }
 }
- */
-/* export async function addLifePoints(curPlayer: any, curUnit: any, execAction?: string, addLP?: number): Promise<void> {
+
+export async function addLifePoints(curPlayer: any, curUnit: any, execAction?: string, addLP?: number): Promise<void> {
     const groupId = (curUnit && curUnit.groupId) ? curUnit.groupId : null;
 
     await ddcsControllers.srvPlayerActionsAddLifePoints({
@@ -183,8 +183,8 @@ export async function lookupAircraftCosts(playerUcid: string): Promise<void> {
         execAction
     });
 }
- */
-/* export async function removeLifePoints(
+
+export async function removeLifePoints(
     curPlayer: any,
     curUnit: any,
     execAction: string,
@@ -211,4 +211,3 @@ export async function lookupAircraftCosts(playerUcid: string): Promise<void> {
         storePoints: !isDirect
     });
 }
- */

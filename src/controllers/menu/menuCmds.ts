@@ -1260,7 +1260,7 @@ export async function spawnReinforcements(curUnit: any, curPlayer: any, reinforc
         const curPlayerArray = await ddcsControllers.srvPlayerActionsRead({name: curUnit.playername});
         const curPlayer = curPlayerArray[0];
         if (costType = "LP"){
-            /* if (curPlayer.curLifePoints >= cost){  
+            if (curPlayer.curLifePoints >= cost){  
                 if (curUnit.inAir) {
                     await ddcsControllers.sendMesgToGroup(
                         curPlayer,
@@ -1279,7 +1279,7 @@ export async function spawnReinforcements(curUnit: any, curPlayer: any, reinforc
                     "G: You do not have the require lifepoints to spawn this.",
                     5
                 );
-            } */
+            }
         } else if (costType = "RS"){
             let WarBonds = 0
             if (curUnit.side = 1){
@@ -1721,12 +1721,12 @@ export async function spawnReinforcementGroup(
     console.log("sRG:reinforcementType",reinforcementType);
     console.log("sRG:reinforcementArray",reinforcementArray);
     let spawnDistance = 0.06;
-    /* ddcsControllers.srvPlayerSpendLifePoints(curPlayer._id, playerUnit.groupId, 12, "LP Removed for Spawning Rinforcement Group");
+    ddcsControllers.srvPlayerSpendLifePoints(curPlayer._id, playerUnit.groupId, 12, "LP Removed for Spawning Rinforcement Group");
     for (let type of reinforcementArray){
         console.log("type:",type)
         await spawnRinGroups(playerUnit, curPlayer, country, type,"",true,engineCache,curTimePeriod,spawnDistance);
         spawnDistance = spawnDistance + 0.02;
-    } */
+    }
 }
 
 export async function spawnRinGroups(

@@ -134,7 +134,7 @@ export async function srvPlayerActionsUpdateFromServer(obj: {
     });
 }
 
-/* export async function srvPlayerActionsAddLifePoints(obj: {
+export async function srvPlayerActionsAddLifePoints(obj: {
     _id: string,
     groupId?: number,
     addLifePoints?: number,
@@ -184,10 +184,10 @@ export async function srvPlayerActionsUpdateFromServer(obj: {
             }
         });
     });
-} */
+}
 
 
-/* export async function srvPlayerActionsRemoveLifePoints(obj: {
+export async function srvPlayerActionsRemoveLifePoints(obj: {
     _id: string,
     groupId: number,
     removeLifePoints: number,
@@ -233,9 +233,9 @@ export async function srvPlayerActionsUpdateFromServer(obj: {
             }
         });
     });
-} */
+}
 
-/* export async function srvPlayerSpendLifePoints(
+export async function srvPlayerSpendLifePoints(
     _id: string,
     groupId: number,
     removeLifePoints: number,
@@ -272,7 +272,7 @@ export async function srvPlayerActionsUpdateFromServer(obj: {
             }
         });
     });
-} */
+}
 
 export async function srvPlayerActionsClearTempScore(obj: {
     _id: string,
@@ -471,11 +471,11 @@ export async function srvPlayerActionsUnsetCampaign(): Promise<void> {
         dbModels.srvPlayerModel.updateMany(
             {},
             {$set: {
-                // curLifePoints: serverCache.config.startLifePoints,
-                sideLock: 0,
-                redWarBonds: 0,
-                blueWarBonds: 0,
-                tmpWarBonds: 0
+                curLifePoints: serverCache.config.startLifePoints,
+                sideLock: 0
+               // redWarBonds: 0,
+                //blueWarBonds: 0,
+                //tmpWarBonds: 0
             }},
             (err: any) => {
                 if (err) { reject(err); }
