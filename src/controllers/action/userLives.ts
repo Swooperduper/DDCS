@@ -82,7 +82,7 @@ export async function updateServerLifePoints(): Promise<void> {
     }
 }
 
-export async function lookupLifeResource(playerUcid: string): Promise<void> {
+export async function lookupWarBonds(playerUcid: string): Promise<void> {
     const srvPlayer = await ddcsControllers.srvPlayerActionsRead({_id: playerUcid});
     const curPlayer = srvPlayer[0];
     if (curPlayer) {
@@ -92,7 +92,7 @@ export async function lookupLifeResource(playerUcid: string): Promise<void> {
         if (curPlayer.name) {
             const cUnit = await ddcsControllers.unitActionRead({dead: false, playername: curPlayer.name});
             const curUnit = cUnit[0];
-            const message = "G: " + i18n.LIFERESOURCEPOINTS.replace("#1", curPlayer.curLifePoints.toFixed(2));
+            const message = "G: " + i18n.WARBONDS.replace("#1", curPlayer.curLifePoints.toFixed(2));
             await ddcsControllers.sendMesgToGroup(curPlayer, curUnit.groupId, message, 5);
         }
     }
@@ -162,7 +162,7 @@ export async function checkAircraftCosts(): Promise<void> {
                     }
                     totalTakeoffCosts = curUnitLPCost + curTopWeaponCost;
                     if ((curPlayer.curLifePoints || 0) < totalTakeoffCosts && !curUnit.inAir) {
-                        message = "G: " + i18n.YOUDONOTHAVEENOUGHPOINTS.replace("#1", curUnit.type)
+                        message = "G: " + i18n.YOUDONOTHAVEENOUGHWARBONDS.replace("#1", curUnit.type)
                             .replace("#2", totalTakeoffCosts.toFixed(2)).replace("#3", curPlayer.curLifePoints.toFixed(2));
                         console.log(curPlayer.name + " " + message);
                         await ddcsControllers.sendMesgToGroup(curPlayer, curUnit.groupId, message, 30);

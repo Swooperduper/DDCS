@@ -544,7 +544,7 @@ export async function menuCmdProcess(pObj: any) {
                 case "serverTimeLeft":
                     await ddcsControllers.timeLeft(curUnit, curPlayer);
                     break;
-                case "lookupAircraftCosts":
+                case "lookupAircraftWarBondCosts":
                     await ddcsControllers.lookupAircraftCosts(curPlayer.ucid);
                     break;
                 case "lookupLifeResource":
@@ -553,8 +553,8 @@ export async function menuCmdProcess(pObj: any) {
                 case "getTargetCoords":
                     await getActiveJTACTargets(curUnit, curPlayer, pObj.target);
                     break;
-                case "resourcePoints":
-                    await ddcsControllers.checkResourcePoints(curPlayer);
+                case "warBonds":
+                    await ddcsControllers.checkWarBonds(curPlayer);
                     break;
                 case "unloadExtractTroops":
                     if (curUnit.inAir) {
@@ -881,7 +881,7 @@ export async function spawnAtkHeli(curUnit: typing.IUnit, curPlayer: typing.ISrv
         };
     }
 
-    const spentPoints = await ddcsControllers.spendResourcePoints(curPlayer, rsCost, "AtkHeli", heliObj);
+    const spentPoints = await ddcsControllers.spendWarBonds(curPlayer, rsCost, "AtkHeli", heliObj);
     if (spentPoints) {
         await ddcsControllers.spawnAtkChopper(curUnit, heliObj);
     }
@@ -1049,7 +1049,7 @@ export async function spawnAWACS(curUnit: typing.IUnit, curPlayer: typing.ISrvPl
         };
     }
 
-    const spentPoints = await ddcsControllers.spendResourcePoints(curPlayer, rsCost, "AWACS", awacsObj);
+    const spentPoints = await ddcsControllers.spendWarBonds(curPlayer, rsCost, "AWACS", awacsObj);
     if (spentPoints) {
         await ddcsControllers.spawnAWACSPlane(curUnit, awacsObj);
     }
@@ -1084,7 +1084,7 @@ export async function spawnBomber(curUnit: any, curPlayer: any, bomberType: stri
         };
     }
 
-    const spentPoints = await ddcsControllers.spendResourcePoints(curPlayer, rsCost, "Bomber", bomberObj);
+    const spentPoints = await ddcsControllers.spendWarBonds(curPlayer, rsCost, "Bomber", bomberObj);
     if (spentPoints) {
         await ddcsControllers.spawnBomberPlane(curUnit, bomberObj);
     }
@@ -1234,7 +1234,7 @@ export async function spawnDefHeli(curUnit: any, curPlayer: any, heliType: strin
         };
     }
 
-    const spentPoints = await ddcsControllers.spendResourcePoints(curPlayer, rsCost, "DefHeli", heliObj);
+    const spentPoints = await ddcsControllers.spendWarBonds(curPlayer, rsCost, "DefHeli", heliObj);
     if (spentPoints) {
         await ddcsControllers.spawnDefenseChopper(curUnit, heliObj);
     }
@@ -1515,7 +1515,7 @@ export async function spawnTanker(curUnit: any, curPlayer: any, tankerType: stri
             5
         );
     } else {
-        const spentPoints = await ddcsControllers.spendResourcePoints(curPlayer, rsCost, "Tanker", tankerObj);
+        const spentPoints = await ddcsControllers.spendWarBonds(curPlayer, rsCost, "Tanker", tankerObj);
         if (spentPoints) {
             await ddcsControllers.spawnTankerPlane(curUnit, tankerObj, curUnit.lonLatLoc, remoteLoc);
         }
