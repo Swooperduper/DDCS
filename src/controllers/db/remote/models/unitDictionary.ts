@@ -14,11 +14,11 @@ export function unitDictionaryModel(dbconn: mongoose.Connection): mongoose.Docum
                 type: String,
                 required: true
             },
-            warbondCost: {
+            warBondCost: {
                 type: Number,
                 default: 250
             },
-            warbondKillMultiplier: {
+            warBondKillMultiplier: {
                 type: Number,
                 default: 1.0
             },
