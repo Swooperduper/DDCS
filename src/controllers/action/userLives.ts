@@ -91,6 +91,7 @@ export async function lookupLifeResource(playerUcid: string): Promise<void> {
 
         if (curPlayer.name) {
 <<<<<<< HEAD
+<<<<<<< HEAD
             const cUnit = await ddcsControllers.unitActionRead({dead: false, playername: curPlayer.name});
             const curUnit = cUnit[0];
 <<<<<<< HEAD
@@ -112,6 +113,12 @@ export async function lookupLifeResource(playerUcid: string): Promise<void> {
                 await ddcsControllers.sendMesgToGroup(curPlayer, curUnit.groupId, message, 5);
             }    
 >>>>>>> parent of 7865931 (Revert "lookup-warbonds")
+=======
+            const cUnit = await ddcsControllers.unitActionRead({dead: false, playername: curPlayer.name});
+            const curUnit = cUnit[0];
+            const message = "G: " + i18n.WARBONDS.replace("#1", curPlayer.curLifePoints.toFixed(2));
+            await ddcsControllers.sendMesgToGroup(curPlayer, curUnit.groupId, message, 5);
+>>>>>>> parent of 712b141 (lookup-warbonds)
         }
     }
 }
