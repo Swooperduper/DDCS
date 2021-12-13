@@ -32,14 +32,14 @@ export async function processEventTakeoff(eventObj: any): Promise<void> {
                 // console.log("getBASE: ", curIUnit, curUnitSide, friendlyBases);
                 if (friendlyBases.length > 0) {
                     // console.log("LPE: ", engineCache.config.lifePointsEnabled, !_.includes(iPlayer.slot, "_"));
-                    /* if (engineCache.config.lifePointsEnabled && !_.includes(iPlayer.slot, "_")) {
+                    if (engineCache.config.lifePointsEnabled && !_.includes(iPlayer.slot, "_")) {
                         console.log("checkSlotTakeoff: ", iPlayer.slot);
                         await ddcsControllers.removeLifePoints(
                             iPlayer,
                             curIUnit,
                             "Takeoff"
                         );
-                    } */
+                    }
                     /*
                     await ddcsControllers.sendToCoalition({payload: {
                             action: eventObj.action,

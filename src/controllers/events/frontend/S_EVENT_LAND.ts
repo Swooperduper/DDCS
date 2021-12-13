@@ -59,14 +59,14 @@ export async function processEventLand(eventObj: any): Promise<void> {
                     msg: "C: " + iUnit[0].type + "(" + iUnit[0].playername + ") has landed at friendly " + place
                 };
                 console.log("FriendlyPlace: ", iCurObj.msg);
-                /* if (engineCache.config.lifePointsEnabled && !_.includes(iPlayer.slot, "_")) {
+                if (engineCache.config.lifePointsEnabled && !_.includes(iPlayer.slot, "_")) {
                     console.log("checkSlotLanding: ", iPlayer.slot);
                     await ddcsControllers.addLifePoints(
                         iPlayer,
                         iUnit[0],
                         "Land"
                     );
-                } */
+                }
                 /*
                 await ddcsControllers.sendToCoalition({payload: {
                         action: eventObj.action,
