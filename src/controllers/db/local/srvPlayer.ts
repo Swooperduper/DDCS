@@ -494,9 +494,15 @@ export async function srvPlayerActionsUnsetCampaign(): Promise<void> {
             {$set: {
                 curLifePoints: serverCache.config.startLifePoints,
                 sideLock: 0
+<<<<<<< HEAD
                // redRSPoints: 0,
                 //blueRSPoints: 0,
                 //tmpRSPoints: 0
+=======
+               // redWarBonds: 0,
+                //blueWarBonds: 0,
+                //tmpWarBonds: 0
+>>>>>>> parent of 154c854 (isolating-lifepoints)
             }},
             (err: any) => {
                 if (err) { reject(err); }

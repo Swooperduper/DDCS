@@ -82,7 +82,11 @@ export async function updateServerLifePoints(): Promise<void> {
     }
 }
 
+<<<<<<< HEAD
 export async function lookupLifeResource(playerUcid: string): Promise<void> {
+=======
+export async function lookupWarBonds(playerUcid: string): Promise<void> {
+>>>>>>> parent of 154c854 (isolating-lifepoints)
     const srvPlayer = await ddcsControllers.srvPlayerActionsRead({_id: playerUcid});
     const curPlayer = srvPlayer[0];
     if (curPlayer) {
