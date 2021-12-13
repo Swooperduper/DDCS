@@ -166,7 +166,7 @@ export async function getGroundKillInProximity(
         coalition: side
     });
 }
-
+//SwooperPooper Pull my Finger
 export async function getCoalitionGroundUnitsInProximity(
     lonLat: number[],
     kmDistance: number,
