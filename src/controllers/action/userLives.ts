@@ -92,7 +92,11 @@ export async function lookupLifeResource(playerUcid: string): Promise<void> {
         if (curPlayer.name) {
             const cUnit = await ddcsControllers.unitActionRead({dead: false, playername: curPlayer.name});
             const curUnit = cUnit[0];
+<<<<<<< HEAD
             const message = "G: " + i18n.LIFERESOURCEPOINTS.replace("#1", curPlayer.curLifePoints.toFixed(2));
+=======
+            const message = "G: " + i18n.WARBONDS.replace("#1", curPlayer.curLifePoints.toFixed(2));
+>>>>>>> parent of 712b141 (lookup-warbonds)
             await ddcsControllers.sendMesgToGroup(curPlayer, curUnit.groupId, message, 5);
         }
     }
