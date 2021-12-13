@@ -17,11 +17,11 @@ export function weaponScoreModel(dbconn: mongoose.Connection): mongoose.Document
             displayName: {
                 type: String
             },
-            warBondCost: {
+            warbondCost: {
                 type: Number,
                 default: 250
             },
-            warBondKillMultiplier: {
+            warbondKillMultiplier: {
                 type: Number,
                 default: 1.0
             },
