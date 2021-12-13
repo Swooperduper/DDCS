@@ -5,7 +5,7 @@
 import * as _ from "lodash";
 import * as ddcsControllers from "../../";
 
-export async function processFriendlyFire(eventObj: any): Promise<void> {
+/* export async function processFriendlyFire(eventObj: any): Promise<void> {
     const engineCache = ddcsControllers.getEngineCache();
     // var iCurObj;
     let iPlayer: any;
@@ -59,4 +59,4 @@ export async function processFriendlyFire(eventObj: any): Promise<void> {
             }
         }
     }
-}
+} */
