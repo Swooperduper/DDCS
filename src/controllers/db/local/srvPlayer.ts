@@ -348,7 +348,6 @@ export async function srvPlayerActionsApplyTempToRealScore(obj: {
                     tmpRSPoints: curPly.tmpRSPoints || 0
                 };
                 if (curPly.side === 1) {
-<<<<<<< HEAD
                     rsTotals.redRSPoints = rsTotals.redRSPoints + rsTotals.tmpRSPoints;
                     message = i18n.AWARDEDRSPOINTS.replace("#1", rsTotals.tmpRSPoints)
                         .replace("#2", "Red").replace("#3", rsTotals.redRSPoints);
@@ -359,18 +358,6 @@ export async function srvPlayerActionsApplyTempToRealScore(obj: {
                     message = i18n.AWARDEDRSPOINTS.replace("#1", rsTotals.tmpRSPoints)
                         .replace("#2", "Blue").replace("#3", rsTotals.blueRSPoints);
                     rsTotals.tmpRSPoints = 0;
-=======
-                    rsTotals.redWarBonds = rsTotals.redWarBonds + rsTotals.tmpWarBonds;
-                    message = i18n.AWARDEDRSPOINTS.replace("#1", rsTotals.tmpWarBonds)
-                        .replace("#2", "Red").replace("#3", rsTotals.redWarBonds);
-                    rsTotals.tmpWarBonds = 0;
-                }
-                if (curPly.side === 2) {
-                    rsTotals.blueWarBonds = rsTotals.blueWarBonds + rsTotals.tmpWarBonds;
-                    message = i18n.AWARDEDRSPOINTS.replace("#1", rsTotals.tmpWarBonds)
-                        .replace("#2", "Blue").replace("#3", rsTotals.blueWarBonds);
-                    rsTotals.tmpWarBonds = 0;
->>>>>>> parent of 6ab96ec (more-warbond-changes)
                 }
                 dbModels.srvPlayerModel.updateOne(
                     {_id: obj._id},
@@ -412,19 +399,11 @@ export async function srvPlayerActionsUnitAddToRealScore(obj: {
                 if (obj.unitCoalition === curPly.side) {
                     if (curPly.side === 1) {
                         message = i18n.AWARDEDRSPOINTSFROMUNIT.replace("#1", addScore).replace("#2", curType).replace("#3", "red");
-<<<<<<< HEAD
                         tObj.redRSPoints = (curPly.redRSPoints || 0) + addScore;
                     }
                     if (curPly.side === 2) {
                         message = i18n.AWARDEDRSPOINTSFROMUNIT.replace("#1", addScore).replace("#2", curType).replace("#3", "blue");
                         tObj.blueRSPoints = (curPly.blueRSPoints || 0) + addScore;
-=======
-                        tObj.redWarBonds = (curPly.redWarBonds || 0) + addScore;
-                    }
-                    if (curPly.side === 2) {
-                        message = i18n.AWARDEDRSPOINTSFROMUNIT.replace("#1", addScore).replace("#2", curType).replace("#3", "blue");
-                        tObj.blueWarBonds = (curPly.blueWarBonds || 0) + addScore;
->>>>>>> parent of 6ab96ec (more-warbond-changes)
                     }
                     dbModels.srvPlayerModel.updateOne(
                         {_id: obj._id},
@@ -494,15 +473,9 @@ export async function srvPlayerActionsUnsetCampaign(): Promise<void> {
             {$set: {
                 curLifePoints: serverCache.config.startLifePoints,
                 sideLock: 0
-<<<<<<< HEAD
                // redRSPoints: 0,
                 //blueRSPoints: 0,
                 //tmpRSPoints: 0
-=======
-               // redWarBonds: 0,
-                //blueWarBonds: 0,
-                //tmpWarBonds: 0
->>>>>>> parent of 154c854 (isolating-lifepoints)
             }},
             (err: any) => {
                 if (err) { reject(err); }

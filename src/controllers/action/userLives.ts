@@ -82,11 +82,7 @@ export async function updateServerLifePoints(): Promise<void> {
     }
 }
 
-<<<<<<< HEAD
 export async function lookupLifeResource(playerUcid: string): Promise<void> {
-=======
-export async function lookupWarBonds(playerUcid: string): Promise<void> {
->>>>>>> parent of 154c854 (isolating-lifepoints)
     const srvPlayer = await ddcsControllers.srvPlayerActionsRead({_id: playerUcid});
     const curPlayer = srvPlayer[0];
     if (curPlayer) {
@@ -94,39 +90,10 @@ export async function lookupWarBonds(playerUcid: string): Promise<void> {
         const i18n = new I18nResolver(engineCache.i18n, curPlayer.lang).translation as any;
 
         if (curPlayer.name) {
-<<<<<<< HEAD
-<<<<<<< HEAD
             const cUnit = await ddcsControllers.unitActionRead({dead: false, playername: curPlayer.name});
             const curUnit = cUnit[0];
-<<<<<<< HEAD
-<<<<<<< HEAD
             const message = "G: " + i18n.LIFERESOURCEPOINTS.replace("#1", curPlayer.curLifePoints.toFixed(2));
-=======
-            const message = "G: " + i18n.WARBONDS.replace("#1", curPlayer.curLifePoints.toFixed(2));
->>>>>>> parent of 712b141 (lookup-warbonds)
-=======
-            const message = "G: " + i18n.LIFERESOURCEPOINTS.replace("#1", curPlayer.curLifePoints.toFixed(2));
->>>>>>> parent of 6ab96ec (more-warbond-changes)
             await ddcsControllers.sendMesgToGroup(curPlayer, curUnit.groupId, message, 5);
-=======
-            if(curPlayer.sideLock == 1){
-                const cUnit = await ddcsControllers.unitActionRead({dead: false, playername: curPlayer.name});
-                const curUnit = cUnit[0];
-                const message = "G: " + i18n.WARBONDS.replace("#1", curPlayer.redWarBonds.toFixed(2));
-                await ddcsControllers.sendMesgToGroup(curPlayer, curUnit.groupId, message, 5);
-            } else {
-                const cUnit = await ddcsControllers.unitActionRead({dead: false, playername: curPlayer.name});
-                const curUnit = cUnit[0];
-                const message = "G: " + i18n.WARBONDS.replace("#1", curPlayer.blueWarBonds.toFixed(2));
-                await ddcsControllers.sendMesgToGroup(curPlayer, curUnit.groupId, message, 5);
-            }    
->>>>>>> parent of 7865931 (Revert "lookup-warbonds")
-=======
-            const cUnit = await ddcsControllers.unitActionRead({dead: false, playername: curPlayer.name});
-            const curUnit = cUnit[0];
-            const message = "G: " + i18n.WARBONDS.replace("#1", curPlayer.curLifePoints.toFixed(2));
-            await ddcsControllers.sendMesgToGroup(curPlayer, curUnit.groupId, message, 5);
->>>>>>> parent of 712b141 (lookup-warbonds)
         }
     }
 }
