@@ -556,6 +556,9 @@ export async function menuCmdProcess(pObj: any) {
                 case "resourcePoints":
                     await ddcsControllers.checkResourcePoints(curPlayer);
                     break;
+                case "warBonds":
+                    await ddcsControllers.checkWarBonds(curPlayer);
+                    break;    
                 case "unloadExtractTroops":
                     if (curUnit.inAir) {
                         await ddcsControllers.sendMesgToGroup(
