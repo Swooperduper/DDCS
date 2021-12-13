@@ -6,7 +6,7 @@ import * as typings from "../../typings";
 import * as ddcsControllers from "..";
 import {I18nResolver} from "i18n-ts";
 
-export async function spendWarBonds(
+export async function spendResourcePoints(
     player: typings.ISrvPlayers,
     warBondCost: number,
     warBondItem: string,
@@ -43,7 +43,7 @@ export async function spendWarBonds(
                             redWarBonds: player.redWarBonds - warBondCost
                         };
                         await ddcsControllers.srvPlayerActionsUpdate(currentObjUpdate);
-                        message = "G: " + i18n.YOUHAVESPENTWARBONDS.replace("#1", i18n[1])
+                        message = "G: " + i18n.YOUHAVESPENTRSPOINTS.replace("#1", i18n[1])
                             .replace("#2", warBondCost).replace("#3", warBondItem).replace("#4", currentObjUpdate.redWarBonds);
                         await ddcsControllers.sendMesgToGroup(
                             player,
@@ -53,7 +53,7 @@ export async function spendWarBonds(
                         );
                         return true;
                     } else {
-                        message = "G: " + i18n.YOUDONTHAVEENOUGHRWARBONDSTOBUY.replace("#1", i18n[1])
+                        message = "G: " + i18n.YOUDONTHAVEENOUGHRSPOINTSTOBUY.replace("#1", i18n[1])
                             .replace("#2", warBondCost).replace("#3", warBondItem).replace("#4", player.redWarBonds);
                         await ddcsControllers.sendMesgToGroup(
                             player,
@@ -70,7 +70,7 @@ export async function spendWarBonds(
                             blueWarBonds: player.blueWarBonds - warBondCost
                         };
                         await ddcsControllers.srvPlayerActionsUpdate(currentObjUpdate);
-                        message = "G: " + i18n.YOUHAVESPENTWARBONDS.replace("#1", i18n[2])
+                        message = "G: " + i18n.YOUHAVESPENTRSPOINTS.replace("#1", i18n[2])
                             .replace("#2", warBondCost).replace("#3", warBondItem).replace("#4", currentObjUpdate.blueWarBonds);
                         await ddcsControllers.sendMesgToGroup(
                             player,
@@ -80,7 +80,7 @@ export async function spendWarBonds(
                         );
                         return true;
                     } else {
-                        message = "G: " + i18n.YOUDONTHAVEENOUGHRWARBONDSTOBUY.replace("#1", i18n[2])
+                        message = "G: " + i18n.YOUDONTHAVEENOUGHRSPOINTSTOBUY.replace("#1", i18n[2])
                             .replace("#2", warBondCost).replace("#3", warBondItem).replace("#4", player.blueWarBonds);
                         await ddcsControllers.sendMesgToGroup(
                             player,
@@ -93,7 +93,7 @@ export async function spendWarBonds(
                 }
             }
         } else {
-            message = "G: " + i18n.YOUCANNOTSPENDWARBONDSONGROUNDFORAIRASSETS;
+            message = "G: " + i18n.YOUCANNOTSPENDRSPOINTSONGROUND;
             await ddcsControllers.sendMesgToGroup(
                 player,
                 curUnit.groupId,
@@ -105,7 +105,7 @@ export async function spendWarBonds(
     }
 }
 
-export async function checkWarBonds(player: typings.ISrvPlayers): Promise<void> {
+export async function checkResourcePoints(player: typings.ISrvPlayers): Promise<void> {
     if (player.name) {
         const engineCache = ddcsControllers.getEngineCache();
         const i18n = new I18nResolver(engineCache.i18n, player.lang).translation as any;
@@ -113,9 +113,9 @@ export async function checkWarBonds(player: typings.ISrvPlayers): Promise<void> 
         let message;
         if (cUnit.length > 0) {
             if (player.side === 1) {
-                message = "G: " + i18n.YOUHAVEWARBONDS.replace("#1", player.redWarBonds).replace("#2", i18n[1]);
+                message = "G: " + i18n.YOUHAVERESOURCEPOINTS.replace("#1", player.redWarBonds).replace("#2", i18n[1]);
             } else {
-                message = "G: " + i18n.YOUHAVEWARBONDS.replace("#1", player.blueWarBonds).replace("#2", i18n[2]);
+                message = "G: " + i18n.YOUHAVERESOURCEPOINTS.replace("#1", player.blueWarBonds).replace("#2", i18n[2]);
             }
 
             await ddcsControllers.sendMesgToGroup(

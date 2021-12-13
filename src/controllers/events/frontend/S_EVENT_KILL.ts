@@ -108,7 +108,7 @@ export async function processEventKill(eventObj: any): Promise<void> {
 
 
         await ddcsControllers.sendMesgToAll(
-            "HASKILLEDWARBONDS",
+            "HASKILLED",
             [
                 "#" + initSide,
                 initMesg,

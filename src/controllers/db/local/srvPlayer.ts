@@ -169,7 +169,7 @@ export async function srvPlayerActionsAddLifePoints(obj: {
                             message = i18n.PERIODICLIFEPOINTADD
                                 .replace("#1", _.round(addPoints, 2)).replace("#2", _.round(maxLimitedPoints, 2));
                         } else {
-                            message = i18n.ADDWARBONDS.replace("#1", srvPlayer.name)
+                            message = i18n.ADDLIFEPOINTS.replace("#1", srvPlayer.name)
                                 .replace("#2", addPoints).replace("#3", obj.execAction).replace("#4", _.round(maxLimitedPoints, 2));
                         }
                         // console.log("MESG: ", msg);
@@ -318,7 +318,7 @@ export async function srvPlayerActionsAddTempScore(obj: {
                     (updateErr: any) => {
                         if (updateErr) { reject(updateErr); }
                         if (engineCache.config.inGameHitMessages) {
-                            ddcsController.sendMesgToGroup(serverObj[0], obj.groupId, i18n.ADDTEMPWARBONDSSCORE, 15);
+                            ddcsController.sendMesgToGroup(serverObj[0], obj.groupId, i18n.ADDTEMPSCORE, 15);
                         }
                         resolve();
                     }
@@ -349,13 +349,13 @@ export async function srvPlayerActionsApplyTempToRealScore(obj: {
                 };
                 if (curPly.side === 1) {
                     rsTotals.redWarBonds = rsTotals.redWarBonds + rsTotals.tmpWarBonds;
-                    message = i18n.AWARDEDWARBONDS.replace("#1", rsTotals.tmpWarBonds)
+                    message = i18n.AWARDEDRSPOINTS.replace("#1", rsTotals.tmpWarBonds)
                         .replace("#2", "Red").replace("#3", rsTotals.redWarBonds);
                     rsTotals.tmpWarBonds = 0;
                 }
                 if (curPly.side === 2) {
                     rsTotals.blueWarBonds = rsTotals.blueWarBonds + rsTotals.tmpWarBonds;
-                    message = i18n.AWARDEDWARBONDS.replace("#1", rsTotals.tmpWarBonds)
+                    message = i18n.AWARDEDRSPOINTS.replace("#1", rsTotals.tmpWarBonds)
                         .replace("#2", "Blue").replace("#3", rsTotals.blueWarBonds);
                     rsTotals.tmpWarBonds = 0;
                 }
@@ -398,11 +398,11 @@ export async function srvPlayerActionsUnitAddToRealScore(obj: {
                 const tObj: any = {};
                 if (obj.unitCoalition === curPly.side) {
                     if (curPly.side === 1) {
-                        message = i18n.AWARDEDWARBONDSFROMUNIT.replace("#1", addScore).replace("#2", curType).replace("#3", "red");
+                        message = i18n.AWARDEDRSPOINTSFROMUNIT.replace("#1", addScore).replace("#2", curType).replace("#3", "red");
                         tObj.redWarBonds = (curPly.redWarBonds || 0) + addScore;
                     }
                     if (curPly.side === 2) {
-                        message = i18n.AWARDEDWARBONDSFROMUNIT.replace("#1", addScore).replace("#2", curType).replace("#3", "blue");
+                        message = i18n.AWARDEDRSPOINTSFROMUNIT.replace("#1", addScore).replace("#2", curType).replace("#3", "blue");
                         tObj.blueWarBonds = (curPly.blueWarBonds || 0) + addScore;
                     }
                     dbModels.srvPlayerModel.updateOne(
