@@ -73,6 +73,18 @@ export function srvPlayerModel(dbconn: mongoose.Connection): mongoose.Document |
                 type: Number,
                 default: 0
             },
+            redWarBonds: {
+                type: Number,
+                default: 0
+            },
+            blueWarBonds: {
+                type: Number,
+                default: 0
+            },
+            tmpWarBonds: {
+                type: Number,
+                default: 0
+            },
             lastLifeAction: {
                 type: String
             },
