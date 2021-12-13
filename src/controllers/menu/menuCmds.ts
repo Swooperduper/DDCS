@@ -558,7 +558,6 @@ export async function menuCmdProcess(pObj: any) {
                     break;
                 case "checkWarBonds":
                     await ddcsControllers.checkWarBonds(curPlayer);
-                    console.log("Calling checkWarBonds")
                     break;    
                 case "unloadExtractTroops":
                     if (curUnit.inAir) {
