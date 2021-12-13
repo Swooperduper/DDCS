@@ -90,17 +90,10 @@ export async function lookupWarBonds(playerUcid: string): Promise<void> {
         const i18n = new I18nResolver(engineCache.i18n, curPlayer.lang).translation as any;
 
         if (curPlayer.name) {
-            if(curPlayer.sideLock == 1){
-                const cUnit = await ddcsControllers.unitActionRead({dead: false, playername: curPlayer.name});
-                const curUnit = cUnit[0];
-                const message = "G: " + i18n.WARBONDS.replace("#1", curPlayer.redWarBonds.toFixed(2));
-                await ddcsControllers.sendMesgToGroup(curPlayer, curUnit.groupId, message, 5);
-            } else {
-                const cUnit = await ddcsControllers.unitActionRead({dead: false, playername: curPlayer.name});
-                const curUnit = cUnit[0];
-                const message = "G: " + i18n.WARBONDS.replace("#1", curPlayer.blueWarBonds.toFixed(2));
-                await ddcsControllers.sendMesgToGroup(curPlayer, curUnit.groupId, message, 5);
-            }    
+            const cUnit = await ddcsControllers.unitActionRead({dead: false, playername: curPlayer.name});
+            const curUnit = cUnit[0];
+            const message = "G: " + i18n.WARBONDS.replace("#1", curPlayer.curLifePoints.toFixed(2));
+            await ddcsControllers.sendMesgToGroup(curPlayer, curUnit.groupId, message, 5);
         }
     }
 }
