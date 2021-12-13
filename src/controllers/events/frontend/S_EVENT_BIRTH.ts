@@ -7,10 +7,8 @@ import { delay } from "lodash";
 import * as ddcsControllers from "../../";
 
 export async function processEventBirth(eventObj: any): Promise<void> {
-    console.log('Im starting my wait')
-    console.log('My wait is over')
     const curUnitId = eventObj.data.initiator.unitId;
-    await new Promise(f => setTimeout(f, 100));
+    await new Promise(f => setTimeout(f, 10));
     console.log("Welcome to Birf!");
     //console.log("Birth Event Object",eventObj);
     if (curUnitId) {
