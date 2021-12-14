@@ -118,6 +118,7 @@ export interface IUnitDictionary {
     routeLocs: number[];
     LPCost: number;
     name: string;
+    warBondCost: number;
 }
 
 export interface IWeaponDictionary {
@@ -130,6 +131,7 @@ export interface IWeaponDictionary {
     createdAt: Date;
     updatedAt: Date;
     displayName: string;
+    warBondCost: number;
 }
 
 export interface ICmdQue {
@@ -369,6 +371,7 @@ export interface IUnit {
     shape_name: string;
     canCargo: boolean;
     lateActivation?: boolean;
+    warBondCost: number;
 }
 
 export interface IWebPush {
