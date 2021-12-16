@@ -7,7 +7,7 @@ import * as typings from "../../typings";
 import * as ddcsControllers from "..";
 import {I18nResolver} from "i18n-ts";
 
-//getWeaponCost updated to return the warbondCost of a weapon
+//Modified to getWeaponCost updated to return the warbondCost of a weapon ~ 16-12-2021
 export function getWeaponCost(typeName: string, count: number): number {
     const engineCache = ddcsControllers.getEngineCache();
     let mantraCHK = 0;
@@ -20,7 +20,7 @@ export function getWeaponCost(typeName: string, count: number): number {
     console.log("cant find weapon in weapon scores table:", typeName);
     return 0;
 }
-
+//Added to getWeaponName updated to return the weapon display name if available ~ 16-12-2021
 export function getWeaponName(typeName: string): string {
     const engineCache = ddcsControllers.getEngineCache();
     const curWeaponLookup = _.find(engineCache.weaponsDictionary, {_id: typeName} );
@@ -107,12 +107,12 @@ export async function lookupLifeResource(playerUcid: string): Promise<void> {
         if (curPlayer.name) {
             const cUnit = await ddcsControllers.unitActionRead({dead: false, playername: curPlayer.name});
             const curUnit = cUnit[0];
-            const message = "G: " + i18n.LIFERESOURCEPOINTS.replace("#1", curPlayer.redWarBonds);
+            const message = "G: " + i18n.LIFERESOURCEPOINTS.replace("#1", curPlayer.warbonds);
             await ddcsControllers.sendMesgToGroup(curPlayer, curUnit.groupId, message, 5);
         }
     }
 }
-
+//Updated lookupAircraftCosts to work entirely with Warbonds ~ 16-12-2021
 export async function lookupAircraftCosts(playerUcid: string): Promise<void> {
     const engineCache = ddcsControllers.getEngineCache();
     const srvPlayer = await ddcsControllers.srvPlayerActionsRead({_id: playerUcid});
@@ -153,12 +153,11 @@ export async function lookupAircraftCosts(playerUcid: string): Promise<void> {
         }
     }
 }
-
+//Updated checkAircraftCosts to work entirely with Warbonds ~ 16-12-2021
 export async function checkAircraftCosts(): Promise<void> {
     const engineCache = ddcsControllers.getEngineCache();
     const latestSession = await ddcsControllers.sessionsActionsReadLatest();
     let message: string;
-
     if (latestSession && latestSession.name) {
         const srvPlayers = await ddcsControllers.srvPlayerActionsRead({sessionName: latestSession.name, playername: {$ne: ""}});
         for (const curPlayer of srvPlayers) {
@@ -168,17 +167,22 @@ export async function checkAircraftCosts(): Promise<void> {
                 if (cUnit.length > 0) {
                     const curUnit = cUnit[0];
                     const curUnitDictionary = _.find(engineCache.unitDictionary, {_id: curUnit.type});
-                    const curUnitLPCost = (curUnitDictionary) ? curUnitDictionary.LPCost : 1;
-                    let curTopWeaponCost = 0;
-                    let totalTakeoffCosts;
+                    const curUnitwarbondCost = (curUnitDictionary) ? curUnitDictionary.warbondCost : 1;
+                    let totalTakeoffCosts = 0;
+                    let weaponCost = 0
+                    let weaponCostString = ""
+                    let thisweaponCost;
+                    let weaponDisplayName;
                     for (const value of curUnit.ammo || []) {
-                        const weaponCost = getWeaponCost(value.typeName, value.count);
-                        curTopWeaponCost = (curTopWeaponCost > weaponCost) ? curTopWeaponCost : weaponCost;
+                        thisweaponCost = getWeaponCost(value.typeName, value.count);
+                        weaponDisplayName = getWeaponName(value.typeName)
+                        weaponCost = weaponCost + thisweaponCost
+                        weaponCostString = weaponCostString.concat(",",value.count.toString(),"x",weaponDisplayName,"(",(thisweaponCost/value.count).toString(),")")
                     }
-                    totalTakeoffCosts = curUnitLPCost + curTopWeaponCost;
-                    if ((curPlayer.curLifePoints || 0) < totalTakeoffCosts && !curUnit.inAir) {
+                    totalTakeoffCosts = curUnitwarbondCost + weaponCost;
+                    if ((curPlayer.warbonds || 0) < totalTakeoffCosts && !curUnit.inAir) {
                         message = "G: " + i18n.YOUDONOTHAVEENOUGHPOINTS.replace("#1", curUnit.type)
-                            .replace("#2", totalTakeoffCosts.toFixed(2)).replace("#3", curPlayer.curLifePoints.toFixed(2));
+                            .replace("#2", totalTakeoffCosts.toFixed(2)).replace("#3", curPlayer.warbonds.toFixed(2));
                         console.log(curPlayer.name + " " + message);
                         await ddcsControllers.sendMesgToGroup(curPlayer, curUnit.groupId, message, 30);
                     }

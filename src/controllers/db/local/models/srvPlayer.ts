@@ -73,15 +73,11 @@ export function srvPlayerModel(dbconn: mongoose.Connection): mongoose.Document |
                 type: Number,
                 default: 0
             },
-            redWarBonds: {
+            warbonds:{
                 type: Number,
                 default: 0
             },
-            blueWarBonds: {
-                type: Number,
-                default: 0
-            },
-            tmpWarBonds: {
+            tmpWarbonds: {
                 type: Number,
                 default: 0
             },
