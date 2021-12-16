@@ -122,8 +122,8 @@ export async function lookupAircraftCosts(playerUcid: string): Promise<void> {
                             weaponCostString = weaponCostString.concat(value.count.toString(),"x",value.typeName,"(",(thisweaponCost/value.count).toString(),"),")
                         }
                         totalTakeoffCosts = curUnitwarbondCost + weaponCost;
-                        const messages = "G: " + i18n.YOURAIRCRAFTCOSTS.replace("#1", totalTakeoffCosts).replace("#2", curUnitwarbondCost)
-                            .replace("#3", curUnit.type).replace("#4", weaponCostString).replace("#5", "");
+                        const messages = "G: " + i18n.YOURAIRCRAFTCOSTS.replace("#1", totalTakeoffCosts).replace("#2", curUnit.type)
+                            .replace("#3", curUnitwarbondCost).replace("#4", weaponCostString).replace("#5", "");
                         await ddcsControllers.sendMesgToGroup(curPlayer, curUnit.groupId, messages, 15);
                         await ddcsControllers.sendMesgToGroup(curPlayer, curUnit.groupId, "Total Cost:"+totalTakeoffCosts.toString(), 15);
                     } else {
