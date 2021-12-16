@@ -119,12 +119,12 @@ export async function lookupAircraftCosts(playerUcid: string): Promise<void> {
                         for (const value of curUnit.ammo || []) {
                             thisweaponCost = getWeaponCost(value.typeName, value.count);
                             weaponCost = weaponCost + thisweaponCost
-                            weaponCostString = weaponCostString.concat(value.count.toString(),"x",value.typeName,"(",(thisweaponCost/value.count).toString(),"),")
+                            weaponCostString = weaponCostString.concat(",",value.count.toString(),"x",value.typeName,"!(",(thisweaponCost/value.count).toString(),")")
                         }
                         totalTakeoffCosts = curUnitwarbondCost + weaponCost;
 
                         
-                        const messages = "G:Your aircraft costs a Total of " +totalTakeoffCosts+ "Warbonds("+curUnit.type+"("+curUnitwarbondCost+")"+ weaponCostString+").";
+                        const messages = "G:Your aircraft costs a Total of " +totalTakeoffCosts+ " Warbonds("+curUnit.type+"("+curUnitwarbondCost+")"+ weaponCostString+").";
                         await ddcsControllers.sendMesgToGroup(curPlayer, curUnit.groupId, messages, 15);
                         await ddcsControllers.sendMesgToGroup(curPlayer, curUnit.groupId, "Total Warbond Cost:"+totalTakeoffCosts.toString(), 15);
                     } else {
