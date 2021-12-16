@@ -190,7 +190,7 @@ export async function srvPlayerActionsAddLifePoints(obj: {
 export async function srvPlayerActionsRemoveLifePoints(obj: {
     _id: string,
     groupId: number,
-    removeLifePoints: number,
+    removeWarbonds: number,
     execAction?: string,
     storePoints?: boolean
 }): Promise<void> {
@@ -198,21 +198,19 @@ export async function srvPlayerActionsRemoveLifePoints(obj: {
         dbModels.srvPlayerModel.find({_id: obj._id}, (err: any, serverObj: typings.ISrvPlayers[]) => {
             const engineCache = ddcsController.getEngineCache();
             const i18n = new I18nResolver(engineCache.i18n, serverObj[0].lang).translation as any;
-            const removePoints = obj.removeLifePoints;
-            const curAction = "removeLifePoints";
-            const curPlayerLifePoints = serverObj[0].curLifePoints || 0;
-            const curTotalPoints = curPlayerLifePoints - removePoints;
-            const maxLimitedPoints = (curTotalPoints > ddcsController.maxLifePoints) ? ddcsController.maxLifePoints : curTotalPoints;
+            const removePoints = obj.removeWarbonds;
+            const curAction = "removeWarbonds";
+            const curPlayerWarbonds = serverObj[0].warbonds || 0;
+            const curTotalPoints = curPlayerWarbonds - removePoints;
             if (err) { reject(err); }
             if (serverObj.length > 0 && serverObj[0].playerId) {
                 if (curTotalPoints < 0) {
-                    const message = i18n.REMOVEPOINTSNOPOINTS.replace("#1", removePoints).replace("#2", curPlayerLifePoints.toFixed(2));
+                    const message = i18n.REMOVEPOINTSNOPOINTS.replace("#1", removePoints).replace("#2", curPlayerWarbonds.toFixed(2));
                     ddcsController.forcePlayerSpectator(serverObj[0].playerId, message);
                     resolve();
                 } else {
                     const setObj = {
-                        cachedRemovedLPPoints: (obj.storePoints) ? removePoints : undefined,
-                        curLifePoints: maxLimitedPoints,
+                        warbonds: curTotalPoints,
                         lastLifeAction: curAction,
                         safeLifeActionTime: new Date().getTime() + ddcsController.time.fifteenSecs
                     };
@@ -221,8 +219,7 @@ export async function srvPlayerActionsRemoveLifePoints(obj: {
                         { $set: setObj },
                         (updateErr: any) => {
                             if (updateErr) { reject(updateErr); }
-                            const message = i18n.PLAYERHASJUSTUSEDLIFEPOINTS.replace("#1", serverObj[0].name)
-                                .replace("#2", removePoints).replace("#3", obj.execAction).replace("#4", curTotalPoints.toFixed(2));
+                            const message = "You Have Just Used "+removePoints+ " Warbonds! "+obj.execAction+"(Total:"+curTotalPoints.toFixed(2)+")";
                             ddcsController.sendMesgToGroup(serverObj[0], obj.groupId, message, 5);
                             resolve();
                         }

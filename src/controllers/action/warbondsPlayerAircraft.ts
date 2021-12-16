@@ -208,24 +208,25 @@ export async function removeLifePoints(
     curUnit: any,
     execAction: string,
     isDirect?: boolean,
-    removeLP?: number
+    removeWarbonds?: number
 ): Promise<void> {
     const engineCache = ddcsControllers.getEngineCache();
-    let curRemoveLP = removeLP;
+    let curRemoveWarbonds = removeWarbonds;
     if (!isDirect) {
         const curUnitDictionary = _.find(engineCache.unitDictionary, {_id: curUnit.type});
-        const curUnitLPCost = (curUnitDictionary) ? curUnitDictionary.LPCost : 1;
-        let curTopWeaponCost = 0;
+        const curUnitWarbondCost = (curUnitDictionary) ? curUnitDictionary.warbondCost : 1;
+        let weaponCost = 0;
+        let thisweaponCost = 0;
         for (const value of curUnit.ammo || []) {
-            const weaponCost = getWeaponCost(value.typeName, value.count);
-            curTopWeaponCost = (curTopWeaponCost > weaponCost) ? curTopWeaponCost : weaponCost;
+            thisweaponCost = getWeaponCost(value.typeName, value.count);
+            weaponCost = weaponCost + thisweaponCost
         }
-        curRemoveLP = curUnitLPCost + curTopWeaponCost;
+        curRemoveWarbonds = curUnitWarbondCost + weaponCost;
     }
     await ddcsControllers.srvPlayerActionsRemoveLifePoints({
         _id: curPlayer._id,
         groupId: curUnit.groupId,
-        removeLifePoints: curRemoveLP || 0,
+        removeWarbonds: curRemoveWarbonds || 0,
         execAction,
         storePoints: !isDirect
     });
