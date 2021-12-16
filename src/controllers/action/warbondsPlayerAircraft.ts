@@ -21,6 +21,21 @@ export function getWeaponCost(typeName: string, count: number): number {
     return 0;
 }
 
+export function getWeaponName(typeName: string): string {
+    const engineCache = ddcsControllers.getEngineCache();
+    const curWeaponLookup = _.find(engineCache.weaponsDictionary, {_id: typeName} );
+    if (curWeaponLookup) {
+        if(curWeaponLookup.displayName){
+            return curWeaponLookup.displayName;
+        }else{
+            return typeName
+            }
+    }else{
+        console.log("Couldn't find weapon with _id:",typeName);
+        return typeName
+    }
+}
+
 export async function getPlayerBalance(): Promise<typings.ISrvPlayerBalance> {
     const serverAlloc: any = {};
     const latestSession = await ddcsControllers.sessionsActionsReadLatest();
@@ -116,10 +131,12 @@ export async function lookupAircraftCosts(playerUcid: string): Promise<void> {
                         let weaponCost = 0
                         let weaponCostString = ""
                         let thisweaponCost;
+                        let weaponDisplayName;
                         for (const value of curUnit.ammo || []) {
                             thisweaponCost = getWeaponCost(value.typeName, value.count);
+                            weaponDisplayName = getWeaponName(value.typeName)
                             weaponCost = weaponCost + thisweaponCost
-                            weaponCostString = weaponCostString.concat(",",value.count.toString(),"x",value.typeName,"(",(thisweaponCost/value.count).toString(),")")
+                            weaponCostString = weaponCostString.concat(",",value.count.toString(),"x",weaponDisplayName,"(",(thisweaponCost/value.count).toString(),")")
                         }
                         totalTakeoffCosts = curUnitwarbondCost + weaponCost;
 
