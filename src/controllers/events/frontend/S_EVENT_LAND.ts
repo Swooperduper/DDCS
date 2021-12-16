@@ -41,14 +41,12 @@ export async function processEventLand(eventObj: any): Promise<void> {
         console.log("landing: ", iUnit[0].playername);
         if (iPlayer) {
             const curUnitSide = iUnit[0].coalition;
+            const curUnit = iUnit[0]
+            let warbondsToAdd = iPlayer.tmpWarbonds
             const friendlyBases = await ddcsControllers.getBasesInProximity(iUnit[0].lonLatLoc, 5, curUnitSide);
             if (friendlyBases.length > 0) {
                 const curBase = friendlyBases[0];
                 place = " at " + curBase._id;
-                await ddcsControllers.srvPlayerActionsApplyTempToRealScore({
-                    _id: iPlayer._id,
-                    groupId: iUnit[0].groupId
-                });
                 const iCurObj = {
                     sessionName: ddcsControllers.getSessionName(),
                     eventCode: ddcsControllers.shortNames[eventObj.action],
@@ -59,12 +57,26 @@ export async function processEventLand(eventObj: any): Promise<void> {
                     msg: "C: " + iUnit[0].type + "(" + iUnit[0].playername + ") has landed at friendly " + place
                 };
                 console.log("FriendlyPlace: ", iCurObj.msg);
+                let curaddWarbonds = 0
+                const curUnitDictionary = _.find(engineCache.unitDictionary, {_id: curUnit.type});
+                const curUnitWarbondCost = (curUnitDictionary) ? curUnitDictionary.warbondCost : 1;
+                let weaponCost = 0;
+                let thisweaponCost = 0;
+                for (const value of curUnit.ammo || []) {
+                    thisweaponCost = ddcsControllers.getWeaponCost(value.typeName, value.count);
+                    weaponCost = weaponCost + thisweaponCost
+                }
+                curaddWarbonds = curUnitWarbondCost + weaponCost;
+                warbondsToAdd = warbondsToAdd + curaddWarbonds
+
                 if (engineCache.config.lifePointsEnabled && !_.includes(iPlayer.slot, "_")) {
+                    ddcsControllers.srvPlayerActionsResettmpWarbonds(iPlayer);
                     console.log("checkSlotLanding: ", iPlayer.slot);
                     await ddcsControllers.addLifePoints(
                         iPlayer,
                         iUnit[0],
-                        "Land"
+                        "Land",
+                        warbondsToAdd
                     );
                 }
                 /*

@@ -137,7 +137,7 @@ export async function srvPlayerActionsUpdateFromServer(obj: {
 export async function srvPlayerActionsAddLifePoints(obj: {
     _id: string,
     groupId?: number,
-    addLifePoints?: number,
+    addWarbonds?: number,
     execAction?: string
 }): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -145,18 +145,15 @@ export async function srvPlayerActionsAddLifePoints(obj: {
             if (err) { reject(err); }
             const engineCache = ddcsController.getEngineCache();
             const i18n = new I18nResolver(engineCache.i18n, serverObj[0].lang).translation as any;
-            const addPoints: number = (obj.addLifePoints) ? obj.addLifePoints : serverObj[0].cachedRemovedLPPoints;
-            const curAction: string = "addLifePoint";
-            const curPlayerLifePoints: number = serverObj[0].curLifePoints || 0;
-            const curTotalPoints: number = (curPlayerLifePoints >= 0) ? curPlayerLifePoints + addPoints : addPoints;
-            const maxLimitedPoints: number = (curTotalPoints > ddcsController.maxLifePoints) ?
-                ddcsController.maxLifePoints : curTotalPoints;
+            const addPoints: number = (obj.addWarbonds) ? obj.addWarbonds : 0;;
+            const curAction: string = "addWarbonds";
+            const curPlayerWarbonds: number = serverObj[0].warbonds || 0;
+            const curTotalPoints: number = curPlayerWarbonds + addPoints;
             let message: string;
             // console.log("OBJ: ", obj, addPoints, maxLimitedPoints);
             if (serverObj.length > 0) {
                 const setObj = {
-                    cachedRemovedLPPoints: (!obj.addLifePoints) ?  0 : serverObj[0].cachedRemovedLPPoints,
-                    curLifePoints: maxLimitedPoints,
+                    warbonds: curTotalPoints,
                     lastLifeAction: curAction,
                     safeLifeActionTime: new Date().getTime() + ddcsController.time.fifteenSecs
                 };
@@ -167,10 +164,9 @@ export async function srvPlayerActionsAddLifePoints(obj: {
                         if (updateErr) { reject(updateErr); }
                         if (obj.execAction === "PeriodicAdd") {
                             message = i18n.PERIODICLIFEPOINTADD
-                                .replace("#1", _.round(addPoints, 2)).replace("#2", _.round(maxLimitedPoints, 2));
+                                .replace("#1", _.round(addPoints, 2)).replace("#2","");
                         } else {
-                            message = i18n.ADDLIFEPOINTS.replace("#1", srvPlayer.name)
-                                .replace("#2", addPoints).replace("#3", obj.execAction).replace("#4", _.round(maxLimitedPoints, 2));
+                            message = "You have gained "+addPoints+" Warbonds and now have a total of "+curTotalPoints+" Warbonds"
                         }
                         // console.log("MESG: ", msg);
                         if (obj.groupId) {
@@ -187,7 +183,7 @@ export async function srvPlayerActionsAddLifePoints(obj: {
 }
 
 
-export async function srvPlayerActionsRemoveLifePoints(obj: {
+export async function srvPlayerActionsRemoveWarbonds(obj: {
     _id: string,
     groupId: number,
     removeWarbonds: number,
@@ -454,6 +450,21 @@ export async function srvPlayerActionsResetMinutesPlayed(obj: {
         dbModels.srvPlayerModel.updateOne(
             {_id: obj._id},
             {$set: {[sessionMinutesVar]: 0}},
+            (err: any) => {
+                if (err) { reject(err); }
+                resolve();
+            }
+        );
+    });
+}
+
+export async function srvPlayerActionsResettmpWarbonds(obj: {
+    _id: string
+}): Promise<void> {
+    return new Promise((resolve, reject) => {
+        dbModels.srvPlayerModel.updateOne(
+            {_id: obj._id},
+            {$set: {tmpWarbonds: 0}},
             (err: any) => {
                 if (err) { reject(err); }
                 resolve();

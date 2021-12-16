@@ -166,25 +166,27 @@ export async function checkAircraftCosts(): Promise<void> {
                 const cUnit = await ddcsControllers.unitActionRead({dead: false, playername: curPlayer.name});
                 if (cUnit.length > 0) {
                     const curUnit = cUnit[0];
-                    const curUnitDictionary = _.find(engineCache.unitDictionary, {_id: curUnit.type});
-                    const curUnitwarbondCost = (curUnitDictionary) ? curUnitDictionary.warbondCost : 1;
-                    let totalTakeoffCosts = 0;
-                    let weaponCost = 0
-                    let weaponCostString = ""
-                    let thisweaponCost;
-                    let weaponDisplayName;
-                    for (const value of curUnit.ammo || []) {
-                        thisweaponCost = getWeaponCost(value.typeName, value.count);
-                        weaponDisplayName = getWeaponName(value.typeName)
-                        weaponCost = weaponCost + thisweaponCost
-                        weaponCostString = weaponCostString.concat(",",value.count.toString(),"x",weaponDisplayName,"(",(thisweaponCost/value.count).toString(),")")
-                    }
-                    totalTakeoffCosts = curUnitwarbondCost + weaponCost;
-                    if ((curPlayer.warbonds || 0) < totalTakeoffCosts && !curUnit.inAir) {
-                        message = "G: " + i18n.YOUDONOTHAVEENOUGHPOINTS.replace("#1", curUnit.type)
-                            .replace("#2", totalTakeoffCosts.toFixed(2)).replace("#3", curPlayer.warbonds.toFixed(2));
-                        console.log(curPlayer.name + " " + message);
-                        await ddcsControllers.sendMesgToGroup(curPlayer, curUnit.groupId, message, 30);
+                    if(!curUnit.inAir){
+                        const curUnitDictionary = _.find(engineCache.unitDictionary, {_id: curUnit.type});
+                        const curUnitwarbondCost = (curUnitDictionary) ? curUnitDictionary.warbondCost : 1;
+                        let totalTakeoffCosts = 0;
+                        let weaponCost = 0
+                        let weaponCostString = ""
+                        let thisweaponCost;
+                        let weaponDisplayName;
+                        for (const value of curUnit.ammo || []) {
+                            thisweaponCost = getWeaponCost(value.typeName, value.count);
+                            weaponDisplayName = getWeaponName(value.typeName)
+                            weaponCost = weaponCost + thisweaponCost
+                            weaponCostString = weaponCostString.concat(",",value.count.toString(),"x",weaponDisplayName,"(",(thisweaponCost/value.count).toString(),")")
+                        }
+                        totalTakeoffCosts = curUnitwarbondCost + weaponCost;
+                        if ((curPlayer.warbonds || 0) < totalTakeoffCosts) {
+                            message = "G:You Do Not Have Enough Warbonds To Takeoff In" + curUnit.type + "with you current loadout("+ totalTakeoffCosts.toFixed(2) +"/"+curPlayer.warbonds.toFixed(2)+")"
+                                .replace("#2", totalTakeoffCosts.toFixed(2)).replace("#3", curPlayer.warbonds.toFixed(2));
+                            console.log(curPlayer.name + " " + message);
+                            await ddcsControllers.sendMesgToGroup(curPlayer, curUnit.groupId, message, 30);
+                        }
                     }
                 }
             }
@@ -192,13 +194,13 @@ export async function checkAircraftCosts(): Promise<void> {
     }
 }
 
-export async function addLifePoints(curPlayer: any, curUnit: any, execAction?: string, addLP?: number): Promise<void> {
+export async function addLifePoints(curPlayer: any, curUnit: any, execAction?: string, addWarbonds?: number): Promise<void> {
     const groupId = (curUnit && curUnit.groupId) ? curUnit.groupId : null;
 
     await ddcsControllers.srvPlayerActionsAddLifePoints({
         _id: curPlayer._id,
         groupId,
-        addLifePoints: addLP,
+        addWarbonds: addWarbonds,
         execAction
     });
 }
@@ -223,7 +225,7 @@ export async function removeLifePoints(
         }
         curRemoveWarbonds = curUnitWarbondCost + weaponCost;
     }
-    await ddcsControllers.srvPlayerActionsRemoveLifePoints({
+    await ddcsControllers.srvPlayerActionsRemoveWarbonds({
         _id: curPlayer._id,
         groupId: curUnit.groupId,
         removeWarbonds: curRemoveWarbonds || 0,

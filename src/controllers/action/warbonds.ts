@@ -14,7 +14,7 @@ export async function checkWarBonds(player: typings.ISrvPlayers): Promise<void> 
         const cUnit = await ddcsControllers.unitActionRead({dead: false, playername: player.name});
         let message;
         if (cUnit.length > 0) {
-            message = "G: " + i18n.YOUHAVEWARBONDS.replace("#1", player.warbonds).replace("#2", i18n[1]);
+            message = "G:You currently have a total of "+player.warbonds+"Warbonds";
             await ddcsControllers.sendMesgToGroup(
                 player,
                 cUnit[0].groupId,
