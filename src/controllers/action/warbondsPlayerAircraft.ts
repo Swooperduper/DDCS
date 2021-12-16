@@ -119,7 +119,7 @@ export async function lookupAircraftCosts(playerUcid: string): Promise<void> {
                         for (const value of curUnit.ammo || []) {
                             thisweaponCost = getWeaponCost(value.typeName, value.count);
                             weaponCost = weaponCost + thisweaponCost
-                            weaponCostString = weaponCostString.concat(",",value.count.toString(),"x",value.typeName,"!(",(thisweaponCost/value.count).toString(),")")
+                            weaponCostString = weaponCostString.concat(",",value.count.toString(),"x",value.typeName,"(",(thisweaponCost/value.count).toString(),")")
                         }
                         totalTakeoffCosts = curUnitwarbondCost + weaponCost;
 
