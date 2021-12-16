@@ -14,6 +14,6 @@ export * from "./sideLock";
 export * from "./staticCrates";
 export * from "./task";
 export * from "./troopLocalizer";
-export * from "./userLives";
+export * from "./warbondsPlayerAircraft";
 export * from "./weaponCompliance";
 export * from "./errorcorrections";

@@ -4,20 +4,20 @@
 
 import * as _ from "lodash";
 import * as typings from "../../typings";
-import * as ddcsControllers from "../";
+import * as ddcsControllers from "..";
 import {I18nResolver} from "i18n-ts";
 
+//getWeaponCost updated to return the warbondCost of a weapon
 export function getWeaponCost(typeName: string, count: number): number {
     const engineCache = ddcsControllers.getEngineCache();
     let mantraCHK = 0;
-
     if (typeName === "MATRA") { mantraCHK += count; }
     const curWeaponLookup = _.find(engineCache.weaponsDictionary, {_id: typeName} );
     if (curWeaponLookup) {
-        const foxAllowance = (mantraCHK > 2) ? 0 : (count > 2) ? 0 : curWeaponLookup.fox2ModUnder2 || 0;
-        return curWeaponLookup.tier || 0 + foxAllowance;
+        console.log("Found ",typeName," and it costs", curWeaponLookup.warbondCost);
+        return curWeaponLookup.warbondCost * count;
     }
-    console.log("cant find weapon: line17 ", typeName);
+    console.log("cant find weapon in weapon scores table:", typeName);
     return 0;
 }
 
@@ -92,7 +92,7 @@ export async function lookupLifeResource(playerUcid: string): Promise<void> {
         if (curPlayer.name) {
             const cUnit = await ddcsControllers.unitActionRead({dead: false, playername: curPlayer.name});
             const curUnit = cUnit[0];
-            const message = "G: " + i18n.LIFERESOURCEPOINTS.replace("#1", curPlayer.curLifePoints.toFixed(2));
+            const message = "G: " + i18n.LIFERESOURCEPOINTS.replace("#1", curPlayer.redWarBonds);
             await ddcsControllers.sendMesgToGroup(curPlayer, curUnit.groupId, message, 5);
         }
     }
@@ -111,22 +111,17 @@ export async function lookupAircraftCosts(playerUcid: string): Promise<void> {
                     const curUnit = cUnit[0];
                     const curUnitDictionary = _.find(engineCache.unitDictionary, {_id: curUnit.type});
                     if (curUnitDictionary) {
-                        const curUnitLPCost = (curUnitDictionary) ? curUnitDictionary.LPCost : 1;
-                        let curTopWeaponCost = 0;
+                        const curUnitwarbondCost = (curUnitDictionary) ? curUnitDictionary.warbondCost : 1;
                         let curTopAmmo = "";
                         let totalTakeoffCosts;
+                        let weaponCost = 0
                         for (const value of curUnit.ammo || []) {
-                            const weaponCost = getWeaponCost(value.typeName, value.count);
-                            if (curTopWeaponCost < weaponCost) {
-                                const curAmmoArray = _.split(value.typeName, ".");
-                                curTopAmmo = curAmmoArray[curAmmoArray.length - 1];
-                                curTopWeaponCost = weaponCost;
-                            }
+                            weaponCost = weaponCost + getWeaponCost(value.typeName, value.count); 
                         }
-                        totalTakeoffCosts = curUnitLPCost + curTopWeaponCost;
+                        totalTakeoffCosts = curUnitwarbondCost + weaponCost;
 
-                        const messages = "G: " + i18n.YOURAIRCRAFTCOSTS.replace("#1", totalTakeoffCosts).replace("#2", curUnitLPCost)
-                            .replace("#3", curUnit.type).replace("#4", curTopWeaponCost).replace("#5", curTopAmmo);
+                        const messages = "G: " + i18n.YOURAIRCRAFTCOSTS.replace("#1", totalTakeoffCosts).replace("#2", curUnitwarbondCost)
+                            .replace("#3", curUnit.type).replace("#4", "Weapons").replace("#5", weaponCost);
 
                         await ddcsControllers.sendMesgToGroup(curPlayer, curUnit.groupId, messages, 5);
                     } else {
