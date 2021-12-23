@@ -419,6 +419,118 @@ export async function srvPlayerActionsUnitAddToRealScore(obj: {
     });
 }
 
+export async function srvPlayerActionsApplyTempToRealWarbonds(obj: {
+    _id: string,
+    groupId?: number
+}): Promise<void> {
+    return new Promise((resolve, reject) => {
+        dbModels.srvPlayerModel.find({_id: obj._id}, (err: any, serverObj: any[]) => {
+            if (err) { reject(err); }
+            if (serverObj.length !== 0) {
+                const engineCache = ddcsController.getEngineCache();
+                const i18n = new I18nResolver(engineCache.i18n, serverObj[0].lang).translation as any;
+                let message: string;
+                const curPly = serverObj[0];
+                const rsTotals = {
+                    warbonds: curPly.warbonds || 0,
+                    tmpWarbonds: curPly.tmpWarbonds || 0
+                };
+
+                rsTotals.warbonds = rsTotals.warbonds + rsTotals.tmpWarbonds;
+                message = i18n.AWARDEDRSPOINTS.replace("#1", rsTotals.tmpWarbonds)
+                    .replace("#2", "Red").replace("#3", rsTotals.warbonds);
+                rsTotals.tmpWarbonds = 0;
+                dbModels.srvPlayerModel.updateOne(
+                    {_id: obj._id},
+                    {$set: rsTotals},
+                    (updateErr: any) => {
+                        if (updateErr) { reject(updateErr); }
+                        // console.log("aplyT2R: ", curPly.name, mesg);
+                        if (obj.groupId) {
+                            ddcsController.sendMesgToGroup(curPly, obj.groupId, message, 15);
+                        }
+                        resolve();
+                    }
+                );
+            } else {
+                resolve();
+            }
+        });
+    });
+}
+
+export async function srvPlayerActionsAddTempWarbonds(obj: {
+    _id: string,
+    groupId: number
+    score?: number
+}): Promise<void> {
+    const engineCache = ddcsController.getEngineCache();
+    return new Promise((resolve, reject) => {
+        dbModels.srvPlayerModel.find({_id: obj._id}, (err: any, serverObj: any[]) => {
+            if (err) { reject(err); }
+            if (serverObj.length !== 0) {
+                const i18n = new I18nResolver(engineCache.i18n, serverObj[0].lang).translation as any;
+                const newTmpScore = (serverObj[0].tmpRSPoints || 0) + (obj.score || 0);
+                dbModels.srvPlayerModel.updateOne(
+                    {_id: obj._id},
+                    {$set: {tmpRSPoints: newTmpScore}},
+                    (updateErr: any) => {
+                        if (updateErr) { reject(updateErr); }
+                        if (engineCache.config.inGameHitMessages) {
+                            ddcsController.sendMesgToGroup(serverObj[0], obj.groupId, i18n.ADDTEMPSCORE, 15);
+                        }
+                        resolve();
+                    }
+                );
+            } else {
+                resolve();
+            }
+        });
+    });
+}
+
+export async function srvPlayerActionsUnitAddToWarbonds(obj: {
+    _id: string,
+    unitCoalition: number,
+    groupId?: number,
+    score?: number,
+    unitType?: string
+}): Promise<void> {
+    const engineCache = ddcsController.getEngineCache();
+    return new Promise((resolve, reject) => {
+        dbModels.srvPlayerModel.find({_id: obj._id}, (err: any, serverObj: any[]) => {
+            if (err) { reject(err); }
+            if (serverObj.length !== 0) {
+                let message: string;
+                const curPly = serverObj[0];
+                const i18n = new I18nResolver(engineCache.i18n, curPly.lang).translation as any;
+                const addScore = obj.score || 0;
+                const curType = obj.unitType || "";
+                const tObj: any = {};
+                if (obj.unitCoalition === curPly.side) {
+                    message = i18n.AWARDEDRSPOINTSFROMUNIT.replace("#1", addScore).replace("#2", curType).replace("#3", "red");
+                    tObj.warbonds = (curPly.warbonds || 0) + addScore;
+                    dbModels.srvPlayerModel.updateOne(
+                        {_id: obj._id},
+                        {$set: tObj},
+                        (updateErr: any) => {
+                            if (updateErr) { reject(updateErr); }
+                            console.log(obj.unitType + " has given " + addScore +
+                                " to " + curPly.name + " on " + curPly.side + ", Total: ", tObj);
+                            if (engineCache.config.inGameHitMessages && !!obj.groupId) {
+                                ddcsController.sendMesgToGroup(curPly, obj.groupId, message, 15);
+                            }
+                            resolve();
+                        }
+                    );
+                }
+            } else {
+                resolve();
+            }
+        });
+    });
+}
+
 export async function srvPlayerActionsAddMinutesPlayed(obj: {
     _id: string,
     side: number,

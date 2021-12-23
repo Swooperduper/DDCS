@@ -38,7 +38,7 @@ export async function processEventKill(eventObj: any): Promise<void> {
                 if (!!curInitiator.playerOwner && !!curInitiator.unit.playerOwnerId) {
                     const playerOwnerUnit = await ddcsControllers.unitActionRead({playername: curInitiator.playerOwner.name});
                     if (playerOwnerUnit.length > 0) {
-                        await ddcsControllers.srvPlayerActionsUnitAddToRealScore({
+                        await ddcsControllers.srvPlayerActionsUnitAddToWarbonds({
                             _id: curInitiator.unit.playerOwnerId,
                             score: 30,
                             groupId: (playerOwnerUnit[0].groupId) ? playerOwnerUnit[0].groupId : undefined,
@@ -49,7 +49,7 @@ export async function processEventKill(eventObj: any): Promise<void> {
                 }
 
                 if (!!curInitiator.player && !!curInitiator.player._id) {
-                    await ddcsControllers.srvPlayerActionsAddTempScore({
+                    await ddcsControllers.srvPlayerActionsAddTempWarbonds({
                         _id: curInitiator.player._id,
                         groupId: curInitiator.unit.groupId,
                         score: 5
