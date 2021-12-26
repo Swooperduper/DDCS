@@ -10,6 +10,7 @@ function capitalizeFirstLetter(string: string) {
 }
 
 export async function processEventKill(eventObj: any): Promise<void> {
+    const engineCache = ddcsControllers.getEngineCache();
     const nowTime = new Date().getTime();
     const playerArray = await ddcsControllers.srvPlayerActionsRead({sessionName: ddcsControllers.getSessionName()});
     let curInitiator: any = {};
@@ -35,12 +36,25 @@ export async function processEventKill(eventObj: any): Promise<void> {
                 }
                 // console.log("playerOwner: ", !!curInitiator.playerOwner,
                 // curInitiator.playerOwner, curInitiator.player, curInitiator.unit);
+                const killedUnitDict = _.find(engineCache.unitDictionary, {type : eventObj.data.target.type});
+                console.log("Test Case 1 - killedUnitDict:",killedUnitDict);
+                const killingWeaponDict = _.find(engineCache.weaponScore, {type : eventObj.data.weapon_name});
+                console.log("Test Case 2 - killingWeaponDict:",killingWeaponDict);
+                let reward = 100
+                if (killedUnitDict){
+                    console.log("warbondCost of Killed Unit",killedUnitDict.warbondCost)
+                    reward = killedUnitDict.warbondCost
+                }
+                if (killingWeaponDict){
+                    console.log("killing Weapon Multiplier:",killingWeaponDict.warbondKillMultiplier)
+                    reward = killedUnitDict.warbondCost * killingWeaponDict.warbondKillMultiplier
+                }
                 if (!!curInitiator.playerOwner && !!curInitiator.unit.playerOwnerId) {
                     const playerOwnerUnit = await ddcsControllers.unitActionRead({playername: curInitiator.playerOwner.name});
                     if (playerOwnerUnit.length > 0) {
                         await ddcsControllers.srvPlayerActionsUnitAddToWarbonds({
                             _id: curInitiator.unit.playerOwnerId,
-                            score: 30,
+                            score: reward,
                             groupId: (playerOwnerUnit[0].groupId) ? playerOwnerUnit[0].groupId : undefined,
                             unitType: iUnit[0].type,
                             unitCoalition: iUnit[0].coalition
@@ -52,7 +66,7 @@ export async function processEventKill(eventObj: any): Promise<void> {
                     await ddcsControllers.srvPlayerActionsAddTempWarbonds({
                         _id: curInitiator.player._id,
                         groupId: curInitiator.unit.groupId,
-                        score: 5
+                        score: reward
                     });
                 }
             }
