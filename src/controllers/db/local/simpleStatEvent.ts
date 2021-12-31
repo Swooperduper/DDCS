@@ -9,7 +9,7 @@ export async function simpleStatEventActionsRead(obj: {
     sessionName: string
 }): Promise<typings.ISimpleStatEvents[]> {
     return new Promise((resolve, reject) => {
-        dbModels.simpleStatEventTable.find({
+        dbModels.simpleStatEventModel.find({
             sessionName: obj.sessionName,
             showInChart: true},
             (err: any, simpleStatEvent: typings.ISimpleStatEvents[]) => {
@@ -22,7 +22,7 @@ export async function simpleStatEventActionsRead(obj: {
 
 export async function simpleStatEventActionsReadAll(): Promise<typings.ISimpleStatEvents[]> {
     return new Promise((resolve, reject) => {
-        dbModels.simpleStatEventTable.find((err: any, simpleStatEvent: typings.ISimpleStatEvents[]) => {
+        dbModels.simpleStatEventModel.find((err: any, simpleStatEvent: typings.ISimpleStatEvents[]) => {
             if (err) { reject(err); }
             resolve(simpleStatEvent);
         });
@@ -31,7 +31,7 @@ export async function simpleStatEventActionsReadAll(): Promise<typings.ISimpleSt
 
 export async function simpleStatEventActionsSave(obj: any): Promise<void> {
     return new Promise((resolve, reject) => {
-        const simplestatevent = new dbModels.simpleStatEventTable(obj);
+        const simplestatevent = new dbModels.simpleStatEventModel(obj);
         simplestatevent.save((err: any) => {
             if (err) { reject(err); }
             resolve();
