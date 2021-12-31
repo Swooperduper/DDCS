@@ -7,6 +7,9 @@ import {ISrvPlayers} from "../../typings";
 import * as ddcsControllers from "../action/aiConvoys";
 
 export async function processingIncomingData(incomingObj: any) {
+    if(_.includes(incomingObj,"Kirkwood")){
+        console.log(incomingObj);
+    }
     switch (incomingObj.action) {
         case "serverInfo":
             await ddcsController.getLatestSession(incomingObj);
@@ -95,7 +98,7 @@ export async function processingIncomingData(incomingObj: any) {
             break;
         case "disconnect":
             await ddcsController.processDisconnect(incomingObj);
-            console.log("Player Disconnected:",incomingObj)
+            //console.log("Player Disconnected:",incomingObj)
             break;
         case "change_slot":
             // console.log('CHANGE EVENT SLOT HAPPENED: ', queObj);
