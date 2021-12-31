@@ -56,8 +56,8 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
         // console.log("CU: ", curUnit);
 
         // update location of carrier in aircraft DB
-        if (_.includes(curData.name, "Carrier")) {
-            // console.log("carrier update location: ", curUnitName, curData.lonLatLoc);
+        if (_.includes(curData.name, "Carrier")||_.includes(curData.name, "~CVN")||_.includes(curData.name, "~Kuznetsov")||_.includes(curData.name, "~LHA-1 Tarawa")||_.includes(curData.name, "~Pyotr Velikiy")) {
+            console.log("carrier update location: ", curUnitName, curData.lonLatLoc);
             await ddcsControllers.baseActionUpdate({_id: curUnitName, centerLoc: curData.lonLatLoc, isResync: true});
         }
 
