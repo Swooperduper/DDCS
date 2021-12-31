@@ -95,6 +95,7 @@ export async function processingIncomingData(incomingObj: any) {
             break;
         case "disconnect":
             await ddcsController.processDisconnect(incomingObj);
+            console.log("Player Disconnected:",incomingObj)
             break;
         case "change_slot":
             // console.log('CHANGE EVENT SLOT HAPPENED: ', queObj);
