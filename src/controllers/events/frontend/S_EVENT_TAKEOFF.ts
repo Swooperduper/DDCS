@@ -29,7 +29,7 @@ export async function processEventTakeoff(eventObj: any): Promise<void> {
         if (iPlayer && iPlayer.ucid) {
             if (await ddcsControllers.checkWeaponComplianceOnTakeoff(iPlayer, curIUnit)) {
                 const friendlyBases = await ddcsControllers.getBasesInProximity(curIUnit.lonLatLoc, 5, curUnitSide);
-                // console.log("getBASE: ", curIUnit, curUnitSide, friendlyBases);
+                console.log("getBASE: ", curIUnit, curUnitSide, friendlyBases);
                 if (friendlyBases.length > 0) {
                     // console.log("LPE: ", engineCache.config.lifePointsEnabled, !_.includes(iPlayer.slot, "_"));
                     if (engineCache.config.lifePointsEnabled && !_.includes(iPlayer.slot, "_")) {
