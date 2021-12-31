@@ -9,7 +9,6 @@ import * as ddcsControllers from "../../";
 export async function processEventBirth(eventObj: any): Promise<void> {
     const curUnitId = eventObj.data.initiator.unitId;
     await new Promise(f => setTimeout(f, 10));
-    console.log("Welcome to Birf!");
     //console.log("Birth Event Object",eventObj);
     if (curUnitId) {
         let iUnit = await ddcsControllers.unitActionRead({unitId: curUnitId});
