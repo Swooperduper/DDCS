@@ -153,16 +153,24 @@ function ddcs.onPlayerChangeSlot(id)
 	end
 end
 
+clients = {}
+
+function ddcs.onPlayerConnect(id)
+	net.log("Player Connected")
+	clients[id] = net.get_player_info(id)
+	net.log(clients[id])
+end
+
 function ddcs.onPlayerDisconnect(id)
-	net.log("Player Disconnected")
-	local playerInfo = net.get_player_info(id)
-	net.log(playerInfo)
+	net.log("Player Disconnected:",clients[id].name)
+	local playerInfo = clients[id]
 	if playerInfo.ucid ~= nil then
 		udpClient:send(JSON:encode({
 			["action"] = "disconnect",
 			["playerInfo"] = playerInfo
 		}))
 	end
+	clients[id] = nil
 end
 
 function ddcs.onChatMessage(message, from)

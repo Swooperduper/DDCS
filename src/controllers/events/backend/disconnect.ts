@@ -7,19 +7,18 @@ import * as ddcsControllers from "../../";
 
 export async function processDisconnect(eventObj: any): Promise<void> {
     // "disconnect", playerID, name, playerSide, reason_code
-    const iPlayer = _.find(ddcsControllers.rtPlayerArray, {id: eventObj.data.arg1});
+    const playerInfo = eventObj.playerInfo
+    console.log ("playerInfo:",playerInfo)
+    const iCurObj = {
+        sessionName: ddcsControllers.getSessionName(),
+        eventCode: ddcsControllers.shortNames[eventObj.action],
+        iucid: playerInfo.ucid,
+        iName: playerInfo.name,
+        displaySide: "A",
+        roleCode: "I",
+        msg: "A: " + playerInfo.name + " has disconnected - Ping:" + playerInfo.ping + " Lang:" + playerInfo.lang
+    };
+    console.log(iCurObj.msg);
+    await ddcsControllers.simpleStatEventActionsSave(iCurObj);
 
-    if (iPlayer) {
-        const iCurObj = {
-            sessionName: ddcsControllers.getSessionName(),
-            eventCode: ddcsControllers.shortNames[eventObj.action],
-            iucid: iPlayer.ucid,
-            iName: iPlayer.name,
-            displaySide: "A",
-            roleCode: "I",
-            msg: "A: " + iPlayer.name + " has disconnected - Ping:" + iPlayer.ping + " Lang:" + iPlayer.lang
-        };
-        console.log(iCurObj.msg);
-        await ddcsControllers.simpleStatEventActionsSave(iCurObj);
-    }
 }
