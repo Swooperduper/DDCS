@@ -3,6 +3,7 @@
  */
 
 import * as ddcsControllers from "../";
+import * as _ from "lodash";
 
 export async function processOneSecActions(fullySynced: boolean) {
     if (fullySynced) {
