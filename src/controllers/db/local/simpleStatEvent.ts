@@ -19,6 +19,18 @@ export async function simpleStatEventActionsRead(obj: {
         );
     });
 }
+export async function simpleStatEventActionUpdate(obj: any): Promise<void> {
+    return new Promise((resolve, reject) => {
+        dbModels.airfieldModel.updateOne(
+            {_id: obj._id},
+            {$set: obj},
+            (err: any) => {
+                if (err) { reject(err); }
+                resolve();
+            }
+        );
+    });
+}
 
 export async function simpleStatEventActionsReadAll(): Promise<typings.ISimpleStatEvents[]> {
     return new Promise((resolve, reject) => {

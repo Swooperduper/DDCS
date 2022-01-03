@@ -18,14 +18,8 @@ export async function processOneSecActions(fullySynced: boolean) {
             for (const player of totalDisconnects){
                 let iCurObj =   {_id: player._id,
                                 showInChart : false,
-                                sessionName: player.sessionName,
-                                eventCode: player.eventCode,
-                                iucid: player.iucid,
-                                iName: player.iName,
-                                displaySide: "A",
-                                roleCode: "I"
                 }
-                await ddcsControllers.simpleStatEventActionsSave(iCurObj)
+                await ddcsControllers.simpleStatEventActionUpdate(iCurObj)
                 console.log("player.name:", player.iName);
             }
         }
