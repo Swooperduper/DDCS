@@ -17,7 +17,7 @@ export async function processOneSecActions(fullySynced: boolean) {
             ddcsControllers.sendMessageToDiscord(mesg);
             for (const player of totalDisconnects){
                 console.log(player._id)
-                let iCurObj =   {_id: "ObjectId("+player._id+")",
+                let iCurObj =   {_id: player._id,
                                 showInChart : false,
                 }
                 await ddcsControllers.simpleStatEventActionUpdate(iCurObj)
