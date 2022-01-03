@@ -47,6 +47,7 @@ export async function simpleStatEventActionsReadDisconnectsInLastSeconds(obj: {
     return new Promise((resolve, reject) => {
         dbModels.simpleStatEventModel.find({
             msg: /disconnected/,
+            showInChart: true,
             updatedAt:{ $gt : new Date(new Date().getTime() - (obj.secondsAgo * 1000)) }},
             (err: any, simpleStatEvent: typings.ISimpleStatEvents[]) => {
                         if (err) { reject(err); }
