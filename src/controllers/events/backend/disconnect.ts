@@ -10,6 +10,7 @@ export async function processDisconnect(eventObj: any): Promise<void> {
     const playerInfo = eventObj.playerInfo
     console.log ("playerInfo:",playerInfo)
     const iCurObj = {
+        _id: playerInfo.ucid + _.random(0,12000),
         sessionName: ddcsControllers.getSessionName(),
         showInChart : true,
         eventCode: ddcsControllers.shortNames[eventObj.action],
