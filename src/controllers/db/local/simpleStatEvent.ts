@@ -38,3 +38,20 @@ export async function simpleStatEventActionsSave(obj: any): Promise<void> {
         });
     });
 }
+
+
+export async function simpleStatEventActionsReadDisconnectsInLastSeconds(obj: {
+    sessionName: string,
+    secondsAgo: number
+}): Promise<typings.ISimpleStatEvents[]> {
+    return new Promise((resolve, reject) => {
+        dbModels.simpleStatEventModel.find({
+            msg: /disconnected/,
+            updatedAt:{ $gt : new Date(new Date().getTime() - (obj.secondsAgo * 1000)) }},
+            (err: any, simpleStatEvent: typings.ISimpleStatEvents[]) => {
+                        if (err) { reject(err); }
+                        resolve(simpleStatEvent);
+                    }
+        );
+    });
+}

@@ -41,7 +41,13 @@ export async function processFiveSecActions(fullySynced: boolean): Promise<void>
         await ddcsControllers.checkUnitsToBaseForCapture();
 
         await ddcsControllers.processCommandQue();
-        
+
+        const iCurObj ={
+            sessionName: ddcsControllers.getSessionName(),
+            secondsAgo: 300
+        }
+        const totalDisconnects = await ddcsControllers.simpleStatEventActionsReadDisconnectsInLastSeconds(iCurObj)
+        console.log("There were a total of ", totalDisconnects.length, "in the past", iCurObj.secondsAgo,"seconds.")
         if (engineCache.config.reactiveConvoyAI)
             await ddcsControllers.killEnemyWithinSightOfConvoy();
         
