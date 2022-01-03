@@ -49,6 +49,36 @@ export async function sendMessageToDiscord(MSG: string){
     });
 }
 
+export async function sendLogFileToDiscord(){
+    const engineCache = ddcsControllers.getEngineCache();
+    const webHookURL = engineCache.config.discordWebHookURL;
+    const fs = require('fs')
+    var request = require('request');
+    var options = {
+    'method': 'POST',
+    'url': webHookURL,
+    'headers': {
+        'Content-Type': 'multipart/form-data',
+        'Cookie': '__dcfduid=2c634e490bef11ec8f2e42010a0a051e; __sdcfduid=2c634e490bef11ec8f2e42010a0a051e0669c9af189f129d4f3434040e29b3b15f6c37206fd8b1473c26474961022577; __cfruid=de531a260997a81c9a4baa383f422a3888a8faa4-1630588241'
+    },
+    formData: {
+        "file1" : fs.createReadStream("C:/Users/DDCSTEST/Saved Games/DCS.openbeta_server/Logs/dcs.log"),
+        payload_json: JSON.stringify({
+            "embeds": [{
+              "image": {
+                "url": "attachment://test.png"
+              }
+            }]
+          })
+    }
+
+    };
+    request(options, function (error: any, response: any) { 
+    if (error) throw new Error(error);
+    console.log(response.body);
+    });
+}
+
 export async function campaignStatusMessage(){
     let campaignStats = await ddcsControllers.campaignsActionsRead()
     let registeredRedPlayers = await ddcsControllers.srvPlayerActionsRead({sideLock : 1});

@@ -12,10 +12,11 @@ export async function processOneSecActions(fullySynced: boolean) {
             secondsAgo: 3000
         }
         const totalDisconnects = await ddcsControllers.simpleStatEventActionsReadDisconnectsInLastSeconds(iCurObj)
-        if(totalDisconnects.length > 1){
+        if(totalDisconnects.length > 0){
             console.log("Clients Disconnected en masse - There were a total of disconnects", totalDisconnects.length, "in the past", iCurObj.secondsAgo,"seconds.")
             const mesg = "**Clients Disconnected en masse** \n DCS.exe stopped sending network traffic for a time \n LP will be refunded \n DCS.log:"
             ddcsControllers.sendMessageToDiscord(mesg);
+            ddcsControllers.sendLogFileToDiscord();
             for (const player of totalDisconnects){
                 let iCurObj =   {_id: player._id,
                                 showInChart : false,
