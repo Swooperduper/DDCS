@@ -5,13 +5,15 @@
 import * as mongoose from "mongoose";
 export function simpleStatEventModel(dbconn: mongoose.Connection): mongoose.Document | {} {
     return dbconn.model("simplestatevents", new mongoose.Schema({
-        sessionName: {
+        _id :{
             type: String,
             required: true
         },
+        sessionName: {
+            type: String,
+        },
         eventCode: {
             type: String,
-            required: true
         },
         iucid: {
             type: String
@@ -27,7 +29,6 @@ export function simpleStatEventModel(dbconn: mongoose.Connection): mongoose.Docu
         },
         displaySide: {
             type: String,
-            required: true
         },
         roleCode: {
             type: String
