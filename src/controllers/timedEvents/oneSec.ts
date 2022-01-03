@@ -12,7 +12,7 @@ export async function processOneSecActions(fullySynced: boolean) {
             secondsAgo: 3000
         }
         const totalDisconnects = await ddcsControllers.simpleStatEventActionsReadDisconnectsInLastSeconds(iCurObj)
-        if(totalDisconnects.length > 2){
+        if(totalDisconnects.length > 1){
             console.log("Clients Disconnected en masse - There were a total of disconnects", totalDisconnects.length, "in the past", iCurObj.secondsAgo,"seconds.")
             const mesg = "**Clients Disconnected en masse** \n DCS.exe stopped sending network traffic for a time \n LP will be refunded \n DCS.log:"
             ddcsControllers.sendMessageToDiscord(mesg);
@@ -25,7 +25,15 @@ export async function processOneSecActions(fullySynced: boolean) {
             const playerArray = await ddcsControllers.srvPlayerActionsRead({sessionName: ddcsControllers.getSessionName()});
             for (const player of totalDisconnects){
                 let iPlayer = _.find(playerArray, {name: player.iName});
-                console.log (iPlayer)
+                if (iPlayer){
+                    let iObject = {_id: iPlayer._id,
+                        warbonds: iPlayer.warbonds + iPlayer.tmpWarbonds,
+                        tmpWarbonds: 0
+                    };
+                    ddcsControllers.srvPlayerActionsUpdate({iObject});
+                    console.log("Refunded ",iPlayer.tmpWarbonds, " to ", iPlayer.name, "due to a mass disconnect event");
+                    console.log("iObject:",iObject)
+                }                
             }
         }
     }
