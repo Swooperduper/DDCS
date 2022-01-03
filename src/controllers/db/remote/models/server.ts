@@ -130,6 +130,11 @@ export function serverModel(dbconn: mongoose.Connection): mongoose.Document | {}
                 type: Boolean,
                 default: true
             },
+            DCSLogFileLocation: {
+                type: String,
+                required: true,
+                default: "C:/Users/DDCSTEST/Saved Games/DCS.openbeta_server/Logs/dcs.log"
+            },
             SRSFilePath: {
                 type: String,
                 required: true,

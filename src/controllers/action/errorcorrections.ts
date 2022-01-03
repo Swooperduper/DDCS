@@ -35,4 +35,35 @@ export async function correctPlayerAircraftDuplicates(): Promise<void> {
     }
 }
 
-
+export async function disconnectionDetction(): Promise<void> {
+    const iCurObj ={
+        sessionName: ddcsControllers.getSessionName(),
+        secondsAgo: 2
+    }
+    const totalDisconnects = await ddcsControllers.simpleStatEventActionsReadDisconnectsInLastSeconds(iCurObj)
+    if(totalDisconnects.length > 0 || ddcsControllers.getCurSeconds() > (ddcsControllers.getMaxTime() - ddcsControllers.time.threeMinutes)){
+        console.log("Clients Disconnected en masse - There were a total of disconnects", totalDisconnects.length, "in the past", iCurObj.secondsAgo,"seconds.")
+        const mesg = "**Clients Disconnected en masse** \n DCS.exe stopped sending network traffic for a time \n LP will be refunded \n DCS.log:"
+        ddcsControllers.sendMessageToDiscord(mesg);
+        ddcsControllers.sendDCSLogFileToDiscord();
+        for (const player of totalDisconnects){
+            let iCurObj =   {_id: player._id,
+                            showInChart : false,
+            };
+            await ddcsControllers.simpleStatEventActionUpdate(iCurObj);
+        }
+        const playerArray = await ddcsControllers.srvPlayerActionsRead({sessionName: ddcsControllers.getSessionName()});
+        for (const player of totalDisconnects){
+            let iPlayer = _.find(playerArray, {name: player.iName});
+            if (iPlayer){
+                let iObject = {_id: iPlayer._id,
+                    warbonds: iPlayer.warbonds + iPlayer.tmpWarbonds,
+                    tmpWarbonds: 0
+                };
+                ddcsControllers.srvPlayerActionsUpdate({iObject});
+                console.log("Refunded ",iPlayer.tmpWarbonds, " to ", iPlayer.name, "due to a mass disconnect event");
+                //console.log("iObject:",iObject)
+            }                
+        }
+    }
+}
