@@ -41,7 +41,7 @@ export async function disconnectionDetction(): Promise<void> {
         secondsAgo: 2
     }
     const totalDisconnects = await ddcsControllers.simpleStatEventActionsReadDisconnectsInLastSeconds(iCurObj)
-    if(totalDisconnects.length > 2 || ddcsControllers.getCurSeconds() > (ddcsControllers.getMaxTime() - ddcsControllers.time.threeMinutes)){
+    if(totalDisconnects.length > 2 && ddcsControllers.getCurSeconds() > (ddcsControllers.getMaxTime() - ddcsControllers.time.threeMinutes)){
         console.log("Clients Disconnected en masse - There were a total of disconnects", totalDisconnects.length, "in the past", iCurObj.secondsAgo,"seconds.")
         const mesg = "**Clients Disconnected en masse** \n DCS.exe stopped sending network traffic for a time \n LP will be refunded \n DCS.log:"
         ddcsControllers.sendMessageToDiscord(mesg);
