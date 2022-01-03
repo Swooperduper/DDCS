@@ -8,7 +8,7 @@ export async function processOneSecActions(fullySynced: boolean) {
     if (fullySynced) {
         const iCurObj ={
             sessionName: ddcsControllers.getSessionName(),
-            secondsAgo: 300
+            secondsAgo: 3000
         }
         const totalDisconnects = await ddcsControllers.simpleStatEventActionsReadDisconnectsInLastSeconds(iCurObj)
         if(totalDisconnects.length > 2){
@@ -17,7 +17,13 @@ export async function processOneSecActions(fullySynced: boolean) {
             ddcsControllers.sendMessageToDiscord(mesg);
             for (const player of totalDisconnects){
                 let iCurObj =   {_id: player._id,
-                                showInChart : false
+                                showInChart : false,
+                                sessionName: player.sessionName,
+                                eventCode: player.eventCode,
+                                iucid: player.iucid,
+                                iName: player.iName,
+                                displaySide: "A",
+                                roleCode: "I"
                 }
                 await ddcsControllers.simpleStatEventActionsSave(iCurObj)
                 console.log("player.name:", player.iName);
