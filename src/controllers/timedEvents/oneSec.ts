@@ -16,7 +16,7 @@ export async function processOneSecActions(fullySynced: boolean) {
             const mesg = "**Clients Disconnected en masse** \n DCS.exe stopped sending network traffic for a time \n LP will be refunded \n DCS.log:"
             ddcsControllers.sendMessageToDiscord(mesg);
             for (const player of totalDisconnects){
-                let iCurObj =   {_id: player._id,
+                let iCurObj =   {_id: "ObjectId("+player._id+")",
                                 showInChart : false,
                 }
                 await ddcsControllers.simpleStatEventActionUpdate(iCurObj)
