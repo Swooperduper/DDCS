@@ -27,7 +27,7 @@ export async function processFriendlyFire(eventObj: any): Promise<void> {
                 curIUnit = iunit[0];
                 curTUnit = tunit[0];
                 if (engineCache.config.lifePointsEnabled) {
-                    await ddcsControllers.removeLifePoints(
+                    await ddcsControllers.removeWarbonds(
                         curIPlayer,
                         curIUnit,
                         "Friendly Kill",
@@ -37,7 +37,7 @@ export async function processFriendlyFire(eventObj: any): Promise<void> {
                 }
 
                 if (curTUnit.inAir && engineCache.config.lifePointsEnabled) {
-                    await ddcsControllers.addLifePoints(
+                    await ddcsControllers.addWarbonds(
                         curTPlayer,
                         curTUnit
                     );

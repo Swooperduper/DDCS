@@ -126,6 +126,11 @@ export function serverModel(dbconn: mongoose.Connection): mongoose.Document | {}
                 required: true,
                 default: 12
             },
+            startMaxPoints: {
+                type: Number,
+                required: true,
+                default: 20
+            },
             inGameHitMessages: {
                 type: Boolean,
                 default: true
@@ -241,6 +246,11 @@ export function serverModel(dbconn: mongoose.Connection): mongoose.Document | {}
                 default: []
             },
             guildedSubGroups: {
+                type: Array,
+                required: true,
+                default: []
+            },
+            freeAirframeBases: {
                 type: Array,
                 required: true,
                 default: []

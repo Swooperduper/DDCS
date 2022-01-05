@@ -34,7 +34,7 @@ export async function processEventTakeoff(eventObj: any): Promise<void> {
                     // console.log("LPE: ", engineCache.config.lifePointsEnabled, !_.includes(iPlayer.slot, "_"));
                     if (engineCache.config.lifePointsEnabled && !_.includes(iPlayer.slot, "_")) {
                         console.log("checkSlotTakeoff: ", iPlayer.slot);
-                        await ddcsControllers.removeLifePoints(
+                        await ddcsControllers.removeWarbonds(
                             iPlayer,
                             curIUnit,
                             "Takeoff"

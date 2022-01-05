@@ -59,12 +59,16 @@ export async function processEventLand(eventObj: any): Promise<void> {
                 console.log("FriendlyPlace: ", iCurObj.msg);
                 let curaddWarbonds = 0
                 const curUnitDictionary = _.find(engineCache.unitDictionary, {_id: curUnit.type});
-                const curUnitWarbondCost = (curUnitDictionary) ? curUnitDictionary.warbondCost : 1;
+                let curUnitWarbondCost = (curUnitDictionary) ? curUnitDictionary.warbondCost : 1;
                 let weaponCost = 0;
                 let thisweaponCost = 0;
                 for (const value of curUnit.ammo || []) {
                     thisweaponCost = ddcsControllers.getWeaponCost(value.typeName, value.count);
                     weaponCost = weaponCost + thisweaponCost
+                }
+                if (_.includes(engineCache.config.freeAirframeBases,curUnit.groupName.split(" @")[0])){
+                    curUnitWarbondCost = 0;
+                    console.log(iPlayer.name, " landed off in a free aircraft");
                 }
                 curaddWarbonds = curUnitWarbondCost + weaponCost;
                 warbondsToAdd = warbondsToAdd + curaddWarbonds
@@ -72,7 +76,7 @@ export async function processEventLand(eventObj: any): Promise<void> {
                 if (engineCache.config.lifePointsEnabled && !_.includes(iPlayer.slot, "_")) {
                     ddcsControllers.srvPlayerActionsResettmpWarbonds(iPlayer);
                     console.log("checkSlotLanding: ", iPlayer.slot);
-                    await ddcsControllers.addLifePoints(
+                    await ddcsControllers.addWarbonds(
                         iPlayer,
                         iUnit[0],
                         "Land",

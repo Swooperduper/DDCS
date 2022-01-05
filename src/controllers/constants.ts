@@ -251,7 +251,7 @@ export const enemySide: number[] = [
     1
 ];
 
-export const maxLifePoints: number = 18;
+export const maxLifePoints: number = getEngineCache().config.startMaxPoints;
 
 export const seasons: string[] = [
     "Autumn",

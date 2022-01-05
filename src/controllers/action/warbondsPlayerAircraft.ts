@@ -85,7 +85,7 @@ export async function updateServerLifePoints(): Promise<void> {
                     } else {
                         addFracPoint = playerBalance.modifier;
                     }
-                    await addLifePoints(
+                    await addWarbonds(
                         cPlayer,
                         curUnit || null,
                         "PeriodicAdd",
@@ -194,7 +194,7 @@ export async function checkAircraftCosts(): Promise<void> {
     }
 }
 
-export async function addLifePoints(curPlayer: any, curUnit: any, execAction?: string, addWarbonds?: number): Promise<void> {
+export async function addWarbonds(curPlayer: any, curUnit: any, execAction?: string, addWarbonds?: number): Promise<void> {
     const groupId = (curUnit && curUnit.groupId) ? curUnit.groupId : null;
 
     await ddcsControllers.srvPlayerActionsAddLifePoints({
@@ -205,7 +205,7 @@ export async function addLifePoints(curPlayer: any, curUnit: any, execAction?: s
     });
 }
 
-export async function removeLifePoints(
+export async function removeWarbonds(
     curPlayer: any,
     curUnit: any,
     execAction: string,
@@ -216,12 +216,16 @@ export async function removeLifePoints(
     let curRemoveWarbonds = removeWarbonds;
     if (!isDirect) {
         const curUnitDictionary = _.find(engineCache.unitDictionary, {_id: curUnit.type});
-        const curUnitWarbondCost = (curUnitDictionary) ? curUnitDictionary.warbondCost : 1;
+        let curUnitWarbondCost = (curUnitDictionary) ? curUnitDictionary.warbondCost : 1;
         let weaponCost = 0;
         let thisweaponCost = 0;
         for (const value of curUnit.ammo || []) {
             thisweaponCost = getWeaponCost(value.typeName, value.count);
             weaponCost = weaponCost + thisweaponCost
+        }
+        if (_.includes(engineCache.config.freeAirframeBases,curUnit.groupName.split(" @")[0])){
+            curUnitWarbondCost = 0;
+            console.log(curPlayer, " took off in a free aircraft");
         }
         curRemoveWarbonds = curUnitWarbondCost + weaponCost;
     }
