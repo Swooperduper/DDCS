@@ -48,7 +48,7 @@ export function serverModel(dbconn: mongoose.Connection): mongoose.Document | {}
             },
             maxCoaltionFactories: {
                 type: Number,
-                default: 100
+                default: 6
             },
             minUnits: {
                 type: Number

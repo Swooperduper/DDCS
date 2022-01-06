@@ -163,7 +163,7 @@ export async function srvPlayerActionsAddLifePoints(obj: {
                     { $set: setObj },
                     (updateErr: any, srvPlayer: typings.ISrvPlayers) => {
                         if (updateErr) { reject(updateErr); }
-                        if (obj.execAction === "PeriodicAdd" && obj.numberOfFactories) {
+                        if (obj.execAction === "PeriodicAdd" && obj.numberOfFactories !== undefined) {
                             message = "You have gained "+addPoints+" Warbonds and now have a total of "+curTotalPoints+" Warbonds.\n" + 
                             "You currently have (" + obj.numberOfFactories +"/"+ engineCache.config.maxCoaltionFactories + ") functional factories and gained an additional income of" +(obj.numberOfFactories * engineCache.config.factoryWarbondIncome)+"as a result"
                         } else {
