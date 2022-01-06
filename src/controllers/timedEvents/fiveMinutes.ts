@@ -5,7 +5,8 @@
 import * as ddcsControllers from "../";
 
 export async function processFiveMinuteActions(fullySynced: boolean): Promise<void> {
-    if (fullySynced) {
+    if (fullySynced) {        
+        await ddcsControllers.updateServerLifePoints();   
         await ddcsControllers.checkBaseWarnings();
         await ddcsControllers.recordFiveMinutesPlayed();
         await ddcsControllers.baseDefenseDetectSmoke(); // smokes everything 5km from center of main base

@@ -138,7 +138,8 @@ export async function srvPlayerActionsAddLifePoints(obj: {
     _id: string,
     groupId?: number,
     addWarbonds?: number,
-    execAction?: string
+    execAction?: string,
+    numberOfFactories?: number
 }): Promise<void> {
     return new Promise((resolve, reject) => {
         dbModels.srvPlayerModel.find({_id: obj._id}, (err: any, serverObj: typings.ISrvPlayers[]) => {
@@ -162,9 +163,9 @@ export async function srvPlayerActionsAddLifePoints(obj: {
                     { $set: setObj },
                     (updateErr: any, srvPlayer: typings.ISrvPlayers) => {
                         if (updateErr) { reject(updateErr); }
-                        if (obj.execAction === "PeriodicAdd") {
-                            message = i18n.PERIODICLIFEPOINTADD
-                                .replace("#1", _.round(addPoints, 2)).replace("#2","");
+                        if (obj.execAction === "PeriodicAdd" && obj.numberOfFactories) {
+                            message = "You have gained "+addPoints+" Warbonds and now have a total of "+curTotalPoints+" Warbonds.\n" + 
+                            "You currently have (" + obj.numberOfFactories +"/"+ engineCache.config.maxCoaltionFactories + ") functional factories and gained an additional income of" +(obj.numberOfFactories * engineCache.config.factoryWarbondIncome)+"as a result"
                         } else {
                             message = "You have gained "+addPoints+" Warbonds and now have a total of "+curTotalPoints+" Warbonds"
                         }

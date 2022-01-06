@@ -38,6 +38,18 @@ export function serverModel(dbconn: mongoose.Connection): mongoose.Document | {}
             replenTimer: {
                 type: Number
             },
+            baseWarbondIncome: {
+                type: Number,
+                default: 250
+            },
+            factoryWarbondIncome: {
+                type: Number,
+                default: 100
+            },
+            maxCoaltionFactories: {
+                type: Number,
+                default: 100
+            },
             minUnits: {
                 type: Number
             },

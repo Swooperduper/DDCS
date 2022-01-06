@@ -6,10 +6,7 @@ import * as ddcsControllers from "../";
 
 export async function processTenMinuteActions(fullySynced: boolean): Promise<void> {
     const engineCache = ddcsControllers.getEngineCache();
-    if (fullySynced) {
-        if (engineCache.config.lifePointsEnabled) {
-            await ddcsControllers.updateServerLifePoints();            
-        }
+    if (fullySynced) {       
         if(engineCache.config.aiConvoysEnabled){
             await ddcsControllers.maintainPvEConfig();
         }

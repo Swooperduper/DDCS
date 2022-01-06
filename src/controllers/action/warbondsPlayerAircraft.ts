@@ -39,6 +39,7 @@ export function getWeaponName(typeName: string): string {
 export async function getPlayerBalance(): Promise<typings.ISrvPlayerBalance> {
     const serverAlloc: any = {};
     const latestSession = await ddcsControllers.sessionsActionsReadLatest();
+    const engineCache = ddcsControllers.getEngineCache();
     if (latestSession.name) {
         const playerArray = await ddcsControllers.srvPlayerActionsRead({sessionName: latestSession.name});
         for (const ePlayer of playerArray) {
@@ -53,19 +54,25 @@ export async function getPlayerBalance(): Promise<typings.ISrvPlayerBalance> {
             return {
                 side: 1,
                 modifier: 2 / (blueAll / redAll),
-                players: playerArray
+                players: playerArray,
+                baseWarbondIncome: engineCache.config.baseWarbondIncome,
+                factoryWarbondIncome: engineCache.config.factoryWarbondIncome
             };
         } else if (redAll < blueAll && blueAll !== 0) {
             return {
                 side: 2,
                 modifier: 2 / (redAll / blueAll),
-                players: playerArray
+                players: playerArray,
+                baseWarbondIncome: engineCache.config.baseWarbondIncome,
+                factoryWarbondIncome: engineCache.config.factoryWarbondIncome
             };
         }
     }
     return {
         side: 0,
-        modifier: 1
+        modifier: 1,        
+        baseWarbondIncome: engineCache.config.baseWarbondIncome,
+        factoryWarbondIncome: engineCache.config.factoryWarbondIncome
     };
 }
 
@@ -81,15 +88,34 @@ export async function updateServerLifePoints(): Promise<void> {
                     const cUnit = await ddcsControllers.unitActionRead({dead: false, playername: cPlayer.name});
                     const curUnit = cUnit[0];
                     if (cPlayer.side === playerBalance.side) {
-                        addFracPoint = 1;
+                        addFracPoint = playerBalance.baseWarbondIncome;
                     } else {
-                        addFracPoint = playerBalance.modifier;
+                        addFracPoint = playerBalance.baseWarbondIncome * playerBalance.modifier;
                     }
+                    let factories = [];
+                    if (cPlayer.side = 2){
+                        factories = await ddcsControllers.unitActionRead({
+                            proxChkGrp: "factory",
+                            dead: false,
+                            coalition: 2
+                        });
+                        addFracPoint = addFracPoint + (factories.length * playerBalance.factoryWarbondIncome)
+
+                    }else if(cPlayer.side = 1){
+                        factories = await ddcsControllers.unitActionRead({
+                            proxChkGrp: "factory",
+                            dead: false,
+                            coalition: 1
+                        });
+                        addFracPoint = addFracPoint + (factories.length * playerBalance.factoryWarbondIncome)
+                    };
+
                     await addWarbonds(
                         cPlayer,
                         curUnit || null,
                         "PeriodicAdd",
-                        addFracPoint
+                        addFracPoint,
+                        factories.length
                     );
                 }
             }
@@ -194,14 +220,15 @@ export async function checkAircraftCosts(): Promise<void> {
     }
 }
 
-export async function addWarbonds(curPlayer: any, curUnit: any, execAction?: string, addWarbonds?: number): Promise<void> {
+export async function addWarbonds(curPlayer: any, curUnit: any, execAction?: string, addWarbonds?: number, numberOfFactories?: number): Promise<void> {
     const groupId = (curUnit && curUnit.groupId) ? curUnit.groupId : null;
 
     await ddcsControllers.srvPlayerActionsAddLifePoints({
         _id: curPlayer._id,
         groupId,
         addWarbonds: addWarbonds,
-        execAction
+        execAction,
+        numberOfFactories
     });
 }
 

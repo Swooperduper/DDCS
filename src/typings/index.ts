@@ -488,6 +488,8 @@ export interface ISrvPlayerBalance {
     side: number;
     modifier: number;
     players?: ISrvPlayers[];
+    baseWarbondIncome: number;
+    factoryWarbondIncome: number;
 }
 
 export interface IPointsTemplate {
