@@ -46,6 +46,10 @@ export function serverModel(dbconn: mongoose.Connection): mongoose.Document | {}
                 type: Number,
                 default: 100
             },
+            startWarbonds:{
+                type: Number,
+                default: 10000
+            },
             maxCoaltionFactories: {
                 type: Number,
                 default: 6

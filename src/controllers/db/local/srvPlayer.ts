@@ -95,7 +95,7 @@ export async function srvPlayerActionsUpdateFromServer(obj: {
                 if (obj.ipaddr === ":10308") {
                     obj.ipaddr = "127.0.0.1";
                 }
-                obj.curLifePoints = engineCache.config.startLifePoints;
+                obj.curLifePoints = engineCache.config.startWarbonds;
 
                 const sObj = new dbModels.srvPlayerModel(obj);
                 sObj.save((saveErr: any) => {
@@ -112,7 +112,7 @@ export async function srvPlayerActionsUpdateFromServer(obj: {
                 // const iUnit = await ddcsController.unitActionRead({playername: curPly.name});
 
                 if (curPly.sessionName && obj.sessionName && (curPly.sessionName !== obj.sessionName)) {
-                    obj.curLifePoints = engineCache.config.startLifePoints;
+                    obj.curLifePoints = engineCache.config.startWarbonds;
                     obj.currentSessionMinutesPlayed_blue = 0;
                     obj.currentSessionMinutesPlayed_red = 0;
                     obj.tmpRSPoints = 0;
@@ -165,7 +165,7 @@ export async function srvPlayerActionsAddLifePoints(obj: {
                         if (updateErr) { reject(updateErr); }
                         if (obj.execAction === "PeriodicAdd" && obj.numberOfFactories !== undefined) {
                             message = "You have gained "+addPoints+" Warbonds and now have a total of "+curTotalPoints+" Warbonds.\n" + 
-                            "You currently have (" + obj.numberOfFactories +"/"+ engineCache.config.maxCoaltionFactories + ") functional factories and gained an additional income of" +(obj.numberOfFactories * engineCache.config.factoryWarbondIncome)+"as a result"
+                            "You currently have (" + obj.numberOfFactories +"/"+ engineCache.config.maxCoaltionFactories + ") functional factories and gained an additional income of " +(obj.numberOfFactories * engineCache.config.factoryWarbondIncome)+" Warbonds as a result"
                         } else {
                             message = "You have gained "+addPoints+" Warbonds and now have a total of "+curTotalPoints+" Warbonds"
                         }
@@ -592,7 +592,7 @@ export async function srvPlayerActionsUnsetCampaign(): Promise<void> {
         dbModels.srvPlayerModel.updateMany(
             {},
             {$set: {
-                curLifePoints: serverCache.config.startLifePoints,
+                curLifePoints: serverCache.config.startWarbonds,
                 sideLock: 0
                // redRSPoints: 0,
                 //blueRSPoints: 0,

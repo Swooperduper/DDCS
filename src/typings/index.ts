@@ -43,6 +43,7 @@ export interface IServer {
     maxTroops: number;
     maxUnitsMoving: number;
     startLifePoints: number;
+    startWarbonds: number;
     inGameHitMessages: boolean;
     mapRotation: [
         string[]
