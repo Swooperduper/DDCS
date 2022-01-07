@@ -36,9 +36,10 @@ export async function processEventKill(eventObj: any): Promise<void> {
                 }
                 // console.log("playerOwner: ", !!curInitiator.playerOwner,
                 // curInitiator.playerOwner, curInitiator.player, curInitiator.unit);
+                console.log(eventObj.data)
                 const killedUnitDict = _.find(engineCache.unitDictionary, {type : eventObj.data.target.type});
                 console.log("Test Case 1 - killedUnitDict:",killedUnitDict);
-                const killingWeaponDict = _.find(engineCache.weaponScore, {type : eventObj.data.weapon_name});
+                const killingWeaponDict = _.find(engineCache.weaponScore, {_id : eventObj.data.weapon_name});
                 console.log("Test Case 2 - killingWeaponDict:",killingWeaponDict);
                 let reward = 100
                 if (killedUnitDict){
