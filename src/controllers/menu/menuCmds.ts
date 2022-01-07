@@ -2309,7 +2309,7 @@ export async function unpackIntCrate(
     }        
 }
 
-export async function spawnStaticObject(){
+/*export async function spawnStaticObject(){
     let spawnObj = {
         _id: curName,
         name: curName,
@@ -2334,4 +2334,4 @@ export async function spawnStaticObject(){
     };
 
     await ddcsControllers.spawnStaticBuilding(crateObj, false);
-}
+}*/
