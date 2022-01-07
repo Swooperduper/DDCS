@@ -2308,3 +2308,30 @@ export async function unpackIntCrate(
         return false;
     }        
 }
+
+export async function spawnStaticObject(){
+    let spawnObj = {
+        _id: curName,
+        name: curName,
+        unitLonLatLoc: unit.lonLatLoc,
+        shape_name: curShapeName,
+        unitCategory: "Cargos",
+        type: crateType,
+        hdg: unit.hdg,
+        heading: unit.hdg,
+        canCargo: true,
+        mass,
+        playerOwnerId: curPlayer.ucid,
+        templateName: type,
+        special: spc,
+        crateAmt: crates,
+        isCombo,
+        playerCanDrive: mobile || false,
+        country: ddcsControllers.defCountrys[unit.coalition],
+        side: unit.coalition,
+        coalition: unit.coalition,
+        lonLatLoc: ddcsControllers.getLonLatFromDistanceDirection(unit.lonLatLoc, unit.hdg, 0.05)
+    };
+
+    await ddcsControllers.spawnStaticBuilding(crateObj, false);
+}

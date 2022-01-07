@@ -250,6 +250,7 @@ export async function removeWarbonds(
             thisweaponCost = getWeaponCost(value.typeName, value.count);
             weaponCost = weaponCost + thisweaponCost
         }
+        console.log("engineCache.config.freeAirframeBases:",engineCache.config.freeAirframeBases,"\n curUnit.groupName.split()[0]:",curUnit.groupName.split(" @")[0]);
         if (_.includes(engineCache.config.freeAirframeBases,curUnit.groupName.split(" @")[0])){
             curUnitWarbondCost = 0;
             console.log(curPlayer, " took off in a free aircraft");
