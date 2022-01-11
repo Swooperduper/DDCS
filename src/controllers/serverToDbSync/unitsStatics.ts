@@ -47,8 +47,7 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
         const isAllowedToDrive = (stParse[5] === "true");
         curData.playerOwnerId = stParse[1];
         curData.proxChkGrp = stParse[3];
-        curData.playerCanDrive = isAllowedToDrive || false;
-        await ddcsControllers.initializeMenu(curData);
+        curData.playerCanDrive = isAllowedToDrive || false;        
     }
 
     if (unit.length > 0) {
@@ -246,6 +245,11 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
                     // console.log("spawning player menu");
                     await ddcsControllers.initializeMenu(curData);
                 }
+
+                if (_.includes(curData.name, "DU|")) {
+                    await ddcsControllers.initializeMenu(curData);       
+                }
+            
             }
         }
     }
