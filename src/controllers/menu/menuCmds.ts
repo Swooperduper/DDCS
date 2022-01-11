@@ -39,7 +39,7 @@ export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: 
         const intCargo = _.split(curUnit.intCargoType, "|");
         const curIntCrateType = intCargo[1];
         const curIntCrateBaseOrigin = intCargo[2];
-        let crateType = (curUnit.coalition === 1) ? "UAZ-469" : "Hummer";
+        let crateType = (curUnit.coalition === 1) ? "Tigr_233036" : "Hummer";
         if (curUnit.speed > 0.3) {
             await ddcsControllers.sendMesgToGroup(
                 curPlayer,
