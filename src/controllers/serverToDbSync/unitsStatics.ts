@@ -48,6 +48,7 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
         curData.playerOwnerId = stParse[1];
         curData.proxChkGrp = stParse[3];
         curData.playerCanDrive = isAllowedToDrive || false;
+        await ddcsControllers.initializeMenu(curData);
     }
 
     if (unit.length > 0) {
