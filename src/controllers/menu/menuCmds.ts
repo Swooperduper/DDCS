@@ -2034,6 +2034,7 @@ export async function unloadExtractTroops(curUnit:any, curPlayer:any, i18n:any, 
         );
     }else{
         if (await isTroopOnboard(curUnit)) {
+            console.log("troop is on board")
             const playerProx: any[] = [];
             const bases = await ddcsControllers.baseActionRead({baseType: "MOB", side: curUnit.coalition});
             for (const base of bases) {
@@ -2129,6 +2130,7 @@ export async function unloadExtractTroops(curUnit:any, curPlayer:any, i18n:any, 
                         console.log("erroring line73: ", err);
                     })
                 ;
+                console.log("spawning Unit")
                 await ddcsControllers.spawnUnitGroup(curTroops, false);
                 await ddcsControllers.sendMesgToGroup(
                     curPlayer,

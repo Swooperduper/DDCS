@@ -1480,6 +1480,7 @@ export async function spawnUnitGroup(spawnArray: typing.IUnitSpawnMin[], init: b
         grpObj.coalition = (side) ? side : spawnArray[0].coalition;
         if (!init) {
             groupTemplate = await grndUnitGroup(grpObj);
+            console.log("groupTemplate:",groupTemplate)
         }
 
         let unitTemplate = "";
@@ -1516,7 +1517,7 @@ export async function spawnUnitGroup(spawnArray: typing.IUnitSpawnMin[], init: b
                 grpObj.country,
                 grpObj.unitCategory
             );
-            //console.log("spawnUnitGroup: ", curCMD);
+            console.log("spawnUnitGroup: ", curCMD);
             const sendClient = {actionObj: {action: "CMD", cmd: [curCMD], reqID: 0}};
             await ddcsControllers.sendUDPPacket("frontEnd", sendClient);
         }
