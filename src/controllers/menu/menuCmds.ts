@@ -2274,7 +2274,7 @@ export async function unpackIntCrate(
             unitStart.lonLatLoc = ddcsControllers.getLonLatFromDistanceDirection(playerUnit.lonLatLoc, curUnitHdg, 0.007);
             unitStart.hdg = SpawnHeading * 0.0174533;
             unitStart.country = pCountry;
-            unitStart.playerCanDrive = mobile || false;
+            unitStart.playerCanDrive = true;
             unitStart.special = special;
             unitStart.coalition = playerUnit.coalition;
             unitStart.virtualGrpName = virtualGroupID
