@@ -36,7 +36,6 @@ export async function startUpReceiveUDPSocket() {
     server.on("message", (msg: any) => {
 
         const dataObj = JSON.parse(msg);
-        console.log(dataObj)
         if (dataObj.action === "C" || dataObj.action === "U") {
             // doing math on nodeJS side, free up more DCS.exe
             const headingNorthCorr = Math.atan2(
