@@ -245,6 +245,11 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
                     // console.log("spawning player menu");
                     await ddcsControllers.initializeMenu(curData);
                 }
+
+                if (_.includes(curData.name, "DU|")) {
+                    await ddcsControllers.initializeMenu(curData);       
+                }
+            
             }
         }
     }

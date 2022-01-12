@@ -74,7 +74,7 @@ export async function processingIncomingData(incomingObj: any) {
             await ddcsController.processEventBirth(incomingObj);
             break;
         case "S_EVENT_PLAYER_ENTER_UNIT":
-            console.log("player enter unit");
+            // console.log("player enter unit1");
             await ddcsController.processEventPlayerEnterUnit(incomingObj);
             break;
         case "S_EVENT_PLAYER_LEAVE_UNIT":
