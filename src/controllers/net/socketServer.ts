@@ -6,7 +6,6 @@ const dgram = require("dgram");
 const backendClient = dgram.createSocket("udp4");
 const frontendClient = dgram.createSocket("udp4");
 import * as ddcsControllers from "../";
-import * as _ from "lodash";
 
 export async function sendUDPPacket(environment: string, packetObj: any) {
     if (packetObj.timeToExecute > 0) {

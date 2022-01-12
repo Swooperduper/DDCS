@@ -4,12 +4,8 @@ import { dbModels } from "../db/common";
 import * as typings from "../../typings";
 import {I18nResolver} from "i18n-ts";
 import {ISrvPlayers} from "../../typings";
-import * as ddcsControllers from "../action/aiConvoys";
 
 export async function processingIncomingData(incomingObj: any) {
-    if(_.includes(incomingObj,"Kirkwood")){
-        console.log(incomingObj);
-    }
     switch (incomingObj.action) {
         case "serverInfo":
             await ddcsController.getLatestSession(incomingObj);
