@@ -5,6 +5,12 @@
 // setup defaults to satisfy config object
 import * as typings from "../typings";
 
+export let engineGlobals = {
+    farpsMarked: false,
+    circlesMarked: false,
+    unitMenuWritten: false
+}
+
 export const engineCache = {
     staticDictionary: [],
     unitDictionary: [],

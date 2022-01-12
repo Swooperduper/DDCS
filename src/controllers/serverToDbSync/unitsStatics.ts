@@ -246,8 +246,7 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
                     await ddcsControllers.initializeMenu(curData);
                 }
                 if (_.includes(curData.name, "DU|")) {
-                    await ddcsControllers.initializeMenu(curData); 
-                    console.log("writing menu for",curData)      
+                    await ddcsControllers.initializeMenu(curData);  
                 }            
             }
         }

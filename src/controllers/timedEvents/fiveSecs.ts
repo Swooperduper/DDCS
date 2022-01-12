@@ -6,12 +6,11 @@ import * as _ from "lodash";
 import { defaultsDeep } from "lodash";
 import * as ddcsControllers from "../";
 import * as ddcsController from "../action/unitDetection";
-import { side } from "../constants";
+import { engineGlobals, side } from "../constants";
 
 
 
 export async function processFiveSecActions(fullySynced: boolean): Promise<void> {
-
     const engineCache = ddcsControllers.getEngineCache();
     const replenThreshold = 1; // percentage under max
     const replenBase = engineCache.config.replenThresholdBase * replenThreshold;
