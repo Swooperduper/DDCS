@@ -639,7 +639,7 @@ export async function spawnLayer2Reinforcements(
 ): Promise<number> {
     let totalUnits = 0;
     const curTickCnt = curTick * rndAmt;
-    console.log("spawnBase: ", baseName);
+    //console.log("spawnBase: ", baseName);
     for (let i = 0; i < curTickCnt; i++) {
         let curAngle = 0;
         const curRndSpawn = getRndFromSpawnCat(catType, side, false, true);
@@ -1480,7 +1480,6 @@ export async function spawnUnitGroup(spawnArray: typing.IUnitSpawnMin[], init: b
         grpObj.coalition = (side) ? side : spawnArray[0].coalition;
         if (!init) {
             groupTemplate = await grndUnitGroup(grpObj);
-            console.log("groupTemplate:",groupTemplate)
         }
 
         let unitTemplate = "";
@@ -1517,7 +1516,7 @@ export async function spawnUnitGroup(spawnArray: typing.IUnitSpawnMin[], init: b
                 grpObj.country,
                 grpObj.unitCategory
             );
-            console.log("spawnUnitGroup: ", curCMD);
+            //console.log("spawnUnitGroup: ", curCMD);
             const sendClient = {actionObj: {action: "CMD", cmd: [curCMD], reqID: 0}};
             await ddcsControllers.sendUDPPacket("frontEnd", sendClient);
         }

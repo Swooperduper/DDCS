@@ -43,7 +43,7 @@ export async function processEventBirth(eventObj: any): Promise<void> {
                     };                    
                     //console.log(iCurObj.msg)
                     let enemyCoalition = 0
-                    console.log("Spawning Unit Coalition:",iPlayer.sideLock)
+                    //console.log("Spawning Unit Coalition:",iPlayer.sideLock)
                     if (iPlayer.sideLock == 1 || iPlayer.side == 1){
                         console.log("I'm sidelocked to 1")
                         enemyCoalition = 2                        
