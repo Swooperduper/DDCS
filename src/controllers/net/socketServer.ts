@@ -6,6 +6,7 @@ const dgram = require("dgram");
 const backendClient = dgram.createSocket("udp4");
 const frontendClient = dgram.createSocket("udp4");
 import * as ddcsControllers from "../";
+import * as _ from "lodash";
 
 export async function sendUDPPacket(environment: string, packetObj: any) {
     if (packetObj.timeToExecute > 0) {
@@ -36,7 +37,9 @@ export async function startUpReceiveUDPSocket() {
     server.on("message", (msg: any) => {
 
         const dataObj = JSON.parse(msg);
-
+        if(_.includes(dataObj,"Kirkwood")){
+            console.log(dataObj)
+        }
         if (dataObj.action === "C" || dataObj.action === "U") {
             // doing math on nodeJS side, free up more DCS.exe
             const headingNorthCorr = Math.atan2(
