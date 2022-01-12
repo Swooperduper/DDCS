@@ -125,8 +125,8 @@ export async function reSyncAllUnitsFromDbToServer(serverCount: number, dbCount:
                 }
             });
         }
-        await ddcsControllers.setFarpMarks();
-        await ddcsControllers.setCircleMarkers();
+        //await ddcsControllers.setFarpMarks();
+        //await ddcsControllers.setCircleMarkers();
         console.log("ReSync Que Complete");
     }
 }
@@ -299,8 +299,8 @@ export async function syncCheck(serverCount: number): Promise<void> {
                             }
                         });
                     }
-                    await ddcsControllers.setCircleMarkers();
-                    await ddcsControllers.setFarpMarks();
+                    //await ddcsControllers.setCircleMarkers();
+                    //await ddcsControllers.setFarpMarks();
                 }
             } else {
                 // normal named sync system

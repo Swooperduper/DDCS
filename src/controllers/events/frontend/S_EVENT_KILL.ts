@@ -51,6 +51,12 @@ export async function processEventKill(eventObj: any): Promise<void> {
                     console.log("killing Weapon Multiplier:",killingWeaponDict.warbondKillMultiplier)
                     reward = killedUnitDict.warbondCost * killingWeaponDict.warbondKillMultiplier
                 }
+                if (eventObj.data.target.side = 0){
+                    reward = 0
+                }
+                if (eventObj.data.target.side = eventObj.data.initiator.side){
+                    reward = -Math.abs(reward)
+                }
                 if (!!curInitiator.playerOwner && !!curInitiator.unit.playerOwnerId) {
                     const playerOwnerUnit = await ddcsControllers.unitActionRead({playername: curInitiator.playerOwner.name});
                     if (playerOwnerUnit.length > 0) {
