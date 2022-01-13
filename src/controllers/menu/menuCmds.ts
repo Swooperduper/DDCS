@@ -312,12 +312,12 @@ export async function isTroopOnboard(unit: any, verbose?: boolean) {
     const curPly = curPlayerArray[0];
     const engineCache = ddcsControllers.getEngineCache();
     const i18n = new I18nResolver(engineCache.i18n, curPly.lang).translation as any;
-    if (unit.troopType) {
+    if (unit.troopType[0]) {
         if (verbose) {
             await ddcsControllers.sendMesgToGroup(
                 curPly,
                 unit.groupId,
-                "G: " + i18n.CRATEISONBOARD.replace("#1", unit.troopType),
+                "G: " + i18n.CRATEISONBOARD.replace("#1", unit.troopType[0]),
                 5
             );
         }
@@ -638,7 +638,7 @@ export async function menuCmdProcess(pObj: any) {
                                         }                                        
                                         setTimeout(() => {setInternalCargoMass(curUnit.name, currentMass - 500); }, curUnit.agl*500);
                                         setTimeout(() => {setInternalCargoMass(curUnit.name, currentMass - 1000); 
-                                            deployTroops(pObj.unitId,curPlayer,i18n, _.some(playerProx), engineCache, curUnit.troopType, curUnit.lonLatLoc, curUnit.agl, timeTaken);}, curUnit.agl*1000);                                        
+                                            deployTroops(pObj.unitId,curPlayer,i18n, _.some(playerProx), engineCache, curUnit.troopType[0], curUnit.lonLatLoc, curUnit.agl, timeTaken);}, curUnit.agl*1000);                                        
                                         } else {
                                             await ddcsControllers.sendMesgToGroup(
                                                 curPlayer,
@@ -657,7 +657,7 @@ export async function menuCmdProcess(pObj: any) {
                                         
                                         setTimeout(() => {setInternalCargoMass(curUnit.name, currentMass - 500); }, timeTaken*500);
                                         setTimeout(() => {setInternalCargoMass(curUnit.name, currentMass - 1000);  
-                                                deployTroops(pObj.unitId,curPlayer,i18n, _.some(playerProx), engineCache, curUnit.troopType, curUnit.lonLatLoc, curUnit.agl, timeTaken);}, timeTaken*1000);
+                                                deployTroops(pObj.unitId,curPlayer,i18n, _.some(playerProx), engineCache, curUnit.troopType[0], curUnit.lonLatLoc, curUnit.agl, timeTaken);}, timeTaken*1000);
                                             }                            
                                 } else {
                                     // no troops
@@ -2052,7 +2052,7 @@ export async function unloadExtractTroops(curUnit:any, curPlayer:any, i18n:any, 
                 await ddcsControllers.sendMesgToGroup(
                     curPlayer,
                     curUnit.groupId,
-                    "G: " + i18n.HASBEENDROPPEDOFFATBASE.replace("#1", curUnit.troopType),
+                    "G: " + i18n.HASBEENDROPPEDOFFATBASE.replace("#1", curUnit.troopType[0]),
                     5
                 );
                 let currentMass = 1000;
@@ -2063,14 +2063,14 @@ export async function unloadExtractTroops(curUnit:any, curPlayer:any, i18n:any, 
             } else {
                 const curTroops: any[] = [];
                 const randInc = _.random(1000000, 9999999);
-                const genName = "TU|" + curPlayer.ucid + "|" + curUnit.troopType + "|" +
+                const genName = "TU|" + curPlayer.ucid + "|" + curUnit.troopType[0] + "|" +
                     curUnit.playername + "|";
                 const delUnits = await ddcsControllers.unitActionReadStd({
                     playerOwnerId: curPlayer.ucid,
                     isTroop: true,
                     dead: false
                 });
-                if (curUnit.troopType == "MANPAD"){
+                if (curUnit.troopType[0] == "MANPAD"){
                     for (const unit of delUnits){
                         if (unit.type == "Stinger manpad"){
                             await ddcsControllers.unitActionUpdateByUnitId({unitId: unit.unitId, dead: true});
@@ -2094,7 +2094,7 @@ export async function unloadExtractTroops(curUnit:any, curPlayer:any, i18n:any, 
                     }
                 }
                 const curSpawnUnit = _.cloneDeep(await ddcsControllers.getRndFromSpawnCat(
-                    curUnit.troopType,
+                    curUnit.troopType[0],
                     curUnit.coalition,
                     false,
                     true
