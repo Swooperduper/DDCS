@@ -132,13 +132,13 @@ export function unitModel(dbconn: mongoose.Connection): mongoose.Document | {} {
                 default: false
             },
             troopType: {
-                type: Array
+                type: Object
             },
             virtCrateType: {
                 type: String
             },
             intCargoType: {
-                type: Array
+                type: Object
             },
             intMass: {
                 type: String
