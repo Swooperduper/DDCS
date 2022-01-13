@@ -78,7 +78,7 @@ export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: 
                     }
                     if (curIntCrateType === "LightAAA") {
                         await ddcsControllers.correctPlayerAircraftDuplicates();
-                        crateType = (curUnit.coalition === 1) ? "ZU-23 Emplacement" : "bofors40";
+                        crateType = (curUnit.coalition === 1) ? "ZU-23 Emplacement" || "S-60_Type59_Artillery" : "bofors40";
                         await ddcsControllers.sendMesgToGroup(
                             curPlayer,
                             curUnit.groupId,
