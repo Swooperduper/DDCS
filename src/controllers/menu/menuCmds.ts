@@ -2066,6 +2066,11 @@ export async function unloadExtractTroops(curUnit:any, curPlayer:any, i18n:any, 
                 }
                 await setInternalCargoMass(curUnit.name, currentMass - 1000);
             } else {
+                if (typeof curUnit.troopType === 'string'){
+                    console.log("troopType is a string")
+                } else {
+                    console.log("troopType is not a string")
+                }
                 const curTroops: any[] = [];
                 const randInc = _.random(1000000, 9999999);
                 const genName = "TU|" + curPlayer.ucid + "|" + curUnit.troopType + "|" +
