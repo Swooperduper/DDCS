@@ -2159,7 +2159,7 @@ export async function unloadExtractTroops(curUnit:any, curPlayer:any, i18n:any, 
                 }
                 await ddcsControllers.unitActionUpdateByUnitId({
                     unitId: pObj.unitId,
-                    troopType: curTroop.spawnCat
+                    troopType: grpUnits
                 })
                     .catch((err) => {
                         console.log("erroring line57: ", err);
