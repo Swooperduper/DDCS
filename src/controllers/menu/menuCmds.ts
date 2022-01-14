@@ -2067,92 +2067,165 @@ export async function unloadExtractTroops(curUnit:any, curPlayer:any, i18n:any, 
                 await setInternalCargoMass(curUnit.name, currentMass - 1000);
             } else {
                 if (typeof curUnit.troopType === 'string'){
-                    console.log("troopType is a string")
-                } else {
-                    console.log("troopType is not a string")
-                }
-                const curTroops: any[] = [];
-                const randInc = _.random(1000000, 9999999);
-                const genName = "TU|" + curPlayer.ucid + "|" + curUnit.troopType + "|" +
-                    curUnit.playername + "|";
-                const delUnits = await ddcsControllers.unitActionReadStd({
-                    playerOwnerId: curPlayer.ucid,
-                    isTroop: true,
-                    dead: false
-                });
-                if (curUnit.troopType == "MANPAD"){
-                    for (const unit of delUnits){
-                        if (unit.type == "Stinger manpad"){
-                            await ddcsControllers.unitActionUpdateByUnitId({unitId: unit.unitId, dead: true});
-                            await ddcsControllers.destroyUnit(unit.name, "unit");
+                    console.log("troopType is a string")                
+                    const curTroops: any[] = [];
+                    const randInc = _.random(1000000, 9999999);
+                    const genName = "TU|" + curPlayer.ucid + "|" + curUnit.troopType + "|" +
+                        curUnit.playername + "|";
+                    const delUnits = await ddcsControllers.unitActionReadStd({
+                        playerOwnerId: curPlayer.ucid,
+                        isTroop: true,
+                        dead: false
+                    });
+                    if (curUnit.troopType == "MANPAD"){
+                        for (const unit of delUnits){
+                            if (unit.type == "Stinger manpad"){
+                                await ddcsControllers.unitActionUpdateByUnitId({unitId: unit.unitId, dead: true});
+                                await ddcsControllers.destroyUnit(unit.name, "unit");
+                            }
+
                         }
 
                     }
+                    let curUnits = 0;
+                    const grpGroups = _.groupBy(delUnits, "groupName");
+                    const tRem = Object.keys(grpGroups).length - engineCache.config.maxTroops;
 
-                }
-                let curUnits = 0;
-                const grpGroups = _.groupBy(delUnits, "groupName");
-                const tRem = Object.keys(grpGroups).length - engineCache.config.maxTroops;
-
-                for (const gUnitKey of Object.keys(grpGroups)) {
-                    if (curUnits <= tRem) {
-                        for (const unit of grpGroups[gUnitKey]) {
-                            await ddcsControllers.unitActionUpdateByUnitId({unitId: unit.unitId, dead: true});
-                            await ddcsControllers.destroyUnit(unit.name, "unit");
+                    for (const gUnitKey of Object.keys(grpGroups)) {
+                        if (curUnits <= tRem) {
+                            for (const unit of grpGroups[gUnitKey]) {
+                                await ddcsControllers.unitActionUpdateByUnitId({unitId: unit.unitId, dead: true});
+                                await ddcsControllers.destroyUnit(unit.name, "unit");
+                            }
+                            curUnits++;
                         }
-                        curUnits++;
                     }
-                }
-                const curSpawnUnit = _.cloneDeep(await ddcsControllers.getRndFromSpawnCat(
-                    curUnit.troopType,
-                    curUnit.coalition,
-                    false,
-                    true
-                )[0]);
+                    const curSpawnUnit = _.cloneDeep(await ddcsControllers.getRndFromSpawnCat(
+                        curUnit.troopType,
+                        curUnit.coalition,
+                        false,
+                        true
+                    )[0]);
 
-                for (
-                    let x = 0;
-                    x < curSpawnUnit.config[engineCache.config.timePeriod].spawnCount;
-                    x++
-                ) {
-                    const spawnArray = {
-                        name: genName + (randInc + x),
-                        groupName: genName + randInc,
-                        type: curSpawnUnit.type,
-                        lonLatLoc: ddcsControllers.getLonLatFromDistanceDirection(
-                            curUnit.lonLatLoc,
-                            curUnit.hdg + (x * 10),
-                            0.05
-                        ),
-                        hdg: curUnit.hdg,
-                        country: curUnit.country,
-                        unitCategory: curSpawnUnit.unitCategory,
-                        playerCanDrive: true,
-                        coalition: curUnit.coalition
-                    };
-                    curTroops.push(spawnArray);
-                }
-                await ddcsControllers.unitActionUpdateByUnitId({
-                    unitId: pObj.unitId,
-                    troopType: null
-                })
-                    .catch((err) => {
-                        console.log("erroring line73: ", err);
+                    for (
+                        let x = 0;
+                        x < curSpawnUnit.config[engineCache.config.timePeriod].spawnCount;
+                        x++
+                    ) {
+                        const spawnArray = {
+                            name: genName + (randInc + x),
+                            groupName: genName + randInc,
+                            type: curSpawnUnit.type,
+                            lonLatLoc: ddcsControllers.getLonLatFromDistanceDirection(
+                                curUnit.lonLatLoc,
+                                curUnit.hdg + (x * 10),
+                                0.05
+                            ),
+                            hdg: curUnit.hdg,
+                            country: curUnit.country,
+                            unitCategory: curSpawnUnit.unitCategory,
+                            playerCanDrive: true,
+                            coalition: curUnit.coalition
+                        };
+                        curTroops.push(spawnArray);
+                    }
+                    await ddcsControllers.unitActionUpdateByUnitId({
+                        unitId: pObj.unitId,
+                        troopType: null
                     })
-                ;
-                console.log("spawning Unit")
-                await ddcsControllers.spawnUnitGroup(curTroops, false);
-                await ddcsControllers.sendMesgToGroup(
-                    curPlayer,
-                    curUnit.groupId,
-                    "G: " + i18n.HASBEENDEPLOYED.replace("#1", curSpawnUnit.type),
-                    5
-                );
-                let currentMass = 1000;
-                if (curUnit.intCargoType){
-                    currentMass = 2000 ;
+                        .catch((err) => {
+                            console.log("erroring line73: ", err);
+                        })
+                    ;
+                    console.log("spawning Unit")
+                    await ddcsControllers.spawnUnitGroup(curTroops, false);
+                    await ddcsControllers.sendMesgToGroup(
+                        curPlayer,
+                        curUnit.groupId,
+                        "G: " + i18n.HASBEENDEPLOYED.replace("#1", curSpawnUnit.type),
+                        5
+                    );
+                    let currentMass = 1000;
+                    if (curUnit.intCargoType){
+                        currentMass = 2000 ;
+                    }
+                    await setInternalCargoMass(curUnit.name, currentMass - 1000);
+                }else{
+                    console.log("troopType is a not string")   
+                    const curTroops: any[] = [];             
+                    const delUnits = await ddcsControllers.unitActionReadStd({
+                        playerOwnerId: curPlayer.ucid,
+                        isTroop: true,
+                        dead: false
+                    });
+                    if (curUnit.troopType[0].spawnCat == "MANPAD"){
+                        for (const unit of delUnits){
+                            if (unit.spawnCat == "MANPAD"){
+                                await ddcsControllers.unitActionUpdateByUnitId({unitId: unit.unitId, dead: true});
+                                await ddcsControllers.destroyUnit(unit.name, "unit");
+                            }
+
+                        }
+
+                    }
+                    let curUnits = 0;
+                    const grpGroups = _.groupBy(delUnits, "groupName");
+                    const tRem = Object.keys(grpGroups).length - engineCache.config.maxTroops;
+
+                    for (const gUnitKey of Object.keys(grpGroups)) {
+                        if (curUnits <= tRem) {
+                            for (const unit of grpGroups[gUnitKey]) {
+                                await ddcsControllers.unitActionUpdateByUnitId({unitId: unit.unitId, dead: true});
+                                await ddcsControllers.destroyUnit(unit.name, "unit");
+                            }
+                            curUnits++;
+                        }
+                    }
+                    let x = 0
+                    for (
+                        let unit of curUnit.troopType
+                    ) {
+                        const spawnArray = {
+                            name: unit.name,
+                            groupName: unit.groupName,
+                            type: unit.type,
+                            lonLatLoc: ddcsControllers.getLonLatFromDistanceDirection(
+                                curUnit.lonLatLoc,
+                                curUnit.hdg + (x * 10),
+                                0.05
+                            ),
+                            hdg: curUnit.hdg,
+                            country: unit.country,
+                            unitCategory: unit.unitCategory,
+                            playerCanDrive: true,
+                            coalition: curUnit.coalition
+                        };
+                        curTroops.push(spawnArray);
+                        x = x + 1
+                    }
+                    await ddcsControllers.unitActionUpdateByUnitId({
+                        unitId: pObj.unitId,
+                        troopType: null
+                    })
+                        .catch((err) => {
+                            console.log("erroring line73: ", err);
+                        })
+                    ;
+                    console.log("spawning Unit")
+                    await ddcsControllers.spawnUnitGroup(curTroops, false);
+                    await ddcsControllers.sendMesgToGroup(
+                        curPlayer,
+                        curUnit.groupId,
+                        "G: " + i18n.HASBEENDEPLOYED.replace("#1", curUnit.troopType[0].type),
+                        5
+                    );
+                    let currentMass = 1000;
+                    if (curUnit.intCargoType){
+                        currentMass = 2000 ;
+                    }
+                    await setInternalCargoMass(curUnit.name, currentMass - 1000);
+
                 }
-                await setInternalCargoMass(curUnit.name, currentMass - 1000);
             }
         } else {
             const troopUnits = await ddcsControllers.getTroopsInProximity(curUnit.lonLatLoc, 0.2, curUnit.coalition);
