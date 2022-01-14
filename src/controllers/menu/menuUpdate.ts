@@ -18,6 +18,7 @@ export async function spawnNewMenuCategory(
     massType?: string,
     startingWeight?: number
 ): Promise<number> {
+    console.log("Spawning Menu For:",playerUnit)
     const massTypeString = (massType) ? " " + massType : "";
     let curWeight = _.cloneDeep(startingWeight);
     // start with clean slate
