@@ -96,20 +96,22 @@ export async function initializeMenu(playerUnit: any): Promise<void> {
         return (menuCommand.allowedUnitTypes.length === 0 || _.includes(menuCommand.allowedUnitTypes, playerUnit.type)) &&
             (menuCommand.side === 0 || menuCommand.side === playerUnit.coalition);
     });
+    let timeDelay = -100
     // build master menu levels, every first lvl, clear menu line out
     for (let i = 0; i < checkMenuLevels; i++) {
         const curMenuLvls = _.groupBy(curMenuCommands, (gb: any) => gb.menuPath[i]);
         for (const curMenuName of Object.keys(curMenuLvls)) {
+            timeDelay = timeDelay + 100
             if ( curMenuName !== "undefined" ) {
                 if (curMenuLvls[curMenuName][0].cmdProp.mass) {
                     // dirty fix for light crate menu, drex to revisit ~Kirkwood
                     if (playerUnit.type === "UH-1H") {
-                        lightCrateWeight = await spawnNewMenuCategory(playerUnit, curMenuLvls, curMenuName, i, "Light", lightCrateWeight);
+                        setTimeout(() => { spawnNewMenuCategory(playerUnit, curMenuLvls, curMenuName, i, "Light", lightCrateWeight);}, timeDelay);                        
                     } else {
-                        heavyCrateWeight = await spawnNewMenuCategory(playerUnit, curMenuLvls, curMenuName, i, "Heavy", heavyCrateWeight);
+                        setTimeout(() => { spawnNewMenuCategory(playerUnit, curMenuLvls, curMenuName, i, "Heavy", heavyCrateWeight);}, timeDelay);                        
                     }
                 } else {
-                    await spawnNewMenuCategory(playerUnit, curMenuLvls, curMenuName, i);
+                    setTimeout(() => { spawnNewMenuCategory(playerUnit, curMenuLvls, curMenuName, i);}, timeDelay);
                 }
             }
         }
