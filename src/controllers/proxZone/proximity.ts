@@ -408,3 +408,33 @@ export async function isPlayerInProximity(lonLat: number[], kmDistance: number, 
     });
     return chkPlayers.length > 0;
 }
+
+export async function getPackableUnitsInProximity(lonLat: number[], kmDistance: number, coalition: number): Promise<typing.IUnit[]> {
+    return await ddcsControllers.unitActionReadStd({
+            dead: false,
+            lonLatLoc: {
+                $near: {
+                    $geometry: {
+                        type: "Point",
+                        coordinates: lonLat
+                    },
+                    $maxDistance: kmDistance * 1000
+                }
+            },
+            playername: {
+                $eq: ""
+            },
+            type: {
+                $in: [
+                    "Soldier M249",
+                    "Infantry AK",
+                    "Stinger manpad",
+                    "Soldier M4",
+                    "Paratrooper RPG-16",
+                    "2B11 mortar",
+                    "SA-18 Igla manpad"
+                ]
+            },
+            coalition
+        });
+}

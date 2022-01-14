@@ -16,11 +16,13 @@ export function unitDictionaryModel(dbconn: mongoose.Connection): mongoose.Docum
             },
             warbondCost: {
                 type: Number,
-                default: 250
+                default: 250,
+                required: true
             },
             warbondKillMultiplier: {
                 type: Number,
-                default: 1.0
+                default: 1.0,
+                required: true
             },
             objectCategory: {
                 type: Number
@@ -104,6 +106,11 @@ export function unitDictionaryModel(dbconn: mongoose.Connection): mongoose.Docum
             mobileBaseDefense: {
                 type: Boolean,
                 default: false
+            },
+            packable: {
+                type: Boolean,
+                default:false,
+                required: true
             }
         },
         {
