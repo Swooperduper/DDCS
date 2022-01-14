@@ -410,6 +410,13 @@ export async function isPlayerInProximity(lonLat: number[], kmDistance: number, 
 }
 
 export async function getPackableUnitsInProximity(lonLat: number[], kmDistance: number, coalition: number): Promise<typing.IUnit[]> {
+    const engineCache = ddcsControllers.getEngineCache();
+    const packableUnitsDicts = _.filter(engineCache.unitDictionary, {packable: true});
+    const packableTypes: any[] = [];
+    for (let unit of packableUnitsDicts){
+        packableTypes.push(unit.type)
+    }
+    console.log("packableTypes:",packableTypes);
     return await ddcsControllers.unitActionReadStd({
             dead: false,
             lonLatLoc: {
@@ -425,15 +432,7 @@ export async function getPackableUnitsInProximity(lonLat: number[], kmDistance: 
                 $eq: ""
             },
             type: {
-                $in: [
-                    "Soldier M249",
-                    "Infantry AK",
-                    "Stinger manpad",
-                    "Soldier M4",
-                    "Paratrooper RPG-16",
-                    "2B11 mortar",
-                    "SA-18 Igla manpad"
-                ]
+                $in: packableTypes
             },
             coalition
         });

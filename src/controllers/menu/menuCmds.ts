@@ -564,20 +564,20 @@ export async function menuCmdProcess(pObj: any) {
                         await ddcsControllers.sendMesgToGroup(
                             curPlayer,
                             curUnit.groupId,
-                            "G: Please land beforte trying to pack the unit",
+                            "G: Please land before trying to pack the unit",
                             5
                         );
                     } else {
-                        const unit = await ddcsControllers.getTroopsInProximity(curUnit.lonLatLoc, 0.2, curUnit.coalition);
+                        const unit = await ddcsControllers.getPackableUnitsInProximity(curUnit.lonLatLoc, 0.2, curUnit.coalition);
                         const curTroop = unit[0];
                         if (curTroop) {
                             await ddcsControllers.sendMesgToGroup(
                                 curPlayer,
                                 curUnit.groupId,
-                                "G: Troops are boarding, wait for them to finish",
+                                "G: The unit is now being packed, wait for it to finish packing before moving",
                                 5
                             );
-                            setTimeout(() => {unloadExtractTroops(curUnit,curPlayer,i18n,pObj,engineCache);}, _.random(10,20)*1000);
+                            //setTimeout(() => {unloadExtractTroops(curUnit,curPlayer,i18n,pObj,engineCache);}, _.random(10,20)*1000);
                             
                         }else{
                             await ddcsControllers.sendMesgToGroup(
