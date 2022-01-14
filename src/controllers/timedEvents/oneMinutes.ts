@@ -23,9 +23,13 @@ export async function processOneMinuteActions(fullySynced: boolean): Promise<voi
                 _id: /DU\|/,
                 dead: false
             });
+            let timeDelay = -100
             for (const playerUnit of playerUnits) {
-                await ddcsControllers.initializeMenu(playerUnit);
+                timeDelay = timeDelay +100
+                setTimeout(() => { ddcsControllers.initializeMenu(playerUnit);}, timeDelay);
+                console.log("Current Time Delay is", timeDelay/1000,"Seconds")
             }
+            console.log("Finished Loop for Drawing Unit Menu's")
         }   
     }
 }
