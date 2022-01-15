@@ -2522,7 +2522,7 @@ export async function packNearbyUnitIntoIntCargo(curUnit:any, curPlayer:any, uni
                 await ddcsControllers.destroyUnit(unitToPack.name, "unit");
                 await ddcsControllers.unitActionUpdateByUnitId({
                     unitId: curUnit.unitId,
-                    internalCargo: unitToPack
+                    intCargoType: unitToPack
                 })
                     .catch((err) => {
                         console.log("erroring line57: ", err);
