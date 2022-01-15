@@ -538,7 +538,6 @@ export async function menuCmdProcess(pObj: any) {
         if (player.length > 0) {
             const curPlayer = player[0];
             const i18n = new I18nResolver(engineCache.i18n, curPlayer.lang).translation as any;
-            let curSpawnUnit;
             // action menu
             switch (pObj.cmd) {
                 case "serverTimeLeft":
@@ -574,16 +573,16 @@ export async function menuCmdProcess(pObj: any) {
                             await ddcsControllers.sendMesgToGroup(
                                 curPlayer,
                                 curUnit.groupId,
-                                "G: The unit is now being packed, wait for it to finish packing before moving",
+                                "G: The nearby "+curTroop.type+" is now being packed, wait for it to finish packing before moving",
                                 5
                             );
-                            //setTimeout(() => {unloadExtractTroops(curUnit,curPlayer,i18n,pObj,engineCache);}, _.random(10,20)*1000);
+                            setTimeout(() => {packNearbyUnitIntoIntCargo(curUnit, curPlayer, curTroop);}, _.random(10,20)*1000);
                             
                         }else{
                             await ddcsControllers.sendMesgToGroup(
                                 curPlayer,
                                 curUnit.groupId,
-                                "G:" + i18n.NOTROOPSTOEXTRACTORUNLOAD,
+                                "G:No packable units are nearby",
                                 5
                             );
                         }
@@ -2093,8 +2092,8 @@ export async function deployTroops(unitId:string, curPlayer:any, i18n:any, proxy
                         type: unit.type,
                         lonLatLoc: ddcsControllers.getLonLatFromDistanceDirection(
                             curUnit.lonLatLoc,
-                            curUnit.hdg + (x * 10),
-                            0.05
+                            curUnit.hdg + 30 + (x * 10),
+                            0.003
                         ),
                         hdg: curUnit.hdg,
                         country: unit.country,
@@ -2496,6 +2495,56 @@ export async function unpackIntCrate(
         return false;
     }        
 }
+
+export async function packNearbyUnitIntoIntCargo(curUnit:any, curPlayer:any, unitToPack:any) {
+    const units = await ddcsControllers.unitActionRead({name: curUnit.name, dead: false})
+    if(units.length > 0){
+        const deltaAGL = Math.abs(curUnit.agl - units[0].agl);
+        const lonLatStart = curUnit.lonLatLoc;
+        const lonLatEnd = units[0].lonLatLoc;
+        const distanceMovedXZ = await ddcsControllers.calcDirectDistanceInKm(lonLatStart[1], lonLatStart[0], lonLatEnd[1], lonLatEnd[0]) * 1000; 
+        if (distanceMovedXZ > 1 || deltaAGL > 1 || units[0].dead == true){
+            await ddcsControllers.sendMesgToGroup(
+                curPlayer,
+                curUnit.groupId,
+                "G: You moved and were unable to pack the unit your internal cargo, please remain still until it has loaded.",
+                5
+            );
+        }else{
+            if(unitToPack.dead){
+                await ddcsControllers.sendMesgToGroup(
+                    curPlayer,
+                    curUnit.groupId,
+                    "G: The "+unitToPack.type+" you attempted to pack was killed before it could be loaded.",
+                    5
+                );
+            }else{
+                await ddcsControllers.destroyUnit(unitToPack.name, "unit");
+                await ddcsControllers.unitActionUpdateByUnitId({
+                    unitId: curUnit.unitId,
+                    internalCargo: unitToPack
+                })
+                    .catch((err) => {
+                        console.log("erroring line57: ", err);
+                    });
+                await ddcsControllers.sendMesgToGroup(
+                    curPlayer,
+                    curUnit.groupId,
+                    "G:"+unitToPack.type+"has been successfully packed onto your vehicle.",
+                    5
+                );
+                let currentMass = 0;
+                if (curUnit.intCargoType){
+                    currentMass = 1000 ;
+                }
+                await setInternalCargoMass(curUnit.name, currentMass + 1000);
+            }
+        }
+    }else{
+        console.log(curUnit.name,"was dead before it could finish loading")
+    }
+}
+
 
 /*export async function spawnStaticObject(){
     let spawnObj = {
