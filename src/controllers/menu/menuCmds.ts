@@ -287,8 +287,18 @@ export async function isCrateOnboard(unit: any, verbose: boolean) {
     const curPly = curPlayerArray[0];
     const engineCache = ddcsControllers.getEngineCache();
     const i18n = new I18nResolver(engineCache.i18n, curPly.lang).translation as any;
-    console.log("unit.virtCrateType:",unit.virtCrateType, "unit.virtCrateType:",unit.intCargoType)
-    if (unit.virtCrateType | unit.intCargoType) {
+    if (unit.intCargoType) {
+        if (verbose) {
+            await ddcsControllers.sendMesgToGroup(
+                curPly,
+                unit.groupId,
+                "G: A "+unit.intCargoType[0].type+" is currently packed onboard",
+                5
+            );
+        }
+        return true;
+    }
+    if (unit.virtCrateType) {
         if (verbose) {
             await ddcsControllers.sendMesgToGroup(
                 curPly,
@@ -896,7 +906,7 @@ export async function menuCmdProcess(pObj: any) {
                                 5
                             );
                         } else {
-                            if(curUnit.intCargoType){
+                            if(await isCrateOnboard(curUnit, true)){
                                 await ddcsControllers.sendMesgToGroup(
                                     curPlayer,
                                     curUnit.groupId,
