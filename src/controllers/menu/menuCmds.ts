@@ -292,7 +292,7 @@ export async function isCrateOnboard(unit: any, verbose: boolean) {
             await ddcsControllers.sendMesgToGroup(
                 curPly,
                 unit.groupId,
-                "G: A "+unit.intCargoType[0].type+" is currently packed onboard",
+                "G: A "+unit.intCargoType.type+" is currently packed onboard",
                 5
             );
         }
@@ -913,7 +913,7 @@ export async function menuCmdProcess(pObj: any) {
                                     "G: "+curUnit.intCargoType+" is currently being unpacked, please remain still until it completes",
                                     5
                                 );
-                                setTimeout(() => {unloadPackedUnit(curUnit,curPlayer,i18n,pObj,engineCache);}, _.random(10,20)*1000);
+                                setTimeout(() => {unloadPackedUnit(curUnit,curPlayer);}, _.random(10,20)*1000);
                             }else{
                                 await ddcsControllers.sendMesgToGroup(
                                     curPlayer,
@@ -2586,7 +2586,7 @@ export async function packNearbyUnitIntoIntCargo(curUnit:any, curPlayer:any, uni
     }
 }
 
-export async function unloadPackedUnit(curUnit:any, curPlayer:any, i18n:any, pObj:any, engineCache:any) {
+export async function unloadPackedUnit(curUnit:any, curPlayer:any) {
     const units = await ddcsControllers.unitActionRead({playername: curPlayer.name})
     if (units[0].inAir || units[0].speed > 1 || units[0].dead == true){
         await ddcsControllers.sendMesgToGroup(
@@ -2627,8 +2627,8 @@ export async function unloadPackedUnit(curUnit:any, curPlayer:any, i18n:any, pOb
 
             const curCMD = await spawnGrp(
                 _.replace(groupTemplate, "#UNITS", unitTemplate),
-                curUnit.intCargoType[0].country,
-                curUnit.intCargoType[0].unitCategory)
+                curUnit.intCargoType.country,
+                curUnit.intCargoType.unitCategory)
             //console.log("spawnUnitGroup: ", curCMD);
             const sendClient = {actionObj: {action: "CMD", cmd: [curCMD], reqID: 0}};
             await ddcsControllers.sendUDPPacket("frontEnd", sendClient);
