@@ -287,6 +287,7 @@ export async function isCrateOnboard(unit: any, verbose: boolean) {
     const curPly = curPlayerArray[0];
     const engineCache = ddcsControllers.getEngineCache();
     const i18n = new I18nResolver(engineCache.i18n, curPly.lang).translation as any;
+    console.log("unit.virtCrateType:",unit.virtCrateType, "unit.virtCrateType:",unit.intCargoType)
     if (unit.virtCrateType | unit.intCargoType) {
         if (verbose) {
             await ddcsControllers.sendMesgToGroup(
@@ -895,7 +896,7 @@ export async function menuCmdProcess(pObj: any) {
                                 5
                             );
                         } else {
-                            if(await isCrateOnboard(curUnit, true)){
+                            if(curUnit.intCargoType){
                                 await ddcsControllers.sendMesgToGroup(
                                     curPlayer,
                                     curUnit.groupId,
