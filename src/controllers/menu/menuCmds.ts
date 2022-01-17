@@ -10,6 +10,8 @@ import * as ddcsController from "../action/unitDetection";
 import {I18nResolver} from "i18n-ts";
 import { Decimal128 } from "mongoose";
 import { count } from "node:console";
+import { type } from "node:os";
+import {IGroundUnitTemp, IStaticSpawnMin} from "../../typings";
 
 export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: string) {
     const engineCache = ddcsControllers.getEngineCache();
@@ -882,7 +884,35 @@ export async function menuCmdProcess(pObj: any) {
                     await spawnReinforcements(curUnit, curPlayer, pObj.type, pObj.cost, pObj.costType);
                     break;
                 case "InternalCargo":
-                    await internalCargo(curUnit, curPlayer, pObj.type);
+                    if (typeof curUnit.intCargoType === 'string'){
+                        await internalCargo(curUnit, curPlayer, pObj.type);
+                    } else {
+                        if (curUnit.inAir || curUnit.speed > 0.5) {
+                            await ddcsControllers.sendMesgToGroup(
+                                curPlayer,
+                                curUnit.groupId,
+                                "G: You must land and be stationary before trying to unpack.",
+                                5
+                            );
+                        } else {
+                            if(await isCrateOnboard(curUnit, true)){
+                                await ddcsControllers.sendMesgToGroup(
+                                    curPlayer,
+                                    curUnit.groupId,
+                                    "G: "+curUnit.intCargoType+" is currently being unpacked, please remain still until it completes",
+                                    5
+                                );
+                                setTimeout(() => {unloadPackedUnit(curUnit,curPlayer,i18n,pObj,engineCache);}, _.random(10,20)*1000);
+                            }else{
+                                await ddcsControllers.sendMesgToGroup(
+                                    curPlayer,
+                                    curUnit.groupId,
+                                    "There currently is no cargo onboard",
+                                    5
+                                );
+                            }
+                        }
+                    }
                     break;
             }
         }
@@ -2545,7 +2575,73 @@ export async function packNearbyUnitIntoIntCargo(curUnit:any, curPlayer:any, uni
     }
 }
 
+export async function unloadPackedUnit(curUnit:any, curPlayer:any, i18n:any, pObj:any, engineCache:any) {
+    const units = await ddcsControllers.unitActionRead({playername: curPlayer.name})
+    if (units[0].inAir || units[0].speed > 1 || units[0].dead == true){
+        await ddcsControllers.sendMesgToGroup(
+            curPlayer,
+            curUnit.groupId,
+            "G: Troops were unable to embark/disembark because you were moving",
+            5
+        );
+    }else{
+        if (await isCrateOnboard(curUnit, true)) {           
+            console.log("Cargo type is a not string")   
+            let x = 0
+            let listOfUnits = {}
+            for (let unit of curUnit.intCargoType) {
+                unit.lonLatLoc = ddcsControllers.getLonLatFromDistanceDirection(
+                curUnit.lonLatLoc,
+                curUnit.hdg + (x * 10),
+                0.05
+                )
+                x = x + 1
+                listOfUnits =  "\n" + listOfUnits + unit.type
+            }
+            // await ddcsControllers.unitActionUpdateByUnitId({
+            //     unitId: pObj.unitId,
+            //     intCargoType: null
+            // })
+            //     .catch((err) => {
+            //         console.log("erroring line73: ", err);
+            //     })
+            //;
+            console.log("spawning Unit")
+            let unitTemplate = "";
+            //await ddcsControllers.spawnUnitGroup(packedUnits, false);
+            for (let unitObj of curUnit.intCargoType){
+                unitTemplate += await ddcsControllers.grndUnitTemplate(unitObj as IGroundUnitTemp);
+            }        
+            let groupTemplate = await ddcsControllers.grndUnitGroup(curUnit.intCargoType[0])
 
+            const curCMD = await spawnGrp(
+                _.replace(groupTemplate, "#UNITS", unitTemplate),
+                curUnit.intCargoType[0].country,
+                curUnit.intCargoType[0].unitCategory)
+            //console.log("spawnUnitGroup: ", curCMD);
+            const sendClient = {actionObj: {action: "CMD", cmd: [curCMD], reqID: 0}};
+            await ddcsControllers.sendUDPPacket("frontEnd", sendClient);
+            await ddcsControllers.sendMesgToGroup(
+                curPlayer,
+                curUnit.groupId,
+                "G: The following units have been unpacked:"+listOfUnits,
+                5
+            );
+            let currentMass = 1000;
+            if (curUnit.troopType){
+                currentMass = 2000 ;
+            }
+            await setInternalCargoMass(curUnit.name, currentMass - 1000);
+        } else {
+            await ddcsControllers.sendMesgToGroup(
+            curPlayer,
+            curUnit.groupId,
+            "G:There is currently nothing onboard to unpack.",
+            5
+            );
+        }
+    }
+}
 /*export async function spawnStaticObject(){
     let spawnObj = {
         _id: curName,
