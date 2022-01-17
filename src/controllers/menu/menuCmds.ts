@@ -287,7 +287,7 @@ export async function isCrateOnboard(unit: any, verbose: boolean) {
     const curPly = curPlayerArray[0];
     const engineCache = ddcsControllers.getEngineCache();
     const i18n = new I18nResolver(engineCache.i18n, curPly.lang).translation as any;
-    if (unit.virtCrateType) {
+    if (unit.virtCrateType | unit.intCargoType) {
         if (verbose) {
             await ddcsControllers.sendMesgToGroup(
                 curPly,
