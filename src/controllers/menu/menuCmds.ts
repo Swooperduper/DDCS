@@ -910,7 +910,7 @@ export async function menuCmdProcess(pObj: any) {
                                 await ddcsControllers.sendMesgToGroup(
                                     curPlayer,
                                     curUnit.groupId,
-                                    "G: "+curUnit.intCargoType+" is currently being unpacked, please remain still until it completes",
+                                    "G: The unit onboard is currently being unpacked, please remain still until it completes",
                                     5
                                 );
                                 setTimeout(() => {unloadPackedUnit(curUnit,curPlayer);}, _.random(10,20)*1000);
@@ -2627,7 +2627,7 @@ export async function unloadPackedUnit(curUnit:any, curPlayer:any) {
             await ddcsControllers.sendMesgToGroup(
                 curPlayer,
                 curUnit.groupId,
-                "G: The following unit have been unpacked:"+curUnit.intCargoType.Type,
+                "G: A "+curUnit.intCargoType.type+" has successfully been unpacked",
                 5
             );
             let currentMass = 1000;
