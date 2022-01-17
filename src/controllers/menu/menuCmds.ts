@@ -2599,16 +2599,11 @@ export async function unloadPackedUnit(curUnit:any, curPlayer:any) {
         if (await isCrateOnboard(curUnit, true)) {           
             console.log("Cargo type is a not string")   
             let x = 0
-            let listOfUnits = {}
-            for (let unit of curUnit.intCargoType) {
-                unit.lonLatLoc = ddcsControllers.getLonLatFromDistanceDirection(
-                curUnit.lonLatLoc,
-                curUnit.hdg + (x * 10),
-                0.05
-                )
-                x = x + 1
-                listOfUnits =  "\n" + listOfUnits + unit.type
-            }
+            curUnit.intCargoType.lonLatLoc = ddcsControllers.getLonLatFromDistanceDirection(
+            curUnit.lonLatLoc,
+            curUnit.hdg + (x * 10),
+            0.05
+            )
             // await ddcsControllers.unitActionUpdateByUnitId({
             //     unitId: pObj.unitId,
             //     intCargoType: null
@@ -2617,13 +2612,10 @@ export async function unloadPackedUnit(curUnit:any, curPlayer:any) {
             //         console.log("erroring line73: ", err);
             //     })
             //;
-            console.log("spawning Unit")
-            let unitTemplate = "";
-            //await ddcsControllers.spawnUnitGroup(packedUnits, false);
-            for (let unitObj of curUnit.intCargoType){
-                unitTemplate += await ddcsControllers.grndUnitTemplate(unitObj as IGroundUnitTemp);
-            }        
-            let groupTemplate = await ddcsControllers.grndUnitGroup(curUnit.intCargoType[0])
+
+            let unitTemplate = await ddcsControllers.grndUnitTemplate(curUnit.intCargoType as IGroundUnitTemp);
+    
+            let groupTemplate = await ddcsControllers.grndUnitGroup(curUnit.intCargoType)
 
             const curCMD = await spawnGrp(
                 _.replace(groupTemplate, "#UNITS", unitTemplate),
@@ -2635,7 +2627,7 @@ export async function unloadPackedUnit(curUnit:any, curPlayer:any) {
             await ddcsControllers.sendMesgToGroup(
                 curPlayer,
                 curUnit.groupId,
-                "G: The following units have been unpacked:"+listOfUnits,
+                "G: The following unit have been unpacked:"+curUnit.intCargoType.Type,
                 5
             );
             let currentMass = 1000;
