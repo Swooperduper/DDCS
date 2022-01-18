@@ -502,15 +502,19 @@ export async function srvPlayerActionsUnitAddToWarbonds(obj: {
         dbModels.srvPlayerModel.find({_id: obj._id}, (err: any, serverObj: any[]) => {
             if (err) { reject(err); }
             if (serverObj.length !== 0) {
+                console.log("Score to add:",obj.score)
                 let message: string;
                 const curPly = serverObj[0];
                 const i18n = new I18nResolver(engineCache.i18n, curPly.lang).translation as any;
                 const addScore = obj.score || 0;
+                console.log("addScore:",obj.score)
                 const curType = obj.unitType || "";
                 const tObj: any = {};
                 if (obj.unitCoalition === curPly.side) {
                     message = i18n.AWARDEDRSPOINTSFROMUNIT.replace("#1", addScore).replace("#2", curType).replace("#3", "red");
+                    console.log(curPly.warbonds,"+",addScore)
                     tObj.warbonds = (curPly.warbonds || 0) + addScore;
+                    console.log(curPly.warbonds,"+",addScore,"=",tObj.warbonds)
                     dbModels.srvPlayerModel.updateOne(
                         {_id: obj._id},
                         {$set: tObj},

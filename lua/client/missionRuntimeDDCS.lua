@@ -808,7 +808,7 @@ function clientEventHandler:onEvent(_event)
         end
     end, _event)
     if (not status) then
-        env.info("failEvent: ".. err)
+        -- env.info("failEvent: ".. err)
     end
 end
 
