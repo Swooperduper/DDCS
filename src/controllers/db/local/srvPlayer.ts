@@ -475,7 +475,7 @@ export async function srvPlayerActionsAddTempWarbonds(obj: {
                 const newtmpWarbonds = (serverObj[0].tmpWarbonds || 0) + (obj.score || 0);
                 dbModels.srvPlayerModel.updateOne(
                     {_id: obj._id},
-                    {$set: {tmpRSPoints: newtmpWarbonds}},
+                    {$set: {tmpWarbonds: newtmpWarbonds}},
                     (updateErr: any) => {
                         if (updateErr) { reject(updateErr); }
                         if (engineCache.config.inGameHitMessages) {
