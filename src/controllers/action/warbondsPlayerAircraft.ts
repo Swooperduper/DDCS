@@ -194,7 +194,7 @@ export async function checkAircraftCosts(): Promise<void> {
                     const curUnit = cUnit[0];
                     if(!curUnit.inAir){
                         const curUnitDictionary = _.find(engineCache.unitDictionary, {_id: curUnit.type});
-                        const curUnitwarbondCost = (curUnitDictionary) ? curUnitDictionary.warbondCost : 1;
+                        let curUnitwarbondCost = (curUnitDictionary) ? curUnitDictionary.warbondCost : 1;
                         let totalTakeoffCosts = 0;
                         let weaponCost = 0
                         let weaponCostString = ""
@@ -206,6 +206,10 @@ export async function checkAircraftCosts(): Promise<void> {
                             weaponCost = weaponCost + thisweaponCost
                             weaponCostString = weaponCostString.concat(",",value.count.toString(),"x",weaponDisplayName,"(",(thisweaponCost/value.count).toString(),")")
                         }
+                        if (_.includes(engineCache.config.freeAirframeBases,curUnit.groupName.split(" @")[0])){
+                            curUnitwarbondCost = 0;
+                            console.log(curPlayer, " took off in a free aircraft");
+                        }                        
                         totalTakeoffCosts = curUnitwarbondCost + weaponCost;
                         if ((curPlayer.warbonds || 0) < totalTakeoffCosts) {
                             message = "G:You Do Not Have Enough Warbonds To Takeoff In" + curUnit.type + "with you current loadout("+ totalTakeoffCosts.toFixed(2) +"/"+curPlayer.warbonds.toFixed(2)+")"
