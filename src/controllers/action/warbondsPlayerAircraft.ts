@@ -214,7 +214,7 @@ export async function checkAircraftCosts(): Promise<void> {
                         }                        
                         totalTakeoffCosts = curUnitwarbondCost + weaponCost;
                         if ((curPlayer.warbonds || 0) < totalTakeoffCosts) {
-                            message = "G:You Do Not Have Enough Warbonds To Takeoff In" + curUnit.type + "with you current loadout("+ totalTakeoffCosts.toFixed(2) +"/"+curPlayer.warbonds.toFixed(2)+")"
+                            message = "G:You Do Not Have Enough Warbonds To Takeoff In a " + curUnit.type + "with your current loadout("+ totalTakeoffCosts.toFixed(2) +"/"+curPlayer.warbonds.toFixed(2)+")"
                                 .replace("#2", totalTakeoffCosts.toFixed(2)).replace("#3", curPlayer.warbonds.toFixed(2));
                             console.log(curPlayer.name + " " + message);
                             await ddcsControllers.sendMesgToGroup(curPlayer, curUnit.groupId, message, 30);
