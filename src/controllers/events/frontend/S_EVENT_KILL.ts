@@ -17,6 +17,7 @@ export async function processEventKill(eventObj: any): Promise<void> {
     let curTarget: any = {};
 
     if (eventObj && eventObj.data) {
+        console.log("eventObj:",eventObj);
         let initSide = 0;
         let targetSide = 0;
 
@@ -36,8 +37,8 @@ export async function processEventKill(eventObj: any): Promise<void> {
                 }
                 // console.log("playerOwner: ", !!curInitiator.playerOwner,
                 // curInitiator.playerOwner, curInitiator.player, curInitiator.unit);
-                console.log(eventObj.data.target.type);
-                console.log(eventObj.data.weapon_name);
+                console.log("eventObj.data.target.type:",eventObj.data.target.type);
+                console.log("eventObj.data.weapon_name:",eventObj.data.weapon_name);
                 const killedUnitDict = _.find(engineCache.unitDictionary, {type : eventObj.data.target.type});
                 console.log("Test Case 1 - killedUnitDict:",killedUnitDict);
                 const killingWeaponDict = _.find(engineCache.weaponsDictionary, {_id : eventObj.data.weapon_name});
@@ -60,6 +61,7 @@ export async function processEventKill(eventObj: any): Promise<void> {
                 if (!!curInitiator.playerOwner && !!curInitiator.unit.playerOwnerId) {
                     const playerOwnerUnit = await ddcsControllers.unitActionRead({playername: curInitiator.playerOwner.name});
                     if (playerOwnerUnit.length > 0) {
+                        console.log("reward",reward)
                         await ddcsControllers.srvPlayerActionsUnitAddToWarbonds({
                             _id: curInitiator.unit.playerOwnerId,
                             score: reward,
@@ -71,6 +73,7 @@ export async function processEventKill(eventObj: any): Promise<void> {
                 }
 
                 if (!!curInitiator.player && !!curInitiator.player._id) {
+                    console.log("reward",reward)
                     await ddcsControllers.srvPlayerActionsAddTempWarbonds({
                         _id: curInitiator.player._id,
                         groupId: curInitiator.unit.groupId,
