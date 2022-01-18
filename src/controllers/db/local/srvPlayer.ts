@@ -470,11 +470,12 @@ export async function srvPlayerActionsAddTempWarbonds(obj: {
         dbModels.srvPlayerModel.find({_id: obj._id}, (err: any, serverObj: any[]) => {
             if (err) { reject(err); }
             if (serverObj.length !== 0) {
+                console.log("score:",obj.score)
                 const i18n = new I18nResolver(engineCache.i18n, serverObj[0].lang).translation as any;
-                const newTmpScore = (serverObj[0].tmpRSPoints || 0) + (obj.score || 0);
+                const newtmpWarbonds = (serverObj[0].tmpWarbonds || 0) + (obj.score || 0);
                 dbModels.srvPlayerModel.updateOne(
                     {_id: obj._id},
-                    {$set: {tmpRSPoints: newTmpScore}},
+                    {$set: {tmpRSPoints: newtmpWarbonds}},
                     (updateErr: any) => {
                         if (updateErr) { reject(updateErr); }
                         if (engineCache.config.inGameHitMessages) {
