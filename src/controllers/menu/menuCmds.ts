@@ -565,8 +565,8 @@ export async function menuCmdProcess(pObj: any) {
                 case "getTargetCoords":
                     await getActiveJTACTargets(curUnit, curPlayer, pObj.target);
                     break;
-                case "resourcePoints":
-                    await ddcsControllers.checkResourcePoints(curPlayer);
+                case "checkTempWarbonds":
+                    await ddcsControllers.checkTempWarbonds(curPlayer);
                     break;
                 case "checkWarBonds":
                     await ddcsControllers.checkWarBonds(curPlayer);

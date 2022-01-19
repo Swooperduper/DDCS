@@ -135,16 +135,8 @@ export async function processEventKill(eventObj: any): Promise<void> {
         
 
 
-        await ddcsControllers.sendMesgToAll(
-            "HASKILLED",
-            [
-                "#" + initSide,
-                initMesg,
-                "#" + targetSide,
-                targetMesg,
-                weaponMesg,
-                reward
-            ],
+        await ddcsControllers.sendMessageToAll(
+            initSide +" "+ initMesg + " has killed " + targetSide +" "+ targetMesg + " with " + weaponMesg + "("+ reward+ "Temp Warbonds)\n Land to bank these into your Warbond pool.",
             20,
             nowTime + ddcsControllers.time.oneMin
         );

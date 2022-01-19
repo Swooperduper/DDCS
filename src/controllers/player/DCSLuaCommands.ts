@@ -149,3 +149,31 @@ export async function sendMesgToGroup(player: ISrvPlayers, groupId: number, mesg
         }
     }
 }
+
+export async function sendMessageToAll(
+    messageInput: string,
+    time: number,
+    delayTime?: number
+): Promise<void> {
+    // send to everyone individually
+    const engineCache = ddcsController.getEngineCache();
+    const playerArray = ddcsController.getRTPlayerArray();
+    // console.log("PA: ", playerArray);
+    if (undefined != playerArray && playerArray.length > 0) {
+        for (const player of playerArray) {
+            const playersInfo = await ddcsController.srvPlayerActionsRead({_id: player._id});
+            if (playersInfo[0] && playersInfo[0].displayAllMessages) {
+                const playerUnits = await ddcsController.unitActionRead({dead: false, playername: playersInfo[0].name});
+                const curPlayerUnit = playerUnits[0] || {};
+                let message = "A: " + messageInput;
+                await sendMesgToGroup(
+                    playersInfo[0],
+                    curPlayerUnit.groupId,
+                    message,
+                    time,
+                    delayTime
+                );
+            }
+        }
+    }
+}

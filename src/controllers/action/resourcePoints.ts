@@ -105,18 +105,15 @@ export async function spendResourcePoints(
     }
 }
 
-export async function checkResourcePoints(player: typings.ISrvPlayers): Promise<void> {
+export async function checkTempWarbonds(player: typings.ISrvPlayers): Promise<void> {
     if (player.name) {
         const engineCache = ddcsControllers.getEngineCache();
         const i18n = new I18nResolver(engineCache.i18n, player.lang).translation as any;
         const cUnit = await ddcsControllers.unitActionRead({dead: false, playername: player.name});
         let message;
         if (cUnit.length > 0) {
-            if (player.side === 1) {
-                message = "G: " + i18n.YOUHAVERESOURCEPOINTS.replace("#1", player.redRSPoints).replace("#2", i18n[1]);
-            } else {
-                message = "G: " + i18n.YOUHAVERESOURCEPOINTS.replace("#1", player.blueRSPoints).replace("#2", i18n[2]);
-            }
+            message = "G: You have earned "+player.tmpWarbonds+" Temp Warbonds. \n When you land these will be added to your account in addiition to the refunded cost of your airframe plus any onboard munitions.";
+
 
             await ddcsControllers.sendMesgToGroup(
                 player,
