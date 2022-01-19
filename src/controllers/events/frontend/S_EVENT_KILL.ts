@@ -73,7 +73,7 @@ export async function processEventKill(eventObj: any): Promise<void> {
                             await ddcsControllers.srvPlayerActionsRemoveWarbonds({
                                 _id: curInitiator.player._id,
                                 groupId: curInitiator.unit.groupId,
-                                removeWarbonds: reward,
+                                removeWarbonds: Math.abs(reward),
                                 execAction: "Friendly Fire"
                             });
                         }else{
@@ -93,7 +93,7 @@ export async function processEventKill(eventObj: any): Promise<void> {
                         ddcsControllers.srvPlayerActionsRemoveWarbonds({
                             _id: curInitiator.player._id,
                             groupId: curInitiator.unit.groupId,
-                            removeWarbonds: reward,
+                            removeWarbonds: Math.abs(reward),
                             execAction: "Friendly Fire"
                         });
                     }else{
@@ -123,7 +123,7 @@ export async function processEventKill(eventObj: any): Promise<void> {
 
         let initMesg: string = "";
         if (!!curInitiator.unit) {
-            if (curInitiator.playerOwner) {
+            if (curInitiator.playerOwner && !curInitiator.player) {
                 initMesg += eventObj.data.initiator.type + "(" + curInitiator.playerOwner.name + ")";
             } else if (curInitiator.player) {
                 initMesg += eventObj.data.initiator.type + "(" + curInitiator.player.name + ")";
@@ -136,7 +136,7 @@ export async function processEventKill(eventObj: any): Promise<void> {
 
         let targetMesg: string = "";
         if (curTarget.unit) {
-            if (curTarget.playerOwner) {
+            if (curTarget.playerOwner && !curTarget.player) {
                 targetMesg += eventObj.data.target.type + "(" + curTarget.playerOwner.name + ")";
             } else if (curTarget.player) {
                 targetMesg += eventObj.data.target.type + "(" + curTarget.player.name + ")";
@@ -153,11 +153,22 @@ export async function processEventKill(eventObj: any): Promise<void> {
         } else if (eventObj.data.weapon_name && eventObj.data.weapon_name !== "") {
             weaponMesg += eventObj.data.weapon_name;
         }
-        
+        let initSideStr = "UNITED NATIONS"
+        if(initSide === 1){
+            initSideStr = "RED"
+        } else if (initSide === 1){
+            initSideStr = "BLUE"
+        }
 
+        let targetSideStr = "UNITED NATIONS"
+        if(initSide === 1){
+            targetSideStr = "RED"
+        } else if (initSide === 1){
+            targetSideStr = "BLUE"
+        }
 
         await ddcsControllers.sendMessageToAll(
-            initSide +" "+ initMesg + " has killed " + targetSide +" "+ targetMesg + " with " + weaponMesg + "("+ reward+ " Temp Warbonds)\n",
+            initSideStr +" "+ initMesg + " has killed " + targetSideStr +" "+ targetMesg + " with " + weaponMesg + "("+ reward+ " Temp Warbonds)\n",
             10,
             nowTime + ddcsControllers.time.oneMin
         );
