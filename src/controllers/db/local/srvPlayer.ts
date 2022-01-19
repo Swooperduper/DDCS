@@ -112,7 +112,7 @@ export async function srvPlayerActionsUpdateFromServer(obj: {
                 // const iUnit = await ddcsController.unitActionRead({playername: curPly.name});
 
                 if (curPly.sessionName && obj.sessionName && (curPly.sessionName !== obj.sessionName)) {
-                    obj.warbonds = engineCache.config.startWarbonds;
+                    //obj.warbonds = engineCache.config.startWarbonds;
                     obj.currentSessionMinutesPlayed_blue = 0;
                     obj.currentSessionMinutesPlayed_red = 0;
                     //obj.tmpRSPoints = 0;
