@@ -207,7 +207,10 @@ export async function srvPlayerActionsRemoveWarbonds(obj: {
             const removePoints = obj.removeWarbonds;
             const curAction = "removeWarbonds";
             const curPlayerWarbonds = serverObj[0].warbonds || 0;
-            const curTotalPoints = curPlayerWarbonds - removePoints;
+            let curTotalPoints = curPlayerWarbonds - removePoints;
+            if(curTotalPoints < 0){
+                curTotalPoints = 0
+            }
             if (err) { reject(err); }
             if (serverObj.length > 0 && serverObj[0].playerId) {
                 if (curTotalPoints < 0) {

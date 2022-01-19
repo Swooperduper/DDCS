@@ -9,8 +9,6 @@ import {I18nResolver} from "i18n-ts";
 export async function checkWarBonds(player: typings.ISrvPlayers): Promise<void> {
     console.log("Check if WarBonds function called.")
     if (player.name) {
-        const engineCache = ddcsControllers.getEngineCache();
-        const i18n = new I18nResolver(engineCache.i18n, player.lang).translation as any;
         const cUnit = await ddcsControllers.unitActionRead({dead: false, playername: player.name});
         let message;
         if (cUnit.length > 0) {
