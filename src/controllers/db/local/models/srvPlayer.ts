@@ -104,9 +104,8 @@ export function srvPlayerModel(dbconn: mongoose.Connection): mongoose.Document |
                 type: Boolean,
                 default: false
             },
-            cachedRemovedLPPoints: {
-                type: Number,
-                default: 0
+            takeOffCostDeducted: {
+                type: Boolean
             },
             currentSessionMinutesPlayed_blue: {
                 type: Number,

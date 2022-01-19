@@ -33,7 +33,7 @@ export async function processEventCrash(eventObj: any): Promise<void> {
                 await ddcsControllers.simpleStatEventActionsSave(iCurObj);
             }
              */
-            await ddcsControllers.srvPlayerActionsClearTempScore({_id: iCurObj.iucid, groupId: iCurObj.groupId});
+            await ddcsControllers.srvPlayerActionsClearTempWarbonds({_id: iCurObj.iucid, groupId: iCurObj.groupId});
 
             if (engineCache.config.inGameHitMessages) {
                 await ddcsControllers.sendMesgToAll(

@@ -190,7 +190,6 @@ export async function checkAircraftCosts(): Promise<void> {
     if (latestSession && latestSession.name) {
         const srvPlayers = await ddcsControllers.srvPlayerActionsRead({sessionName: latestSession.name, playername: {$ne: ""}});
         for (const curPlayer of srvPlayers) {
-            const i18n = new I18nResolver(engineCache.i18n, curPlayer.lang).translation as any;
             if (curPlayer.name) {
                 const cUnit = await ddcsControllers.unitActionRead({dead: false, playername: curPlayer.name});
                 if (cUnit.length > 0) {
@@ -229,7 +228,7 @@ export async function checkAircraftCosts(): Promise<void> {
 export async function addWarbonds(curPlayer: any, curUnit: any, execAction?: string, addWarbonds?: number, numberOfFactories?: number): Promise<void> {
     const groupId = (curUnit && curUnit.groupId) ? curUnit.groupId : null;
 
-    await ddcsControllers.srvPlayerActionsAddLifePoints({
+    await ddcsControllers.srvPlayerActionsAddWarbonds({
         _id: curPlayer._id,
         groupId,
         addWarbonds: addWarbonds,

@@ -42,7 +42,6 @@ export interface IServer {
     maxCrates: number;
     maxTroops: number;
     maxUnitsMoving: number;
-    startLifePoints: number;
     startWarbonds: number;
     inGameHitMessages: boolean;
     mapRotation: [
@@ -72,7 +71,6 @@ export interface IServer {
     isDiscordOnline: boolean;
     fullServerResetOnCampaign: boolean;
     resetFullCampaign: boolean;
-    lifePointsEnabled: boolean;
     aiConvoysEnabled: boolean;
     spwnLimitsPerTick: number;
     fullServerRestartOnCampaignWin: boolean;
@@ -170,7 +168,7 @@ export interface ISrvPlayers {
     _id: string;
     ucid: string;
     sideLockTime: number;
-    cachedRemovedLPPoints: number;
+    takeOffCostDeducted: boolean;
     currentSessionMinutesPlayed_blue: number;
     currentSessionMinutesPlayed_red: number;
     side: number;
@@ -181,7 +179,6 @@ export interface ISrvPlayers {
     warbonds: number;
     tmpWarbonds: number;
     sideLock: number;
-    curLifePoints: number;
     gicTimeLeft: number;
     safeLifeActionTime: number;
     updatedAt: Date;

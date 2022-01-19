@@ -26,17 +26,15 @@ export async function processFriendlyFire(eventObj: any): Promise<void> {
                 const tunit = await ddcsControllers.unitActionRead({unitId: tPlayer.slot});
                 curIUnit = iunit[0];
                 curTUnit = tunit[0];
-                if (engineCache.config.lifePointsEnabled) {
-                    await ddcsControllers.removeWarbonds(
-                        curIPlayer,
-                        curIUnit,
-                        "Friendly Kill",
-                        true,
-                        6
-                    );
-                }
+                await ddcsControllers.removeWarbonds(
+                    curIPlayer,
+                    curIUnit,
+                    "Friendly Kill",
+                    true,
+                    6
+                );
 
-                if (curTUnit.inAir && engineCache.config.lifePointsEnabled) {
+                if (curTUnit.inAir) {
                     await ddcsControllers.addWarbonds(
                         curTPlayer,
                         curTUnit

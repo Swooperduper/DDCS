@@ -31,8 +31,7 @@ export async function processEventTakeoff(eventObj: any): Promise<void> {
                 const friendlyBases = await ddcsControllers.getBasesInProximity(curIUnit.lonLatLoc, 5, curUnitSide);
                 //console.log("getBASE: ", curIUnit, curUnitSide, friendlyBases);
                 if (friendlyBases.length > 0) {
-                    // console.log("LPE: ", engineCache.config.lifePointsEnabled, !_.includes(iPlayer.slot, "_"));
-                    if (engineCache.config.lifePointsEnabled && !_.includes(iPlayer.slot, "_")) {
+                    if (!_.includes(iPlayer.slot, "_")&& !iPlayer.takeOffCostDeducted) {
                         console.log("checkSlotTakeoff: ", iPlayer.slot);
                         await ddcsControllers.removeWarbonds(
                             iPlayer,

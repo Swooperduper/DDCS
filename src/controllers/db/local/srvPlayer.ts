@@ -78,7 +78,7 @@ export async function srvPlayerActionsUpdateFromServer(obj: {
     side: number,
     sideLockTime: number,
     playerId: string,
-    curLifePoints?: number,
+    warbonds?: number,
     currentSessionMinutesPlayed_blue?: number,
     currentSessionMinutesPlayed_red?: number,
     ipaddr?: string,
@@ -95,7 +95,7 @@ export async function srvPlayerActionsUpdateFromServer(obj: {
                 if (obj.ipaddr === ":10308") {
                     obj.ipaddr = "127.0.0.1";
                 }
-                obj.curLifePoints = engineCache.config.startWarbonds;
+                obj.warbonds = engineCache.config.startWarbonds;
 
                 const sObj = new dbModels.srvPlayerModel(obj);
                 sObj.save((saveErr: any) => {
@@ -112,10 +112,10 @@ export async function srvPlayerActionsUpdateFromServer(obj: {
                 // const iUnit = await ddcsController.unitActionRead({playername: curPly.name});
 
                 if (curPly.sessionName && obj.sessionName && (curPly.sessionName !== obj.sessionName)) {
-                    obj.curLifePoints = engineCache.config.startWarbonds;
+                    //obj.warbonds = engineCache.config.startWarbonds;
                     obj.currentSessionMinutesPlayed_blue = 0;
                     obj.currentSessionMinutesPlayed_red = 0;
-                    obj.tmpRSPoints = 0;
+                    //obj.tmpRSPoints = 0;
                 }
                 if (obj.ipaddr === ":10308") {
                     obj.ipaddr = "127.0.0.1";
@@ -134,7 +134,7 @@ export async function srvPlayerActionsUpdateFromServer(obj: {
     });
 }
 
-export async function srvPlayerActionsAddLifePoints(obj: {
+export async function srvPlayerActionsAddWarbonds(obj: {
     _id: string,
     groupId?: number,
     addWarbonds?: number,
@@ -145,7 +145,6 @@ export async function srvPlayerActionsAddLifePoints(obj: {
         dbModels.srvPlayerModel.find({_id: obj._id}, (err: any, serverObj: typings.ISrvPlayers[]) => {
             if (err) { reject(err); }
             const engineCache = ddcsController.getEngineCache();
-            const i18n = new I18nResolver(engineCache.i18n, serverObj[0].lang).translation as any;
             const addPoints: number = (obj.addWarbonds) ? obj.addWarbonds : 0;;
             const curAction: string = "addWarbonds";
             const curPlayerWarbonds: number = serverObj[0].warbonds || 0;
@@ -153,11 +152,21 @@ export async function srvPlayerActionsAddLifePoints(obj: {
             let message: string;
             // console.log("OBJ: ", obj, addPoints, maxLimitedPoints);
             if (serverObj.length > 0) {
-                const setObj = {
-                    warbonds: curTotalPoints,
-                    lastLifeAction: curAction,
-                    safeLifeActionTime: new Date().getTime() + ddcsController.time.fifteenSecs
-                };
+                let setObj = {}
+                if (obj.execAction == "Land"){
+                    setObj = {
+                        warbonds: curTotalPoints,
+                        lastLifeAction: curAction,
+                        safeLifeActionTime: new Date().getTime() + ddcsController.time.fifteenSecs,
+                        takeOffCostDeducted: false
+                    };
+                }else{
+                    setObj = {
+                        warbonds: curTotalPoints,
+                        lastLifeAction: curAction,
+                        safeLifeActionTime: new Date().getTime() + ddcsController.time.fifteenSecs
+                    };
+                }
                 dbModels.srvPlayerModel.findOneAndUpdate(
                     {_id: obj._id},
                     { $set: setObj },
@@ -206,11 +215,21 @@ export async function srvPlayerActionsRemoveWarbonds(obj: {
                     ddcsController.forcePlayerSpectator(serverObj[0].playerId, message);
                     resolve();
                 } else {
-                    const setObj = {
+                    let setObj = {}
+                    if(obj.execAction == "Takeoff"){
+                    setObj = {
+                        warbonds: curTotalPoints,
+                        lastLifeAction: curAction,
+                        safeLifeActionTime: new Date().getTime() + ddcsController.time.fifteenSecs,
+                        takeOffCostDeducted: true
+                    }
+
+                    }else{
+                    setObj = {
                         warbonds: curTotalPoints,
                         lastLifeAction: curAction,
                         safeLifeActionTime: new Date().getTime() + ddcsController.time.fifteenSecs
-                    };
+                    };}
                     dbModels.srvPlayerModel.findOneAndUpdate(
                         {_id: obj._id},
                         { $set: setObj },
@@ -232,17 +251,17 @@ export async function srvPlayerActionsRemoveWarbonds(obj: {
 export async function srvPlayerSpendLifePoints(
     _id: string,
     groupId: number,
-    removeLifePoints: number,
+    removeWarbonds: number,
     execAction?: string
     ): Promise<void> {
     return new Promise((resolve, reject) => {
         dbModels.srvPlayerModel.find({_id: _id}, (err: any, serverObj: typings.ISrvPlayers[]) => {
             const engineCache = ddcsController.getEngineCache();
             const i18n = new I18nResolver(engineCache.i18n, serverObj[0].lang).translation as any;
-            const removePoints = removeLifePoints;
+            const removePoints = removeWarbonds;
             const curAction = "removeLifePoints";
-            const curPlayerLifePoints = serverObj[0].curLifePoints || 0;
-            const curTotalPoints = curPlayerLifePoints - removePoints;
+            const warbonds = serverObj[0].warbonds || 0;
+            const curTotalPoints = warbonds - removePoints;
             if (err) { reject(err); }
             if (serverObj.length > 0 && serverObj[0].playerId) {
                     const setObj = {
@@ -268,7 +287,7 @@ export async function srvPlayerSpendLifePoints(
     });
 }
 
-export async function srvPlayerActionsClearTempScore(obj: {
+export async function srvPlayerActionsClearTempWarbonds(obj: {
     _id: string,
     groupId: number
 }): Promise<void> {
@@ -280,7 +299,7 @@ export async function srvPlayerActionsClearTempScore(obj: {
                 const i18n = new I18nResolver(engineCache.i18n, serverObj[0].lang).translation as any;
                 dbModels.srvPlayerModel.updateOne(
                     {_id: obj._id},
-                    {$set: {tmpRSPoints: 0}},
+                    {$set: {tmpWarbonds: 0, takeOffCostDeducted: false}},
                     (updateErr: any) => {
                         if (updateErr) { reject(updateErr); }
                         ddcsController.sendMesgToGroup(serverObj[0], obj.groupId, i18n.YOURTEMPSCOREHASBEENCLEARED, 15);
@@ -597,7 +616,7 @@ export async function srvPlayerActionsUnsetCampaign(): Promise<void> {
         dbModels.srvPlayerModel.updateMany(
             {},
             {$set: {
-                curLifePoints: serverCache.config.startWarbonds,
+                warbonds: serverCache.config.startWarbonds,
                 sideLock: 0
                // redRSPoints: 0,
                 //blueRSPoints: 0,

@@ -66,7 +66,7 @@ export async function processEventBirth(eventObj: any): Promise<void> {
                         // await ddcsControllers.simpleStatEventActionsSave(iCurObj);
                     }
                      */
-                    await ddcsControllers.srvPlayerActionsClearTempScore({_id: iCurObj.iucid, groupId: iCurObj.groupId});
+                    await ddcsControllers.srvPlayerActionsClearTempWarbonds({_id: iCurObj.iucid, groupId: iCurObj.groupId});
                 }
             }
         }

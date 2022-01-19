@@ -38,7 +38,7 @@ export async function processPlayerEvent(playerArray: any): Promise<void> {
                 await ddcsControllers.srvPlayerActionsApplyTempToRealScore({
                     _id: player.ucid
                 });
-                await ddcsControllers.srvPlayerActionsAddLifePoints({
+                await ddcsControllers.srvPlayerActionsAddWarbonds({
                     _id: player.ucid
                 });
             }

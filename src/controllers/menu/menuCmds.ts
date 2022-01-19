@@ -1334,7 +1334,7 @@ export async function spawnReinforcements(curUnit: any, curPlayer: any, reinforc
         const curPlayerArray = await ddcsControllers.srvPlayerActionsRead({name: curUnit.playername});
         const curPlayer = curPlayerArray[0];
         if (costType = "LP"){
-            if (curPlayer.curLifePoints >= cost){  
+            if (curPlayer.warbonds >= cost){  
                 if (curUnit.inAir) {
                     await ddcsControllers.sendMesgToGroup(
                         curPlayer,

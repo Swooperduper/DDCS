@@ -73,7 +73,7 @@ export async function processEventLand(eventObj: any): Promise<void> {
                 curaddWarbonds = curUnitWarbondCost + weaponCost;
                 warbondsToAdd = warbondsToAdd + curaddWarbonds
 
-                if (engineCache.config.lifePointsEnabled && !_.includes(iPlayer.slot, "_")) {
+                if (!_.includes(iPlayer.slot, "_")&&iPlayer.takeOffCostDeducted) {
                     ddcsControllers.srvPlayerActionsResettmpWarbonds(iPlayer);
                     console.log("checkSlotLanding: ", iPlayer.slot);
                     await ddcsControllers.addWarbonds(

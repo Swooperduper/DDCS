@@ -55,7 +55,8 @@ export async function processEventKill(eventObj: any): Promise<void> {
                 if (eventObj.data.target.side = 0){
                     reward = 0
                 }
-                if (eventObj.data.target.side = eventObj.data.initiator.side){
+                console.log("eventObj.data.target.side:",eventObj.data.target.side, " eventObj.data.initiator.side:",eventObj.data.initiator.side)
+                if (eventObj.data.target.side === eventObj.data.initiator.side){
                     reward = -Math.abs(reward)
                 }
                 if (!!curInitiator.playerOwner && !!curInitiator.unit.playerOwnerId) {

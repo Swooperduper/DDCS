@@ -124,10 +124,7 @@ export async function initV3Engine(): Promise<void> {
 
     await ddcsController.startUpReceiveUDPSocket();
 
-    const engineCache = ddcsController.getEngineCache();
-    if (engineCache.config.lifePointsEnabled) {
-        await ddcsController.updateServerLifePoints();
-    }
+    await ddcsController.updateServerLifePoints();
 
     setInterval( async () => {
         if (ddcsController.getServerSynced()) {

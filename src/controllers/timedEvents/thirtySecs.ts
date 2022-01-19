@@ -25,9 +25,7 @@ export async function processThirtySecActions(fullySynced: boolean) {
         }
         await ddcsControllers.unitActionRemoveAllDead();
         await ddcsControllers.checkTimeToRestart();
-        if (engineCache.config.lifePointsEnabled) {
-            await ddcsControllers.checkAircraftCosts();
-        }
+        await ddcsControllers.checkAircraftCosts();
 
         await ddcsControllers.checkAircraftWeaponCompliance();
 

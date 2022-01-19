@@ -137,11 +137,6 @@ export function serverModel(dbconn: mongoose.Connection): mongoose.Document | {}
                 required: true,
                 default: 7
             },
-            startLifePoints: {
-                type: Number,
-                required: true,
-                default: 12
-            },
             startMaxPoints: {
                 type: Number,
                 required: true,
@@ -224,10 +219,6 @@ export function serverModel(dbconn: mongoose.Connection): mongoose.Document | {}
             resetFullCampaign: {
                 type: Boolean,
                 default: false
-            },
-            lifePointsEnabled: {
-                type: Boolean,
-                default: true
             },
             aiConvoysEnabled: {
                 type: Boolean,
