@@ -20,7 +20,7 @@ export async function processEventKill(eventObj: any): Promise<void> {
         console.log("eventObj:",eventObj);
         let initSide:Number = 0;
         let targetSide:Number = 0;
-
+        let reward = 1
         if (eventObj.data.initiator && eventObj.data.initiator.unitId) {
             const iUnitId = eventObj.data.initiator.unitId;
             const iUnit = await ddcsControllers.unitActionRead({unitId: iUnitId});
@@ -44,7 +44,10 @@ export async function processEventKill(eventObj: any): Promise<void> {
                 console.log("Test Case 1 - killedUnitDict:",killedUnitDict);
                 const killingWeaponDict = _.find(engineCache.weaponsDictionary, {_id : eventObj.data.weapon_name});
                 console.log("Test Case 2 - killingWeaponDict:",killingWeaponDict);
-                let reward = 100
+                if(killingWeaponDict === undefined){
+                    
+                }
+
                 if (killedUnitDict){
                     console.log("warbondCost of Killed Unit",killedUnitDict.warbondCost)
                     reward = killedUnitDict.warbondCost
@@ -63,7 +66,6 @@ export async function processEventKill(eventObj: any): Promise<void> {
                 if (!!curInitiator.playerOwner && !!curInitiator.unit.playerOwnerId) {
                     const playerOwnerUnit = await ddcsControllers.unitActionRead({playername: curInitiator.playerOwner.name});
                     if (playerOwnerUnit.length > 0) {
-                        console.log("reward",reward)
                         await ddcsControllers.srvPlayerActionsUnitAddToWarbonds({
                             _id: curInitiator.unit.playerOwnerId,
                             score: reward,
@@ -75,7 +77,6 @@ export async function processEventKill(eventObj: any): Promise<void> {
                 }
 
                 if (!!curInitiator.player && !!curInitiator.player._id) {
-                    console.log("reward",reward)
                     await ddcsControllers.srvPlayerActionsAddTempWarbonds({
                         _id: curInitiator.player._id,
                         groupId: curInitiator.unit.groupId,
@@ -141,7 +142,8 @@ export async function processEventKill(eventObj: any): Promise<void> {
                 initMesg,
                 "#" + targetSide,
                 targetMesg,
-                weaponMesg
+                weaponMesg,
+                reward
             ],
             20,
             nowTime + ddcsControllers.time.oneMin
