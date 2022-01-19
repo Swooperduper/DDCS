@@ -68,6 +68,7 @@ export async function processEventKill(eventObj: any): Promise<void> {
                     if (playerOwnerUnit.length > 0) {
                         if(curInitiator.player){
                             console.log("curInitiator.player:",curInitiator.player)
+                            console.log(iUnit[0])
                             await ddcsControllers.srvPlayerActionsUnitAddToWarbonds({
                                 _id: curInitiator.player._id,
                                 score: reward,
