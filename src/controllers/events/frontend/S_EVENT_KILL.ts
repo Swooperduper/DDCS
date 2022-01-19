@@ -18,8 +18,8 @@ export async function processEventKill(eventObj: any): Promise<void> {
 
     if (eventObj && eventObj.data) {
         console.log("eventObj:",eventObj);
-        let initSide = 0;
-        let targetSide = 0;
+        let initSide:Number = 0;
+        let targetSide:Number = 0;
 
         if (eventObj.data.initiator && eventObj.data.initiator.unitId) {
             const iUnitId = eventObj.data.initiator.unitId;
@@ -32,6 +32,7 @@ export async function processEventKill(eventObj: any): Promise<void> {
                     isGroundTarget: (ddcsControllers.UNIT_CATEGORY[iUnit[0].unitCategory] === "GROUND_UNIT")
                 };
                 initSide = eventObj.data.initiator.side;
+                targetSide = eventObj.data.target.side;
                 if (ddcsControllers.UNIT_CATEGORY[iUnit[0].unitCategory] === "GROUND_UNIT") {
                     await ddcsControllers.baseUnitUnderAttack(iUnit[0]);
                 }
@@ -52,11 +53,11 @@ export async function processEventKill(eventObj: any): Promise<void> {
                     console.log("killing Weapon Multiplier:",killingWeaponDict.warbondKillMultiplier)
                     reward = killedUnitDict.warbondCost * killingWeaponDict.warbondKillMultiplier
                 }
-                if (eventObj.data.target.side = 0){
+                if (targetSide === 0){
                     reward = 0
                 }
-                console.log("eventObj.data.target.side:",eventObj.data.target.side, " eventObj.data.initiator.side:",eventObj.data.initiator.side)
-                if (eventObj.data.target.side === eventObj.data.initiator.side){
+                console.log("targetSide:",targetSide, " initSide:",initSide)
+                if (initSide === targetSide){
                     reward = -Math.abs(reward)
                 }
                 if (!!curInitiator.playerOwner && !!curInitiator.unit.playerOwnerId) {
