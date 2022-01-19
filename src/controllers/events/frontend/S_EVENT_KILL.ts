@@ -23,6 +23,7 @@ export async function processEventKill(eventObj: any): Promise<void> {
         let targetSide:Number = 0;
         let reward = 1
         let teamKill = false
+        let TempStr = "Temp"
         if (eventObj.data.initiator && eventObj.data.initiator.unitId) {
             const iUnitId = eventObj.data.initiator.unitId;
             const iUnit = await ddcsControllers.unitActionRead({unitId: iUnitId});
@@ -65,7 +66,8 @@ export async function processEventKill(eventObj: any): Promise<void> {
                 if (initSide === targetSide){
                     reward = -Math.abs(reward)
                     teamKill = true
-                }
+                    TempStr = ""
+                };
                 if (!!curInitiator.playerOwner && !!curInitiator.unit.playerOwnerId) {
                     const playerOwnerUnit = await ddcsControllers.unitActionRead({playername: curInitiator.playerOwner.name});
                     if (playerOwnerUnit.length > 0) {
@@ -168,7 +170,7 @@ export async function processEventKill(eventObj: any): Promise<void> {
         }
 
         await ddcsControllers.sendMessageToAll(
-            initSideStr +" "+ initMesg + " has killed " + targetSideStr +" "+ targetMesg + " with " + weaponMesg + "("+ reward+ " Temp Warbonds)\n",
+            initSideStr +" "+ initMesg + " has killed " + targetSideStr +" "+ targetMesg + " with " + weaponMesg + "("+ reward+ " "+TempStr+"Warbonds)\n",
             10,
             nowTime + ddcsControllers.time.oneMin
         );
