@@ -96,7 +96,6 @@ export async function spendWarBonds(
 
 export async function checkTempWarbonds(player: typings.ISrvPlayers): Promise<void> {
     if (player.name) {
-        const engineCache = ddcsControllers.getEngineCache();
         const cUnit = await ddcsControllers.unitActionRead({dead: false, playername: player.name});
         let message;
         if (cUnit.length > 0) {

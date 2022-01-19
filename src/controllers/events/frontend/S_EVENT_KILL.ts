@@ -4,6 +4,7 @@
 
 import * as _ from "lodash";
 import * as ddcsControllers from "../../";
+import { removeWarbonds } from "../../";
 
 function capitalizeFirstLetter(string: string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
@@ -21,6 +22,7 @@ export async function processEventKill(eventObj: any): Promise<void> {
         let initSide:Number = 0;
         let targetSide:Number = 0;
         let reward = 1
+        let teamKill = false
         if (eventObj.data.initiator && eventObj.data.initiator.unitId) {
             const iUnitId = eventObj.data.initiator.unitId;
             const iUnit = await ddcsControllers.unitActionRead({unitId: iUnitId});
@@ -62,19 +64,17 @@ export async function processEventKill(eventObj: any): Promise<void> {
                 console.log("targetSide:",targetSide, " initSide:",initSide)
                 if (initSide === targetSide){
                     reward = -Math.abs(reward)
+                    teamKill = true
                 }
                 if (!!curInitiator.playerOwner && !!curInitiator.unit.playerOwnerId) {
                     const playerOwnerUnit = await ddcsControllers.unitActionRead({playername: curInitiator.playerOwner.name});
                     if (playerOwnerUnit.length > 0) {
-                        if(curInitiator.player){
-                            console.log("curInitiator.player:",curInitiator.player)
-                            console.log(iUnit[0])
-                            await ddcsControllers.srvPlayerActionsUnitAddToWarbonds({
+                        if(curInitiator.player && teamKill){
+                            await ddcsControllers.srvPlayerActionsRemoveWarbonds({
                                 _id: curInitiator.player._id,
-                                score: reward,
-                                groupId: (iUnit[0].groupId) ? iUnit[0].groupId : undefined,
-                                unitType: iUnit[0].type,
-                                unitCoalition: iUnit[0].coalition
+                                groupId: curInitiator.unit.groupId,
+                                removeWarbonds: reward,
+                                execAction: "Friendly Fire"
                             });
                         }else{
                             await ddcsControllers.srvPlayerActionsUnitAddToWarbonds({
@@ -89,11 +89,20 @@ export async function processEventKill(eventObj: any): Promise<void> {
                 }
 
                 if (!!curInitiator.player && !!curInitiator.player._id) {
-                    await ddcsControllers.srvPlayerActionsAddTempWarbonds({
-                        _id: curInitiator.player._id,
-                        groupId: curInitiator.unit.groupId,
-                        score: reward
-                    });
+                    if(teamKill){
+                        ddcsControllers.srvPlayerActionsRemoveWarbonds({
+                            _id: curInitiator.player._id,
+                            groupId: curInitiator.unit.groupId,
+                            removeWarbonds: reward,
+                            execAction: "Friendly Fire"
+                        });
+                    }else{
+                        await ddcsControllers.srvPlayerActionsAddTempWarbonds({
+                            _id: curInitiator.player._id,
+                            groupId: curInitiator.unit.groupId,
+                            score: reward
+                        });
+                    }
                 }
             }
         }
