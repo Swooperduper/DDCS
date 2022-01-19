@@ -30,7 +30,7 @@ export async function checkShootingUsers(): Promise<void> {
                         unitCoalition: shootObj.iUnitCoalition
                     });
                 } else {
-                    await ddcsControllers.srvPlayerActionsAddTempScore({
+                    await ddcsControllers.srvPlayerActionsAddTempWarbonds({
                         _id: shootObj.iucid,
                         groupId: shootObj.groupId,
                         score: shootObj.score
@@ -199,7 +199,7 @@ export async function processEventHit(eventObj: any): Promise<void> {
                             unitCoalition: iCurObj.iCoalition
                         });
                     } else {
-                        await ddcsControllers.srvPlayerActionsAddTempScore({
+                        await ddcsControllers.srvPlayerActionsAddTempWarbonds({
                             _id: iCurObj.iucid,
                             groupId: iCurObj.groupId,
                             score: iCurObj.score

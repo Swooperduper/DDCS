@@ -66,13 +66,24 @@ export async function processEventKill(eventObj: any): Promise<void> {
                 if (!!curInitiator.playerOwner && !!curInitiator.unit.playerOwnerId) {
                     const playerOwnerUnit = await ddcsControllers.unitActionRead({playername: curInitiator.playerOwner.name});
                     if (playerOwnerUnit.length > 0) {
-                        await ddcsControllers.srvPlayerActionsUnitAddToWarbonds({
-                            _id: curInitiator.unit.playerOwnerId,
-                            score: reward,
-                            groupId: (playerOwnerUnit[0].groupId) ? playerOwnerUnit[0].groupId : undefined,
-                            unitType: iUnit[0].type,
-                            unitCoalition: iUnit[0].coalition
-                        });
+                        if(curInitiator.player){
+                            console.log("curInitiator.player:",curInitiator.player)
+                            await ddcsControllers.srvPlayerActionsUnitAddToWarbonds({
+                                _id: curInitiator.player._id,
+                                score: reward,
+                                groupId: (iUnit[0].groupId) ? iUnit[0].groupId : undefined,
+                                unitType: iUnit[0].type,
+                                unitCoalition: iUnit[0].coalition
+                            });
+                        }else{
+                            await ddcsControllers.srvPlayerActionsUnitAddToWarbonds({
+                                _id: curInitiator.unit.playerOwnerId,
+                                score: reward,
+                                groupId: (playerOwnerUnit[0].groupId) ? playerOwnerUnit[0].groupId : undefined,
+                                unitType: iUnit[0].type,
+                                unitCoalition: iUnit[0].coalition
+                            });
+                        }
                     }
                 }
 
@@ -136,7 +147,7 @@ export async function processEventKill(eventObj: any): Promise<void> {
 
 
         await ddcsControllers.sendMessageToAll(
-            initSide +" "+ initMesg + " has killed " + targetSide +" "+ targetMesg + " with " + weaponMesg + "("+ reward+ "Temp Warbonds)\n",
+            initSide +" "+ initMesg + " has killed " + targetSide +" "+ targetMesg + " with " + weaponMesg + "("+ reward+ " Temp Warbonds)\n",
             10,
             nowTime + ddcsControllers.time.oneMin
         );
