@@ -313,36 +313,6 @@ export async function srvPlayerActionsClearTempWarbonds(obj: {
     });
 }
 
-export async function srvPlayerActionsAddTempScore(obj: {
-    _id: string,
-    groupId: number
-    score?: number
-}): Promise<void> {
-    const engineCache = ddcsController.getEngineCache();
-    return new Promise((resolve, reject) => {
-        dbModels.srvPlayerModel.find({_id: obj._id}, (err: any, serverObj: any[]) => {
-            if (err) { reject(err); }
-            if (serverObj.length !== 0) {
-                const i18n = new I18nResolver(engineCache.i18n, serverObj[0].lang).translation as any;
-                const newTmpScore = (serverObj[0].tmpRSPoints || 0) + (obj.score || 0);
-                dbModels.srvPlayerModel.updateOne(
-                    {_id: obj._id},
-                    {$set: {tmpRSPoints: newTmpScore}},
-                    (updateErr: any) => {
-                        if (updateErr) { reject(updateErr); }
-                        if (engineCache.config.inGameHitMessages) {
-                            ddcsController.sendMesgToGroup(serverObj[0], obj.groupId, i18n.ADDTEMPSCORE, 15);
-                        }
-                        resolve();
-                    }
-                );
-            } else {
-                resolve();
-            }
-        });
-    });
-}
-
 export async function srvPlayerActionsApplyTempToRealScore(obj: {
     _id: string,
     groupId?: number
@@ -498,7 +468,7 @@ export async function srvPlayerActionsAddTempWarbonds(obj: {
                     (updateErr: any) => {
                         if (updateErr) { reject(updateErr); }
                         if (engineCache.config.inGameHitMessages) {
-                            ddcsController.sendMesgToGroup(serverObj[0], obj.groupId, i18n.ADDTEMPSCORE, 15);
+                            ddcsController.sendMesgToGroup(serverObj[0], obj.groupId, "TmpScore: "+newtmpWarbonds+", Land at a friendly base/farp to receive these War Bonds!", 15);
                         }
                         resolve();
                     }

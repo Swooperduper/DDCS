@@ -93,3 +93,22 @@ export async function spendWarBonds(
         }
     }
 }
+
+export async function checkTempWarbonds(player: typings.ISrvPlayers): Promise<void> {
+    if (player.name) {
+        const engineCache = ddcsControllers.getEngineCache();
+        const cUnit = await ddcsControllers.unitActionRead({dead: false, playername: player.name});
+        let message;
+        if (cUnit.length > 0) {
+            message = "G: You have earned "+player.tmpWarbonds+" Temp Warbonds. \n When you land these will be added to your account in addiition to the refunded cost of your airframe plus any onboard munitions.";
+
+
+            await ddcsControllers.sendMesgToGroup(
+                player,
+                cUnit[0].groupId,
+                message,
+                15
+            );
+        }
+    }
+}
