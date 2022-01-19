@@ -568,7 +568,7 @@ export async function menuCmdProcess(pObj: any) {
                 case "checkTempWarbonds":
                     await ddcsControllers.checkTempWarbonds(curPlayer);
                     break;
-                case "checkWarBonds":
+                case "checkWarbonds":
                     await ddcsControllers.checkWarBonds(curPlayer);
                     break;
                 case "packStaticUnit":
