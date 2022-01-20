@@ -1609,6 +1609,7 @@ export async function unpackCrate(
     const engineCache = ddcsControllers.getEngineCache();
     const i18n = new I18nResolver(engineCache.i18n, curPlayer.lang).translation as any;
     const curTimePeriod = engineCache.config.timePeriod || "modern";
+    let obj = {}
     if (playerUnit.inAir) {
         await ddcsControllers.sendMesgToGroup(
             curPlayer,
@@ -1629,6 +1630,7 @@ export async function unpackCrate(
         const grpGroups = _.groupBy(delUnits, "groupName");
 
         let newSpawnArray: any[] = [];
+        let unpackCost:number = 0
         if (combo) {
             console.log("Is Combo Unit");
             const addHdg = 30;
@@ -1639,11 +1641,13 @@ export async function unpackCrate(
             const findUnits = _.filter(engineCache.unitDictionary, (curUnitDict) => {
                 return _.includes(curUnitDict.comboName, type);
             });
+            
             for (const cbUnit of findUnits) {
                 randInc += 1;
                 const genName = "DU|" + curPlayer.ucid + "|" + cbUnit.type + "|" + special + "|true|" + mobile + "|" +
                     curPlayer.name + "|";
                 const spawnUnitCount = cbUnit.config[curTimePeriod].spawnCount;
+                unpackCost = (spawnUnitCount * cbUnit.warbondCost) + unpackCost
                 for (let x = 0; x < spawnUnitCount; x++) {
                     if (curUnitHdg > 359) {
                         curUnitHdg = 30;
@@ -1683,6 +1687,7 @@ export async function unpackCrate(
                     curUnit++;
                 }
             }
+            await ddcsControllers.removeWarbonds(curPlayer,playerUnit,"unpackedUnits",true,Math.round(unpackCost*engineCache.config.slingableDiscount));
             await ddcsControllers.spawnUnitGroup(newSpawnArray, false);
             return true;
         } else {
@@ -1701,6 +1706,7 @@ export async function unpackCrate(
                     console.log("EWR: UKRAINE");
                     pCountry = 1;
                 }
+                unpackCost = spawnUnitCount * findUnit.warbondCost
                 for (let x = 0; x < spawnUnitCount; x++) {
                     let randInc = _.random(1000000, 9999999);
                     let genName = "DU|" + curPlayer.ucid + "|" + type + "|" + special +
@@ -1735,7 +1741,7 @@ export async function unpackCrate(
                     let curUnit = 0;
                     const grpGroups = _.groupBy(delUnits, "groupName");
                     const tRem = Object.keys(grpGroups).length - engineCache.config.maxUnitsMoving;
-            
+                    
                     for (const gUnitKey of Object.keys(grpGroups)) {
                         if (curUnit <= tRem) {
                             for (const unit of grpGroups[gUnitKey]) {
@@ -1747,6 +1753,8 @@ export async function unpackCrate(
                         }
                     }
                 }
+                await ddcsControllers.removeWarbonds(curPlayer,playerUnit,"unpackedUnits",true,Math.round(unpackCost*engineCache.config.slingableDiscount));
+
                 return true;
             } else {
                 console.log("Count not find unit: line 1172: ", type);

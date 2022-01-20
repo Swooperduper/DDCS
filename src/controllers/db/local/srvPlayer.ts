@@ -241,6 +241,8 @@ export async function srvPlayerActionsRemoveWarbonds(obj: {
                             let message = "You Have Just Used "+removePoints+ " Warbonds! "+obj.execAction+"(Total:"+curTotalPoints.toFixed(2)+")";
                             if(obj.execAction == "Friendly Fire"){
                                 message = "You Have Just Lost "+removePoints+ " Warbonds due to "+obj.execAction+"(Total:"+curTotalPoints.toFixed(2)+")";
+                            }else if(obj.execAction == "unpackedUnits"){
+                                message = "You Have Just Spent "+removePoints+ " Warbonds on unpacking units.(Total:"+curTotalPoints.toFixed(2)+")";
                             }
                             ddcsController.sendMesgToGroup(serverObj[0], obj.groupId, message, 5);
                             resolve();

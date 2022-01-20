@@ -57,7 +57,7 @@ export async function processEventKill(eventObj: any): Promise<void> {
                 }
                 if (killingWeaponDict){
                     console.log("killing Weapon Multiplier:",killingWeaponDict.warbondKillMultiplier)
-                    reward = killedUnitDict.warbondCost * killingWeaponDict.warbondKillMultiplier
+                    reward = Math.round(killedUnitDict.warbondCost * killingWeaponDict.warbondKillMultiplier)
                 }
                 if (targetSide === 0){
                     reward = 0

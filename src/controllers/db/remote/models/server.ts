@@ -50,6 +50,10 @@ export function serverModel(dbconn: mongoose.Connection): mongoose.Document | {}
                 type: Number,
                 default: 10000
             },
+            slingableDiscount: {
+                type: Number,
+                default: 0.5
+            },
             maxCoaltionFactories: {
                 type: Number,
                 default: 6
