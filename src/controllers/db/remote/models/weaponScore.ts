@@ -17,6 +17,10 @@ export function weaponScoreModel(dbconn: mongoose.Connection): mongoose.Document
             displayName: {
                 type: String
             },
+            warheadName: {
+                type: String,
+                required: true
+            },
             warbondCost: {
                 type: Number,
                 default: 250

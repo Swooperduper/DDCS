@@ -19,10 +19,6 @@ export function unitDictionaryModel(dbconn: mongoose.Connection): mongoose.Docum
                 default: 250,
                 required: true
             },
-            warheadName: {
-                type: String,
-                required: true
-            },
             warbondKillMultiplier: {
                 type: Number,
                 default: 1.0,
