@@ -40,7 +40,7 @@ export function serverModel(dbconn: mongoose.Connection): mongoose.Document | {}
             },
             baseWarbondIncome: {
                 type: Number,
-                default: 250
+                default: 10
             },
             factoryWarbondIncome: {
                 type: Number,
