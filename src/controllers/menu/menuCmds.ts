@@ -1609,7 +1609,6 @@ export async function unpackCrate(
     const engineCache = ddcsControllers.getEngineCache();
     const i18n = new I18nResolver(engineCache.i18n, curPlayer.lang).translation as any;
     const curTimePeriod = engineCache.config.timePeriod || "modern";
-    let obj = {}
     if (playerUnit.inAir) {
         await ddcsControllers.sendMesgToGroup(
             curPlayer,
@@ -1676,20 +1675,25 @@ export async function unpackCrate(
                 }
             }
             const tRem = (Object.keys(grpGroups).length + (newSpawnArray.length -1)) - engineCache.config.maxUnitsMoving;
-            console.log(newSpawnArray.length);
-            for (const gUnitKey of Object.keys(grpGroups)) {
-                if (curUnit <= tRem) {
-                    for (const unit of grpGroups[gUnitKey]) {
-                        await ddcsControllers.unitActionUpdateByUnitId({unitId: unit.unitId, dead: true});
-                        await ddcsControllers.destroyUnit(unit.name, "unit");
-                        console.log("Player has too many units, removing:",unit.name)
+            if((unpackCost*engineCache.config.slingableDiscount) < curPlayer.warbonds){
+                await ddcsControllers.removeWarbonds(curPlayer,playerUnit,"unpackedUnits",true,Math.round(unpackCost*engineCache.config.slingableDiscount));
+                console.log(newSpawnArray.length);
+                for (const gUnitKey of Object.keys(grpGroups)) {
+                    if (curUnit <= tRem) {
+                        for (const unit of grpGroups[gUnitKey]) {
+                            await ddcsControllers.unitActionUpdateByUnitId({unitId: unit.unitId, dead: true});
+                            await ddcsControllers.destroyUnit(unit.name, "unit");
+                            console.log("Player has too many units, removing:",unit.name)
+                        }
+                        curUnit++;
                     }
-                    curUnit++;
-                }
-            }
-            await ddcsControllers.removeWarbonds(curPlayer,playerUnit,"unpackedUnits",true,Math.round(unpackCost*engineCache.config.slingableDiscount));
+                }            
             await ddcsControllers.spawnUnitGroup(newSpawnArray, false);
             return true;
+            }else{
+            ddcsControllers.sendMesgToGroup(curPlayer,playerUnit._id,"You do not have enough warbonds to unpack this unit",5);
+            return false; 
+            }
         } else {
             console.log("Is not Combo Unit");
             const addHdg = 30;
@@ -1707,55 +1711,61 @@ export async function unpackCrate(
                     pCountry = 1;
                 }
                 unpackCost = spawnUnitCount * findUnit.warbondCost
-                for (let x = 0; x < spawnUnitCount; x++) {
-                    let randInc = _.random(1000000, 9999999);
-                    let genName = "DU|" + curPlayer.ucid + "|" + type + "|" + special +
-                        "|true|" + mobile + "|" + curPlayer.name + "|";
-                    const unitStart = _.cloneDeep(findUnit);
-                    if (curUnitHdg > 359) {
-                        curUnitHdg = 30;
-                    }
-                    if (SpawnHeading > 359) {
-                        SpawnHeading = SpawnHeading - 359;
-                    }
-                    unitStart.name = genName + (randInc + x);
-                    unitStart.groupName = genName + randInc;
-                    unitStart.lonLatLoc = ddcsControllers.getLonLatFromDistanceDirection(playerUnit.lonLatLoc, curUnitHdg, 0.08);
-                    unitStart.hdg = SpawnHeading * 0.0174533;
-                    unitStart.country = pCountry;
-                    unitStart.playerCanDrive = mobile || false;
-                    unitStart.special = special;
-                    unitStart.coalition = playerUnit.coalition;
-                    unitStart.virtualGrpName = virtualGroupID
-                    newSpawnArray.push(unitStart);
-                    curUnitHdg = curUnitHdg + addHdg;
-                    SpawnHeading = SpawnHeading +addSpawnHeading;
-                    await ddcsControllers.spawnUnitGroup(newSpawnArray, false);
-                    newSpawnArray = [];
-                    const delUnits = await ddcsControllers.unitActionReadStd({
-                        playerOwnerId: curPlayer.ucid,
-                        playerCanDrive: mobile || false,
-                        isCrate: false,
-                        dead: false
-                    });
-                    let curUnit = 0;
-                    const grpGroups = _.groupBy(delUnits, "groupName");
-                    const tRem = Object.keys(grpGroups).length - engineCache.config.maxUnitsMoving;
-                    
-                    for (const gUnitKey of Object.keys(grpGroups)) {
-                        if (curUnit <= tRem) {
-                            for (const unit of grpGroups[gUnitKey]) {
-                                await ddcsControllers.unitActionUpdateByUnitId({unitId: unit.unitId, dead: true});
-                                await ddcsControllers.destroyUnit(unit.name, "unit");
-                                console.log("Player has too many units, removing:",unit.name)
+                if((unpackCost*engineCache.config.slingableDiscount) < curPlayer.warbonds){                    
+                    await ddcsControllers.removeWarbonds(curPlayer,playerUnit,"unpackedUnits",true,Math.round(unpackCost*engineCache.config.slingableDiscount));
+                    for (let x = 0; x < spawnUnitCount; x++) {
+                        let randInc = _.random(1000000, 9999999);
+                        let genName = "DU|" + curPlayer.ucid + "|" + type + "|" + special +
+                            "|true|" + mobile + "|" + curPlayer.name + "|";
+                        const unitStart = _.cloneDeep(findUnit);
+                        if (curUnitHdg > 359) {
+                            curUnitHdg = 30;
+                        }
+                        if (SpawnHeading > 359) {
+                            SpawnHeading = SpawnHeading - 359;
+                        }
+                        unitStart.name = genName + (randInc + x);
+                        unitStart.groupName = genName + randInc;
+                        unitStart.lonLatLoc = ddcsControllers.getLonLatFromDistanceDirection(playerUnit.lonLatLoc, curUnitHdg, 0.08);
+                        unitStart.hdg = SpawnHeading * 0.0174533;
+                        unitStart.country = pCountry;
+                        unitStart.playerCanDrive = mobile || false;
+                        unitStart.special = special;
+                        unitStart.coalition = playerUnit.coalition;
+                        unitStart.virtualGrpName = virtualGroupID
+                        newSpawnArray.push(unitStart);
+                        curUnitHdg = curUnitHdg + addHdg;
+                        SpawnHeading = SpawnHeading +addSpawnHeading;
+                        await ddcsControllers.spawnUnitGroup(newSpawnArray, false);
+                        newSpawnArray = [];
+                        const delUnits = await ddcsControllers.unitActionReadStd({
+                            playerOwnerId: curPlayer.ucid,
+                            playerCanDrive: mobile || false,
+                            isCrate: false,
+                            dead: false
+                        });
+                        let curUnit = 0;
+                        const grpGroups = _.groupBy(delUnits, "groupName");
+                        const tRem = Object.keys(grpGroups).length - engineCache.config.maxUnitsMoving;
+                        
+                        for (const gUnitKey of Object.keys(grpGroups)) {
+                            if (curUnit <= tRem) {
+                                for (const unit of grpGroups[gUnitKey]) {
+                                    await ddcsControllers.unitActionUpdateByUnitId({unitId: unit.unitId, dead: true});
+                                    await ddcsControllers.destroyUnit(unit.name, "unit");
+                                    console.log("Player has too many units, removing:",unit.name)
+                                }
+                                curUnit++;
                             }
-                            curUnit++;
                         }
                     }
-                }
-                await ddcsControllers.removeWarbonds(curPlayer,playerUnit,"unpackedUnits",true,Math.round(unpackCost*engineCache.config.slingableDiscount));
+                    
 
-                return true;
+                    return true;
+                }else{
+                    ddcsControllers.sendMesgToGroup(curPlayer,playerUnit._id,"You do not have enough warbonds to unpack this unit",5);
+                    return false
+                }
             } else {
                 console.log("Count not find unit: line 1172: ", type);
                 return false;
