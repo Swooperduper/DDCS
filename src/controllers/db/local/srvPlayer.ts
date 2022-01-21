@@ -150,9 +150,9 @@ export async function srvPlayerActionsAddWarbonds(obj: {
             const addPoints: number = (obj.addWarbonds) ? obj.addWarbonds : 0;;
             const curAction: string = "addWarbonds";
             const curPlayerWarbonds: number = serverObj[0].warbonds || 0;
-            const curTotalPoints: number = curPlayerWarbonds + addPoints;
+            const curTotalPoints: number = Math.round(curPlayerWarbonds) + Math.round(addPoints);
             let message: string;
-            // console.log("OBJ: ", obj, addPoints, maxLimitedPoints);
+            console.log("Adding Warbonds to",obj._id);
             if (serverObj.length > 0) {
                 let setObj = {}
                 if (obj.execAction == "Land"){
