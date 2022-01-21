@@ -5,7 +5,6 @@
 import * as _ from "lodash";
 import * as typings from "../../typings";
 import * as ddcsControllers from "../";
-import * as ddcsController from "./unitDetection";
 import {I18nResolver} from "i18n-ts";
 
 export async function destroyCrates(
@@ -28,7 +27,7 @@ export async function destroyCrates(
     }
 }
 
-export async function unpackStaticCrate(curPlayerUnit: any): Promise<void> {
+export async function unpackStaticCrate(curPlayerUnit: any, facingPlayerHeading?:boolean): Promise<void> {
     const curPlayerArray = await ddcsControllers.srvPlayerActionsRead({name: curPlayerUnit.playername});
     const curPly = curPlayerArray[0];
     const engineCache = ddcsControllers.getEngineCache();
@@ -75,7 +74,8 @@ export async function unpackStaticCrate(curPlayerUnit: any): Promise<void> {
                     curCrateType,
                     curCrateSpecial,
                     isCombo,
-                    isMobile
+                    isMobile,
+                    facingPlayerHeading
                 )
                     .then((response: any) => {
                         //console.log("unpacking response2: ", response);

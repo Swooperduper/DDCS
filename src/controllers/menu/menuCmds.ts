@@ -6,11 +6,7 @@ import * as _ from "lodash";
 import * as typing from "../../typings";
 import * as ddcsControllers from "../";
 import {airUnitTemplate, getNextUniqueId, processLOSEnemy, setRequestJobArray, spawnGrp} from "../";
-import * as ddcsController from "../action/unitDetection";
 import {I18nResolver} from "i18n-ts";
-import { Decimal128 } from "mongoose";
-import { count } from "node:console";
-import { type } from "node:os";
 import {IGroundUnitTemp, IStaticSpawnMin} from "../../typings";
 
 export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: string) {
@@ -543,7 +539,7 @@ export async function menuCmdProcess(pObj: any) {
     // console.log("MENU COMMAND: ", pObj);
     const engineCache = ddcsControllers.getEngineCache();
     const defCrate = "container_cargo";
-
+    let logiProx
     let units = await ddcsControllers.unitActionRead({unitId: pObj.unitId});
     if (units.length > 0) {
         let curUnit = units[0];
@@ -736,7 +732,33 @@ export async function menuCmdProcess(pObj: any) {
                     await isCrateOnboard(curUnit, true);
                     break;
                 case "unpackCrate":
-                    const logiProx = await ddcsControllers.getLogiTowersProximity(curUnit.lonLatLoc, engineCache.config.crateUnpackDistance, curUnit.coalition);
+                    logiProx = await ddcsControllers.getLogiTowersProximity(curUnit.lonLatLoc, engineCache.config.crateUnpackDistance, curUnit.coalition);
+                    if (logiProx.length) {
+                        await ddcsControllers.sendMesgToGroup(
+                            curPlayer,
+                            curUnit.groupId,
+                            "G: " + i18n.YOUNEEDTOMOVEFARTHERAWAY.replace("#1", "Command Towers ("+ engineCache.config.crateUnpackDistance * 1000 +"m)"),
+                            5
+                        );
+                    } else {
+                        if (curUnit.inAir) {
+                            await ddcsControllers.sendMesgToGroup(
+                                curPlayer,
+                                curUnit.groupId,
+                                "G: " + i18n.LANDBEFORECARGOCOMMAND,
+                                5
+                            );
+                        } else {
+                            const chkPlayer = await ddcsControllers.srvPlayerActionsRead({name: curUnit.playername});
+                            const curChkPlayer = chkPlayer[0];
+                            if (curChkPlayer) {
+                                await ddcsControllers.unpackStaticCrate(curUnit,true);
+                            }
+                        }
+                    }
+                    break;
+                case "unpackCrate2":
+                    logiProx = await ddcsControllers.getLogiTowersProximity(curUnit.lonLatLoc, engineCache.config.crateUnpackDistance, curUnit.coalition);
                     if (logiProx.length) {
                         await ddcsControllers.sendMesgToGroup(
                             curPlayer,
@@ -1602,7 +1624,8 @@ export async function unpackCrate(
     type: string,
     special: string,
     combo: boolean,
-    mobile: boolean
+    mobile: boolean,
+    facingPlayerHeading?: boolean
 ) {
     const curPlayerArray = await ddcsControllers.srvPlayerActionsRead({name: playerUnit.playername});
     const curPlayer = curPlayerArray[0];
@@ -1627,13 +1650,15 @@ export async function unpackCrate(
         });
         let curUnit = 0;
         const grpGroups = _.groupBy(delUnits, "groupName");
-
+        let addSpawnHeading = 119;
+        if (facingPlayerHeading){
+            addSpawnHeading = 0;
+        }
         let newSpawnArray: any[] = [];
         let unpackCost:number = 0
         if (combo) {
             console.log("Is Combo Unit");
             const addHdg = 30;
-            const addSpawnHeading = 119;
             let SpawnHeading = playerUnit.hdg
             let curUnitHdg = playerUnit.hdg;
             let randInc = _.random(1000000, 9999999);
