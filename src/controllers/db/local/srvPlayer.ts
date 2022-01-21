@@ -79,6 +79,7 @@ export async function srvPlayerActionsUpdateFromServer(obj: {
     sideLockTime: number,
     playerId: string,
     warbonds?: number,
+    tmpWarbonds?:number,
     currentSessionMinutesPlayed_blue?: number,
     currentSessionMinutesPlayed_red?: number,
     ipaddr?: string,
@@ -113,6 +114,7 @@ export async function srvPlayerActionsUpdateFromServer(obj: {
 
                 if (curPly.sessionName && obj.sessionName && (curPly.sessionName !== obj.sessionName)) {
                     //obj.warbonds = engineCache.config.startWarbonds;
+                    obj.tmpWarbonds = 0;
                     obj.currentSessionMinutesPlayed_blue = 0;
                     obj.currentSessionMinutesPlayed_red = 0;
                     //obj.tmpRSPoints = 0;
@@ -595,6 +597,7 @@ export async function srvPlayerActionsUnsetCampaign(): Promise<void> {
             {},
             {$set: {
                 warbonds: serverCache.config.startWarbonds,
+                tmpWarbonds: 0,
                 sideLock: 0
                // redRSPoints: 0,
                 //blueRSPoints: 0,
