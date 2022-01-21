@@ -917,7 +917,7 @@ export async function menuCmdProcess(pObj: any) {
                     await spawnReinforcements(curUnit, curPlayer, pObj.type, pObj.cost, pObj.costType);
                     break;
                 case "InternalCargo":
-                    if (typeof curUnit.intCargoType === 'string'){
+                    if (true){
                         await internalCargo(curUnit, curPlayer, pObj.type);
                     } else {
                         if (curUnit.inAir || curUnit.speed > 0.5) {
