@@ -778,7 +778,7 @@ export async function menuCmdProcess(pObj: any) {
                             const chkPlayer = await ddcsControllers.srvPlayerActionsRead({name: curUnit.playername});
                             const curChkPlayer = chkPlayer[0];
                             if (curChkPlayer) {
-                                await ddcsControllers.unpackStaticCrate(curUnit);
+                                await ddcsControllers.unpackStaticCrate(curUnit, true);
                             }
                         }
                     }

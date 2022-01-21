@@ -21,6 +21,8 @@ export async function processEventKill(eventObj: any): Promise<void> {
         console.log("eventObj:",eventObj);
         let initSide:Number = 0;
         let targetSide:Number = 0;
+        initSide = eventObj.data.initiator.side;
+        targetSide = eventObj.data.target.side;
         let reward = 1
         let teamKill = false
         let TempStr = "Temp"
@@ -34,8 +36,6 @@ export async function processEventKill(eventObj: any): Promise<void> {
                     playerOwner: (!!iUnit[0].playerOwnerId) ? _.find(playerArray, {_id: iUnit[0].playerOwnerId}) : undefined,
                     isGroundTarget: (ddcsControllers.UNIT_CATEGORY[iUnit[0].unitCategory] === "GROUND_UNIT")
                 };
-                initSide = eventObj.data.initiator.side;
-                targetSide = eventObj.data.target.side;
                 if (ddcsControllers.UNIT_CATEGORY[iUnit[0].unitCategory] === "GROUND_UNIT") {
                     await ddcsControllers.baseUnitUnderAttack(iUnit[0]);
                 }

@@ -8,10 +8,14 @@ import * as ddcsControllers from "../";
 
 export async function repairBase(base: typing.IBase, curUnit: typing.IUnit): Promise<void> {
     const curBaseName = _.split(_.get(base, "name"), " #")[0];
-
     const resp = await ddcsControllers.healBase(curBaseName, curUnit, false);
     if (resp) {
         await ddcsControllers.unitActionUpdateByUnitId({unitId: curUnit.unitId, intCargoType: ""});
+        const curPlayerArray = await ddcsControllers.srvPlayerActionsRead({name: curUnit.playername});
+        const curPly = curPlayerArray[0];
+        const engineCache = ddcsControllers.getEngineCache();
+        const shelterCost = _.find(engineCache.unitDictionary, {type: "Shelter"});
+        ddcsControllers.addWarbonds(curPly,curUnit,"baseRepair",shelterCost);
         await ddcsControllers.sendMesgToCoalition(
             curUnit.coalition,
             "BASEHASBEENBUILT",
