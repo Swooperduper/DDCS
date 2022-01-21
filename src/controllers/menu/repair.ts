@@ -16,8 +16,8 @@ export async function repairBase(base: typing.IBase, curUnit: typing.IUnit): Pro
         const engineCache = ddcsControllers.getEngineCache();
         const shelters = _.find(engineCache.unitDictionary, {type: "Shelter"});
         console.log("shelters:",shelters)
-        console.log(curPly.name,"is repairing a shelter shelters[0].warbondCost:",shelters[0].warbondCost)
-        ddcsControllers.addWarbonds(curPly,curUnit,"baseRepair",shelters[0].warbondCost);
+        console.log(curPly.name,"is repairing a shelter shelters.warbondCost:",shelters.warbondCost)
+        ddcsControllers.addWarbonds(curPly,curUnit,"baseRepair",shelters.warbondCost);
         await ddcsControllers.sendMesgToCoalition(
             curUnit.coalition,
             "BASEHASBEENBUILT",
