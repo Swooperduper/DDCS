@@ -155,18 +155,18 @@ export async function processEventKill(eventObj: any): Promise<void> {
         } else if (eventObj.data.weapon_name && eventObj.data.weapon_name !== "") {
             weaponMesg += eventObj.data.weapon_name;
         }
-        let initSideStr = "UNITED NATIONS"
+        let initSideStr = ""
         if(initSide === 1){
-            initSideStr = "RED"
+            initSideStr = ""
         } else if (initSide === 1){
-            initSideStr = "BLUE"
+            initSideStr = ""
         }
 
-        let targetSideStr = "UNITED NATIONS"
+        let targetSideStr = ""
         if(initSide === 1){
-            targetSideStr = "RED"
+            targetSideStr = ""
         } else if (initSide === 1){
-            targetSideStr = "BLUE"
+            targetSideStr = ""
         }
 
         await ddcsControllers.sendMessageToAll(
