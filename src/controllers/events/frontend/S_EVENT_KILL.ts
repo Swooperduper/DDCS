@@ -45,7 +45,7 @@ export async function processEventKill(eventObj: any): Promise<void> {
                 console.log("eventObj.data.weapon_name:",eventObj.data.weapon_name);
                 const killedUnitDict = _.find(engineCache.unitDictionary, {type : eventObj.data.target.type});
                 console.log("Test Case 1 - killedUnitDict:",killedUnitDict);
-                const killingWeaponDict = _.find(engineCache.weaponsDictionary, {displayName : eventObj.data.weapon_name});
+                const killingWeaponDict = _.find(engineCache.weaponsDictionary, {warheadName : eventObj.data.weapon_name});
                 console.log("Test Case 2 - killingWeaponDict:",killingWeaponDict);
                 if(killingWeaponDict === undefined){
                     
