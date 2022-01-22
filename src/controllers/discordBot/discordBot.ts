@@ -78,8 +78,8 @@ export async function campaignStatusMessage(){
     let campaignStats = await ddcsControllers.campaignsActionsRead()
     let registeredRedPlayers = await ddcsControllers.srvPlayerActionsRead({sideLock : 1});
     let registeredBluePlayers = await ddcsControllers.srvPlayerActionsRead({sideLock : 2});
-    let redMobs = await ddcsControllers.baseActionRead({baseType: "MOB", side: 1});
-    let blueMobs = await ddcsControllers.baseActionRead({baseType: "MOB", side: 2});
+    let redMobs = await ddcsControllers.baseActionRead({baseType: "MOB", side: 1, enabled: true});
+    let blueMobs = await ddcsControllers.baseActionRead({baseType: "MOB", side: 2, enabled: true});
     const latestSession = await ddcsControllers.sessionsActionsReadLatest();
     const unitsNewThan = new Date().getTime() - ddcsControllers.time.fourMins;
     const redplayerArray = await ddcsControllers.srvPlayerActionsRead({
