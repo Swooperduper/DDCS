@@ -47,9 +47,6 @@ export async function processEventKill(eventObj: any): Promise<void> {
                 console.log("Test Case 1 - killedUnitDict:",killedUnitDict);
                 const killingWeaponDict = _.find(engineCache.weaponsDictionary, {warheadName : eventObj.data.weapon_name});
                 console.log("Test Case 2 - killingWeaponDict:",killingWeaponDict);
-                if(killingWeaponDict === undefined){
-                    
-                }
 
                 if (killedUnitDict){
                     console.log("warbondCost of Killed Unit",killedUnitDict.warbondCost)
@@ -58,6 +55,8 @@ export async function processEventKill(eventObj: any): Promise<void> {
                 if (killingWeaponDict){
                     console.log("killing Weapon Multiplier:",killingWeaponDict.warbondKillMultiplier)
                     reward = Math.round(killedUnitDict.warbondCost * killingWeaponDict.warbondKillMultiplier)
+                } else {
+                    reward = Math.round(killedUnitDict.warbondCost * 0.1)
                 }
                 if (targetSide === 0){
                     reward = 0
