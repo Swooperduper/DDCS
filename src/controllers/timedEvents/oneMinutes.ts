@@ -7,6 +7,7 @@ import { engineGlobals } from "../constants";
 
 export async function processOneMinuteActions(fullySynced: boolean): Promise<void> {
     if (fullySynced) {
+        await ddcsControllers.fixInfinityWarbonds()
         //Slowly Adding F10 Markers to the Map
         if(!engineGlobals.farpsMarked){
             console.log("Placing Farp Markers on F-10 Map")

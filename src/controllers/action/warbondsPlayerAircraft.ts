@@ -87,6 +87,7 @@ export async function updateServerLifePoints(): Promise<void> {
                 if (!_.isEmpty(cPlayer.name)) {
                     const cUnit = await ddcsControllers.unitActionRead({dead: false, playername: cPlayer.name});
                     const curUnit = cUnit[0];
+                    let factoryIncome = 0
                     if (cPlayer.side === playerBalance.side) {
                         addFracPoint = playerBalance.baseWarbondIncome;
                     } else {
@@ -99,7 +100,10 @@ export async function updateServerLifePoints(): Promise<void> {
                             dead: false,
                             coalition: 2
                         });
-                        addFracPoint = addFracPoint + (factories.length * playerBalance.factoryWarbondIncome)
+                        if(factories.length > 0){
+                            factoryIncome = factories.length * playerBalance.factoryWarbondIncome
+                        }
+                        addFracPoint = Math.round(addFracPoint + factoryIncome)
 
                     }else if(cPlayer.side = 1){
                         factories = await ddcsControllers.unitActionRead({
@@ -107,7 +111,10 @@ export async function updateServerLifePoints(): Promise<void> {
                             dead: false,
                             coalition: 1
                         });
-                        addFracPoint = addFracPoint + (factories.length * playerBalance.factoryWarbondIncome)
+                        if(factories.length > 0){
+                            factoryIncome = factories.length * playerBalance.factoryWarbondIncome
+                        }
+                        addFracPoint = Math.round(addFracPoint + factoryIncome)
                     };
 
                     await addWarbonds(
