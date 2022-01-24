@@ -19,13 +19,13 @@ export async function processEventKill(eventObj: any): Promise<void> {
 
     if (eventObj && eventObj.data) {
         console.log("eventObj:",eventObj);
-        let initSide:Number = 0;
-        let targetSide:Number = 0;
+        let initSide:number = 0;
+        let targetSide:number = 0;
         initSide = eventObj.data.initiator.side;
         targetSide = eventObj.data.target.side;
-        let reward = 1
-        let teamKill = false
-        let TempStr = "Temp"
+        let reward:number = 1
+        let teamKill:boolean = false
+        let TempStr:String = "Temp"
         if (eventObj.data.initiator && eventObj.data.initiator.unitId) {
             const iUnitId = eventObj.data.initiator.unitId;
             const iUnit = await ddcsControllers.unitActionRead({unitId: iUnitId});

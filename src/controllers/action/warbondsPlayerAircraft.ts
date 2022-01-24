@@ -77,7 +77,7 @@ export async function getPlayerBalance(): Promise<typings.ISrvPlayerBalance> {
 }
 
 export async function updateServerLifePoints(): Promise<void> {
-    let addFracPoint;
+    let addFracPoint:number;
     const playerBalance = await getPlayerBalance();
 
     console.log("UPDATING LIFE POINTS");
@@ -116,7 +116,7 @@ export async function updateServerLifePoints(): Promise<void> {
                         }
                         addFracPoint = Math.round(addFracPoint + factoryIncome)
                     };
-
+                    console.log("Add Warbonds on warbond Tick",addFracPoint, "to",cPlayer.name)
                     await addWarbonds(
                         cPlayer,
                         curUnit || null,
