@@ -144,7 +144,7 @@ export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: 
                             5
                         );
                         if (await isTroopOnboard(curUnit)){
-                            await setInternalCargoMass(curUnit.name,1000);
+                            await setInternalCargoMass(curUnit.name,500);
                         }else{
                             await setInternalCargoMass(curUnit.name,0);
                         }
@@ -195,9 +195,9 @@ export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: 
                             5
                         );
                         if (await isTroopOnboard(curUnit)){
-                            await setInternalCargoMass(curUnit.name,2000);
-                        }else{
                             await setInternalCargoMass(curUnit.name,1000);
+                        }else{
+                            await setInternalCargoMass(curUnit.name,500);
                         }
                     }
                     if (intCargoType === "loadLightAAA") {
@@ -212,9 +212,9 @@ export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: 
                             5
                         );
                         if (await isTroopOnboard(curUnit)){
-                            await setInternalCargoMass(curUnit.name,2000);
-                        }else{
                             await setInternalCargoMass(curUnit.name,1000);
+                        }else{
+                            await setInternalCargoMass(curUnit.name,500);
                         }
                     }
                     if (intCargoType === "loadBaseRepair") {
@@ -236,9 +236,9 @@ export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: 
                             5
                         );
                         if (await isTroopOnboard(curUnit)){
-                            await setInternalCargoMass(curUnit.name,2000);
-                        }else{
                             await setInternalCargoMass(curUnit.name,1000);
+                        }else{
+                            await setInternalCargoMass(curUnit.name,500);
                         }
                     }
                     if (intCargoType === "loadCCBuild") {
@@ -253,9 +253,9 @@ export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: 
                             5
                         );
                         if (await isTroopOnboard(curUnit)){
-                            await setInternalCargoMass(curUnit.name,2000);
-                        }else{
                             await setInternalCargoMass(curUnit.name,1000);
+                        }else{
+                            await setInternalCargoMass(curUnit.name,500);
                         }
                     }
                 } else {
@@ -374,9 +374,9 @@ export async function loadTroops(unitId: string, troopType: string) {
             );
             let currentMass = 0;
             if (curUnit.intCargoType){
-                currentMass = 1000 ;
+                currentMass = 500 ;
             }
-            await setInternalCargoMass(curUnit.name, currentMass + 1000);
+            await setInternalCargoMass(curUnit.name, currentMass + 500);
         } else {
             // secondary check for second base distance
             const secondBases = await ddcsControllers.baseActionRead({});
@@ -408,9 +408,9 @@ export async function loadTroops(unitId: string, troopType: string) {
                         );
                         let currentMass = 0;
                         if (curUnit.intCargoType){
-                            currentMass = 1000 ;
+                            currentMass = 500 ;
                         }
-                        await setInternalCargoMass(curUnit.name, currentMass + 1000);
+                        await setInternalCargoMass(curUnit.name, currentMass + 500);
                     })
                     .catch((err) => {
                         console.log("line 13: ", err);
@@ -689,13 +689,13 @@ export async function menuCmdProcess(pObj: any) {
                                                 unitId: pObj.unitId,
                                                 troopType: null
                                             });
-                                            let currentMass = 1000;
+                                            let currentMass = 500;
                                             if (curUnit.intCargoType){
-                                                currentMass = 2000 ;
+                                                currentMass = 1000 ;
                                             }
                                         
-                                        setTimeout(() => {setInternalCargoMass(curUnit.name, currentMass - 500); }, timeTaken*500);
-                                        setTimeout(() => {setInternalCargoMass(curUnit.name, currentMass - 1000);  
+                                        setTimeout(() => {setInternalCargoMass(curUnit.name, currentMass - 250); }, timeTaken*500);
+                                        setTimeout(() => {setInternalCargoMass(curUnit.name, currentMass - 500);  
                                                 deployTroops(pObj.unitId,curPlayer,i18n, _.some(playerProx), engineCache, curUnit.troopType, curUnit.lonLatLoc, curUnit.agl, timeTaken);}, timeTaken*1000);
                                             }                            
                                 } else {
@@ -2023,7 +2023,7 @@ export async function deployTroops(unitId:string, curPlayer:any, i18n:any, proxy
     const distanceXYZ = Math.sqrt((distanceMovedXZ*distanceMovedXZ)+(distanceMovedY*distanceMovedY))
     const AVGvelocity = distanceXYZ/timeTaken
     if(proxyPlayer){
-        if(AVGvelocity > 7.5){
+        if(AVGvelocity > 5){
             await ddcsControllers.sendMesgToGroup(
                 curPlayer,
                 curUnit.groupId,
@@ -2043,7 +2043,7 @@ export async function deployTroops(unitId:string, curPlayer:any, i18n:any, proxy
             })
         }
     }else{
-        if(AVGvelocity > 7.5){
+        if(AVGvelocity > 5){
             await ddcsControllers.sendMesgToGroup(
                 curPlayer,
                 curUnit.groupId,
@@ -2130,11 +2130,11 @@ export async function deployTroops(unitId:string, curPlayer:any, i18n:any, proxy
                     "G: " + i18n.HASBEENDEPLOYED.replace("#1", curSpawnUnit.type),
                     5
                 );
-                let currentMass = 1000;
+                let currentMass = 500;
                 if (curUnit.intCargoType){
-                    currentMass = 2000 ;
+                    currentMass = 1000 ;
                 }
-                await setInternalCargoMass(curUnit.name, currentMass - 1000);
+                await setInternalCargoMass(curUnit.name, currentMass - 500);
             }else{
                 console.log("troopType is a not string")   
                 const curTroops: any[] = [];             
@@ -2204,11 +2204,11 @@ export async function deployTroops(unitId:string, curPlayer:any, i18n:any, proxy
                     "G: " + i18n.HASBEENDEPLOYED.replace("#1", troopType[0].type),
                     5
                 );
-                let currentMass = 1000;
+                let currentMass = 500;
                 if (curUnit.intCargoType){
-                    currentMass = 2000 ;
+                    currentMass = 1000 ;
                 }
-                await setInternalCargoMass(curUnit.name, currentMass - 1000);
+                await setInternalCargoMass(curUnit.name, currentMass - 500);
             }
         }
     } 
@@ -2246,11 +2246,11 @@ export async function unloadExtractTroops(curUnit:any, curPlayer:any, i18n:any, 
                     "G: " + i18n.HASBEENDROPPEDOFFATBASE.replace("#1", curUnit.troopType),
                     5
                 );
-                let currentMass = 1000;
+                let currentMass = 500;
                 if (curUnit.intCargoType){
-                    currentMass = 2000 ;
+                    currentMass = 1000 ;
                 }
-                await setInternalCargoMass(curUnit.name, currentMass - 1000);
+                await setInternalCargoMass(curUnit.name, currentMass - 500);
             } else {
                 if (typeof curUnit.troopType === 'string'){
                     console.log("troopType is a string")                
@@ -2331,11 +2331,11 @@ export async function unloadExtractTroops(curUnit:any, curPlayer:any, i18n:any, 
                         "G: " + i18n.HASBEENDEPLOYED.replace("#1", curSpawnUnit.type),
                         5
                     );
-                    let currentMass = 1000;
+                    let currentMass = 500;
                     if (curUnit.intCargoType){
-                        currentMass = 2000 ;
+                        currentMass = 1000 ;
                     }
-                    await setInternalCargoMass(curUnit.name, currentMass - 1000);
+                    await setInternalCargoMass(curUnit.name, currentMass - 500);
                 }else{
                     console.log("troopType is a not string")   
                     const curTroops: any[] = [];             
@@ -2405,11 +2405,11 @@ export async function unloadExtractTroops(curUnit:any, curPlayer:any, i18n:any, 
                         "G: " + i18n.HASBEENDEPLOYED.replace("#1", curUnit.troopType[0].type),
                         5
                     );
-                    let currentMass = 1000;
+                    let currentMass = 500;
                     if (curUnit.intCargoType){
-                        currentMass = 2000 ;
+                        currentMass = 1000 ;
                     }
-                    await setInternalCargoMass(curUnit.name, currentMass - 1000);
+                    await setInternalCargoMass(curUnit.name, currentMass - 500);
 
                 }
             }
@@ -2441,9 +2441,9 @@ export async function unloadExtractTroops(curUnit:any, curPlayer:any, i18n:any, 
                 );
                 let currentMass = 0;
                 if (curUnit.intCargoType){
-                    currentMass = 1000 ;
+                    currentMass = 500 ;
                 }
-                await setInternalCargoMass(curUnit.name, currentMass + 1000);
+                await setInternalCargoMass(curUnit.name, currentMass + 500);
             } else {
                 // no troops
                 await ddcsControllers.sendMesgToGroup(
