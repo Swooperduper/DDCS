@@ -39,6 +39,7 @@ export async function spawnNewMenuCategory(
             let curUnitDictionary = ddcsControllers.getEngineCache().unitDictionary.filter(
                 (unit: any) => unit.type === curSubMenu.cmdProp.type
             );
+            let curwarbondCost = curUnitDictionary.warbondCost
             let spawnAmount = 1;
             if (curUnitDictionary.length === 1) {
                 spawnAmount = curUnitDictionary[0].config[ddcsControllers.getEngineCache().config.timePeriod].spawnCount;
@@ -71,7 +72,7 @@ export async function spawnNewMenuCategory(
             if (curSubMenu.cmdProp.mass) {
                 curMenuArray[0] += massTypeString;
             }
-            const curCrates = (curSubMenu.cmdProp.crates) ? "(" + spawnAmount + "Q-" + curSubMenu.cmdProp.crates + "C)" : "";
+            const curCrates = (curSubMenu.cmdProp.crates) ? "(" + spawnAmount + "Q-" + curwarbondCost + "WBs)" : "";
 
             // tslint:disable-next-line:max-line-length
             menuSpawnArray.push(`missionCommands.addCommandForGroup(${playerUnit.groupId},"${curSubMenu.itemTitle}${curCrates}",{"${curMenuArray.join('","')}"},sendRequest,${cmdProps})`);
