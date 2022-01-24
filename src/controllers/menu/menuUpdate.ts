@@ -72,7 +72,7 @@ export async function spawnNewMenuCategory(
             if (curSubMenu.cmdProp.mass) {
                 curMenuArray[0] += massTypeString;
             }
-            const curCrates = (curSubMenu.cmdProp.crates) ? "(" + spawnAmount + "Q-" + curwarbondCost + "WBs)" : "";
+            const curCrates = (curSubMenu.cmdProp.crates) ? "(" + spawnAmount + "Q-" + curSubMenu.cmdProp.crates + "C)" : "";
 
             // tslint:disable-next-line:max-line-length
             menuSpawnArray.push(`missionCommands.addCommandForGroup(${playerUnit.groupId},"${curSubMenu.itemTitle}${curCrates}",{"${curMenuArray.join('","')}"},sendRequest,${cmdProps})`);
