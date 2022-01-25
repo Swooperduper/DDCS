@@ -154,7 +154,7 @@ export async function srvPlayerActionsAddWarbonds(obj: {
             console.log("serverObj[0].warbonds:",serverObj[0].warbonds, "\n","serverObj[0]:",serverObj[0])
             const curTotalPoints: number = Math.round(curPlayerWarbonds) + Math.round(addPoints);
             let message: string;
-            let setObj: any;
+            let setObj = {}
             console.log("Adding Warbonds to",obj._id);
             if (serverObj.length > 0) {
                 if (obj.execAction == "Land"){
@@ -188,6 +188,7 @@ export async function srvPlayerActionsAddWarbonds(obj: {
                         };
                     }
                 }
+                console.log(setObj)
                 dbModels.srvPlayerModel.findOneAndUpdate(
                     {_id: obj._id},
                     { $set: setObj },
