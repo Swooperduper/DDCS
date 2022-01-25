@@ -164,7 +164,7 @@ export async function srvPlayerActionsAddWarbonds(obj: {
                         safeLifeActionTime: new Date().getTime() + ddcsController.time.fifteenSecs,
                         takeOffCostDeducted: false
                     };
-                    if(setObj.warbonds = Infinity){
+                    if(!isFinite(setObj.warbonds)){
                         console.log("ERROR-INFWB Warbonds for infinity found in setObj, line 159 , crvPlayer.ts")
                         setObj = {
                             warbonds: 2000,
@@ -179,7 +179,7 @@ export async function srvPlayerActionsAddWarbonds(obj: {
                         lastLifeAction: curAction,
                         safeLifeActionTime: new Date().getTime() + ddcsController.time.fifteenSecs
                     };
-                    if(setObj.warbonds = Infinity){
+                    if(!isFinite(setObj.warbonds)){
                         console.log("ERROR-INFWB Warbonds for infinity found in setObj, line 175 , crvPlayer.ts")
                         setObj = {
                             warbonds: 2000,
@@ -249,7 +249,7 @@ export async function srvPlayerActionsRemoveWarbonds(obj: {
                         safeLifeActionTime: new Date().getTime() + ddcsController.time.fifteenSecs,
                         takeOffCostDeducted: true
                     }
-                    if(setObj.warbonds = Infinity){
+                    if(!isFinite(setObj.warbonds)){
                         console.log("ERROR-INFWB Warbonds for infinity found in setObj, line 242 , crvPlayer.ts")
                         setObj = {
                             warbonds: 2000,
@@ -264,7 +264,7 @@ export async function srvPlayerActionsRemoveWarbonds(obj: {
                         lastLifeAction: curAction,
                         safeLifeActionTime: new Date().getTime() + ddcsController.time.fifteenSecs
                     };
-                    if(setObj.warbonds = Infinity){
+                    if(!isFinite(setObj.warbonds)){
                         console.log("ERROR-INFWB Warbonds for infinity found in setObj, line 258 , crvPlayer.ts")
                         setObj = {
                             warbonds: 2000,
@@ -475,7 +475,7 @@ export async function srvPlayerActionsApplyTempToRealWarbonds(obj: {
                 };
 
                 rsTotals.warbonds = rsTotals.warbonds + rsTotals.tmpWarbonds;
-                if(rsTotals.warbonds = Infinity){
+                if(!isFinite(rsTotals.warbonds)){
                     console.log("ERROR-INFWB Warbonds for infinity found in rsTotals.warbonds, line 473 , srvPlayer.ts")
                     rsTotals.warbonds = 2000
                 }

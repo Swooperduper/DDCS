@@ -60,7 +60,7 @@ export async function disconnectionDetction(): Promise<void> {
                     warbonds: iPlayer.warbonds + iPlayer.tmpWarbonds,
                     tmpWarbonds: 0
                 };
-                if(iObject.warbonds = Infinity){
+                if(!isFinite(iObject.warbonds)){
                     iObject = {_id: iPlayer._id,
                         warbonds: 2000,
                         tmpWarbonds: 0
