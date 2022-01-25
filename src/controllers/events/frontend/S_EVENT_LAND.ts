@@ -43,6 +43,7 @@ export async function processEventLand(eventObj: any): Promise<void> {
             const curUnitSide = iUnit[0].coalition;
             const curUnit = iUnit[0]
             let warbondsToAdd = iPlayer.tmpWarbonds
+            console.log("Player is landing ",iPlayer.name," iPlayer.tmpWarbonds",iPlayer.tmpWarbonds)
             const friendlyBases = await ddcsControllers.getBasesInProximity(iUnit[0].lonLatLoc, 5, curUnitSide);
             if (friendlyBases.length > 0) {
                 const curBase = friendlyBases[0];
@@ -72,9 +73,9 @@ export async function processEventLand(eventObj: any): Promise<void> {
                 }
                 curaddWarbonds = curUnitWarbondCost + weaponCost;
                 warbondsToAdd = warbondsToAdd + curaddWarbonds
-
+                console.log("Calculated on landing",iPlayer.name," should recieve",warbondsToAdd)
                 if (!_.includes(iPlayer.slot, "_")&&iPlayer.takeOffCostDeducted) {
-                    ddcsControllers.srvPlayerActionsResettmpWarbonds(iPlayer);
+                    await ddcsControllers.srvPlayerActionsResettmpWarbonds(iPlayer);
                     console.log("checkSlotLanding: ", iPlayer.slot);
                     await ddcsControllers.addWarbonds(
                         iPlayer,

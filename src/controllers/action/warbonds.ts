@@ -57,7 +57,7 @@ export async function spendWarBonds(
                         _id: player._id,
                         warbonds: player.warbonds - warBondCost
                     };
-                    if(currentObjUpdate.warbonds = Infinity){
+                    if(!isFinite(currentObjUpdate.warbonds)){
                         currentObjUpdate = {
                             _id: player._id,
                             warbonds: 2000
