@@ -152,22 +152,39 @@ export async function srvPlayerActionsAddWarbonds(obj: {
             const curPlayerWarbonds: number = serverObj[0].warbonds || 0;
             const curTotalPoints: number = Math.round(curPlayerWarbonds) + Math.round(addPoints);
             let message: string;
+            let setObj: any;
             console.log("Adding Warbonds to",obj._id);
             if (serverObj.length > 0) {
-                let setObj = {}
                 if (obj.execAction == "Land"){
-                    setObj = {
+                    let setObj = {
                         warbonds: curTotalPoints,
                         lastLifeAction: curAction,
                         safeLifeActionTime: new Date().getTime() + ddcsController.time.fifteenSecs,
                         takeOffCostDeducted: false
                     };
+                    if(setObj.warbonds = Infinity){
+                        console.log("ERROR-INFWB Warbonds for infinity found in setObj, line 159 , crvPlayer.ts")
+                        setObj = {
+                            warbonds: 2000,
+                            lastLifeAction: curAction,
+                            safeLifeActionTime: new Date().getTime() + ddcsController.time.fifteenSecs,
+                            takeOffCostDeducted: false
+                        };
+                    }
                 }else{
-                    setObj = {
+                    let setObj = {
                         warbonds: curTotalPoints,
                         lastLifeAction: curAction,
                         safeLifeActionTime: new Date().getTime() + ddcsController.time.fifteenSecs
                     };
+                    if(setObj.warbonds = Infinity){
+                        console.log("ERROR-INFWB Warbonds for infinity found in setObj, line 175 , crvPlayer.ts")
+                        setObj = {
+                            warbonds: 2000,
+                            lastLifeAction: curAction,
+                            safeLifeActionTime: new Date().getTime() + ddcsController.time.fifteenSecs
+                        };
+                    }
                 }
                 dbModels.srvPlayerModel.findOneAndUpdate(
                     {_id: obj._id},
@@ -220,7 +237,7 @@ export async function srvPlayerActionsRemoveWarbonds(obj: {
                     ddcsController.forcePlayerSpectator(serverObj[0].playerId, message);
                     resolve();
                 } else {
-                    let setObj = {}
+                    let setObj: any;
                     if(obj.execAction == "Takeoff"){
                     setObj = {
                         warbonds: curTotalPoints,
@@ -228,13 +245,30 @@ export async function srvPlayerActionsRemoveWarbonds(obj: {
                         safeLifeActionTime: new Date().getTime() + ddcsController.time.fifteenSecs,
                         takeOffCostDeducted: true
                     }
-
+                    if(setObj.warbonds = Infinity){
+                        console.log("ERROR-INFWB Warbonds for infinity found in setObj, line 242 , crvPlayer.ts")
+                        setObj = {
+                            warbonds: 2000,
+                            lastLifeAction: curAction,
+                            safeLifeActionTime: new Date().getTime() + ddcsController.time.fifteenSecs,
+                            takeOffCostDeducted: true
+                        }
+                    }
                     }else{
                     setObj = {
                         warbonds: curTotalPoints,
                         lastLifeAction: curAction,
                         safeLifeActionTime: new Date().getTime() + ddcsController.time.fifteenSecs
-                    };}
+                    };
+                    if(setObj.warbonds = Infinity){
+                        console.log("ERROR-INFWB Warbonds for infinity found in setObj, line 258 , crvPlayer.ts")
+                        setObj = {
+                            warbonds: 2000,
+                            lastLifeAction: curAction,
+                            safeLifeActionTime: new Date().getTime() + ddcsController.time.fifteenSecs
+                        };
+                    }
+                    }
                     dbModels.srvPlayerModel.findOneAndUpdate(
                         {_id: obj._id},
                         { $set: setObj },
@@ -437,6 +471,10 @@ export async function srvPlayerActionsApplyTempToRealWarbonds(obj: {
                 };
 
                 rsTotals.warbonds = rsTotals.warbonds + rsTotals.tmpWarbonds;
+                if(rsTotals.warbonds = Infinity){
+                    console.log("ERROR-INFWB Warbonds for infinity found in rsTotals.warbonds, line 473 , srvPlayer.ts")
+                    rsTotals.warbonds = 2000
+                }
                 message = i18n.AWARDEDRSPOINTS.replace("#1", rsTotals.tmpWarbonds)
                     .replace("#2", "Red").replace("#3", rsTotals.warbonds);
                 rsTotals.tmpWarbonds = 0;

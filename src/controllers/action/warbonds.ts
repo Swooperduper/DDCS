@@ -57,6 +57,13 @@ export async function spendWarBonds(
                         _id: player._id,
                         warbonds: player.warbonds - warBondCost
                     };
+                    if(currentObjUpdate.warbonds = Infinity){
+                        currentObjUpdate = {
+                            _id: player._id,
+                            warbonds: 2000
+                        };
+                        console.log("ERROR-INFWB:Warbonds for infinity found in currentObjUpdate, line 56, warbonds.ts")
+                    }
                     await ddcsControllers.srvPlayerActionsUpdate(currentObjUpdate);
                     message = "G: " + i18n.YOUHAVESPENTWARBONDS.replace("#1", i18n[1])
                         .replace("#2", warBondCost).replace("#3", warBondItem).replace("#4", currentObjUpdate.warbonds);

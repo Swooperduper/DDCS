@@ -60,6 +60,13 @@ export async function disconnectionDetction(): Promise<void> {
                     warbonds: iPlayer.warbonds + iPlayer.tmpWarbonds,
                     tmpWarbonds: 0
                 };
+                if(iObject.warbonds = Infinity){
+                    iObject = {_id: iPlayer._id,
+                        warbonds: 2000,
+                        tmpWarbonds: 0
+                    };
+                    console.log("ERROR-INFWB Warbonds for infinity found in iObject, line 59 , errorCorrection.ts")
+                }
                 ddcsControllers.srvPlayerActionsUpdate({iObject});
                 console.log("Refunded ",iPlayer.tmpWarbonds, " to ", iPlayer.name, "due to a mass disconnect event");
                 //console.log("iObject:",iObject)
@@ -74,7 +81,7 @@ export async function fixInfinityWarbonds(): Promise<void> {
         for (const player of playersWithInfinityWarbonds){
             let iCurObj =   {_id: player._id,
                 warbonds : 2000}
-            ddcsControllers.srvPlayerActionsUpdate({iCurObj});
+            await ddcsControllers.srvPlayerActionsUpdate({iCurObj});
             console.log(player.name," had Infinity warbonds, resetting to 1000")
         };
     }
