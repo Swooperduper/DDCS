@@ -79,10 +79,8 @@ export async function fixInfinityWarbonds(): Promise<void> {
     const playersWithInfinityWarbonds = await ddcsControllers.srvPlayerActionsRead({warbonds: Infinity});
     if(playersWithInfinityWarbonds.length > 0){
         for (const player of playersWithInfinityWarbonds){
-            let iCurObj =   {_id: player._id,
-                warbonds : 2000}
-            await ddcsControllers.srvPlayerActionsUpdate({iCurObj});
-            console.log(player.name," had Infinity warbonds, resetting to 1000")
+            await ddcsControllers.srvPlayerActionsUpdate({_id: player._id, warbonds: 2000});
+            console.log(player.name," had Infinity warbonds, resetting to 1000. player._id",player._id)
         };
     }
 }
