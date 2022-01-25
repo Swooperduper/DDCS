@@ -105,7 +105,8 @@ export function srvPlayerModel(dbconn: mongoose.Connection): mongoose.Document |
                 default: false
             },
             takeOffCostDeducted: {
-                type: Boolean
+                type: Boolean,
+                default: false
             },
             currentSessionMinutesPlayed_blue: {
                 type: Number,
