@@ -154,11 +154,17 @@ export async function srvPlayerActionsAddWarbonds(obj: {
             console.log("serverObj[0].warbonds:",serverObj[0].warbonds, "\n","serverObj[0]:",serverObj[0])
             const curTotalPoints: number = Math.round(curPlayerWarbonds) + Math.round(addPoints);
             let message: string;
-            let setObj = {}
             console.log("Adding Warbonds to",obj._id);
             if (serverObj.length > 0) {
+                let setObj = {
+                    warbonds: curPlayerWarbonds,
+                    lastLifeAction: curAction,
+                    safeLifeActionTime: new Date().getTime() + ddcsController.time.fifteenSecs,
+                    takeOffCostDeducted: serverObj[0].takeOffCostDeducted
+                    }
+                console.log("obj.execAction",obj.execAction)
                 if (obj.execAction == "Land"){
-                    let setObj = {
+                    setObj = {
                         warbonds: curTotalPoints,
                         lastLifeAction: curAction,
                         safeLifeActionTime: new Date().getTime() + ddcsController.time.fifteenSecs,
@@ -174,17 +180,19 @@ export async function srvPlayerActionsAddWarbonds(obj: {
                         };
                     }
                 }else{
-                    let setObj = {
+                    setObj = {
                         warbonds: curTotalPoints,
                         lastLifeAction: curAction,
-                        safeLifeActionTime: new Date().getTime() + ddcsController.time.fifteenSecs
+                        safeLifeActionTime: new Date().getTime() + ddcsController.time.fifteenSecs,
+                        takeOffCostDeducted:serverObj[0].takeOffCostDeducted
                     };
                     if(!isFinite(setObj.warbonds)){
                         console.log("ERROR-INFWB Warbonds for infinity found in setObj, line 175 , crvPlayer.ts")
                         setObj = {
                             warbonds: 2000,
                             lastLifeAction: curAction,
-                            safeLifeActionTime: new Date().getTime() + ddcsController.time.fifteenSecs
+                            safeLifeActionTime: new Date().getTime() + ddcsController.time.fifteenSecs,
+                            takeOffCostDeducted:serverObj[0].takeOffCostDeducted
                         };
                     }
                 }
