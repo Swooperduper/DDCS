@@ -188,7 +188,7 @@ export async function srvPlayerActionsAddWarbonds(obj: {
                         };
                     }
                 }
-                console.log(setObj)
+
                 dbModels.srvPlayerModel.findOneAndUpdate(
                     {_id: obj._id},
                     { $set: setObj },
@@ -207,6 +207,7 @@ export async function srvPlayerActionsAddWarbonds(obj: {
                         resolve();
                     }
                 );
+                console.log("Warbonds before:",serverObj[0].warbonds,"\n Warbonds After:", setObj)
             } else {
                 resolve();
             }
