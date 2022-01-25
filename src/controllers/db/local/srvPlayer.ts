@@ -147,7 +147,8 @@ export async function srvPlayerActionsAddWarbonds(obj: {
         dbModels.srvPlayerModel.find({_id: obj._id}, (err: any, serverObj: typings.ISrvPlayers[]) => {
             if (err) { reject(err); }
             const engineCache = ddcsController.getEngineCache();
-            const addPoints: number = (obj.addWarbonds) ? obj.addWarbonds : 0;;
+            const addPoints: number = (obj.addWarbonds) ? obj.addWarbonds : 0;
+            console.log("addPoints:",addPoints)
             const curAction: string = "addWarbonds";
             const curPlayerWarbonds: number = serverObj[0].warbonds || 0;
             console.log("serverObj[0].warbonds:",serverObj[0].warbonds, "\n","serverObj[0]:",serverObj[0])
@@ -225,6 +226,7 @@ export async function srvPlayerActionsRemoveWarbonds(obj: {
             const engineCache = ddcsController.getEngineCache();
             const i18n = new I18nResolver(engineCache.i18n, serverObj[0].lang).translation as any;
             const removePoints = obj.removeWarbonds;
+            console.log("removePoints:",removePoints)
             const curAction = "removeWarbonds";
             console.log("serverObj[0].warbonds:",serverObj[0].warbonds, "\n","serverObj[0]:",serverObj[0])
             const curPlayerWarbonds = serverObj[0].warbonds || 0;
