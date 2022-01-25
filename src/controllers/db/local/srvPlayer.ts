@@ -150,6 +150,7 @@ export async function srvPlayerActionsAddWarbonds(obj: {
             const addPoints: number = (obj.addWarbonds) ? obj.addWarbonds : 0;;
             const curAction: string = "addWarbonds";
             const curPlayerWarbonds: number = serverObj[0].warbonds || 0;
+            console.log("serverObj[0].warbonds:",serverObj[0].warbonds, "\n","serverObj[0]:",serverObj[0])
             const curTotalPoints: number = Math.round(curPlayerWarbonds) + Math.round(addPoints);
             let message: string;
             let setObj: any;
@@ -225,6 +226,7 @@ export async function srvPlayerActionsRemoveWarbonds(obj: {
             const i18n = new I18nResolver(engineCache.i18n, serverObj[0].lang).translation as any;
             const removePoints = obj.removeWarbonds;
             const curAction = "removeWarbonds";
+            console.log("serverObj[0].warbonds:",serverObj[0].warbonds, "\n","serverObj[0]:",serverObj[0])
             const curPlayerWarbonds = serverObj[0].warbonds || 0;
             let curTotalPoints = curPlayerWarbonds - removePoints;
             if(curTotalPoints < 0){
