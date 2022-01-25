@@ -71,6 +71,7 @@ export async function processEventKill(eventObj: any): Promise<void> {
                     const playerOwnerUnit = await ddcsControllers.unitActionRead({playername: curInitiator.playerOwner.name});
                     if (playerOwnerUnit.length > 0) {
                         if(curInitiator.player && teamKill){
+                            TempStr = ""
                             await ddcsControllers.srvPlayerActionsRemoveWarbonds({
                                 _id: curInitiator.player._id,
                                 groupId: curInitiator.unit.groupId,
@@ -78,6 +79,7 @@ export async function processEventKill(eventObj: any): Promise<void> {
                                 execAction: "Friendly Fire"
                             });
                         }else{
+                            TempStr = ""
                             await ddcsControllers.srvPlayerActionsUnitAddToWarbonds({
                                 _id: curInitiator.unit.playerOwnerId,
                                 score: reward,
