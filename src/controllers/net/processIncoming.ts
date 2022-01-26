@@ -257,7 +257,8 @@ export async function processingIncomingData(incomingObj: any) {
                         if (serverObj.length > 0) {
                             const curPlayer = serverObj[0];
                             const curSlotBase = bases[0];
-                            await processSlotLock(curPlayer, curSlotBase.side, curSlotSide, incomingObj.playerInfo.id);
+                            if(!curPlayer.isGameMaster){
+                            await processSlotLock(curPlayer, curSlotBase.side, curSlotSide, incomingObj.playerInfo.id);}
                         }
                     });
                 }
