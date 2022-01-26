@@ -41,7 +41,7 @@ export async function spawnNewMenuCategory(
             );           
             let spawnAmount = 1;
             if (curUnitDictionary.length === 1) {
-                spawnAmount = curUnitDictionary[0].config[ddcsControllers.getEngineCache().config.timePeriod].spawnCount;
+                spawnAmount = (curUnitDictionary[0].config[ddcsControllers.getEngineCache().config.timePeriod].spawnCount)*curUnitDictionary[0].warbondCost;
             } else {
                 curUnitDictionary = ddcsControllers.getEngineCache().unitDictionary.filter(
                     (unit: any) => {
@@ -51,7 +51,7 @@ export async function spawnNewMenuCategory(
                 if (curUnitDictionary.length > 1) {
                     spawnAmount = 0
                     for (const unit of curUnitDictionary){
-                        spawnAmount = spawnAmount + unit.config[ddcsControllers.getEngineCache().config.timePeriod].spawnCount;
+                        spawnAmount = spawnAmount + ((unit.config[ddcsControllers.getEngineCache().config.timePeriod].spawnCount)*unit.warbondCost);
                         
                     }
                 }
