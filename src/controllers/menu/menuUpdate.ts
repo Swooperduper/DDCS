@@ -39,7 +39,6 @@ export async function spawnNewMenuCategory(
             let curUnitDictionary = ddcsControllers.getEngineCache().unitDictionary.filter(
                 (unit: any) => unit.type === curSubMenu.cmdProp.type
             );           
-            console.log(curUnitDictionary)
             let spawnAmount = 1;
             if (curUnitDictionary.length === 1) {
                 spawnAmount = curUnitDictionary[0].config[ddcsControllers.getEngineCache().config.timePeriod].spawnCount;
@@ -57,7 +56,6 @@ export async function spawnNewMenuCategory(
                     }
                 }
             }
-
             let cmdProps = `{["action"]="f10Menu",`;
             for (const [keyProp, valueProp] of Object.entries(curSubMenu.cmdProp)) {
                 if (keyProp === "mass" && curWeight) {
