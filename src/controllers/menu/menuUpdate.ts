@@ -36,10 +36,10 @@ export async function spawnNewMenuCategory(
     if (menuLevel !== 0 || !curMenuLvls[curMenuName][0].cmdProp.mass) {
         // draw subPayload items
         for (const curSubMenu of curMenu) {
-            let curUnitDictionary = ddcsControllers.getEngineCache().unitDictionary.filter(
+            var curUnitDictionary = ddcsControllers.getEngineCache().unitDictionary.filter(
                 (unit: any) => unit.type === curSubMenu.cmdProp.type
             );           
-            console.log(curUnitDictionary)
+            console.log(curUnitDictionary.warbondCost)
             let spawnAmount = 1;
             if (curUnitDictionary.length === 1) {
                 spawnAmount = curUnitDictionary[0].config[ddcsControllers.getEngineCache().config.timePeriod].spawnCount;
