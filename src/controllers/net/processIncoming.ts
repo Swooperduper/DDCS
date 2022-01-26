@@ -257,8 +257,7 @@ export async function processingIncomingData(incomingObj: any) {
                         if (serverObj.length > 0) {
                             const curPlayer = serverObj[0];
                             const curSlotBase = bases[0];
-                            if(!curPlayer.isGameMaster){
-                            await processSlotLock(curPlayer, curSlotBase.side, curSlotSide, incomingObj.playerInfo.id);}
+                            await processSlotLock(curPlayer, curSlotBase.side, curSlotSide, incomingObj.playerInfo.id);
                         }
                     });
                 }
@@ -271,10 +270,10 @@ export async function processSlotLock(curPlayer: ISrvPlayers, baseSide: number, 
     const engineCache = ddcsController.getEngineCache();
     const i18n = new I18nResolver(engineCache.i18n, curPlayer.lang).translation as any;
 
-    if (curPlayer.sideLock === 0) {
+    if (curPlayer.sideLock === 0 && !curPlayer.isGameMaster) {
         await ddcsController.forcePlayerSpectator(playerId, i18n.CHOOSEASIDE);
     } else {
-        if (curPlayer.sideLock !== curSlotSide) {
+        if (curPlayer.sideLock !== curSlotSide && !curPlayer.isGameMaster) {
             await ddcsController.forcePlayerSpectator(playerId, i18n.PLAYERALREADYLOCKEDTOSIDE.replace("#1", i18n[curPlayer.sideLock]));
         }
 
@@ -290,11 +289,11 @@ export async function protectSlots(curPlayer: ISrvPlayers, playerSide: number, p
     const engineCache = ddcsController.getEngineCache();
     const i18n = new I18nResolver(engineCache.i18n, curPlayer.lang).translation as any;
 
-    if (curPlayer.sideLock === 0 && playerSide !== 0) {
+    if (curPlayer.sideLock === 0 && playerSide !== 0 && !curPlayer.isGameMaster) {
         await ddcsController.forcePlayerSpectator(playerId, i18n.CHOOSEASIDE);
     }
 
-    if (playerSide !== 0 && curPlayer.sideLock !== playerSide) {
+    if (playerSide !== 0 && curPlayer.sideLock !== playerSide && !curPlayer.isGameMaster) {
         await ddcsController.forcePlayerSpectator(playerId, i18n.PLAYERALREADYLOCKEDTOSIDE.replace("#1", i18n[curPlayer.sideLock]));
     }
 }
