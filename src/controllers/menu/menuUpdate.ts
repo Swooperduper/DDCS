@@ -39,6 +39,8 @@ export async function spawnNewMenuCategory(
             let curUnitDictionary = ddcsControllers.getEngineCache().unitDictionary.filter(
                 (unit: any) => unit.type === curSubMenu.cmdProp.type
             );
+            let curwarbondCost = curUnitDictionary.warbondCost;
+            console.log(curwarbondCost)
             let spawnAmount = 1;
             if (curUnitDictionary.length === 1) {
                 spawnAmount = curUnitDictionary[0].config[ddcsControllers.getEngineCache().config.timePeriod].spawnCount;
