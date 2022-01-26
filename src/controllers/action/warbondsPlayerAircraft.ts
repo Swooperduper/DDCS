@@ -92,6 +92,7 @@ export async function updateServerLifePoints(): Promise<void> {
                         addFracPoint = playerBalance.baseWarbondIncome;
                     } else {
                         addFracPoint = playerBalance.baseWarbondIncome * playerBalance.modifier;
+                        console.log("playerBalance.baseWarbondIncome * playerBalance.modifier = addFracPoint:",addFracPoint)
                     }
                     let factories = [];
                     if (cPlayer.side = 2){
@@ -117,6 +118,10 @@ export async function updateServerLifePoints(): Promise<void> {
                         addFracPoint = Math.round(addFracPoint + factoryIncome)
                     };
                     console.log("Add Warbonds on warbond Tick",addFracPoint, "to",cPlayer.name)
+                    if(!isFinite(addFracPoint)){
+                        console.log("ERROR-Infinite on addFracPoint - line 122 warbonbadPlayerAircraft.ts")
+                        addFracPoint = 50;
+                    }
                     await addWarbonds(
                         cPlayer,
                         curUnit || null,
