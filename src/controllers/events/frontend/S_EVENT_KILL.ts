@@ -26,6 +26,7 @@ export async function processEventKill(eventObj: any): Promise<void> {
         let reward:number = 1
         let teamKill:boolean = false
         let TempStr:String = "Temp"
+        let modifier:number = 0.1
         if (eventObj.data.initiator && eventObj.data.initiator.unitId) {
             const iUnitId = eventObj.data.initiator.unitId;
             const iUnit = await ddcsControllers.unitActionRead({unitId: iUnitId});
@@ -55,6 +56,7 @@ export async function processEventKill(eventObj: any): Promise<void> {
                 if (killingWeaponDict){
                     console.log("killing Weapon Multiplier:",killingWeaponDict.warbondKillMultiplier)
                     reward = Math.round(killedUnitDict.warbondCost * killingWeaponDict.warbondKillMultiplier)
+                    modifier = killingWeaponDict.warbondKillMultiplier
                 } else {
                     reward = Math.round(killedUnitDict.warbondCost * 0.1)
                 }
@@ -171,7 +173,7 @@ export async function processEventKill(eventObj: any): Promise<void> {
         }
 
         await ddcsControllers.sendMessageToAll(
-            initSideStr +" "+ initMesg + " has killed " + targetSideStr +" "+ targetMesg + " with " + weaponMesg + "("+ reward+ " "+TempStr+"Warbonds)\n",
+            initSideStr +" "+ initMesg + " has killed " + targetSideStr +" "+ targetMesg + " with " + weaponMesg+"[μ"+modifier +"]"+ "("+ reward+ " "+TempStr+"Warbonds)\n",
             10,
             nowTime + ddcsControllers.time.oneMin
         );
