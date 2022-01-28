@@ -172,6 +172,7 @@ export async function internalCargo(curUnit: any, curPlayer: any, intCargoType: 
             const bases = await ddcsControllers.baseActionRead({});
             const playerProx: any [] = [];
             for (const base of bases) {
+                console.log("ddcsControllers.isPlayerInProximity(",base.centerLoc, engineCache.config.intCargoLoadDistance, curUnit.playername)
                 const curCheckAllBase = await ddcsControllers.isPlayerInProximity(base.centerLoc, engineCache.config.intCargoLoadDistance, curUnit.playername);
                 playerProx.push(curCheckAllBase);
                 if (curCheckAllBase) {
@@ -918,6 +919,7 @@ export async function menuCmdProcess(pObj: any) {
                     break;
                 case "InternalCargo":
                     if (true){
+                        console.log("curUnit:",curUnit,"\ncurPlayer:",curPlayer,"\npObj.type:",pObj.type)
                         await internalCargo(curUnit, curPlayer, pObj.type);
                     } else {
                         if (curUnit.inAir || curUnit.speed > 0.5) {
