@@ -1701,7 +1701,7 @@ export async function unpackCrate(
                     SpawnHeading = SpawnHeading +addSpawnHeading;
                 }
             }
-            const tRem = (Object.keys(grpGroups).length + (newSpawnArray.length -1)) - engineCache.config.maxUnitsMoving;
+            const tRem = (Object.keys(grpGroups).length) - engineCache.config.maxUnitsMoving;
             if((unpackCost*engineCache.config.slingableDiscount) < curPlayer.warbonds){
                 await ddcsControllers.removeWarbonds(curPlayer,playerUnit,"unpackedUnits",true,Math.round(unpackCost*engineCache.config.slingableDiscount));
                 console.log(newSpawnArray.length);
@@ -1914,7 +1914,7 @@ export async function spawnRinGroups(
                 SpawnHeading = SpawnHeading +addSpawnHeading;
             }
         }
-        const tRem = (Object.keys(grpGroups).length + (newSpawnArray.length -1)) - engineCache.config.maxUnitsMoving;
+        const tRem = (Object.keys(grpGroups).length) - engineCache.config.maxUnitsMoving;
             console.log(newSpawnArray.length);
             for (const gUnitKey of Object.keys(grpGroups)) {
                 if (curUnit <= tRem) {
