@@ -27,7 +27,7 @@ export async function processEventBirth(eventObj: any): Promise<void> {
             const playerArray = await ddcsControllers.srvPlayerActionsRead({sessionName: ddcsControllers.getSessionName()});
             //console.log("PA: ", playerArray);
             if (curIUnit) {
-                console.log("Player with name",curIUnit.playername,"tried to spawn");
+                //console.log("Player with name",curIUnit.playername,"tried to spawn");
                 const iPlayer = _.find(playerArray, {name: curIUnit.playername});
                 //console.log("playerarray: ", iPlayer, curIUnit);
                 if (iPlayer) {
@@ -45,16 +45,16 @@ export async function processEventBirth(eventObj: any): Promise<void> {
                     let enemyCoalition = 0
                     //console.log("Spawning Unit Coalition:",iPlayer.sideLock)
                     if (iPlayer.sideLock == 1 || iPlayer.side == 1){
-                        console.log("I'm sidelocked to 1")
+                        //console.log("I'm sidelocked to 1")
                         enemyCoalition = 2                        
                     } else {
-                        console.log("I'm sidelocked to 2")
+                        //console.log("I'm sidelocked to 2")
                         enemyCoalition = 1
                     }
                     const enemiesNearby = await ddcsControllers.getCoalitionGroundUnitsInProximity(curIUnit.lonLatLoc, 0.5, enemyCoalition);
                     //console.log("enemiesNearby.length:",enemiesNearby.length);
                     if (enemiesNearby.length >> 0){
-                        console.log("There were enemies nearby to",iPlayer.name,". Units were:",enemiesNearby);
+                        //console.log("There were enemies nearby to",iPlayer.name,". Units were:",enemiesNearby);
                         await ddcsControllers.forcePlayerSpectator(
                             iPlayer.playerId,
                             "There are enemy ground units near(<500m) the aircraft you attempted to spawn in, you were unable to reach the aircraft."

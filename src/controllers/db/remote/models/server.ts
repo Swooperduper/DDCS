@@ -54,6 +54,10 @@ export function serverModel(dbconn: mongoose.Connection): mongoose.Document | {}
                 type: Number,
                 default: 0.5
             },
+            ejectionRefundModifier:{
+                type: Number,
+                default: 0.2
+            },
             maxCoaltionFactories: {
                 type: Number,
                 default: 6
