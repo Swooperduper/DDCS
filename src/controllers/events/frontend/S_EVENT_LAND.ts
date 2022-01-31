@@ -69,7 +69,7 @@ export async function processEventLand(eventObj: any): Promise<void> {
                 }
                 if (_.includes(engineCache.config.freeAirframeBases,curUnit.groupName.split(" @")[0])){
                     curUnitWarbondCost = 0;
-                    console.log(iPlayer.name, " landed off in a free aircraft");
+                    console.log(iPlayer.name, " landed in a free aircraft");
                 }
                 curaddWarbonds = curUnitWarbondCost + weaponCost;
                 warbondsToAdd = warbondsToAdd + curaddWarbonds

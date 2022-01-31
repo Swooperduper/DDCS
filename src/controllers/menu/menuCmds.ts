@@ -672,9 +672,9 @@ export async function menuCmdProcess(pObj: any) {
                                             unitId: pObj.unitId,
                                             troopType: null
                                         });
-                                        let currentMass = 1000;
+                                        let currentMass = 500;
                                         if (curUnit.intCargoType){
-                                            currentMass = 2000 ;
+                                            currentMass = 1000 ;
                                         }                                        
                                         setTimeout(() => {setInternalCargoMass(curUnit.name, currentMass - 500); }, curUnit.agl*500);
                                         setTimeout(() => {setInternalCargoMass(curUnit.name, currentMass - 1000); 
@@ -2675,9 +2675,9 @@ export async function unloadPackedUnit(curUnit:any, curPlayer:any) {
                 "G: A "+curUnit.intCargoType.type+" has successfully been unpacked",
                 5
             );
-            let currentMass = 1000;
+            let currentMass = 500;
             if (curUnit.troopType){
-                currentMass = 2000 ;
+                currentMass = 1000 ;
             }
             await setInternalCargoMass(curUnit.name, currentMass - 1000);
         } else {
