@@ -58,6 +58,13 @@ export async function processUnitUpdates(unitObj: any): Promise<void> {
         // update location of carrier in aircraft DB
         if ((_.includes(curData.name, "Carrier")||_.includes(curData.name, "~CVN")||_.includes(curData.name, "~Kuznetsov")||_.includes(curData.name, "~LHA-1 Tarawa")||_.includes(curData.name, "~Pyotr Velikiy"))&&!_.includes(curData.name,"LSO")) {
             //console.log("carrier update location: ", curUnitName, curData.lonLatLoc);
+            if(curData.lonLatLoc == null){
+                console.log("carrier update location: ", curUnitName, curData.lonLatLoc);
+                curData.lonLatLoc = [
+                    36.310033648499, 
+                    45.404240593378
+                ]
+            }
             await ddcsControllers.baseActionUpdate({_id: curUnitName, centerLoc: curData.lonLatLoc, isResync: true});
         }
 
