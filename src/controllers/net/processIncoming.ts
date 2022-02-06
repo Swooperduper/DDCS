@@ -132,7 +132,7 @@ export async function processingIncomingData(incomingObj: any) {
                     await ddcsController.sendMesgToPlayerChatWindow("-red to choose the red side for this campaign", curPly.playerId);
                     await ddcsController.sendMesgToPlayerChatWindow("-blue to choose the red side for this campaign", curPly.playerId);
                     await ddcsController.sendMesgToPlayerChatWindow("-balance to join the side with the least time played this campaign", curPly.playerId);
-                    await ddcsController.sendMesgToPlayerChatWindow("-swap to join the losing side with less than 10 bases remaining", curPly.playerId);
+                    await ddcsController.sendMesgToPlayerChatWindow("-swap to join the losing side with less than 5 bases remaining", curPly.playerId);
                     await ddcsController.sendMesgToPlayerChatWindow("-refreshmenu if the menu in your logistics aircraft doesn't draw correctly", curPly.playerId);
                 } else if (incomingObj.message === "-joinrandom") {
                     const randSide = _.random(1, 2);

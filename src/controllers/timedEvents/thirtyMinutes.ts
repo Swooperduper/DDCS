@@ -17,13 +17,13 @@ export async function processThirtyMinuteActions(fullySynced: boolean) {
         });
 
         let losingSide = 0;
-        if (currentRedBases.length< 10){
+        if (currentRedBases.length< 5){
             losingSide = 1
-        } else if (currentBlueBases.length < 10) {
+        } else if (currentBlueBases.length < 5) {
             losingSide = 2
         }
         if(losingSide != 0){
-            const msg = "The other team is now down to their last 10 bases, if you'd like to help them out and keep the war going you can now swap to their team with the -swap command";
+            const msg = "The other team is now down to their last 5 bases, if you'd like to help them out and keep the war going you can now swap to their team with the -swap command";
             await ddcsController.sendMesgToCoalition(
                 losingSide,
                 msg,

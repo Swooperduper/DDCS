@@ -73,9 +73,9 @@ export async function swapUserToLosingSide(incomingObj: any): Promise<void> {
             });
 
             let lockToSide = 0;
-            if (currentRedBases.length< 10){
+            if (currentRedBases.length< 5){
                 lockToSide = 1
-            } else if (currentBlueBases.length < 10) {
+            } else if (currentBlueBases.length < 5) {
                 lockToSide = 2
             }
             if(lockToSide == 0){
